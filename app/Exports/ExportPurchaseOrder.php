@@ -88,7 +88,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     ->where('post_date', '<=', $this->end_date);
                     if(!$this->modedata){
                         $query->where('user_id',session('bo_id'));
-                        
+
                     }
             })
             ->where(function($query){
@@ -105,7 +105,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     ->where('post_date', '<=', $this->end_date);
                     if(!$this->modedata){
                         $query->where('user_id',session('bo_id'));
-                        
+
                     }
             })
             ->where(function($query){
@@ -125,7 +125,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
             $discount = $row->discountHeader() * $row->purchaseOrder->currency_rate;
             $total = $subtotal - $discount;
             if($row->item()->exists()){
-              
+
                 if(!$row->deleted_at ||($row->deleted_at&&$row->purchaseOrder->deleted_at)){
                     $no++;
                     $arr[] = [
@@ -154,7 +154,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                         'plant'             => $row->place()->exists() ? $row->place->code : '',
                         'note'              => $row->note,
                         'note2'             => $row->note2,
-                        'note3'             => $row->note3,
+                        'note3'             => $row->goodScale->code ?? '-',
                         'qty'               => $row->qty,
                         'unit'              => $row->itemUnit->unit->code,
                         'qty_stock'         => $row->qty * $row->qty_conversion,
@@ -228,7 +228,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     ];
                 }
             }
-            
+
         }
 
         activity()

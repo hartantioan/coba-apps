@@ -24,7 +24,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
 		$this->end_date = $end_date ? $end_date : '';
         $this->status = $status ? $status : '';
         $this->type_buy = $type_buy ? $type_buy : '';
-       
+
         $this->type_deliv = $type_deliv ? $type_deliv : '';
         $this->company = $company ? $company : '';
         $this->type_pay = $type_pay ? $type_pay : '';
@@ -112,13 +112,13 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
                         });
                     });
             });
-    
+
             // Other conditions for the 'purchaseOrder' relationship
             if($this->status){
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
             }
-    
+
             if($this->start_date && $this->end_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
                     ->whereDate('post_date', '<=', $this->end_date);
@@ -127,33 +127,33 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
             } else if($this->end_date) {
                 $query->whereDate('post_date','<=', $this->end_date);
             }
-    
+
             if($this->type_buy){
                 $query->where('inventory_type',$this->type_buy);
             }
-    
+
             if($this->type_deliv){
                 $query->where('shipping_type',$this->type_deliv);
             }
-    
+
             if($this->supplier){
                 $groupIds = explode(',', $this->supplier);
                 $query->whereIn('account_id',$groupIds);
             }
-            
+
             if($this->company){
                 $query->where('company_id',$this->company);
             }
-    
+
             if($this->type_pay){
                 $query->where('payment_type',$this->type_pay);
-            }                
-            
+            }
+
             if($this->currency){
                 $groupIds = explode(',', $this->currency);
                 $query->whereIn('currency_id',$groupIds);
             }
-    
+
             if(!$this->modedata){
                 $query->where('user_id',session('bo_id'));
             }
@@ -166,7 +166,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
                     });
         })
         ->get();
-    
+
 
         foreach($data as $key => $row){
             $subtotal = $row->subtotal * $row->purchaseOrder->currency_rate;
@@ -201,7 +201,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
                     'plant'             => $row->place()->exists() ? $row->place->code : '',
                     'note'              => $row->note,
                     'note2'             => $row->note2,
-                    'note3'             => $row->note3,
+                    'note3'             => $row->goodScale->code ?? '-',
                     'qty'               => $row->qty,
                     'unit'              => $row->itemUnit->unit->code,
                     'qty_stock'         => $row->qty * $row->qty_conversion,
@@ -273,7 +273,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
                     'based_on'          => $row->getReference(),
                 ];
             }
-            
+
         }
 
         return collect($arr);

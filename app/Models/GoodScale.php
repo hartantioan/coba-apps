@@ -79,6 +79,16 @@ class GoodScale extends Model
         return $has;
     }
 
+    public function typeDelivery(){
+        $has = '';
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable_type == 'marketing_order_deliveries'){
+                $has = $row->lookable->deliveryType();
+            }
+        }
+        return $has;
+    }
+
     public function getSalesSuratJalan(){
         $arr = [];
         foreach($this->goodScaleDetail as $row){

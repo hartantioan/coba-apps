@@ -27,7 +27,7 @@ class ReportSalesGoodScaleController extends Controller
     {
         $data = [
             'title'         => 'Laporan Timbangan Penjualan',
-            'content'       => 'admin.sales.recap_good_Scale',
+            'content'       => 'admin.sales.recap_good_scale',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

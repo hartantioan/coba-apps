@@ -101,6 +101,7 @@ class MarketingOrderController extends Controller
     }
 
     public function getSalesItemInformation(Request $request){
+        info($request);
         $item = Item::find($request->item_id);
         $place = Place::where('code',$request->place_code)->first();
         $account_id   = $request->account_id;
@@ -111,12 +112,10 @@ class MarketingOrderController extends Controller
         $user = User::find($account_id);
         $transportation = Transportation::find($request->transportation_id);
         $cek_price = ItemPricelist::where('group_id',$user->group_id)
-            ->where('brand_id',$item->brand_id)
             ->where('grade_id',$item->grade_id)
             ->where('place_id',$place->id)
-            ->where('customer_id',$account_id)
-            ->whereDate('start_date', '<=', $date)
-            ->whereDate('end_date', '>=', $date)
+            ->where('city_id',$city)
+            ->where('type_id',$item->type_id)
             ->where('status','1')
             ->first() ?? 0;
 
@@ -149,7 +148,7 @@ class MarketingOrderController extends Controller
             'old_prices'        => $item->oldSalePrices($this->dataplaces),
             'list_warehouse'    => $item->warehouseList(),
             'list_outletprice'  => $item->listOutletPrice(),
-            'price'             => $cek_price->price ?? 0,
+            'price'             => $cek_price->sell_price ?? 0,
             'price_delivery'    => $cek_delivery->price ?? 0,
             'price_bp'          => $cek_type->price ?? 0,
             'disc1'             => $cek_discount->disc1 ?? 0,
@@ -644,7 +643,7 @@ class MarketingOrderController extends Controller
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Untuk tipe pembayaran DP, prosentase DP (%) harus diinput tidak boleh 0.',
-                        ]); 
+                        ]);
                     }
                 }
 

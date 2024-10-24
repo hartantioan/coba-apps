@@ -17,15 +17,17 @@ class ItemPricelist extends Model
         'code',
         'user_id',
         'type_id',
+        'province_id',
+        'city_id',
+        'type_delivery',
+        'grade_id',
+        'price',
         'group_id',
         'place_id',
-        'grade_id',
-        'customer_id',
-        'brand_id',
-        'type_delivery',
-        'start_date',
-        'end_date',
-        'price',
+
+        'discount',
+        'sell_price',
+
         'status',
     ];
     public function type(){
@@ -39,11 +41,17 @@ class ItemPricelist extends Model
     public function customer(){
         return $this->belongsTo('App\Models\User','customer_id','id')->withTrashed();
     }
-    public function brand(){
-        return $this->belongsTo('App\Models\Brand','brand_id','id')->withTrashed();
-    }
+
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
+    }
+
+    public function province(){
+        return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
+    }
+
+    public function city(){
+        return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
     }
 
     public function deliveryType(){
@@ -75,7 +83,7 @@ class ItemPricelist extends Model
     }
 
     public function statusRaw(){
-        
+
         $status = match ($this->status) {
             '1' => 'Aktif',
             '2' => 'Tidak Aktif',

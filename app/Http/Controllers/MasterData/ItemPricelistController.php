@@ -47,14 +47,12 @@ class ItemPricelistController extends Controller
             'code',
             'user_id',
             'type_id',
+            'province_id',
+            'city_id',
             'group_id',
             'place_id',
             'grade_id',
-            'customer_id',
-            'brand_id',
             'type_delivery',
-            'start_date',
-            'end_date',
             'price',
             'status',
         ];
@@ -66,7 +64,7 @@ class ItemPricelistController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ItemPricelist::count();
-        
+
         $query_data = ItemPricelist::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -116,19 +114,19 @@ class ItemPricelistController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->user->name,
-                    $val->type->code ?? '-',
+                    $val->type->name ?? '-',
+                    $val->province->name ?? '-',
+                    $val->city->name ?? '-',
                     $val->group->name,
-                    $val->customer->name ?? '-',
-                    $val->brand->code ?? '-',
                     $val->deliveryType() ?? '-',
                     $val->grade->code ?? '-',
                     $val->place->code.' - '.$val->place->name,
-                    date('d/m/Y',strtotime($val->start_date)),
-                    date('d/m/Y',strtotime($val->end_date)),
+                    number_format($val->discount,2,',','.') ?? 0,
+                    number_format($val->sell_price,2,',','.') ?? '-',
                     number_format($val->price,2,',','.'),
                     $val->status(),
                     '
@@ -162,11 +160,15 @@ class ItemPricelistController extends Controller
             'price'                 => 'required',
             'start_date'            => 'required',
             'end_date'              => 'required',
+            'province_id'       => 'required',
+            'city_id'           => 'required'
         ], [
             'type_id.required'      => 'Tipe Item tidak boleh kosong.',
             'place_id.required'     => 'Plant tidak boleh kosong.',
             'group_id.required'     => 'Group tidak boleh kosong.',
             'price.required'        => 'Harga tidak boleh kosong.',
+            'province_id.required'  => 'Provinsi tidak boleh kosong.',
+            'city_id.required'      => 'Kota tidak boleh kosong.',
             'start_date.required'   => 'Tgl.Mulai Aktif tidak boleh kosong.',
             'end_date.required'     => 'Tgl.Akhir Aktif tidak boleh kosong.',
         ]);
@@ -182,16 +184,16 @@ class ItemPricelistController extends Controller
                 if($request->temp){
                     $query = ItemPricelist::find($request->temp);
                     $query->user_id         = session('bo_id');
-                   
+
                     $query->group_id        = $request->group_id;
                     $query->place_id        = $request->place_id;
-                    $query->brand_id        = $request->brand_id;
-                    $query->customer_id	    = $request->customer_id;
                     $query->type_id         = $request->type_id;
                     $query->grade_id        = $request->grade_id;
                     $query->type_delivery   = $request->type_delivery;
-                    $query->start_date      = $request->start_date;
-                    $query->end_date        = $request->end_date;
+                    $query->province_id     = $request->province_id;
+                    $query->city_id         = $request->city_id;
+                    $query->discount           = str_replace(',','.',str_replace('.','',$request->discount));
+                    $query->sell_price           = str_replace(',','.',str_replace('.','',$request->sell_price));
                     $query->price           = str_replace(',','.',str_replace('.','',$request->price));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
@@ -199,18 +201,18 @@ class ItemPricelistController extends Controller
                     $query = ItemPricelist::create([
                         'code'              => strtoupper(Str::random(15)),
                         'user_id'           => session('bo_id'),
-                     
+
                         'group_id'          => $request->group_id,
                         'place_id'          => $request->place_id,
 
                         'type_id'			=> $request->type_id,
-                        'customer_id'          => $request->customer_id,
-                        'brand_id'          => $request->brand_id,
+                        'province_id'			=> $request->province_id,
+                        'city_id'			=> $request->city_id,
                         'grade_id'			=> $request->grade_id,
                         'type_delivery'          => $request->type_delivery,
 
-                        'start_date'        => $request->start_date,
-                        'end_date'          => $request->end_date,
+                        'discount'             => str_replace(',','.',str_replace('.','',$request->discount)),
+                        'sell_price'             => str_replace(',','.',str_replace('.','',$request->sell_price)),
                         'price'             => str_replace(',','.',str_replace('.','',$request->price)),
                         'status'            => $request->status ? $request->status : '2'
                     ]);
@@ -220,7 +222,7 @@ class ItemPricelistController extends Controller
             }catch(\Exception $e){
                 DB::rollback();
             }
-			
+
 			if($query) {
 
                 activity()
@@ -240,7 +242,7 @@ class ItemPricelistController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -249,16 +251,16 @@ class ItemPricelistController extends Controller
         $bp['price'] = number_format($bp->price,2,',','.');
         $bp['type'] = $bp->type;
         $bp['grade'] = $bp->grade;
-        $bp['customer'] = $bp->customer;
-        $bp['brand'] = $bp->brand;
         $bp['group']= $bp->group;
-        				
+        $bp['province'] = $bp->province;
+        $bp['city']= $bp->city;
+
 		return response()->json($bp);
     }
 
     public function destroy(Request $request){
         $query = ItemPricelist::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new ItemPricelist())

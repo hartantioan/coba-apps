@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\Item;
 use App\Models\ItemGroup;
 use App\Models\Place;
+use App\Models\Region;
 use App\Models\Type;
 use App\Models\User;
 use Maatwebsite\Excel\Excel;
@@ -33,8 +34,8 @@ class ExportTemplatePriceList implements WithEvents
         $Item =  Type::where('status',1)->get();
         $Group = Group::where('type',2)->where('status',1)->get();
         $Place = Place::where('status',1)->get();
-        $Customer = User::where('status',1)->whereIn('type',['2','5'])->get();
-        $Brand = Brand::where('status',1)->get();
+        $city =  Region::whereRaw('LENGTH(code) = 5')->get();
+        $province = Region::whereRaw('LENGTH(code) = 2')->get();
         $Grade = Grade::where('status',1)->get();
 
         $startRow = 2;
@@ -43,7 +44,7 @@ class ExportTemplatePriceList implements WithEvents
             $event->getWriter()->getSheetByIndex(1)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
-        
+
         $startRow = 2;
         foreach($Group as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
@@ -57,25 +58,27 @@ class ExportTemplatePriceList implements WithEvents
             $startRow++;
         }
         $startRow = 2;
-        foreach($Customer as $row){
-            $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->employee_no);
+        foreach($province as $row){
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
-        $startRow = 2;
-        foreach($Brand as $row){
-            $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
-            $startRow++;
-        }
+
         $startRow = 2;
         foreach($Grade as $row){
             $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
-       
-        
+
+        $startRow = 2;
+        foreach($city as $row){
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+
 
         return $event->getWriter()->getSheetByIndex(0);
     }

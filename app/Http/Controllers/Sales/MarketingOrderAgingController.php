@@ -410,7 +410,7 @@ class MarketingOrderAgingController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAgingAR(), 'aging_ar_'.uniqid().'.xlsx');
+		return Excel::download(new ExportAgingAR($request->date,$request->interval,$request->column, $request->type), 'aging_ar_'.uniqid().'.xlsx');
     }
 
     function findDuplicate($value,$array){

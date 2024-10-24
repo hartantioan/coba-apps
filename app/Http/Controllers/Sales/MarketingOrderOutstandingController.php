@@ -41,74 +41,21 @@ class MarketingOrderOutstandingController extends Controller
             })
             ->whereIn('status',['2','3'])
             ->get();
-        $query_data2 = MarketingOrderDownPayment::where(function($query) use ( $request) {
-                if($request->date) {
-                    $query->whereDate('post_date', '<=', $request->date);
-                }
-            })
-            ->whereIn('status',['2','3'])
-            ->get();
-        if($query_data && $query_data2){
+        if($query_data){
             $grandtotalAll = 0;
             foreach($query_data as $row){
-                if($row->balancePaymentIncoming() > 0){
-                    foreach($row->marketingOrderInvoiceDeliveryProcess as $rowdetail){
-                        $price = $rowdetail->getPrice();
-                        $rounding = $rowdetail->getRounding();
-                        $grandtotal = $rowdetail->getGrandtotal();
-                        $memo = $rowdetail->getMemo();
-                        $payment = $rowdetail->getDownPayment() + $rowdetail->getPayment();
-                        $balance = $grandtotal - $memo - $payment;
-                        $array_filter[] = [
-                            'code'              => $row->code,
-                            'customer'          => $row->account->name,
-                            'post_date'         => date('d/m/Y',strtotime($row->post_date)),
-                            'top'               => $row->account->top,
-                            'item_name'         => $rowdetail->lookable->item->name,
-                            'qty_order'         => CustomHelper::formatConditionalQty($rowdetail->lookable->marketingOrderDetail->qty),
-                            'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
-                            'unit'              => $rowdetail->lookable->item->sellUnit->code,
-                            'price'             => number_format($price,2,',','.'),
-                            'total'             => number_format($rowdetail->total,2,',','.'),
-                            'tax'               => number_format($rowdetail->tax,2,',','.'),
-                            'total_after_tax'   => number_format($rowdetail->grandtotal,2,',','.'),
-                            'rounding'          => number_format($rounding,2,',','.'),
-                            'grandtotal'        => number_format($grandtotal,2,',','.'),
-                            'memo'              => number_format($memo,2,',','.'),
-                            'payment'           => number_format($payment,2,',','.'),
-                            'balance'           => number_format($balance,2,',','.'),
-                            'note'              => $rowdetail->note_internal.' - '.$rowdetail->note_external,
-                        ];
-                    }
-                    $grandtotalAll += $balance;
-                }
-            }
-
-            foreach($query_data2 as $row){
-                if($row->balancePaymentIncoming() > 0){
-                    $rounding = 0;
-                    $memo = $row->totalMemo();
-                    $payment = $row->totalPay();
-                    $balance = $row->grandtotal - $memo - $payment;
+                $payment = round($row->totalPayByDate($request->date),2);
+                $balance = round($row->grandtotal - $payment,2);
+                if($balance > 0){
                     $array_filter[] = [
                         'code'              => $row->code,
                         'customer'          => $row->account->name,
                         'post_date'         => date('d/m/Y',strtotime($row->post_date)),
-                        'top'               => $row->account->top,
-                        'item_name'         => '-',
-                        'qty_order'         => 1,
-                        'qty'               => 1,
-                        'unit'              => '-',
-                        'price'             => number_format($row->total,2,',','.'),
-                        'total'             => number_format($row->total,2,',','.'),
-                        'tax'               => number_format($row->tax,2,',','.'),
-                        'total_after_tax'   => number_format($row->grandtotal,2,',','.'),
-                        'rounding'          => number_format(0,2,',','.'),
-                        'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                        'memo'              => number_format($memo,2,',','.'),
-                        'payment'           => number_format($payment,2,',','.'),
-                        'balance'           => number_format($balance,2,',','.'),
+                        'due_date'          => date('d/m/Y',strtotime($row->due_date)),
                         'note'              => $row->note,
+                        'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
+                        'payment'           => CustomHelper::formatConditionalQty($payment),
+                        'balance'           => CustomHelper::formatConditionalQty($balance),
                     ];
                     $grandtotalAll += $balance;
                 }

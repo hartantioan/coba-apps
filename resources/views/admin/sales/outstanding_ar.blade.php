@@ -84,26 +84,16 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TOP(Hari)</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Nama Item</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Note</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Order</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Invoice</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Harga Satuan</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Stl PPN</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Pembulatan</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Keterangan</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="19">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -164,19 +154,9 @@
                                     <td>`+val.code+`</td>
                                     <td>`+val.customer+`</td>
                                     <td class="center-align">`+val.post_date+`</td>
-                                    <td class="center-align">`+val.top+`</td>
-                                    <td>`+val.item_name+`</td>
+                                    <td class="center-align">`+val.due_date+`</td>
                                     <td>`+val.note+`</td>
-                                    <td class="right-align">`+val.qty_order+`</td>
-                                    <td class="right-align">`+val.qty+`</td>
-                                    <td class="center-align">`+val.unit+`</td>
-                                    <td class="right-align">`+val.price+`</td>
                                     <td class="right-align">`+val.total+`</td>
-                                    <td class="right-align">`+val.tax+`</td>
-                                    <td class="right-align">`+val.total_after_tax+`</td>
-                                    <td class="right-align">`+val.rounding+`</td>
-                                    <td class="right-align">`+val.grandtotal+`</td>
-                                    <td class="right-align">`+val.memo+`</td>
                                     <td class="right-align">`+val.payment+`</td>
                                     <td class="right-align">`+val.balance+`</td>
                                 </tr>

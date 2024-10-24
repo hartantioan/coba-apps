@@ -352,7 +352,7 @@ class PurchaseInvoice extends Model
     public function hasChildDocumentExceptAdjustRate(){
         $hasRelation = false;
 
-        if($this->hasPaymentRequestDetail()->exists()){
+        if($this->hasPaymentRequestDetailWithPending()->exists()){
             $hasRelation = true;
         }
 

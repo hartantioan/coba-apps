@@ -402,6 +402,11 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
+    public function balancePaymentIncomingByDate($date){
+        $total = $this->grandtotal - $this->totalPayByDate($date);
+        return $total;
+    }
+
     public function totalPay(){
         $total = 0;
 

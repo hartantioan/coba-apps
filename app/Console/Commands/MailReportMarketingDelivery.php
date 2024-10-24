@@ -69,7 +69,7 @@ class MailReportMarketingDelivery extends Command
                 LEFT JOIN items e ON e.id=c.item_id
                 LEFT JOIN types f ON f.id=e.type_id
                 WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01')
-                AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                AND a.post_date<=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                 GROUP BY f.name)c ON a.name=c.tipe
                 ");
 
@@ -104,7 +104,7 @@ class MailReportMarketingDelivery extends Command
                             LEFT JOIN items e ON e.id=c.item_id
                             left join brands g on g.id=e.brand_id and g.deleted_at is null
                             WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01')
-                            AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                            AND a.post_date<=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                             GROUP BY g.name)c ON a.name=c.brand
                             WHERE a.deleted_at IS null
         ");
@@ -138,7 +138,7 @@ class MailReportMarketingDelivery extends Command
 
             $handover_awal = ProductionHandoverDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('productionHandover', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '<', '2024-10-18');
+                    ->where('post_date', '<', NOW());
             })->get();
 
             $totalQty_handover_awal = 0;
@@ -153,7 +153,7 @@ class MailReportMarketingDelivery extends Command
 
             $repack_in_awal = ProductionRepackDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('productionRepack', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '<', '2024-10-18');
+                    ->where('post_date', '<', NOW());
             })->sum('qty');
 
             $repack_out_awal = ProductionRepackDetail::where('deleted_at', null)
@@ -162,7 +162,7 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('productionRepack', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '<', '2024-10-18');
+                        ->where('post_date', '<', NOW());
                 })->sum('qty');
 
 
@@ -170,7 +170,7 @@ class MailReportMarketingDelivery extends Command
 
             $goodReceive_awal = GoodReceiveDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('goodReceive', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '<', '2024-10-18');
+                    ->where('post_date', '<', NOW());
             })->sum('qty') ?? 0;
 
             $delivery_process_awal = MarketingOrderDeliveryProcessDetail::where('deleted_at', null)
@@ -179,7 +179,7 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('marketingOrderDeliveryProcess', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '<', '2024-10-18');
+                        ->where('post_date', '<', NOW());
                     // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
                     //     $query->whereIn('status',['2']);
                     // });
@@ -192,7 +192,7 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('marketingOrderDeliveryProcess', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '<', '2024-10-18')
+                        ->where('post_date', '<', NOW())
                         ->whereHas('marketingOrderDeliveryProcessTrack', function ($query) {
                             $query->whereNotIn('status', ['2']);
                         });
@@ -226,15 +226,15 @@ class MailReportMarketingDelivery extends Command
 
             $goodIssue_awal = GoodIssueDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('goodIssue', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '<', '2024-10-18');
+                    ->where('post_date', '<', NOW());
             })->sum('qty') ?? 0;
 
             $awal = ($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal) - ($total_sj_awal + $goodIssue_awal  + $repack_out_awal);
 
             $handover = ProductionHandoverDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('productionHandover', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                    ->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->get();
 
             $total_handover = 0;
@@ -249,8 +249,8 @@ class MailReportMarketingDelivery extends Command
 
             $goodReceive = GoodReceiveDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('goodReceive', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                    ->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->sum('qty') ?? 0;
 
             $delivery_process = MarketingOrderDeliveryProcessDetail::where('deleted_at', null)
@@ -259,8 +259,8 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('marketingOrderDeliveryProcess', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '>=', '2024-10-18')
-                        ->where('post_date', '<=', '2024-10-18')
+                        ->where('post_date', '>=', NOW())
+                        ->where('post_date', '<=', NOW())
                         /* ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
                     $query->whereIn('status',['2']);
                 }) */;
@@ -272,8 +272,8 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('marketingOrderDeliveryProcess', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '>=', '2024-10-18')
-                        ->where('post_date', '<=', '2024-10-18')
+                        ->where('post_date', '>=', NOW())
+                        ->where('post_date', '<=', NOW())
                         ->whereHas('marketingOrderDeliveryProcessTrack', function ($query) {
                             $query->whereNotIn('status', ['2']);
                         });
@@ -300,14 +300,14 @@ class MailReportMarketingDelivery extends Command
 
             $goodIssue = GoodIssueDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('goodIssue', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                    ->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->sum('qty') ?? 0;
 
             $repack_in = ProductionRepackDetail::where('item_shading_id', $row->id)->where('deleted_at', null)->whereHas('productionRepack', function ($query) use ($row) {
                 $query->whereIn('status', ["2", "3"])
-                    ->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                    ->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->sum('qty');
 
             $repack_out = ProductionRepackDetail::where('deleted_at', null)
@@ -316,8 +316,8 @@ class MailReportMarketingDelivery extends Command
                 })
                 ->whereHas('productionRepack', function ($query) use ($row) {
                     $query->whereIn('status', ["2", "3"])
-                        ->where('post_date', '>=', '2024-10-18')
-                        ->where('post_date', '<=', '2024-10-18');
+                        ->where('post_date', '>=', NOW())
+                        ->where('post_date', '<=', NOW());
                 })->sum('qty');
 
 
@@ -376,8 +376,8 @@ class MailReportMarketingDelivery extends Command
                         $query->where('box_conversion', '>', 1);
                     });
             })->whereHas('marketingOrderDelivery', function ($query) {
-                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
             $first_mod_p = MarketingOrderDeliveryDetail::whereHas('item', function ($q) use ($v) {
@@ -386,8 +386,8 @@ class MailReportMarketingDelivery extends Command
                         $query->where('box_conversion', '>', 1);
                     });
             })->whereHas('marketingOrderDelivery', function ($query) {
-                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->first();
 
             if ($first_mod_p) {
@@ -404,8 +404,8 @@ class MailReportMarketingDelivery extends Command
                         $query->where('box_conversion', '=', 1);
                     });
             })->whereHas('marketingOrderDelivery', function ($query) {
-                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
             $first_mod_b = MarketingOrderDeliveryDetail::whereHas('item', function ($q) use ($v) {
@@ -414,8 +414,8 @@ class MailReportMarketingDelivery extends Command
                         $query->where('box_conversion', '=', 1);
                     });
             })->whereHas('marketingOrderDelivery', function ($query) {
-                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->first();
 
 
@@ -431,8 +431,8 @@ class MailReportMarketingDelivery extends Command
                         $query->where('box_conversion', '=', 0);
                     });
             })->whereHas('marketingOrderDelivery', function ($query) {
-                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', '2024-10-18')
-                    ->where('post_date', '<=', '2024-10-18');
+                $query->whereIn('status', ['2', '3'])->where('post_date', '>=', NOW())
+                    ->where('post_date', '<=', NOW());
             })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
 

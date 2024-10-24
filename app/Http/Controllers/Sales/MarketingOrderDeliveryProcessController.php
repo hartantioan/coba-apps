@@ -96,9 +96,9 @@ class MarketingOrderDeliveryProcessController extends Controller
             ->first();
 
             if($data){
-                $qtyStock = round($data->balanceWithUnsent() / $request->conversion,3);
+                $qtyStock = round($data->balanceWithUnsent() / round($request->conversion,3),3);
+                info($qtyStock);
                 $qtyNeeded = 1;
-                info($data->balanceWithUnsent());
                 if($qtyStock < $qtyNeeded){
                     $response = [
                         'status'  => 500,

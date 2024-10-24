@@ -75,8 +75,8 @@
                                     Hasil
                                 </h4>
                                 <div class="row">
-                                    <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result" style="width:2500px;">
+                                    <div class="col s12 m12">
+                                        <div class="result">
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>
@@ -93,7 +93,7 @@
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -164,19 +164,19 @@
                         });
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="right-align" colspan="18"><b><h6>TOTAL</h6></b></td>
+                                <td class="right-align" colspan="8"><b><h6>TOTAL</h6></b></td>
                                 <td class="right-align"><b><h6>` + response.grandtotal + `</h6></b></td>
                             </tr>
                         `);
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="" colspan="19">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
+                                <td class="" colspan="9">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
                             </tr>
                         `);
                     }else{
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="center-align" colspan="19">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="9">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }

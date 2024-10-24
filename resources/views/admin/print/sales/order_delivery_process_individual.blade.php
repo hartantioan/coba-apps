@@ -379,7 +379,7 @@
 
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->marketingOrderDelivery->transportation->name }}/
-                                            {{ ($data->no_container ?? '-').' - No. Seal '.$data->seal_no }}
+                                            {{ ($data->no_container ?? '-').' - NO. SEAL '.$data->seal_no }}
                                         </td>
                                     </tr>
                                     <tr>

@@ -798,6 +798,23 @@ class ProductionHandoverController extends Controller
         $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+            $stockUsed = false;
+            foreach($query->productionHandoverDetail as $row){
+                $cekStock = ItemStock::where('production_batch_id',$row->productionBatch->id)->first();
+                if($cekStock){
+                    if(round($cekStock->qty,3) !== round($row->qty * $row->productionFgReceiveDetail->conversion,3)){
+                        $stockUsed = true;
+                    }
+                }
+            }
+
+            if($stockUsed) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Stock telah dipakai.'
+                ]);
+            }
+
             if(!CustomHelper::checkLockAcc($query->post_date)){
                 return response()->json([
                     'status'  => 500,

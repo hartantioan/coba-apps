@@ -81,14 +81,14 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>Tipe Item</th>
+                                                        <th>Provinsi</th>
+                                                        <th>Kota</th>
                                                         <th>Grup BP</th>
-                                                        <th>Customer</th>
-                                                        <th>Brand</th>
                                                         <th>Tipe Pengiriman</th>
                                                         <th>Grade</th>
                                                         <th>{{ __('translations.plant') }}</th>
-                                                        <th>Tgl.Mulai Aktif</th>
-                                                        <th>Tgl.Akhir Aktif</th>
+                                                        <th>Disc.</th>
+                                                        <th>Harga Jual</th>
                                                         <th>{{ __('translations.price') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -101,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -134,18 +134,16 @@
                             <label for="group_id" class="">Group Customer</label>
                         </div>
                         <div class="input-field col s12 m3">
-                            
-                            <select class="browser-default" id="customer_id" name="customer_id"></select>
-                            <label class="active" for="customer_id">Customer</label>
+                            <select class="browser-default" id="province_id" name="province_id"></select>
+                            <label class="active" for="province_id">{{ __('translations.province') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
-                            
-                            <select class="browser-default" id="brand_id" name="brand_id"></select>
-                            <label class="active" for="brand_id">Brand</label>
+                            <select class="browser-default" id="city_id" name="city_id"></select>
+                            <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s12 m12"></div>
                         <div class="input-field col s12 m3">
-                            
+
                             <select class="browser-default" id="grade_id" name="grade_id"></select>
                             <label class="active" for="grade_id">Grade</label>
                         </div>
@@ -172,12 +170,12 @@
                         </div>
                         <div class="input-field col s12 m12"></div>
                         <div class="input-field col s12 m3">
-                            <input id="start_date" name="start_date" type="date" value="{{ date('Y-m-d') }}">
-                            <label class="active" for="start_date">Tgl. Mulai Aktif</label>
+                            <input id="discount" name="discount" type="text" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="discount">Diskon</label>
                         </div>
                         <div class="input-field col s12 m3">
-                            <input id="end_date" name="end_date" type="date" value="{{ date('Y-m-d') }}">
-                            <label class="active" for="end_date">Tgl. Akhir Aktif</label>
+                            <input id="sell_price" name="sell_price" type="text" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="sell_price">Harga Jual</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <div class="switch mb-1">
@@ -251,13 +249,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -275,7 +273,7 @@
         $('#modal_import').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
@@ -312,8 +310,8 @@
                     } else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
-                       
+
+
                     } else {
                         M.toast({
                             html: response.message
@@ -352,8 +350,8 @@
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         console.log(response);
-                        let errorMessage = response.status === 400 ? 
-                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                        let errorMessage = response.status === 400 ?
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` :
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
 
                         $('#validation_alertImport').append(`
@@ -377,11 +375,11 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
-                
+
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -394,14 +392,13 @@
                 M.updateTextFields();
                 $('#type_id').empty();
                 $('#customer_id').empty();
-                $('#brand_id').empty();
                 $('#grade_id').empty();
             }
         });
 
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
-        select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
-        select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
+        select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
+        select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
     });
 
@@ -461,18 +458,18 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -499,7 +496,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -567,16 +564,16 @@
                 $('#grade_id').empty().append(`
                     <option value="` + response.grade_id + `">` + response.grade['name'] + `</option>
                 `);
-                $('#customer_id').empty().append(`
-                    <option value="` + response.customer_id + `">` + response.customer['name'] + `</option>
+
+                $('#province_id').empty().append(`
+                    <option value="` + response.province_id + `">` + response.province['name'] + `</option>
                 `);
-                $('#brand_id').empty().append(`
-                    <option value="` + response.brand_id + `">` + response.brand['name'] + `</option>
+                $('#city_id').empty().append(`
+                    <option value="` + response.city_id + `">` + response.city['name'] + `</option>
                 `);
-                
                 $('#type_delivery').val(response.type_delivery).formSelect();
-                $('#start_date').val(response.start_date);
-                $('#end_date').val(response.end_date);
+                $('#sell_price').val(response.sell_price);
+                $('#discount').val(response.discount);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#group_id').val(response.group_id).formSelect();
                 $('#price').val(response.price);
@@ -646,7 +643,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        
+
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status;
     }
 </script>

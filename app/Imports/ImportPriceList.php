@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exceptions\RowImportException;
 use App\Models\Brand;
 use App\Models\Grade;
+use App\Models\Region;
 use App\Models\Type;
 use App\Models\User;
 use DateTime;
@@ -31,7 +32,7 @@ class ImportPriceList implements WithMultipleSheets
         ->log('From excel item price list to database.');
         return [
             0 => new handleItemPriceList(),
-           
+
         ];
     }
 }
@@ -51,29 +52,27 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                 $group_code = explode('#', $row['group'])[0];
                 $group = Group::where('code',$group_code)->first();
 
-                $customer_code = explode('#', $row['customer'])[0];
-                $customer = User::where('employee_no',$customer_code)->first();
-                $brand_code = explode('#', $row['brand'])[0];
-                $brand = Brand::where('code',$brand_code)->first();
+                $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
+                $city_id = Region::where('code',$city)->first()->id;
+
+                $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
+                $province_id = Region::where('code',$province)->first()->id ?? null;
                 $grade_code = explode('#', $row['grade'])[0];
                 $grade = Grade::where('code',$grade_code)->first();
                 $delivery_type = explode('#', $row['tipe_delivery'])[0];
-                
+
                 if(!$item && $this->error ==null){
                     $this->error = "type.";
                 }elseif(!$group && $this->error ==null){
                     $this->error = "Group.";
-                }elseif(!$customer && $this->error ==null){
-                    $this->error = "Customer.";
-                }elseif(!$brand && $this->error ==null){
-                    $this->error = "BRAND.";
                 }elseif(!$grade && $this->error ==null){
                     $this->error = "GRADE.";
+                }elseif(!$province_id && $this->error ==null){
+                    $this->error = "Provinsi.";
+                }elseif(!$city_id && $this->error ==null){
+                    $this->error = "Kota.";
                 }
-                $dateTime1 = DateTime::createFromFormat('U', ($row['startdate'] - 25569) * 86400);
-                $dateFormatted_1 = $dateTime1->format('Y/m/d');
-                $dateTime2 = DateTime::createFromFormat('U', ($row['enddate'] - 25569) * 86400);
-                $dateFormatted_2 = $dateTime2->format('Y/m/d');
+
                 if(!$this->error){
                     $query = ItemPricelist::create([
                         'code'              => strtoupper(Str::random(15)),
@@ -81,25 +80,26 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                         'type_id'           => $item->id,
                         'group_id'          => $group->id,
                         'place_id'          => $place->id,
-                        'customer_id'       => $customer->id,
-                        'brand_id'          => $brand->id,
                         'grade_id'          => $grade->id,
-                        'start_date'        => $dateFormatted_1,
-                        'end_date'          => $dateFormatted_2,
+                        'province_id'       => $province_id,
+                        'city_id'           => $city_id,
                         'type_delivery'     => $delivery_type,
                         'price'             => $row['price'],
+                        'sell_price'        => $row['harga_jual'],
+                        'discount'          => $row['discount'],
                         'status'            => '1',
                     ]);
-                    
+
                 }else{
-                         
+
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
                 }
-                
+
             }else{
-                return null;
-            } 
+                $sheet='Header';
+                throw new RowImportException("Plant Belum terisi", $row->getIndex(),'mohon diisi',$sheet);
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();

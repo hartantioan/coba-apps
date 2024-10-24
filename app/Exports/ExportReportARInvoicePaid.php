@@ -7,9 +7,10 @@ use App\Models\MarketingOrderInvoice;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
+class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStrictNullComparison
 {
     protected $start_date, $finish_date;
 

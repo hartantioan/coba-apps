@@ -150,10 +150,10 @@
             },
             beforeSend: function() {
                 $('#validation_alert_multi').html('');
-                loadingOpen('#main-display');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
                     if(response.data.length > 0){
@@ -206,7 +206,7 @@
                     });
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
-                    $('#main-display').scrollTop(0);
+                    $('#main').scrollTop(0);
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -234,8 +234,8 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

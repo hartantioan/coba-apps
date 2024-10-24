@@ -190,10 +190,10 @@
             },
             beforeSend: function() {
                 $('#validation_alert').html('');
-                loadingOpen('#main-display');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('.result').html('');
                     if(response.content){
@@ -213,8 +213,8 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

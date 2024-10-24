@@ -132,9 +132,7 @@ class ItemStock extends Model
         ->get();
 
         foreach($modp as $row){
-            if(!$row->marketingOrderDeliveryProcess->isItemSent()){
-                $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);
-            }
+            $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);
         }
 
         return $balance;

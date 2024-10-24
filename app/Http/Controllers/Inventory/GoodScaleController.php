@@ -20,6 +20,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\GoodScaleDetail;
+use App\Models\WeightHistory;
 use App\Models\Item;
 use App\Models\ItemUnit;
 use App\Models\MarketingOrderDelivery;
@@ -866,7 +867,14 @@ class GoodScaleController extends Controller
         if($gs){
             $qty_in = 0;
             if($gs->type == '1'){
-                $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
+                $lastWeight = WeightHistory::orderByDesc('id')->first();
+                $weightOut = round(str_replace(',',replace: '.',subject: str_replace('.','',$request->qtyOutUpdate)));
+                if($lastWeight){
+                    if(intval($weightOut) !== intval($lastWeight->rawdata)){
+                        $weightOut = intval($lastWeight->rawdata);
+                    }
+                }
+                $balanceweight = $gs->qty_in - $weightOut;
                 $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
                 $balancegrpo = $gs->purchaseOrderDetail->qtyGR();
                 $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
@@ -889,7 +897,13 @@ class GoodScaleController extends Controller
 
                 $qty_final -= $qty_qc;
             }else{
+                $lastWeight = WeightHistory::orderByDesc('id')->first();
                 $balanceweight = str_replace(',','.',str_replace('.','',$request->qtyBalanceUpdate));
+                if($lastWeight){
+                    if(intval($balanceweight) !== intval($lastWeight->rawdata)){
+                        $balanceweight = intval($lastWeight->rawdata);
+                    }
+                }
                 $qty_in = $gs->qty_out + $balanceweight;
 
                 $qty_qc = 0;

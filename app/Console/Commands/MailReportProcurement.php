@@ -39,7 +39,7 @@ class MailReportProcurement extends Command
             $data2 = [];
             $scale2 =  DB::table('item_stocks')
                 ->leftJoin('items', 'items.id', '=', 'item_stocks.item_id')
-                ->whereIn('items.item_group_id', ['2'])
+                ->whereIn('items.item_group_id', ['2','4','5','39','40','41','42'])
                 ->get(['items.name', 'item_stocks.qty']);
             foreach ($scale as $row) {
                 $data[] = [

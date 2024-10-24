@@ -219,8 +219,10 @@ use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
 use App\Http\Controllers\Accounting\ReportAccountingSales;
 use App\Http\Controllers\Accounting\StockInRupiahShadingController;
+use App\Http\Controllers\Accounting\ReportTransaction_CogsController;
 use App\Http\Controllers\Accounting\StockInRupiahShading_BatchController;
 use App\Http\Controllers\Finance\HistoryEmployeeReceivableController;
+use App\Http\Controllers\Finance\ReportARInvoicePaidController;
 use App\Http\Controllers\Inventory\GoodReturnIssueController;
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -3156,6 +3158,13 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter', [HistoryEmployeeReceivableController::class, 'filter']);
                         Route::get('export', [HistoryEmployeeReceivableController::class, 'export']);
                     });
+
+                    Route::prefix('report_ar_invoice_paid')->middleware('operation.access:report_ar_invoice_paid,view')->group(function () {
+                        Route::get('/', [ReportARInvoicePaidController::class, 'index']);
+                        Route::post('filter', [ReportARInvoicePaidController::class, 'filter']);
+                        Route::get('export', [ReportARInvoicePaidController::class, 'export']);
+                    });
+
                     Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
                         Route::get('/', [CashBankController::class, 'index']);
                         Route::get('datatable', [CashBankController::class, 'datatable']);
@@ -3465,6 +3474,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [StockInRupiahShadingController::class, 'index']);
                         Route::post('filter', [StockInRupiahShadingController::class, 'filter']);
                         Route::post('export', [StockInRupiahShadingController::class, 'export']);
+                    });
+
+                    Route::prefix('report_transaction_cogs')->middleware('operation.access:report_transaction_cogs,view')->group(function () {
+                        Route::get('/', [ReportTransaction_CogsController::class, 'index']);
+                        Route::post('filter', [ReportTransaction_CogsController::class, 'filter']);
+                        Route::post('export', [ReportTransaction_CogsController::class, 'export']);
                     });
 
                     Route::prefix('report_stock_in_rupiah_shading_batch')->middleware('operation.access:report_stock_in_rupiah,view')->group(function () {

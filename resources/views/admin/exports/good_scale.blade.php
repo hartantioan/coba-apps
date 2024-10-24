@@ -16,6 +16,7 @@
             <th>Tgl Terima</th>
             <th>Tipe Timbangan</th>
             <th>No SJ</th>
+            <th>Tipe Pengiriman</th>
             <th>No Kendaraan</th>
             <th>Supir</th>
             <th>{{ __('translations.note') }}</th>
@@ -69,6 +70,7 @@
                         {{ $row->getSalesSuratJalan() }}
                     @endif
                 </td>
+                <td>{{ $row->typeDelivery()}}</td>
                 <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>
                 <td>{{ $row->note }}</td>

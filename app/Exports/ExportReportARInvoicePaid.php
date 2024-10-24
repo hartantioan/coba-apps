@@ -57,7 +57,6 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
         $keys= 1;
         foreach ($query_invoice as $row) {
 
-            info($row->type);
             if($row->incomingPaymentDetail()->exists()){
                 foreach($row->incomingPaymentDetail as $key=>$row_ip){
                     if($row_ip->incomingPayment->coa()->exists()){

@@ -123,8 +123,6 @@ class ItemStock extends Model
 
     public function balanceWithUnsent(){
         $balance = $this->qty;
-
-        info($balance);
         
         $modp = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
             $query->where('status','2');

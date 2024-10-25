@@ -92,6 +92,13 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
             }
             elseif($row->marketingOrderInvoiceDownPayment()->exists()){
                 foreach($row->marketingOrderInvoiceDownPayment as $row_dp){
+                    $arr_ipym = '';
+                    $arr_tgl_ipym = '';
+                    if($row_dp->lookable->incomingPaymentDetail()->exists()){
+                        info($row_dp->lookable->getCodeIncomingPayments());
+                        $arr_ipym = $row_dp->lookable->getCodeIncomingPayments()[0];
+                        $arr_tgl_ipym = $row_dp->lookable->getCodeIncomingPayments()[1];
+                    }
                     $arr[] = [
                         'No'                =>$keys,
                         'No. ARIN'          => $row->code,
@@ -112,8 +119,8 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                         'DP/TOP'=>$row->type(),
                         'Tgl APDP'=>date('d/m/Y',strtotime($row_dp->lookable->post_date)),
                         'No. APDP'=>$row_dp->lookable->code,
-                        'Tgl IPYM'=>'',
-                        'No. IPYM'=>'',
+                        'Tgl IPYM'=>$arr_tgl_ipym,
+                        'No. IPYM'=>$arr_ipym,
                         'Sisa Nominal Inv'=>$row->balancePaymentIncoming(),
                     ];
                 }

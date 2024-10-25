@@ -220,7 +220,7 @@ class ProductionFgReceiveController extends Controller
     public function getDocumentBarcode(Request $request){
 
         $barcode = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
-            $query->where('production_order_detail_id',$request->production_order_detail_id);
+            $query->where('production_order_detail_id',$request->production_order_detail_id)->where('status','2');
         })
         ->whereDoesntHave('productionFgReceiveDetail')
         ->where(column: function($query)use($request){

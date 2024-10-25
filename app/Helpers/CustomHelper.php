@@ -1027,7 +1027,7 @@ class CustomHelper {
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $gs->id,
 						'post_date'		=> $data->post_date,
-						'note'			=> 'GOOD SCALE NO - '.$gs->account->employee_no,
+						'note'			=> 'BIAYA KIRIM '.$gs->referenceGRPODO(),
 						'status'		=> '3',
 					]);
 
@@ -1047,7 +1047,8 @@ class CustomHelper {
 										'type'			=> '1',
 										'nominal'		=> $delivery_cost,
 										'nominal_fc'    => $delivery_cost,
-										'note'          => 'Biaya Kirim dari Timbangan No. '.$gs->code.' untuk DO No. '.$row->lookable->marketingOrderDeliveryProcess->code,
+										'note'          => $row->lookable->code,
+										'note2'			=> $gs->code,
 										'lookable_type'	=> $gs->getTable(),
 										'lookable_id'	=> $gs->id,
 										'detailable_type'=> $row->getTable(),
@@ -1062,7 +1063,8 @@ class CustomHelper {
 										'type'			=> '2',
 										'nominal'		=> $delivery_cost,
 										'nominal_fc'    => $delivery_cost,
-										'note'          => 'Biaya Kirim dari Timbangan No. '.$gs->code.' untuk DO No. '.$row->lookable->marketingOrderDeliveryProcess->code,
+										'note'          => $row->lookable->code,
+										'note2'			=> $gs->code,
 										'lookable_type'	=> $gs->getTable(),
 										'lookable_id'	=> $gs->id,
 										'detailable_type'=> $row->getTable(),

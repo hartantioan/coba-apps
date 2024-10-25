@@ -87,6 +87,10 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                 }
             }
             elseif($row->marketingOrderInvoiceDownPayment()->exists()){
+                $total = 0;
+                foreach($row->marketingOrderInvoiceDownPayment as $row_dp){
+                    $total += $row_dp->total + $row_dp->tax ;
+                }
                 foreach($row->marketingOrderInvoiceDownPayment as $row_dp){
 
                     $arr[] = [
@@ -103,7 +107,7 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                         'tgl_done'          => $row->doneUser()->exists() ? $row->done_date : '',
                         'ket_done'          => $row->doneUser()->exists() ? $row->done_note : '',
                         'tgl_posting'       => date('d/m/Y',strtotime($row->post_date)),
-                        'Nominal Invoice'   =>$row->subtotal,
+                        'Nominal Invoice'   =>$total,
                         'Bank/COA'          =>'',
                         'Nominal dibayarkan'=>$row_dp->total,
                         'DP/TOP'=>$row->type(),

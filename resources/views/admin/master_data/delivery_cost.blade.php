@@ -737,7 +737,6 @@
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
         var account_id = $('#filter_account').val();
-        console.log(account_id)
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&account=" + account_id +"&da_date=" + end_date ;
 
     }

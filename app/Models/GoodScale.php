@@ -498,12 +498,13 @@ class GoodScale extends Model
                 foreach($this->goodScaleDetail as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         $total += $row->total;
-                        $price = $row->qty > 0 ? $row->total / $row->qty : 0;
+                        $qty = $row->lookable->cost_delivery_type == '1' ? $row->qty : 1;
+                        $price = $row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : $row->total;
                         $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'                     => $purchaseOrder->id,
                             'marketing_order_delivery_process_id'   => $row->lookable->marketingOrderDeliveryProcess->id,
                             'coa_id'                                => $coahutangusahaekspedisi->id,
-                            'qty'                                   => $row->qty,
+                            'qty'                                   => $qty,
                             'coa_unit_id'                           => $unit->id,
                             'price'                                 => round($price,5),
                             'percent_discount_1'                    => 0,

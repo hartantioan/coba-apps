@@ -74,8 +74,6 @@ $cogs = ItemCogs::where('lookable_type', $row_x->getTable())
             if(count($cogs) > 0){
                 if (round($totalInSum,2) != round($total,2)) {
 
-                    info(round($total,2));
-                    info($totalInSum);
                     $arr[]=[
                         'no' =>$keys,
                         'Transaksi'=>$row_x->getTable(),

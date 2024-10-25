@@ -38,10 +38,8 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
         'Bank/COA',
         'Nominal dibayarkan',
         'DP/TOP',
-        'Tgl APDP',
-        'No. APDP',
-        'Tgl IPYM',
-        'No. IPYM',
+        'Tgl APDP / Tgl IPYM',
+        'No. APDP / No. IPYM',
         'Sisa Nominal Inv',
     ];
 
@@ -82,8 +80,6 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                         'Bank/COA'          =>$namecoa,
                         'Nominal dibayarkan'=>$row_ip->total,
                         'DP/TOP'=>$row->type(),
-                        'Tgl APDP'=>'',
-                        'No. APDP'=>'',
                         'Tgl IPYM'=>date('d/m/Y',strtotime($row_ip->incomingPayment->post_date)),
                         'No. IPYM'=>$row_ip->incomingPayment->code,
                         'Sisa Nominal Inv'=>$row->balancePaymentIncoming(),
@@ -92,13 +88,7 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
             }
             elseif($row->marketingOrderInvoiceDownPayment()->exists()){
                 foreach($row->marketingOrderInvoiceDownPayment as $row_dp){
-                    $arr_ipym = '';
-                    $arr_tgl_ipym = '';
-                    if($row_dp->lookable->incomingPaymentDetail()->exists()){
-                        info($row_dp->lookable->getCodeIncomingPayments());
-                        $arr_ipym = $row_dp->lookable->getCodeIncomingPayments()[0];
-                        $arr_tgl_ipym = $row_dp->lookable->getCodeIncomingPayments()[1];
-                    }
+
                     $arr[] = [
                         'No'                =>$keys,
                         'No. ARIN'          => $row->code,
@@ -113,14 +103,12 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                         'tgl_done'          => $row->doneUser()->exists() ? $row->done_date : '',
                         'ket_done'          => $row->doneUser()->exists() ? $row->done_note : '',
                         'tgl_posting'       => date('d/m/Y',strtotime($row->post_date)),
-                        'Nominal Invoice'   =>$row->grandtotal,
+                        'Nominal Invoice'   =>$row->subtotal,
                         'Bank/COA'          =>'',
                         'Nominal dibayarkan'=>$row_dp->total,
                         'DP/TOP'=>$row->type(),
                         'Tgl APDP'=>date('d/m/Y',strtotime($row_dp->lookable->post_date)),
                         'No. APDP'=>$row_dp->lookable->code,
-                        'Tgl IPYM'=>$arr_tgl_ipym,
-                        'No. IPYM'=>$arr_ipym,
                         'Sisa Nominal Inv'=>$row->balancePaymentIncoming(),
                     ];
                 }
@@ -143,8 +131,6 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
                     'Bank/COA'          =>'',
                     'Nominal dibayarkan'=>'',
                     'DP/TOP'=>$row->type(),
-                    'Tgl APDP'=>'',
-                    'No. APDP'=>'',
                     'Tgl IPYM'=>'',
                     'No. IPYM'=>'',
                     'Sisa Nominal Inv'=>$row->balancePaymentIncoming(),

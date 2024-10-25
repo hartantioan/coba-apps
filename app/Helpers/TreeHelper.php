@@ -285,10 +285,13 @@ class TreeHelper {
                             $properties = [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->goodScale->post_date],
                                 ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                ['name'=> "Netto  : ".($good_receipt_detail->goodScale->qty_final !== null ? CustomHelper::formatConditionalQty($good_receipt_detail->goodScale->qty_final) : ' ')],
+                                ['name'=> "Timbang Masuk  : ".($good_receipt_detail->goodScale->time_scale_in !== null ? $good_receipt_detail->goodScale->time_scale_in : ' ')],
+                                ['name'=> "Timbang Keluar  : ".($good_receipt_detail->goodScale->time_scale_out !== null ? $good_receipt_detail->goodScale->time_scale_out : ' ')],
                             ];
 
                             if (!$hide_nominal) {
-                                $properties[] = ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScale).number_format($good_receipt_detail->goodScale->grandtotal,2,',','.')];
+                                $properties[] = [];
                             }
                             $data_gscale = [
                                     'properties'=> $properties,
@@ -3400,11 +3403,14 @@ class TreeHelper {
                     if($query_mo_delivery->goodScaleDetail()->exists()){
                         $properties = [
                             ['name'=> "Tanggal :".$query_mo_delivery->goodScaleDetail->goodScale->post_date],
+                            ['name'=> "Netto  : ".($query_mo_delivery->goodScaleDetail->goodScale->qty_final !== null ? CustomHelper::formatConditionalQty($query_mo_delivery->goodScaleDetail->goodScale->qty_final) : ' ')],
+                            ['name'=> "Timbang Masuk  : ".($query_mo_delivery->goodScaleDetail->goodScale->time_scale_in !== null ? $query_mo_delivery->goodScaleDetail->goodScale->time_scale_in : ' ')],
+                            ['name'=> "Timbang Keluar  : ".($query_mo_delivery->goodScaleDetail->goodScale->time_scale_out !== null ? $query_mo_delivery->goodScaleDetail->goodScale->time_scale_out : ' ')],
                         ];
 
                         if (!$hide_nominal) {
-                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->goodScaleDetail->goodScale->grandtotal,2,',','.')]
-                            ;
+                            // $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->goodScaleDetail->goodScale->grandtotal,2,',','.')]
+                            // ;
                         }
                         $data_mo_delivery_process = [
                             "name"=>$query_mo_delivery->goodScaleDetail->goodScale->code,

@@ -3479,7 +3479,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_transaction_cogs')->middleware('operation.access:report_transaction_cogs,view')->group(function () {
                         Route::get('/', [ReportTransaction_CogsController::class, 'index']);
                         Route::post('filter', [ReportTransaction_CogsController::class, 'filter']);
-                        Route::post('export', [ReportTransaction_CogsController::class, 'export']);
+                        Route::get('export', [ReportTransaction_CogsController::class, 'export']);
                     });
 
                     Route::prefix('report_stock_in_rupiah_shading_batch')->middleware('operation.access:report_stock_in_rupiah,view')->group(function () {

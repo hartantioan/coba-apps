@@ -51,7 +51,7 @@ class GoodReceipt extends Model
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
-    
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -122,8 +122,17 @@ class GoodReceipt extends Model
 
         return $currency;
     }
-    
-    public function attachment() 
+
+    public function currencyRate(){
+        $currency = '';
+        foreach($this->goodReceiptDetail as $row){
+            $currency = $row->purchaseOrderDetail->purchaseOrder->currency_rate;
+        }
+
+        return $currency;
+    }
+
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -222,7 +231,7 @@ class GoodReceipt extends Model
             '1' => 'Dibuka',
             default => 'Ditutup',
         };
-  
+
         return $multiple;
     }
 
@@ -453,7 +462,7 @@ class GoodReceipt extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

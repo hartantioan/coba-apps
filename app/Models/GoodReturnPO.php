@@ -105,8 +105,8 @@ class GoodReturnPO extends Model
         return $ada;
     }
 
-    
-    public function attachment() 
+
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -188,7 +188,7 @@ class GoodReturnPO extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -202,5 +202,14 @@ class GoodReturnPO extends Model
             $arr[] = $row->goodReceiptDetail->purchaseOrderDetail->requester;
         }
         return implode(', ',$arr);
+    }
+
+    public function currencyRate(){
+        $currency = '';
+        foreach($this->goodReturnPODetail as $row){
+            $currency = $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate;
+        }
+
+        return $currency;
     }
 }

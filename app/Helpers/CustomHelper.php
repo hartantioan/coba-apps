@@ -519,14 +519,14 @@ class CustomHelper {
 			$query->where('user_id',session('bo_id'));
 		})->get();
 
-		$underEbitda = false;
+		/* $underEbitda = false;
 
 		if($table_name == 'marketing_orders'){
 			$salesOrder = MarketingOrder::find($table_id);
 			if($salesOrder){
 				$underEbitda = $salesOrder->underEbitda();
 			}
-		}
+		} */
 
 		$count = 0;
 
@@ -731,13 +731,13 @@ class CustomHelper {
 			}
 
 			#if sales order disini ya
-			if($table_name == 'marketing_orders'){
+			/* if($table_name == 'marketing_orders'){
 				if($underEbitda){
 					$passed = true;
 				}else{
 					$passed = false;
 				}
-			}
+			} */
 
 			if($passed == true){
 

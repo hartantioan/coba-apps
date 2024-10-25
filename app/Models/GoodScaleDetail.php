@@ -36,4 +36,10 @@ class GoodScaleDetail extends Model
     {
         return $this->belongsTo('App\Models\GoodScale', 'good_scale_id', 'id');
     }
+
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
 }

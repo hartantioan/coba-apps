@@ -38,8 +38,8 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
         'Bank/COA',
         'Nominal dibayarkan',
         'DP/TOP',
-        'Tgl APDP / Tgl IPYM',
-        'No. APDP / No. IPYM',
+        'Tgl ARDP / Tgl IPYM',
+        'No. ARDP / No. IPYM',
         'Sisa Nominal Inv',
     ];
 

@@ -2399,6 +2399,10 @@
                                             $('#arr_percent_wtax' + count).val(val.percent_wtax);
                                             /* $('#arr_include_tax' + count).val(val.include_tax); */
 
+                                            if(val.is_expedition){
+                                                $('#arr_percent_wtax' + count).val('2.00000');
+                                            }
+
                                             $('#top').val(val.top);
 
                                             $('#received_date').val(val.received_date);

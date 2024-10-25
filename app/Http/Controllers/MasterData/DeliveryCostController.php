@@ -10,6 +10,7 @@ use App\Models\DeliveryCost;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportDeliveryCost;
 use App\Exceptions\RowImportException;
+use App\Exports\ExportDeliveryCost;
 use App\Exports\ExportTemplateDeliveryCost;
 use App\Models\Transportation;
 
@@ -51,7 +52,7 @@ class DeliveryCostController extends Controller
         $search = $request->input('search.value');
 
         $total_data = DeliveryCost::count();
-        
+
         $query_data = DeliveryCost::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where('name','like',"%$search%")
@@ -159,7 +160,7 @@ class DeliveryCostController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -278,7 +279,7 @@ class DeliveryCostController extends Controller
                         'status'                => $request->status ? $request->status : '2'
                     ]);
                 }
-                
+
                 if($query) {
 
                     activity()
@@ -302,7 +303,7 @@ class DeliveryCostController extends Controller
                 DB::rollback();
             }
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -318,13 +319,13 @@ class DeliveryCostController extends Controller
         $dc['ritage'] = number_format($dc->ritage,2,',','.');
         $dc['qty_tonnage'] = number_format($dc->qty_tonnage,3,',','.');
         $dc['account_name'] = $dc->account()->exists() ? $dc->account->name : '';
-        				
+
 		return response()->json($dc);
     }
 
     public function destroy(Request $request){
         $query = DeliveryCost::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new DeliveryCost())
@@ -366,5 +367,19 @@ class DeliveryCostController extends Controller
 
     public function getImportExcel(){
         return Excel::download(new ExportTemplateDeliveryCost(), 'format_template_delivery_cost_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        if($request->account == "null"){
+            $account = '';
+        }else{
+		    $account = $request->account ? $request->account : '';
+        }
+        info($account);
+		// return Excel::download(new ExportDeliveryCost($search,$post_date,$end_date,$status,$account), 'delivery_cost_'.uniqid().'.xlsx');
     }
 }

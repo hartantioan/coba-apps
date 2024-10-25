@@ -1427,6 +1427,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [DeliveryCostController::class, 'index']);
                         Route::get('datatable', [DeliveryCostController::class, 'datatable']);
                         Route::post('show', [DeliveryCostController::class, 'show']);
+                        Route::get('export_from_page', [DeliveryCostController::class, 'exportFromTransactionPage']);
                         Route::get('get_import_excel', [DeliveryCostController::class, 'getImportExcel']);
                         Route::post('import', [DeliveryCostController::class, 'import'])->middleware('operation.access:delivery_cost,update');
                         Route::post('create', [DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');

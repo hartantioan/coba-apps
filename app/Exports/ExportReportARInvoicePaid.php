@@ -47,7 +47,7 @@ class ExportReportARInvoicePaid implements FromCollection, WithTitle, WithHeadin
     {
         $query_invoice= MarketingOrderInvoice::whereNull('deleted_at')
         ->where('post_date', '>=',$this->start_date)
-        ->where('post_date', '<=', $this->finish_date)
+        ->where('post_date', '<=', $this->finish_date)->whereIn('status',["2","3"])
         ->get();
 
 

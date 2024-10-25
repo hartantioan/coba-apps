@@ -1904,8 +1904,10 @@ class Select2Controller extends Controller {
         $data = PaymentRequest::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('note', 'like', "%$search%");
+                })->orWhereHas('account',function($query) use($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
                 })
-                ->whereDoesntHave('outgoingPayment')
                 ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {

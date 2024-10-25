@@ -10,13 +10,13 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportPaymentRequestDateReport implements FromView,ShouldAutoSize
 {
-    protected $start_date, $end_date,$filter_payment_request;
-    public function __construct(string $start_date, string $end_date,string $filter_payment_request)
+    protected $start_date, $end_date,$filter_payment_request,$filter_account;
+    public function __construct(string $start_date, string $end_date,string $filter_payment_request,string $filter_account)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->filter_payment_request = $filter_payment_request ? $filter_payment_request : '';
-
+        $this->filter_account = $filter_account ? $filter_account : '';
     }
     public function view(): View
     {
@@ -33,16 +33,24 @@ class ExportPaymentRequestDateReport implements FromView,ShouldAutoSize
                 $groupIds = explode(',', $this->filter_payment_request);
                 $query->whereIn('id',$groupIds);
             }
+            if($this->filter_account){
+                $groupIds = explode( ',', $this->filter_account);
+                $query->whereIn('account_id',$groupIds);
+            }
         })->where('lookable_type','purchase_invoices')->get();
 
         if ($query_data->isEmpty()) {
             $query_data = [];
         }
-        
+
         $array_filter = [];
-       
+
         foreach($query_data as $row){
-            
+                if ($row->paymentRequest->outgoingPayment()->exists()) {
+                    $date= date('d/m/Y',strtotime($row->paymentRequest->outgoingPayment->post_date));
+                } else {
+                    $date = '';
+                }
                 $data_tempura = [
                     'code' => $row->paymentRequest->code,
                     'invoice_code' => $row->lookable->code,
@@ -50,11 +58,13 @@ class ExportPaymentRequestDateReport implements FromView,ShouldAutoSize
                     'status' => $row->paymentRequest->statusRaw(),
                     'vendor' => $row->lookable->account->name,
                     'pay_date' => date('d/m/Y',strtotime($row->paymentRequest->pay_date)),
+                    'opym_date'=> $date,
+                    'note' => $row->paymentRequest->note
                 ];
-            
+
                 $array_filter[]=$data_tempura;
-            
-            
+
+
         }
         activity()
             ->performedOn(new PaymentRequest())

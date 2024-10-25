@@ -23,11 +23,19 @@
                                     <div class="row">
                                         <div class="input-field col m6 s12">
                                             <label for="filter_payment_request" class="active" style="font-size:1rem;">Filter Invoice :</label>
-                                           
+
                                             <select class="select2 browser-default" multiple="multiple" id="filter_payment_request" name="filter_payment_request[]">
-                                               
+
                                             </select>
-                                           
+
+                                        </div>
+                                        <div class="input-field col m6 s12">
+                                            <label for="filter_account" class="active" style="font-size:1rem;">Filter Vendor :</label>
+
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_account" name="filter_account[]">
+
+                                            </select>
+
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
@@ -38,12 +46,12 @@
                                             <label class="active" for="end_date">Tanggal Akhir</label>
                                         </div>
                                         <div class="col s12 mt-3">
-                                            
+
                                             <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Get Rekap <i class="material-icons right">file_download</i></button>
                                             <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="Filter();" id="btn_out">Cari <i class="material-icons right">list</i></button>
 
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </form>
@@ -61,17 +69,19 @@
 <script>
     $(document).ready(function() {
         select2ServerSide('#filter_payment_request', '{{ url("admin/select2/payment_request") }}');
-        
+        select2ServerSide('#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
+
     });
     function exportExcel(){
-        
+
         var search = $('#start_date').val();
         var status = $('#end_date').val();
         var filter_payment_request = $('#filter_payment_request').val();
-        
-        window.location = "{{ Request::url() }}/export?start_date=" + search + "&end_date=" + status+"&filter_payment_request=" + filter_payment_request;
-       
-       
+        var filter_account = $('#filter_account').val();
+
+        window.location = "{{ Request::url() }}/export?start_date=" + search + "&end_date=" + status+"&filter_payment_request=" + filter_payment_request+"&filter_account=" + filter_account;
+
+
     }
     function Filter(){
         var formData = new FormData($('#form_data')[0]);
@@ -105,7 +115,7 @@
                     icon: 'error'
                 });
             }
-            
+
         });
     }
 </script>

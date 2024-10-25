@@ -379,7 +379,6 @@ class DeliveryCostController extends Controller
         }else{
 		    $account = $request->account ? $request->account : '';
         }
-        info($account);
-		// return Excel::download(new ExportDeliveryCost($search,$post_date,$end_date,$status,$account), 'delivery_cost_'.uniqid().'.xlsx');
+		return Excel::download(new ExportDeliveryCost($search,$post_date,$end_date,$status,$account), 'delivery_cost_'.uniqid().'.xlsx');
     }
 }

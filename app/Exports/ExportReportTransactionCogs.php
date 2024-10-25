@@ -484,20 +484,11 @@ $cogs = ItemCogs::where('lookable_type', $row_x->getTable())
 
 
         foreach ($production_repack as $row_x) {
-            $cogs_out = ItemCogs::where('lookable_type', $row_x->getTable())
-            ->where('lookable_id', $row_x->id)
-            ->where('type','OUT')
-            ->whereNull('deleted_at')
-            ->get();
-
             $cogs_in = ItemCogs::where('lookable_type', $row_x->getTable())
             ->where('lookable_id', $row_x->id)
             ->where('type','IN')
             ->whereNull('deleted_at')
             ->get();
-
-            $cogIdsOut = $cogs_out->pluck('id');
-            $totalInSumOut = $cogs_out->sum('total_out');
 
             $cogIdsIn = $cogs_in->pluck('id');
             $totalInSumIn = $cogs_in->sum('total_in');
@@ -505,7 +496,7 @@ $cogs = ItemCogs::where('lookable_type', $row_x->getTable())
                 $total += round($row_b->total,2);
             }
 
-            if(count($cogs_in) > 0 || count($cogs_out) > 0){
+            if(count($cogs_in) > 0){
                 if ($totalInSumIn != round($total,2)) {
                     $arr[]=[
                         'no' =>$keys,
@@ -516,6 +507,35 @@ $cogs = ItemCogs::where('lookable_type', $row_x->getTable())
                         'Total Item Cogs'=>$totalInSumIn
                     ];
                 }
+            }else{
+                $arr[]=[
+                    'no' =>$keys,
+                    'Transaksi'=>$row_x->getTable(),
+                    'No Dokumen'=>$row_x->code,
+                    'Grandtotal'=>$row_x->total,
+                    'ID ITEM COGS'=>'tidak punya cogs',
+                    'Total Item Cogs'=>'tidak punya cogs',
+                ];
+            }
+
+            $keys++;
+        }
+
+        foreach ($production_repack as $row_x) {
+            $cogs_out = ItemCogs::where('lookable_type', $row_x->getTable())
+            ->where('lookable_id', $row_x->id)
+            ->where('type','OUT')
+            ->whereNull('deleted_at')
+            ->get();
+
+            $cogIdsOut = $cogs_out->pluck('id');
+            $totalInSumOut = $cogs_out->sum('total_out');
+
+            foreach($row_x->productionRepackDetail as $row_b){
+                $total += round($row_b->total,2);
+            }
+
+            if( count($cogs_out) > 0){
                 if ($totalInSumOut != round($total,2)) {
                     $arr[]=[
                         'no' =>$keys,

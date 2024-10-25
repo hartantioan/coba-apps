@@ -55,28 +55,28 @@ class ItemStock extends Model
     }
 
     public function productionBatch(){
-        return $this->belongsTo('App\Models\ProductionBatch', 'production_batch_id', 'id');
+        return $this->belongsTo('App\Models\ProductionBatch', 'production_batch_id', 'id')->withTrashed();
     }
 
     public function item(){
-        return $this->belongsTo('App\Models\Item','item_id','id');
+        return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
     public function itemShading(){
-        return $this->belongsTo('App\Models\ItemShading','item_shading_id','id');
+        return $this->belongsTo('App\Models\ItemShading','item_shading_id','id')->withTrashed();
     }
 
     public function place(){
-        return $this->belongsTo('App\Models\Place','place_id','id');
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
 
     public function warehouse(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id');
+        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
     public function area(){
-        return $this->belongsTo('App\Models\Area','area_id','id');
+        return $this->belongsTo('App\Models\Area','area_id','id')->withTrashed();
     }
 
     public function valueNow(){

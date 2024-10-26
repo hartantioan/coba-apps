@@ -375,7 +375,7 @@
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

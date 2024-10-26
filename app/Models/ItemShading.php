@@ -32,4 +32,25 @@ class ItemShading extends Model
     {
         return $this->hasMany('App\Models\ItemCogs','item_shading_id','id');
     }
+
+    public function marketingOrderDeliveryDetailStock(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetailStock')->whereHas('marketingOrderDeliveryDetail',function($query){
+            $query->whereHas('marketingOrderDelivery',function($query){
+                $query->whereIn('status',['2','3']);
+            });
+        });
+    }
+
+    public function marketingOrderDeliveryDetailStockSpecial(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetailStock')->whereHas('marketingOrderDeliveryDetail',function($query){
+            $query->whereDoesntHave('marketingOrderDeliveryProcessDetail')->whereHas('marketingOrderDelivery',function($query){
+                $query->where('status','2');
+            });
+        });
+    }
+
+    public function totalUnsentMOd(){
+        $total = $this->marketingOrderDeliveryDetailStockSpecial()->sum('qty');
+        return $total;
+    }
 }

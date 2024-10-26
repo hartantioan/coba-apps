@@ -109,6 +109,10 @@ class ProductionIssueController extends Controller
                     $query->whereIn('status', $request->status);
                 }
 
+                if($request->line){
+                    $query->where('line_id', $request->line);
+                }
+
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -143,6 +147,10 @@ class ProductionIssueController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if($request->line){
+                    $query->where('line_id', $request->line);
                 }
 
                 if($request->start_date && $request->finish_date) {

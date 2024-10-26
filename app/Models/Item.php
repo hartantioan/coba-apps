@@ -952,13 +952,37 @@ class Item extends Model
     }
 
     public function getStockPlaceWithUnsentSales($place_id){
+        $total = $this->itemStock()->where('place_id',$place_id)->sum('qty');
+        $data = $this->marketingOrderDeliveryDetail()->where('place_id',$place_id)->whereHas('marketingOrderDelivery',function($query){
+            $query->where('status','2');
+        })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->get();
+        foreach($data as $item){
+            $total -= round($item->qty * $item->marketingOrderDetail->qty_conversion,3);
+        }
+        return $total;
+    }
+
+    public function getStockPlaceWithMod($place_id){
         $total = 0;
 
         foreach($this->itemStock()->where('place_id',$place_id)->get() as $row){
-            $total += $row->balanceWithUnsent();
+            $total += $row->qty;
         }
 
         return $total;
+    }
+
+    public function arrayStockByShading($conversion){
+        $arr = [];
+        foreach($this->itemShading as $row){
+            $balance = round($row->itemStock()->sum('qty') / $conversion,3) - $row->totalUnsentMOd();
+            $arr[] = [
+                'item_shading_id'   => $row->id,
+                'item_shading_code' => $row->code,
+                'qty'               => CustomHelper::formatConditionalQty($balance),
+            ];
+        }
+        return $arr;
     }
 
     public function getStockArrayPlace($arr){

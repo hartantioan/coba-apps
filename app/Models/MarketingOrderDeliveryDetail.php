@@ -42,6 +42,10 @@ class MarketingOrderDeliveryDetail extends Model
         });
     }
 
+    public function marketingOrderDeliveryDetailStock(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetailStock');
+    }
+
     public function realPriceAfterGlobalDiscount(){
         return $this->marketingOrderDetail->realPriceAfterGlobalDiscount();
     }

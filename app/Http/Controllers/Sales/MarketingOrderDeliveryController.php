@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
 use App\Models\IncomingPayment;
+use App\Models\ItemShading;
 use App\Models\ItemStock;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
+use App\Models\MarketingOrderDeliveryDetailStock;
 use App\Models\MarketingOrderDetail;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
@@ -329,20 +331,21 @@ class MarketingOrderDeliveryController extends Controller
 
                 foreach($data->marketingOrderDetail as $row){
                     $details[] = [
-                        'id'            => $row->id,
-                        'item_id'       => $row->item_id,
-                        'item_name'     => $row->item->code.' - '.$row->item->name,
-                        'place_id'      => $row->place_id,
-                        'place_name'    => $row->place->code,
-                        'warehouse'     => $row->item->warehouseName(),
-                        'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlaceWithUnsentSales($row->place_id) / $row->qty_conversion,3)),
-                        'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
-                        'qty_uom'       => CustomHelper::formatConditionalQty(round($row->balanceQtyMod() * $row->qty_conversion,3)),
-                        'unit'          => $row->itemUnit->unit->code,
-                        'note'          => $row->note,
-                        'qty_conversion'=> CustomHelper::formatConditionalQty($row->qty_conversion),
-                        'code'          => $data->code,
-                        'uom_unit'      => $row->item->uomUnit->code,
+                        'id'                => $row->id,
+                        'item_id'           => $row->item_id,
+                        'item_name'         => $row->item->code.' - '.$row->item->name,
+                        'place_id'          => $row->place_id,
+                        'place_name'        => $row->place->code,
+                        'warehouse'         => $row->item->warehouseName(),
+                        'qty_stock'         => CustomHelper::formatConditionalQty(round($row->item->getStockPlaceWithUnsentSales($row->place_id) / $row->qty_conversion,3)),
+                        'qty'               => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
+                        'qty_uom'           => CustomHelper::formatConditionalQty(round($row->balanceQtyMod() * $row->qty_conversion,3)),
+                        'unit'              => $row->itemUnit->unit->code,
+                        'note'              => $row->note,
+                        'qty_conversion'    => CustomHelper::formatConditionalQty($row->qty_conversion),
+                        'code'              => $data->code,
+                        'uom_unit'          => $row->item->uomUnit->code,
+                        'stock_by_shading'  => $row->item->arrayStockByShading($row->qty_conversion),
                     ];
                 }
                 $total=0;
@@ -425,6 +428,12 @@ class MarketingOrderDeliveryController extends Controller
                 'arr_qty.array'                     => 'Baris qty harus array.',
                 'arr_place.required'                => 'Baris plant tidak boleh kosong.',
                 'arr_place.array'                   => 'Baris plant harus array.',
+                'arr_stock_detail_id.required'      => 'Baris stock tidak boleh kosong.',
+                'arr_stock_detail_id.array'         => 'Baris stock harus dalam bentuk array.',
+                'arr_item_shading_id.required'      => 'Baris shading tidak boleh kosong.',
+                'arr_item_shading_id.array'         => 'Baris shading harus array.',
+                'arr_item_shading_qty.required'     => 'Baris qty shading tidak boleh kosong.',
+                'arr_item_shading_qty.array'        => 'Baris qty shading harus array.',
         ]);
 
             if($validation->fails()) {
@@ -456,6 +465,37 @@ class MarketingOrderDeliveryController extends Controller
                         'status'  => 500,
                         'message' => 'Ada Item yang stocknya kurang pada SO yang dipilih dengan nama Item :'. $list_item,
                     ]);
+                }
+
+                if($request->arr_item_shading_id){
+                    $arrShadingItem = [];
+                    $arrShadingQty = [];
+                    $arrShadingStock = [];
+                    $passedQtyShading = true;
+                    $arrItemError = [];
+                    foreach($request->arr_item_shading_id as $key => $row){
+                        if(!in_array($row,$arrShadingItem)){
+                            $arrShadingItem[] = $row;
+                            $arrShadingQty[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));
+                            $arrShadingStock[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_stock[$key]));
+                        }else{
+                            $index = array_search($row,$arrShadingItem);
+                            $arrShadingQty[$index] += str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));
+                        }
+                    }
+                    foreach($arrShadingItem as $key => $row){
+                        if($arrShadingQty[$key] > $arrShadingStock[$key]){
+                            $itemShading = ItemShading::find($row);
+                            $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty($arrShadingQty[$key]).' Stok : '.CustomHelper::formatConditionalQty($arrShadingStock[$key]);
+                            $passedQtyShading = false;
+                        }
+                    }
+                    if(!$passedQtyShading){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => implode(', ',$arrItemError),
+                        ]);
+                    }
                 }
 
                 if(!$request->temp){
@@ -560,56 +600,13 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->temp){
                     $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    /* $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                        ]);
-                    } */
                     if(in_array($query->status,['2'])){
 
                         $query->user_update_id = session('bo_id');
                         $query->update_time = date('Y-m-d H:i:s');
-                        /* $query->code = $request->code; */
                         $query->account_id = $request->account_id;
                         $query->cost_delivery_type = $request->cost_delivery_type;
                         $query->stage_status = '2';
-                        /* $query->company_id = $request->company_id;
-                        $query->customer_id = $request->customer_id;
-                        $query->post_date = $request->post_date;
-                        $query->delivery_date = $request->delivery_date;
-                        $query->destination_address = $request->destination_address;
-                        $query->city_id = $request->tempCity;
-                        $query->district_id = $request->tempDistrict;
-                        $query->transportation_id = $request->tempTransport;
-                        $query->note_internal = $request->note_internal;
-                        $query->note_external = $request->note_external;
-                        $query->send_status = NULL;
-                        $query->status = '1'; */
-
                         $query->save();
 
 
@@ -672,6 +669,20 @@ class MarketingOrderDeliveryController extends Controller
                                 'note'                          => $request->arr_note[$key],
                                 'place_id'                      => $request->arr_place[$key],
                             ]);
+                            if($request->arr_stock_detail_id){
+                                foreach($request->arr_stock_detail_id as $keykuy => $rowdetail){
+                                    if($rowdetail == $row){
+                                        if(str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$keykuy])) > 0){
+                                            MarketingOrderDeliveryDetailStock::create([
+                                                'marketing_order_delivery_detail_id'    => $querydetail->id,
+                                                'item_shading_id'                       => $request->arr_item_shading_id[$keykuy],
+                                                'qty'                                   => str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$keykuy])),
+                                                'stock'                                 => str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_stock[$keykuy])),
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         $query->updateGrandtotal();
                         CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
@@ -907,12 +918,27 @@ class MarketingOrderDeliveryController extends Controller
         foreach($data->marketingOrderDeliveryDetailWithTrashed as $key => $row){
             $totalqty+=$row->qty;
             $string .= '<tr class="'.($row->deleted_at ? 'red white-text' : '').'">
-                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align" rowspan="2">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
+            </tr>';
+            $string .= '<tr>
+                <td colspan="5">';
+
+            if($row->marketingOrderDeliveryDetailStock()->count() > 0){
+                $string .= '<ol>';
+                foreach($row->marketingOrderDeliveryDetailStock as $rowshading){
+                    $string .= '<li>'.$rowshading->itemShading->code.' Qty '.CustomHelper::formatConditionalQty($rowshading->qty).' Stok '.CustomHelper::formatConditionalQty($rowshading->stock).'</li>';
+                }
+                $string .= '</ol>';
+            }else{
+                $string .= 'Data request shading tidak ditemukan.';
+            }
+
+            $string .= '</td>
             </tr>';
         }
         $string .= '<tr>

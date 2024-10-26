@@ -96,6 +96,16 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
+                                                <label for="filter_line" style="font-size:1rem;">Line :</label>
+                                                <div class="input-field col s12">
+                                                    <select class="form-control" id="filter_line" onchange="loadDataTable()">
+                                                        @foreach ($line as $row)
+                                                            <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai Posting) :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
@@ -1916,6 +1926,7 @@
                     'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    line : $('#filter_line').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

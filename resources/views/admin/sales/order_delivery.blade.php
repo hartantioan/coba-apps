@@ -782,7 +782,7 @@ document.addEventListener('focusin', function (event) {
                 total_grandtotal.splice(iteration, 1);
             }
             let newGrandTotal=0;
-
+            $row.next().remove();
             $.each(total_grandtotal, function(index, value) {
                 d = parseFloat(value);
                 newGrandTotal += d;
@@ -933,6 +933,24 @@ document.addEventListener('focusin', function (event) {
         }
     }
 
+    function removeStock(element,id){
+        $(element).parent().parent().remove();
+        if($('#body-detail-' + id + ' tr').length == 0){
+            $('#body-detail-' + id).append(`
+                <tr>
+                    <td colspan="4">Data tidak ditemukan.</td>    
+                </tr>
+            `);
+        }
+    }
+
+    function checkMax(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($(element).data('max').toString().replaceAll(".", "").replaceAll(",","."));
+        if(qty > max){
+            $(element).val(formatRupiahIni(max.toFixed(3).toString().replace('.',',')));
+        }
+    }
+
     function getMarketingOrder(){
         if($('#marketing_order_id').val()){
             $.ajax({
@@ -947,10 +965,10 @@ document.addEventListener('focusin', function (event) {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
 
                     if(response.status == 500){
                         swal({
@@ -1021,14 +1039,39 @@ document.addEventListener('focusin', function (event) {
                             var length = total_grandtotal.length - 1;
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
+                                
+                                let rowstock = ``;
+                                if(val.stock_by_shading.length > 0){
+                                    $.each(val.stock_by_shading, function(j, value) {
+                                        rowstock += `<tr>
+                                            <input type="hidden" name="arr_stock_detail_id[]" value="` + val.id + `">
+                                            <input type="hidden" name="arr_item_shading_id[]" value="` + value.item_shading_id + `">
+                                            <input type="hidden" name="arr_item_shading_stock[]" value="` + value.qty + `">
+                                            <td class="center-align">` + (j+1) + `</td>
+                                            <td>` + value.item_shading_code + `</td>
+                                            <td><input name="arr_item_shading_qty[]" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty + `" data-mod="` + val.id + `"></td>
+                                            <td class="center">
+                                                <span>` + val.unit + `</span>
+                                            </td>
+                                            <td>
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1" onclick="removeStock(this,'` + count + `');" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>`;
+                                    });
+                                }else{
+                                    rowstock += `<tr><td class="center" colspan="5">Stock shading tidak ditemukan</td></tr>`;
+                                }
+
                                 $('#body-item').append(`
-                                    <tr class="row_item" data-id="` + response.id + `" data-iteration="`+length+`">
+                                    <tr class="row_item" data-id="` + response.id + `" data-iteration="`+length+`" style="background-color:` + getRandomColor() + `;">
                                         <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + $('#marketing_order_id').val() + `">
                                         <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_conversion[]" id="arr_conversion` + count + `" value="` + val.qty_conversion + `">
-                                        <td rowspan="1" id="row-main` + count + `">
+                                        <td id="row-main` + count + `" rowspan="2">
                                             ` + no + `
                                         </td>
                                         <td>
@@ -1058,10 +1101,31 @@ document.addEventListener('focusin', function (event) {
                                         <td>
                                             <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                         </td>
-                                        <td class="center">
+                                        <td class="center" rowspan="2">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="9">
+                                            <table class="bordered" style="width:600px !important;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center" colspan="5">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i></th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="center">No</th>
+                                                        <th class="center">Shading</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Satuan</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-detail-` + count + `">
+                                                    ` + rowstock + `
+                                                </tbody>
+                                            </table>
                                         </td>
                                     </tr>
                                 `);
@@ -1075,7 +1139,7 @@ document.addEventListener('focusin', function (event) {
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',
@@ -1761,7 +1825,8 @@ document.addEventListener('focusin', function (event) {
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passed = true;
+                
+                var formData = new FormData($('#form_data')[0]), passed = true, passedStock = true;
 
                 formData.delete("arr_modi[]");
                 formData.delete("arr_item[]");
@@ -1772,7 +1837,8 @@ document.addEventListener('focusin', function (event) {
 
                 if($('input[name^="arr_modi[]"]').length > 0){
                     $('input[name^="arr_modi[]"]').each(function(index){
-                        formData.append('arr_modi[]',$(this).val());
+                        let parent = $(this);
+                        formData.append('arr_modi[]',parent.val());
                         formData.append('arr_item[]',$('input[name^="arr_item[]"]').eq(index).val());
                         formData.append('arr_place[]',$('input[name^="arr_place[]"]').eq(index).val());
                         formData.append('arr_qty[]',$('input[name^="arr_qty[]"]').eq(index).val());
@@ -1780,9 +1846,25 @@ document.addEventListener('focusin', function (event) {
                         if(!$('input[name^="arr_modi[]"]').eq(index).val()){
                             passed = false;
                         }
+                        let totalRow = parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                        $('input[name^="arr_item_shading_qty[]"][data-mod="' + parent.val() + '"]').each(function(indexkuy){
+                            totalRow -= parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                        });
+                        if(totalRow < 0){
+                            passedStock = false;
+                        }
                     });
                 }else{
                     passed = false;
+                }
+
+                if(!passedStock){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Qty pemilihan stock per shading tidak boleh lebih dari qty MOD.',
+                        icon: 'warning'
+                    });
+                    return false;
                 }
 
                 if($('input[name^="arr_stock_id[]"]').length > 0){

@@ -93,6 +93,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             })
             ->where('place_id',$request->place)
             ->where('item_id',$request->item)
+            ->where('qty','>',0)
             ->first();
 
             if($data){

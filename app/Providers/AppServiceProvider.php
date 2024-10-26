@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->app['request']->server->set('HTTPS', true);
         date_default_timezone_set('Asia/Jakarta');
         Relation::morphMap([
             'purchase_requests'                     => 'App\Models\PurchaseRequest',

@@ -519,14 +519,14 @@ class CustomHelper {
 			$query->where('user_id',session('bo_id'));
 		})->get();
 
-		/* $underEbitda = false;
+		$underEbitda = false;
 
 		if($table_name == 'marketing_orders'){
 			$salesOrder = MarketingOrder::find($table_id);
 			if($salesOrder){
 				$underEbitda = $salesOrder->underEbitda();
 			}
-		} */
+		}
 
 		$count = 0;
 
@@ -745,22 +745,30 @@ class CustomHelper {
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
 					$status = $count == 0 ? '1': '0';
-					foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
-						ApprovalMatrix::create([
-							'code'							=> strtoupper(Str::random(30)),
-							'approval_template_stage_id'	=> $rowTemplateStage->id,
-							'approval_source_id'			=> $source->id,
-							'user_id'						=> $rowStageDetail->user_id,
-							'date_request'					=> date('Y-m-d H:i:s'),
-							'status'						=> $status
-						]);
-						if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
-							WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
-							WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+					$check = true;
+					if($table_name == 'marketing_orders' && $rowTemplateStage->approvalStage->level == 2){
+						if(!$underEbitda){
+							$check = false;
 						}
 					}
-					$count++;
-
+					if($check){
+						foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
+						
+							ApprovalMatrix::create([
+								'code'							=> strtoupper(Str::random(30)),
+								'approval_template_stage_id'	=> $rowTemplateStage->id,
+								'approval_source_id'			=> $source->id,
+								'user_id'						=> $rowStageDetail->user_id,
+								'date_request'					=> date('Y-m-d H:i:s'),
+								'status'						=> $status
+							]);
+							if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
+								WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+								WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+							}
+						}
+						$count++;
+					}
 				}
 
 			}

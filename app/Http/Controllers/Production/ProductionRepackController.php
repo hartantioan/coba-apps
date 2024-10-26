@@ -534,7 +534,7 @@ class ProductionRepackController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item</th>
+                                <th class="center-align" colspan="13" style="font-size:20px !important;">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center">'.__('translations.no').'</th>
@@ -549,6 +549,7 @@ class ProductionRepackController extends Controller
                                 <th class="center">Qty (Konversi)</th>
                                 <th class="center">Satuan (Konversi)</th>
                                 <th class="center">Batch Baru</th>
+                                <th class="center">Shading Baru</th>
                             </tr>
                         </thead><tbody>';
         foreach($data->productionRepackDetail()->orderBy('id')->get() as $key => $row){
@@ -562,9 +563,10 @@ class ProductionRepackController extends Controller
                 <td class="center-align">'.$row->itemUnitSource->unit->code.'</td>
                 <td class="center-align">'.$row->itemStock->productionBatch->code.'</td>
                 <td>'.$row->itemTarget->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitSource->conversion,3)).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitTarget->conversion,3)).'</td>
                 <td class="center-align">'.$row->itemUnitTarget->unit->code.'</td>
                 <td class="center-align">'.$row->batch_no.'</td>
+                <td class="center-align">'.$row->itemShading->code.'</td>
             </tr>';
         }
 

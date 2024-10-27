@@ -99,6 +99,7 @@
                                                 <label for="filter_line" style="font-size:1rem;">Line :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_line" onchange="loadDataTable()">
+                                                        <option value="">Semua Line</option>
                                                         @foreach ($line as $row)
                                                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                                                         @endforeach

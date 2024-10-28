@@ -133,9 +133,8 @@ class MarketingOrderMemo extends Model
 
     public function type(){
         $type = match ($this->type) {
-            '1' => 'Potongan Nominal (Invoice)',
-            '2' => 'Potongan Qty (Invoice)',
-            '3' => 'Mandiri',
+            '1' => 'DP',
+            '2' => 'Credit',
             default => 'Invalid',
         };
 

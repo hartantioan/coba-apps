@@ -646,6 +646,41 @@
     </div>
 </div>
 
+<div id="modal8" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Stock <b id="item_name"></b></h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <input type="hidden" id="tempCode">
+                        <input type="hidden" id="tempModd">
+                        <div id="datatable_buttons_multi"></div>
+                        <i class="right">Pilih salah satu item atau lebih untuk dipindah ke tabel utama.</i>
+                        <table id="table_stock" class="display" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center-align">No.</th>
+                                    <th class="center-align">Batch</th>
+                                    <th class="center-align">Shading</th>
+                                    <th class="center-align">Area</th>
+                                    <th class="center-align">Qty</th>
+                                    <th class="center-align">Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail-stock"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyStockPopUp();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -971,6 +1006,56 @@ document.addEventListener('focusin', function (event) {
                 return false;
             }
         });
+
+        $('#modal8').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_stock = $('#table_stock').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                        },
+                        "select": {
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                
+                $('#table_stock_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_stock_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-stock').empty();
+                $('#item_name').text('');
+                $('#tempCode,#tempModd').val('');
+                $('#table_stock').DataTable().clear().destroy();
+            }
+        });
     });
 
     function fillArrayStock(){
@@ -985,6 +1070,127 @@ document.addEventListener('focusin', function (event) {
             if(val == '3'){
                 $('#div-receive-date').removeClass('hide');
             }
+        }
+    }
+
+    function applyStockPopUp(){
+        if($('#tempCode').val() && $('#tempModd').val()){
+            let id = $('#tempCode').val(), modd = $('#tempModd').val();
+            if($('#last-row-item-' + id).length > 0){
+                $('#last-row-item-' + id).remove();
+            }
+            $.map(table_stock.rows('.selected').nodes(), function (item) {
+                let count = makeid(10);
+                $('#body-item-' + id).append(`
+                    <tr class="row_item_detail_` + id + `">
+                        <input type="hidden" name="arr_modd_id[]" value="` + modd + `">
+                        <input type="hidden" name="arr_item_stock_id[]" value="` + $(item).data('id') + `">
+                        <td>
+                            ` + $(item).data('place') + `
+                        </td>
+                        <td>
+                            ` + $(item).data('warehouse') + `
+                        </td>
+                        <td>
+                            ` + $(item).data('area') + `
+                        </td>
+                        <td>
+                            ` + $(item).data('shading') + `
+                        </td>
+                        <td>
+                            ` + $(item).data('batch') + `
+                        </td>
+                        <td>
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + $(item).data('qty') + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + $(item).data('qty') + `" class="rowQtyDetail` + id + `">
+                        </td>
+                        <td class="center-align">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + id + `');">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+                arrStock.push($(item).data('id'));
+            });
+            $('#modal8').modal('close');
+            $('html, body').animate({
+                scrollTop: $('#body-item-' + id).offset().top
+            }, 1000);
+            countItemQty(id);
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan minimal pilih 1 baris item.',
+                icon: 'error'
+            });
+        }
+    }
+
+    function getStockPopUp(code,modd_id,conversion){
+        if(modd_id){
+            $.ajax({
+                url: '{{ Request::url() }}/get_stock_pop_up',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    arr_stock: arrStock,
+                    modd_id: modd_id,
+                    conversion: conversion,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+
+                    $('#modal8').modal('open');
+                    $('#tempCode').val(code);
+                    $('#tempModd').val(modd_id);
+                    $('#item_name').text(response.item_name);
+                
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-stock').append(`
+                                <tr data-id="` + val.id + `" data-batch="` + val.batch + `" data-shading="` + val.shading + `" data-area="` + val.area + `" data-qty="` + val.qty + `" data-unit="` + val.unit + `" data-place="` + val.place + `" data-warehouse="` + val.warehouse + `">
+                                    <td>
+                                        ` + (i+1) + `
+                                    </td>
+                                    <td>
+                                        ` + val.batch + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.shading + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.area + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }
     }
 
@@ -1083,8 +1289,11 @@ document.addEventListener('focusin', function (event) {
                                                         <th class="center" colspan="2" width="20%">
                                                             <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                         </div>
-                                                        <th class="center" colspan="3">
+                                                        <th class="center" colspan="2">
                                                             <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `',` + val.modd_id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');">
+                                                        </th>
+                                                        <th>
+                                                            <a class="waves-effect waves-light red btn-small" onclick="getStockPopUp('` + count + `',` + val.modd_id + `,'` + val.conversion + `');" href="javascript:void(0);"><i class="material-icons left">list</i> List</a>
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -1104,6 +1313,17 @@ document.addEventListener('focusin', function (event) {
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="5" class="right-align">
+                                                            TOTAL
+                                                        </td>
+                                                        <td class="right-align" id="total-qty-` + count + `">
+                                                            0,000
+                                                        </td>
+                                                        <td class="right-align"> / ` + val.qty + `</td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </td>
                                     </tr>
@@ -1224,6 +1444,7 @@ document.addEventListener('focusin', function (event) {
                         }
                         $('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').parent().find('input[name^="arr_qty[]"]').trigger('keyup');
                         fillArrayStock();
+                        countItemQty(id);
                     }else{
                         M.toast({
                             html: response.message
@@ -1283,6 +1504,16 @@ document.addEventListener('focusin', function (event) {
         }
         $('#item_stock_id' + id).empty();
         fillArrayStock();
+        countItemQty(id);
+    }
+
+    function countItemQty(id){
+        let total = 0;
+        $(".rowQtyDetail" + id).each(function(){
+            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            total += qty;
+        });
+        $('#total-qty-' + id).text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
     }
 
     function removeRow(element,id){
@@ -1297,6 +1528,7 @@ document.addEventListener('focusin', function (event) {
             `);
         }
         fillArrayStock();
+        countItemQty(id);
     }
 
     function checkMax(element){
@@ -2324,8 +2556,11 @@ document.addEventListener('focusin', function (event) {
                                                     <th class="center" colspan="2" width="20%">
                                                         <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                     </div>
-                                                    <th class="center" colspan="3">
-                                                        <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `');">
+                                                    <th class="center" colspan="2">
+                                                        <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.id + `" onchange="getStockByBarcode('` + count + `','`+ val.id + `',` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');">
+                                                    </th>
+                                                    <th>
+                                                        <a class="waves-effect waves-light red btn-small" onclick="getStockPopUp('` + count + `',` + val.id + `,'` + val.conversion + `');" href="javascript:void(0);"><i class="material-icons left">list</i> List</a>
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -2341,6 +2576,17 @@ document.addEventListener('focusin', function (event) {
                                             <tbody id="body-item-` + count + `">
                                                 ` + details + `
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="5" class="right-align">
+                                                        TOTAL
+                                                    </td>
+                                                    <td class="right-align" id="total-qty-` + count + `">
+                                                        0,000
+                                                    </td>
+                                                    <td class="right-align"> / ` + val.qty + `</td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </td>
                                 </tr>
@@ -2372,6 +2618,7 @@ document.addEventListener('focusin', function (event) {
                                     }
                                 }
                             });
+                            countItemQty(count);
                         });
                     }
 

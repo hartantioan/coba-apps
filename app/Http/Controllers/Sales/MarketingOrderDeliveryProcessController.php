@@ -1890,6 +1890,52 @@ class MarketingOrderDeliveryProcessController extends Controller
         }
     }
 
+    public function getStockPopUp(Request $request){
+        $query = MarketingOrderDeliveryDetail::find($request->modd_id);
+
+        if($query){
+            $details = [];
+
+            $data = ItemStock::where('item_id',$query->item_id)
+                    ->where('place_id',$query->place_id)
+                    ->where('qty','>',0)
+                    ->where(function($query)use($request){
+                        if($request->arr_stock){
+                            $query->whereNotIn('id',$request->arr_stock);
+                        }
+                    })
+                    ->get();
+            
+            foreach($data as $item){
+                $balanceWithUnsent = $item->balanceWithUnsent();
+                if($balanceWithUnsent > 0){
+                    $details[] = [
+                        'id'        => $item->id,
+                        'batch'     => $item->productionBatch->code,
+                        'shading'   => $item->itemShading->code,
+                        'area'      => $item->area->name,
+                        'qty'       => round($item->qty / $request->conversion,3),
+                        'unit'      => $query->marketingOrderDetail->itemUnit->unit->code,
+                        'place'     => $item->place->code,
+                        'warehouse' => $item->warehouse->name,
+                    ];
+                }
+            }
+            
+            $response = [
+                'status'    => 200,
+                'details'   => $details,
+                'item_name' => $query->item->name,
+            ];
+        }else{
+            $response = [
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.'
+            ];
+        }
+
+        return response()->json($response);
+    }
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
         $status = $request->status? $request->status : '';

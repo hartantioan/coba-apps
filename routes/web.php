@@ -2690,6 +2690,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/', [MarketingOrderDeliveryProcessController::class, 'index']);
                     Route::get('datatable', [MarketingOrderDeliveryProcessController::class, 'datatable']);
                     Route::post('done', [MarketingOrderDeliveryProcessController::class, 'done'])->middleware('operation.access:delivery_order,update');
+                    Route::post('get_stock_pop_up', [MarketingOrderDeliveryProcessController::class, 'getStockPopUp']);
                     Route::get('row_detail', [MarketingOrderDeliveryProcessController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderDeliveryProcessController::class, 'show']);
                     Route::post('get_code', [MarketingOrderDeliveryProcessController::class, 'getCode']);

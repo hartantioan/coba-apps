@@ -188,7 +188,7 @@
                                 {{ __('translations.bank') }}
                             </td>
                             <td width="60%">
-                                {{ $data->coa->name }}
+                                {{ $data->coa->name ?? '-' }}
                             </td>
                         </tr>
                     </table>

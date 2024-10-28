@@ -1267,16 +1267,18 @@ class CustomHelper {
 					]);
 				}
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $ip->coa_id,
-					'account_id'	=> $ip->coa->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
-					'type'			=> '1',
-					'nominal'		=> floatval($ip->grandtotal * $ip->currency_rate),
-					'nominal_fc'	=> $ip->currency->type == '1' ? floatval($ip->grandtotal * $ip->currency_rate) : floatval($ip->grandtotal),
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-				]);
+				if($ip->coa_id){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $ip->coa_id,
+						'account_id'	=> $ip->coa->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
+						'type'			=> '1',
+						'nominal'		=> floatval($ip->grandtotal * $ip->currency_rate),
+						'nominal_fc'	=> $ip->currency->type == '1' ? floatval($ip->grandtotal * $ip->currency_rate) : floatval($ip->grandtotal),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+					]);
+				}
 
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first();
 				$coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first();

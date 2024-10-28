@@ -1853,9 +1853,11 @@
                         <option value="` + response.account_id + `">` + response.account_name + `</option>
                     `);
                 }
-                $('#coa_id').empty().append(`
-                    <option value="` + response.coa_id + `">` + response.coa_name + `</option>
-                `);
+                if(response.coa_name){
+                    $('#coa_id').empty().append(`
+                        <option value="` + response.coa_id + `">` + response.coa_name + `</option>
+                    `);
+                }
                 $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);

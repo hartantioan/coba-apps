@@ -505,7 +505,7 @@ class IncomingPaymentController extends Controller
                     $val->user->name,
                     $val->account_id ? $val->account->name : '-',
                     $val->company->name,
-                    $val->coa->name,
+                    $val->coa()->exists() ? $val->coa->name : '-',
                     $val->listBgCheck()->exists() ? $val->listBgCheck->code.' - '.$val->listBgCheck->document_no : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
@@ -566,7 +566,7 @@ class IncomingPaymentController extends Controller
             'code_place_id'             => 'required',
             /* 'code'			        => $request->temp ? ['required', Rule::unique('incoming_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:incoming_payments,code',
              */'company_id'            => 'required',
-            'coa_id'                => 'required',
+            'coa_id'                => round(str_replace(',','.',str_replace('.','',$request->grandtotal)),2) > 0 ? 'required' : '',
             'post_date'             => 'required',
             'currency_rate'         => 'required',
             'currency_id'           => 'required',
@@ -600,12 +600,12 @@ class IncomingPaymentController extends Controller
 
             $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
-            if($grandtotal <= 0){
+            /* if($grandtotal <= 0){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Nominal tidak boleh dibawah sama dengan 0.'
                 ]);
-            }
+            } */
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -909,7 +909,7 @@ class IncomingPaymentController extends Controller
         $ip['total'] = number_format($ip->total,2,',','.');
         $ip['rounding'] = number_format($ip->rounding,2,',','.');
         $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
-        $ip['coa_name'] = $ip->coa->code.' - '.$ip->coa->name;
+        $ip['coa_name'] = $ip->coa()->exists() ? $ip->coa->code.' - '.$ip->coa->name : '';
         $ip['currency_rate'] = number_format($ip->currency_rate,2,',','.');
         $ip['list_bg_check_name'] = $ip->listBgCheck()->exists() ? $ip->listBgCheck->document_no.' Rp '.CustomHelper::formatConditionalQty($ip->listBgCheck->nominal).' - '.$ip->listBgCheck->bank_source_name.' - '.$ip->listBgCheck->bank_source_no : '';
         $coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first()->id;

@@ -42,6 +42,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
         $counts = array_count_values($code);
         $checkdata = '1';
         $ceksama = '';
+        $pricefinal =0;
 
         foreach ($data as $row) {
 
@@ -49,6 +50,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $checkdata=2;
             } else {
                 $checkdata=1;
+            }
+
+            if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->include_tax == "0"){
+                $pricefinal=$row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+            }
+            else
+            {
+                $pricefinal=Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
             }
 
 
@@ -64,6 +73,10 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'item' => $row->lookable->itemStock->item->name,
                 'qty' => $row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
                 'uom' => $row->lookable->itemStock->item->uomUnit->code,
+                'price'=>$pricefinal,
+                'disc1' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,
+                'disc2' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,
+                'disc3' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,
                 'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
                 'typesell' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
@@ -104,6 +117,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $checkdata=1;
             }
 
+            if ($row->lookable->marketingOrderDetail->include_tax == "0"){
+                $pricefinal=$row->lookable->marketingOrderDetail->price;
+            }
+            else
+            {
+                $pricefinal=Round($row->lookable->marketingOrderDetail->price/(($row->lookable->marketingOrderDetail->percent_tax + 100) /100),2);
+            }
+
 
             $array_filter[] = [
                 'code'  => $row->marketingOrderInvoice->code,
@@ -117,6 +138,10 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'item' => $row->lookable->marketingOrderDetail->item->name ?? "",
                 'qty' => $row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,
                 'uom' => $row->lookable->marketingOrderDetail->item->uomUnit->code,
+                'price'=>$pricefinal,
+                'disc1' => $row->lookable->marketingOrderDetail->percent_discount_1,
+                'disc2' => $row->lookable->marketingOrderDetail->percent_discount_2,
+                'disc3' => $row->lookable->marketingOrderDetail->discount_3,
                 'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
                 'typesell' => $row->lookable->marketingOrderDetail->marketingOrder->Type() ?? '',
@@ -141,6 +166,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
 
         foreach ($data as $row) {
 
+            if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->include_tax == "0"){
+                $pricefinal=$row->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+            }
+            else
+            {
+                $pricefinal=Round($row->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
+            }
+
             $array_filter[] = [
                 'code'  => '',
                 'tglinvoice' => '',
@@ -154,6 +187,10 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'item' => $row->marketingOrderDeliveryDetail->item->name,
                 'qty' => $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
                 'uom' => $row->marketingOrderDeliveryDetail->item->uomUnit->code,
+                'price'=>$pricefinal,
+                'disc1' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,
+                'disc2' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,
+                'disc3' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,
                 'type' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'typesell' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
                 'totalbayar' => 0,

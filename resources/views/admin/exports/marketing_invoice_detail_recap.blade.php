@@ -14,6 +14,10 @@
             <th>Item</th>
             <th>Qty</th>
             <th>Uom</th>
+            <th>Harga</th>
+            <th>Disc 1</th>
+            <th>Disc 2</th>
+            <th>Disc 3</th>
             <th>Subtotal</th>
             <th>Total</th>
             <th>Tax</th>
@@ -43,6 +47,10 @@
             <td>{{ $row['item'] }}</td>
             <td>{{ $row['qty'] }}</td>
             <td>{{ $row['uom'] }}</td>
+            <td>{{ $row['price'] }}</td>
+            <td>{{ $row['disc1'] }}</td>
+            <td>{{ $row['disc2'] }}</td>
+            <td>{{ $row['disc3'] }}</td>
             <td>{{ $row['grandtotal'] }}</td>
             @if($row['code']!='')
             @if($row['row']>1 && $row['checkdata']==1)

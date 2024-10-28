@@ -15,9 +15,10 @@ use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
-class ExportTemplatePriceList implements WithEvents
+class ExportTemplatePriceList extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements WithCustomValueBinder, WithEvents
 {
     use Exportable, RegistersEventListeners;
     public static function beforeExport(BeforeExport $event)

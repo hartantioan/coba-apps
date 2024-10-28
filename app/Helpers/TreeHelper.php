@@ -2941,8 +2941,8 @@ class TreeHelper {
                         ];
 
                         if (!$hide_nominal) {
-                            $properties[] = ['name'=> "Nominal : Rp.:".number_format($query_invoice->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
-                            ;
+                            // $properties[] = ['name'=> "Nominal : Rp.:".number_format($query_invoice->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                            // ;
                         }
                         $mo_delivery=[
                             "name"=> $query_invoice->marketingOrderDeliveryProcess->code,
@@ -3118,8 +3118,8 @@ class TreeHelper {
                             ];
 
                             if (!$hide_nominal) {
-                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->lookable->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
-                                ;
+                                // $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->lookable->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                                // ;
                             }
                             $mo_delivery=[
                                 "name"=> $row_invoice_detail->lookable->marketingOrderDeliveryProcess->code,
@@ -3279,8 +3279,8 @@ class TreeHelper {
                         ];
 
                         if (!$hide_nominal) {
-                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
-                            ;
+                            // $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                            // ;
                         }
                         $data_mo_delivery_process = [
                             "name"=>$query_mo_delivery->marketingOrderDeliveryProcess->code,

@@ -54,7 +54,8 @@ class DeliveryCostController extends Controller
         $total_data = DeliveryCost::count();
 
         $query_data = DeliveryCost::where(function($query) use ($search, $request) {
-                if($search) {
+            if($search) {
+                $query->where(function($query) use ($search, $request) {
                     $query->where('name','like',"%$search%")
                     ->orWhere('code','like',"%$search%")
                     ->orWhereHas('account',function($query) use ($search) {
@@ -77,37 +78,40 @@ class DeliveryCostController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%");
                     });
-                }
+                });
+            }
 
-                if($request->account_id){
-                    $query->where('account_id', $request->account_id);
-                }
 
-                if($request->start_date && $request->finish_date) {
-                    $query->where(function($query) use ($request) {
-                        $query->whereDate('valid_from', '>=', $request->start_date)
-                            ->whereDate('valid_from', '<=', $request->finish_date);
-                    })->orWhere(function($query) use ($request) {
-                        $query->whereDate('valid_to', '>=', $request->start_date)
-                            ->whereDate('valid_to', '<=', $request->finish_date);
-                    });
-                } else if($request->start_date) {
-                    $query->whereDate('valid_from','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    $query->whereDate('valid_to','<=', $request->finish_date);
-                }
+            if($request->account_id){
+                $query->where('account_id', $request->account_id);
+            }
 
-                if($request->status){
-                    $query->where('status', $request->status);
-                }
-            })
-            ->offset($start)
-            ->limit($length)
-            ->orderBy($order, $dir)
-            ->get();
+            if($request->start_date && $request->finish_date) {
+                $query->where(function($query) use ($request) {
+                    $query->whereDate('valid_from', '>=', $request->start_date)
+                        ->whereDate('valid_from', '<=', $request->finish_date);
+                })->orWhere(function($query) use ($request) {
+                    $query->whereDate('valid_to', '>=', $request->start_date)
+                        ->whereDate('valid_to', '<=', $request->finish_date);
+                });
+            } else if($request->start_date) {
+                $query->whereDate('valid_from','>=', $request->start_date);
+            } else if($request->finish_date) {
+                $query->whereDate('valid_to','<=', $request->finish_date);
+            }
+
+            if($request->status){
+                $query->where('status', $request->status);
+            }
+        })
+        ->offset($start)
+        ->limit($length)
+        ->orderBy($order, $dir)
+        ->get();
 
         $total_filtered = DeliveryCost::where(function($query) use ($search, $request) {
-                if($search) {
+            if($search) {
+                $query->where(function($query) use ($search, $request) {
                     $query->where('name','like',"%$search%")
                     ->orWhere('code','like',"%$search%")
                     ->orWhereHas('account',function($query) use ($search) {
@@ -130,31 +134,32 @@ class DeliveryCostController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%");
                     });
-                }
+                });
+            }
 
-                if($request->account_id){
-                    $query->where('account_id', $request->account_id);
-                }
+            if($request->account_id){
+                $query->where('account_id', $request->account_id);
+            }
 
-                if($request->start_date && $request->finish_date) {
-                    $query->where(function($query) use ($request) {
-                        $query->whereDate('valid_from', '>=', $request->start_date)
-                            ->whereDate('valid_from', '<=', $request->finish_date);
-                    })->orWhere(function($query) use ($request) {
-                        $query->whereDate('valid_to', '>=', $request->start_date)
-                            ->whereDate('valid_to', '<=', $request->finish_date);
-                    });
-                } else if($request->start_date) {
-                    $query->whereDate('valid_from','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    $query->whereDate('valid_to','<=', $request->finish_date);
-                }
+            if($request->start_date && $request->finish_date) {
+                $query->where(function($query) use ($request) {
+                    $query->whereDate('valid_from', '>=', $request->start_date)
+                        ->whereDate('valid_from', '<=', $request->finish_date);
+                })->orWhere(function($query) use ($request) {
+                    $query->whereDate('valid_to', '>=', $request->start_date)
+                        ->whereDate('valid_to', '<=', $request->finish_date);
+                });
+            } else if($request->start_date) {
+                $query->whereDate('valid_from','>=', $request->start_date);
+            } else if($request->finish_date) {
+                $query->whereDate('valid_to','<=', $request->finish_date);
+            }
 
-                if($request->status){
-                    $query->where('status', $request->status);
-                }
-            })
-            ->count();
+            if($request->status){
+                $query->where('status', $request->status);
+            }
+        })
+        ->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {

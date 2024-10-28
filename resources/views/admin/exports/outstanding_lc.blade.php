@@ -9,12 +9,6 @@
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">{{ __('translations.status') }}</th>
-            <th class="center-align">Voider</th>
-            <th class="center-align">Tgl. Void</th>
-            <th class="center-align">Ket. Void</th>
-            <th class="center-align">Deleter</th>
-            <th class="center-align">Tgl. Delete</th>
-            <th class="center-align">Ket. Delete</th>
             <th class="center-align">NIK</th>
             <th class="center-align">User</th>
             <th class="center-align">Due Date</th>
@@ -42,12 +36,6 @@
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['status'] }}</td>
-                <td>{{ $row['void_user'] }}</td>
-                <td>{{ $row['void_date'] }}</td>
-                <td>{{ $row['void_note'] }}</td>
-                <td>{{ $row['delete_user'] }}</td>
-                <td>{{ $row['delete_date'] }}</td>
-                <td>{{ $row['delete_note'] }}</td>
                 <td>{{ $row['user_code'] }}</td>
                 <td>{{ $row['user_name'] }}</td>
                 <td>{{ $row['due_date'] }}</td>
@@ -64,11 +52,11 @@
                 <td>{{ $row['tagihan'] }}</td>
                 <td>{{ $row['dibayar'] }}</td>
                 <td>{{ $row['sisa'] }}</td>
-                
-                
+
+
             </tr>
         @endforeach
-            
+
         @endif
     </tbody>
 </table>

@@ -3210,9 +3210,15 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
-        ->whereHas('goodScaleDetail',function($query){
-            $query->whereHas('goodScale',function($query){
-                $query->whereNull('time_scale_out');
+        ->where(function($query){
+            $query->where(function($query){
+                $query->whereNotNull('marketing_order_delivery_id');
+            })->orWhere(function($query){
+                $query->whereHas('goodScaleDetail',function($query){
+                    $query->whereHas('goodScale',function($query){
+                        $query->whereNull('time_scale_out');
+                    });
+                });
             });
         })
         ->get();

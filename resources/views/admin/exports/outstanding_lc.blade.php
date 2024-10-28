@@ -25,6 +25,7 @@
             <th class="center-align">Total Tagihan</th>
             <th class="center-align">Total Dibayar</th>
             <th class="center-align">Sisa Tunggakan</th>
+            <th class="center-align">No GRPO</th>
         </tr>
     </thead>
     <tbody>
@@ -52,6 +53,7 @@
                 <td>{{ $row['tagihan'] }}</td>
                 <td>{{ $row['dibayar'] }}</td>
                 <td>{{ $row['sisa'] }}</td>
+                <td>{{ $row['grpo_no'] }}</td>
 
 
             </tr>

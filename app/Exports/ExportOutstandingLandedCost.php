@@ -20,7 +20,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
-		
+
     }
 
     public function view(): View
@@ -29,7 +29,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             $query->whereIn('status',['2','3'])
                 ->where('post_date','<=',$this->date);
         })->get();
-        
+
         $array=[];
         foreach($data as $row){
             $entry = [];
@@ -62,21 +62,22 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             $entry["tagihan"] = number_format($row->total * $row->landedCost->currency_rate,2,',','.');
             $entry["dibayar"] = number_format($row->totalInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');
             $entry["sisa"] = number_format($row->balanceInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');
+            $entry["grpo_no"] = $row->landedCost->getGoodReceiptNo();
             if($row->balanceInvoiceByDate($this->date) > 0){
                 $array[] = $entry;
             }
-            
-            
+
+
         }
         activity()
             ->performedOn(new LandedCostFeeDetail())
             ->causedBy(session('bo_id'))
             ->withProperties(null)
             ->log('Export outstanding Lc.');
-        
+
         return view('admin.exports.outstanding_lc', [
             'data' => $array,
-            
+
         ]);
     }
 }

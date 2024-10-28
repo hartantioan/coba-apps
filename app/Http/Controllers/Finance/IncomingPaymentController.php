@@ -169,23 +169,7 @@ class IncomingPaymentController extends Controller
                 }
             }
 
-            foreach($data->marketingOrderMemo()->whereHas('marketingOrderMemoDetail',function($query){
-                $query->where('lookable_type','coas');
-            })->get() as $row){
-                if(!$row->used()->exists() && $row->balance() > 0){
-                    $details[] = [
-                        'id'                    => $row->id,
-                        'type'                  => $row->getTable(),
-                        'code'                  => $row->code,
-                        'post_date'             => date('d/m/Y',strtotime($row->post_date)),
-                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
-                        'memo'                  => number_format($row->totalUsed(),2,',','.'),
-                        'balance'               => number_format($row->balance(),2,',','.'),
-                    ];
-                }
-            }
-
-            foreach($data->marketingOrderMemo()->where('type','3')->get() as $row){
+            foreach($data->marketingOrderMemo as $row){
                 if(!$row->used()->exists() && $row->balance() > 0){
                     $details[] = [
                         'id'                    => $row->id,

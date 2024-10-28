@@ -1365,6 +1365,11 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
+							if($row->lookable->balance() <= 0){
+								$row->lookable->update([
+									'status'	=> '3',
+								]);
+							}
 						}elseif($row->lookable_type == 'marketing_order_down_payments'){
 							JournalDetail::create([
 								'journal_id'	=> $query->id,

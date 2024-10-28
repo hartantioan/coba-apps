@@ -31,6 +31,14 @@ class ApprovalMatrix extends Model
         'status',
     ];
 
+    public function getTotal(){
+        $grandtotal = 0;
+        if($this->approvalSource->lookable_type == 'fund_requests'){
+            $grandtotal = $this->approvalSource->grandtotal;
+        }
+        return CustomHelper::formatConditionalQty($grandtotal);
+    }
+
     public function user(){
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }

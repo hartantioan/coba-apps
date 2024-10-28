@@ -335,6 +335,7 @@ class ApprovalController extends Controller
                     $val->approvalSource->lookable->code??'asdfas',
                     $val->approvalSource->note,
                     $val->status(),
+                    $val->getTotal(),
                     $val->note,
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light '.($val->status == '1' ? 'amber' : 'green').' accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`,'.$val->status.')"><i class="material-icons dp48">pageview</i></button>&nbsp;<br>'.(
                     $val->status == '1' ? '

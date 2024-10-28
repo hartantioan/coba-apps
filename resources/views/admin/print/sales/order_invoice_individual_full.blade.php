@@ -300,6 +300,21 @@
                                     </td>
 
                                 </tr>
+                                <tr class="break-row">
+                                    <td>
+                                        Pembayaran dapat dilakukan ke:
+                                        <br>
+                                        PT Superior Porcelain Sukses
+                                        <h3>
+                                            - MANDIRI KCP DARMO PERMAI 14100 798 77999
+                                        </h3>
+                                        Catatan:
+                                        <ol>
+                                            <li>Pembayaran dengan Cek/BG lunas setelah pencairan.</li>
+                                            <li>Invoice ini adalah bukti penagihan, BUKAN bukti pembayaran.</li>
+                                        </ol>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         <div class="column2">

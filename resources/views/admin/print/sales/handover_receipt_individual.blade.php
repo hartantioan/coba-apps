@@ -140,7 +140,7 @@
                 min-height: auto;
             }
 
-            @page { margin: 3em 3em 6em 3em; }
+            @page { margin: 2em 2em 5em 2em; }
 
         </style>
     </head>
@@ -196,7 +196,7 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <div class="invoice-subtotal break-row" style="margin-top:50px;">
+                    <div class="invoice-subtotal break-row" style="margin-top:30px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="50%" align="center">

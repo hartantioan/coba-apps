@@ -264,28 +264,7 @@
                 </div>
             </div>
         </main>
-        <div style="margin-top:15px;page-break-after: always;">
-            <table border="0" width="100%">
-                <tr>
-                    <td width="33%">
-                        <img src="{{ $image }}" width="50%" style="top:5px; width:60%">
-                    </td>
-                    <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
-                        <b>{{ $title }}</b>
-                    </td>
-                    <td align="center" width="33%" style="padding-top:10px;">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
-                        <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
-                            {{ $data->code }}
-                        </span>
-                        <div class="invoice-number mr-1" style="font-size:10px;font-weight:800;margin-left:40px;">
-                            *Untuk Finance
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <main>
+        <main style="margin-top:15px;page-break-after: always;">
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->

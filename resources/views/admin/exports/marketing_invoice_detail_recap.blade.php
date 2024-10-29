@@ -13,6 +13,7 @@
             <th>Jenis Pengiriman</th>
             <th>Item</th>
             <th>Qty</th>
+            <th>No Faktur Pajak</th>
             <th>Uom</th>
             <th>Harga</th>
             <th>Disc 1</th>
@@ -46,6 +47,7 @@
             <td>{{ $row['type'] }}</td>
             <td>{{ $row['item'] }}</td>
             <td>{{ $row['qty'] }}</td>
+            <td>{{ $row['taxno'] }}</td>
             <td>{{ $row['uom'] }}</td>
             <td>{{ $row['price'] }}</td>
             <td>{{ $row['disc1'] }}</td>

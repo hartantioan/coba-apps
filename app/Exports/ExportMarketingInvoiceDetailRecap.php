@@ -86,6 +86,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'totalinvoice'=>$row->marketingOrderInvoice->total,
                 'tax'=>$row->marketingOrderInvoice->tax,
                 'grandtotalinvoice'=>$row->marketingOrderInvoice->grandtotal,
+                'taxno'=>$row->marketingOrderInvoice->tax_no,
                
             ];
 
@@ -151,6 +152,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'totalinvoice'=>$row->marketingOrderInvoice->total,
                 'tax'=>$row->marketingOrderInvoice->tax,
                 'grandtotalinvoice'=>$row->marketingOrderInvoice->grandtotal,
+                'taxno'=>$row->marketingOrderInvoice->tax_no,
                
             ];
 
@@ -199,6 +201,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'totalinvoice'=>0,
                 'tax'=>0,
                 'grandtotalinvoice'=>0,
+                'taxno'=>'',
             ];
         }
 

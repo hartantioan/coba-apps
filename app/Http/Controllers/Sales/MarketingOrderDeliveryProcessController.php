@@ -954,6 +954,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $placeCode = $pr->getPlace();
 
             $barcodeData = $currentDate. $currentTime . $placeCode ;
+            $pr->update(['scan_barcode'=> $barcodeData]);
             $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,188.98,78.59),'portrait','admin.print.sales.order_delivery_proces_barcode_individual');
 
             $content = $pdf->download()->getOriginalContent();

@@ -101,7 +101,7 @@ class DeliveryScanController extends Controller
 
     public function showFromBarcode(Request $request){
         $barcode = $request->input('barcode');
-        $mop = MarketingOrderDeliveryProcess::where('code', $barcode)->first();
+        $mop = MarketingOrderDeliveryProcess::where('scan_barcode', $barcode)->first();
         $detail = [];
         if($mop){
             foreach ($mop->marketingOrderDeliveryProcessDetail as $key => $value) {
@@ -137,7 +137,7 @@ class DeliveryScanController extends Controller
         }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Bukan Barcode SJ'
+                'message' => 'Barcode Tidak Ditemukan'
             ];
         }
 

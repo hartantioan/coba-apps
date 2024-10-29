@@ -140,34 +140,32 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
+            @page { margin: 3em 3em 6em 3em; }
             
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
 
         </style>
     </head>
     <body>
-        <header>
-            <table border="0" width="100%">
-                <tr>
-                    <td align="center" width="33%">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                    </td>
-                    <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
-                        <b>{{ $title }}</b>
-                    </td>
-                    <td align="center" width="33%" style="padding-top:10px;">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
-                        <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
-                            {{ $data->code }}
-                        </span>
-                        <div class="invoice-number mr-1" style="font-size:10px;font-weight:800;margin-left:40px;">
-                            *Untuk Customer
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </header>
+        <table border="0" width="100%">
+            <tr>
+                <td align="center" width="33%">
+                    <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
+                    <b>{{ $title }}</b>
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;">
+                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
+                    <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
+                        {{ $data->code }}
+                    </span>
+                    <div class="invoice-number mr-1" style="font-size:10px;font-weight:800;margin-left:40px;">
+                        *Untuk Customer
+                    </div>
+                </td>
+            </tr>
+        </table>
         <main style="margin-bottom:20px;">
             <div class="card">
                 <div class="card-content invoice-print-area">
@@ -264,7 +262,26 @@
                 </div>
             </div>
         </main>
-        <main style="margin-top:15px;page-break-before: always;">
+        <table border="0" width="100%" style="page-break-before: always;">
+            <tr>
+                <td align="center" width="33%">
+                    <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
+                    <b>{{ $title }}</b>
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;">
+                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
+                    <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
+                        {{ $data->code }}
+                    </span>
+                    <div class="invoice-number mr-1" style="font-size:10px;font-weight:800;margin-left:40px;">
+                        *Untuk Finance
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <main>
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->

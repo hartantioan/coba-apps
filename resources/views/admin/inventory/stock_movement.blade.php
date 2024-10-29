@@ -198,7 +198,7 @@
             width: '100%',
         });
 
-        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/simple_item") }}');
     });
     $('#export_button').hide();
 

@@ -171,7 +171,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
             }
             else
             {
-                $pricefinal=Round($row->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
+                $pricefinal=Round($row->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
             }
 
             $array_filter[] = [

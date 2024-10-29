@@ -140,6 +140,10 @@
                 min-height: auto;
             }
 
+            .page-break {
+                page-break-after: always;
+            }
+
             @page { margin: 2em 2em 5em 2em; }
 
         </style>
@@ -177,7 +181,7 @@
                         </thead>
                         <tbody>
                             @foreach($data->marketingOrderReceiptDetail as $key => $row)
-                                <tr>
+                                <tr class="{{ $key == 30 ? 'page-break' : '' }}">
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>

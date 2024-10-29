@@ -2572,7 +2572,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('production_summary_stock_fg')->middleware('operation.access:production_summary_stock_fg,view')->group(function () {
                         Route::get('/', [ReportProductionSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportProductionSummaryStockFgController::class, 'filter']);
-                        Route::get('export', [ReportProductionSummaryStockFgController::class, 'export']);
+                        Route::post('export', [ReportProductionSummaryStockFgController::class, 'export']);
                     });
 
                     Route::prefix('report_balance_wip')->middleware('operation.access:production_summary_stock_fg,view')->group(function () {

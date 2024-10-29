@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ExportProductionSummaryStockFgJob;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\ItemShading;
@@ -72,7 +73,6 @@ class ReportProductionSummaryStockFgController extends Controller
         ->groupBy('item_stocks.item_id', 'items.code', 'items.name')
         ->get();
 
-        info($query_data);
         $newData = [];
 
         // foreach($query_data as $index_data =>$row){
@@ -130,7 +130,13 @@ class ReportProductionSummaryStockFgController extends Controller
     public function export(Request $request){
 
         $start_date = $request->start_date;
-        $finish_date = $request->end_date;
-		return Excel::download(new ExportReportProductionSummaryStockFg($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+        $finish_date = $request->finish_date;
+
+        $user_id = session('bo_id');
+
+        ExportProductionSummaryStockFgJob::dispatch($start_date, $finish_date,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
+
 }

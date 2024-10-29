@@ -228,20 +228,41 @@
     });
     function exportExcel(){
 
-        var status = $('#filter_status').val();
-        var type_buy = $('#filter_inventory').val();
-        var type_deliv = $('#filter_delivery').val();
-        var company = $('#filter_company').val();
-        var type_pay = $('#filter_payment').val();
-        var supplier = $('#filter_account').val();
-        var sender = $('#filter_sender').val();
-        var sales = $('#filter_sales').val();
-        var currency = $('#filter_currency').val();
+        var finish_date = $('#finish_date').val();
         var start_date = $('#start_date').val();
-        var end_date = $('#finish_date').val();
-        var account_id = $('#filter_account').val();
         var $search = '';
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&start_date=" + start_date;
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                finish_date: finish_date,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
 
     }
     function exportCsv(){

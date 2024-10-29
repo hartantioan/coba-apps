@@ -264,7 +264,7 @@
                 </div>
             </div>
         </main>
-        <main style="margin-top:15px;page-break-after: always;">
+        <main style="margin-top:15px;page-break-before: always;">
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->

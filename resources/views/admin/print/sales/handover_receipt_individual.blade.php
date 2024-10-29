@@ -181,7 +181,7 @@
                         </thead>
                         <tbody>
                             @foreach($data->marketingOrderReceiptDetail as $key => $row)
-                                <tr class="{{ $key % 30 == 0 ? 'page-break' : '' }}">
+                                <tr class="{{ $key % 35 == 0 ? 'page-break' : '' }}">
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>

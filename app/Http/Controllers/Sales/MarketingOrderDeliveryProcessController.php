@@ -1812,7 +1812,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),
+                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_marketing_order_process;
@@ -1905,7 +1905,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         }
                     })
                     ->get();
-            
+
             foreach($data as $item){
                 $balanceWithUnsent = $item->balanceWithUnsent();
                 if($balanceWithUnsent > 0){
@@ -1921,7 +1921,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ];
                 }
             }
-            
+
             $response = [
                 'status'    => 200,
                 'details'   => $details,

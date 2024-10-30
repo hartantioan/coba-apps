@@ -131,6 +131,23 @@ class MarketingOrderDeliveryProcess extends Model
         return implode(', ',$arr);
     }
 
+    public function getUnit(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,$arr)){
+                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code){
+
+                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code;
+                }
+            }
+        }
+
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
     public function getOutlet(){
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
@@ -209,6 +226,19 @@ class MarketingOrderDeliveryProcess extends Model
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if(!in_array($row->itemStock->warehouse->name,$arr)){
                 $arr[] = $row->itemStock->warehouse->name;
+            }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getArea(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->itemStock->area->name,$arr)){
+                $arr[] = $row->itemStock->area->name;
             }
         }
         if(count($arr) == 0){

@@ -162,11 +162,13 @@ class MarketingBarcodeScanController extends Controller
                 ];
                 return response()->json($response);
             }
+            $query_track_3 = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$mop->id)
+            ->whereIn('status',values: ['3'])->count();
 
-            if($query->status == '2'){
+            if($query_track_3 > 0){
                 $find_send_customer = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$mop->id)
                 ->whereNotIn('status',values: ['5'])
-                ->whereIn('status',values: ['3'])
+                ->whereIn(column: 'status',values: ['3'])
                 ->get();
                 if(count($find_send_customer) > 0){
                     MarketingOrderDeliveryProcessTrack::create([
@@ -196,7 +198,7 @@ class MarketingBarcodeScanController extends Controller
             }else{
                 $response = [
                     'status'  => 500,
-                    'message' => 'Status Dokumen Harus Dalam status Proses'
+                    'message' => 'Status Dokumen Harus : Barang Diterima Customer'
                 ];
 
             }

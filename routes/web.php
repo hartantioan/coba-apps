@@ -161,6 +161,7 @@ use App\Http\Controllers\Sales\MarketingOrderMemoController;
 use App\Http\Controllers\Sales\MarketingOrderReportController;
 use App\Http\Controllers\Sales\ReportMarketingOrderDeliveryController;
 use App\Http\Controllers\Sales\ReportSalesOrderRecapController;
+use App\Http\Controllers\Sales\ReportMarketingDOScalesController;
 use App\Http\Controllers\Sales\ReportSalesOrderController;
 use App\Http\Controllers\Sales\ReportMarketingInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderOutstandingController;
@@ -2875,6 +2876,13 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter', [ReportSalesOrderRecapController::class, 'filter']);
                         Route::get('export', [ReportSalesOrderRecapController::class, 'export']);
                         Route::get('export_csv', [ReportSalesOrderRecapController::class, 'exportCsv']);
+                    });
+
+                    Route::prefix('report_marketing_do_scale')->middleware('operation.access:report_marketing_do_scale,view')->group(function () {
+                        Route::get('/', [ReportMarketingDOScalesController::class, 'index']);
+                        Route::post('filter', [ReportMarketingDOScalesController::class, 'filter']);
+                        Route::get('export', [ReportMarketingDOScalesController::class, 'export']);
+                        Route::get('export_csv', [ReportMarketingDOScalesController::class, 'exportCsv']);
                     });
 
                     Route::prefix('report_sales_order')->middleware('operation.access:report_sales_order,view')->group(function () {

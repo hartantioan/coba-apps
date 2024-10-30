@@ -34,7 +34,7 @@ class ApprovalMatrix extends Model
     public function getTotal(){
         $grandtotal = 0;
         if($this->approvalSource->lookable_type == 'fund_requests'){
-            $grandtotal = $this->approvalSource->grandtotal;
+            $grandtotal = $this->approvalSource->lookable->grandtotal;
         }
         return CustomHelper::formatConditionalQty($grandtotal);
     }

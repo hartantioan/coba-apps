@@ -50,7 +50,6 @@ class MailReportMarketingGlobal extends Command
 		$data3 = [];
 		$data4 = [];
 		$data5 = [];
-		$data6 = [][][];
 		//global 1a
 		$query = DB::select("
               	SELECT a.name, ifnull(b.qtyso,0) AS qtySO,ifnull(c.qtymod,0) AS qtyMOD,ifnull(d.qtysj,0) AS qtySJ ,
@@ -731,10 +730,6 @@ class MailReportMarketingGlobal extends Command
 
 			];
 		}
-
-	
-
-info($data6);
 
 		$obj = json_decode(json_encode($data));
 		$obj2 = json_decode(json_encode($data2));

@@ -770,7 +770,7 @@ class MarketingOrderDeliveryProcess extends Model
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
             'post_date'		=> $modp->receive_date,
-            'note'			=> $modp->note_internal.' - '.$modp->note_external,
+            'note'			=> $modp->marketingOrderDelivery->code,
             'status'		=> '3'
         ]);
 
@@ -790,7 +790,8 @@ class MarketingOrderDeliveryProcess extends Model
                 'type'			=> '1',
                 'nominal'		=> $hpp,
                 'nominal_fc'	=> $hpp,
-                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.',
+                'note'          => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                'note2'         => $modp->marketingOrderDelivery->goodScaleDetail()->exists() ? $modp->marketingOrderDelivery->goodScaleDetail->goodScale->code : '-',
                 'lookable_type'	=> $modp->getTable(),
                 'lookable_id'	=> $modp->id,
                 'detailable_type'=> $row->getTable(),

@@ -38,12 +38,12 @@ class FetchCurrencyRates extends Command
                 'date' => $dateString,
             ]);
 
-            if ($response->successful()) {
+            /* if ($response->successful()) { */
                 $data = $response->json();
-                $query_currency_ada = CurrencyDate::where('id',$row_currency->id)
+                /* $query_currency_ada = CurrencyDate::where('id',$row_currency->id)
                 ->where('currency_date',$data['date'])
                 ->get();
-                if(count($query_currency_ada) == 0){
+                if(count($query_currency_ada) == 0){ */
                   
                     CurrencyDate::create([
                         'currency_id'   => $row_currency->id,
@@ -51,13 +51,13 @@ class FetchCurrencyRates extends Command
                         'currency_rate' => $data['rates']['IDR'],
                         'taken_from'    => 'https://api.vatcomply.com/rates',
                     ]);
-                }
+                /* }
                 
     
                 $this->info('Currency rates fetched and stored successfully.');
             } else {
                 $this->error('Failed to fetch currency rates.');
-            }
+            } */
         }
         
     }

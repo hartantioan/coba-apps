@@ -42,7 +42,7 @@
         /* bring your own prefixes */
         transform: translate(-50%, -50%) !important;
     }
-    
+
     @media (min-width: 960px) {
         #modal4 {
             width:60%;
@@ -78,13 +78,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -153,7 +153,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -224,7 +224,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -236,7 +236,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                
+
                     <h4 class="mt-2">{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                     <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Lain-lain, Landed Cost, atau AP DP.</i>
                     <form class="row" id="form_data" onsubmit="return false;">
@@ -290,8 +290,8 @@
                                     <label class="" for="type">{{ __('translations.type') }}</label>
                                 </div>
                                 <div class="col s12 m12 l12"></div>
-                                
-                               
+
+
                                 <div class="input-field col m3 s12 step7">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
@@ -301,7 +301,7 @@
                                     <label class="active" for="received_date">Tgl. Terima</label>
                                 </div>
                                 <div class="input-field col m3 s12 step9">
-                                    <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
+                                    <input id="top" name="top" min="0" type="number" value="30" onchange="addDays();">
                                     <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
                                 </div>
                                 <div class="input-field col m3 s12 step10">
@@ -351,7 +351,7 @@
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                                     <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                 </div>
-                                
+
                                 <div class="input-field col m4 s12 step18">
                                     <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
                                     <label class="active" for="scan_barcode">Scan Barcode (Single Input)</label>
@@ -364,7 +364,7 @@
                                     <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                         Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                         <br>
-                                        
+
                                     </div>
                                     <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                        Clear
@@ -410,7 +410,7 @@
                                                                             <th class="center">PPh (%)</th>
                                                                             <th class="center">PPh (Rp)</th>
                                                                             <th class="center">{{ __('translations.grandtotal') }}</th>
-                                                                            
+
                                                                             <th class="center">{{ __('translations.plant') }}</th>
                                                                             <th class="center">{{ __('translations.line') }}</th>
                                                                             <th class="center">{{ __('translations.engine') }}</th>
@@ -586,7 +586,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -641,7 +641,7 @@
                                             <tr>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">GR/LC/PO/FR No.</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Detail Item</th>
-                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No PO</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No SJ/PO</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Ter-Invoice</th>
@@ -731,7 +731,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -754,7 +754,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -771,7 +771,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -782,10 +782,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -801,7 +801,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -848,7 +848,7 @@
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -901,7 +901,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -909,18 +909,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -928,16 +928,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -956,22 +956,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -1003,13 +1003,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -1080,7 +1080,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -1092,9 +1092,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -1148,7 +1148,7 @@
                         style: 'multi'
                     }
                 });
-                
+
                 $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_multi_length"]').addClass('browser-default');
             },
@@ -1215,9 +1215,9 @@
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -1227,7 +1227,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -1237,18 +1237,18 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -1393,12 +1393,12 @@
                                                     </select>
                                                 </td>
                                                 <td class="right-align" id="row_wtax` + count + `">
-                                                    ` + val.wtax + `    
+                                                    ` + val.wtax + `
                                                 </td>
                                                 <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                     ` + val.grandtotal + `
                                                 </td>
-                                                
+
                                                 <td class="center">
                                                     ` + val.place_name + `
                                                 </td>
@@ -1435,7 +1435,7 @@
                                         $('#spk_no').val(val.spk_no);
                                         $('#invoice_no').val(val.invoice_no);
 
-                                    });                        
+                                    });
                                 }else{
                                     $('.row_detail').remove();
                                     $('#total,#tax,#balance').text('0,00');
@@ -1444,7 +1444,7 @@
                                 if(!$('#received_date').val()){
                                     addDays();
                                 }
-                                
+
                                 $('.modal-content').scrollTop(400);
                                 M.updateTextFields();
 
@@ -1755,7 +1755,7 @@
                                         if($start.closest('td').next('td').find('input')[0] != undefined) {
                                             $start = $start.closest('td').next('td').find('input');
                                         }else{
-                                            return false;  
+                                            return false;
                                         }
                                     });
                                     $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
@@ -1833,11 +1833,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1859,8 +1859,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1868,7 +1868,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1877,10 +1877,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1904,7 +1904,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1917,17 +1917,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1948,8 +1948,8 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     function printMultiSelect(){
@@ -1960,7 +1960,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -2005,13 +2005,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -2041,11 +2041,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function applyDocuments(type){
@@ -2075,7 +2075,7 @@
                         arr_type.push($(item).data('type'));
                     });
                 }
-                
+
                 if(arr_type.length > 0){
                     let arrResult = arr_type.filter((element, index) => {
                         return arr_type.indexOf(element) === index;
@@ -2097,7 +2097,7 @@
                             dataType: 'JSON',
                             data: {
                                 arr_id: arr_id,
-                                arr_type: arr_type, 
+                                arr_type: arr_type,
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2207,7 +2207,7 @@
                                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                             ` + val.grandtotal + `
                                                         </td>
-                                                        
+
                                                         <td class="center">
                                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                                 @foreach ($place as $rowplace)
@@ -2221,7 +2221,7 @@
                                                                 @foreach ($line as $rowline)
                                                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                                                 @endforeach
-                                                            </select>    
+                                                            </select>
                                                         </td>
                                                         <td>
                                                             <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
@@ -2229,7 +2229,7 @@
                                                                 @foreach ($machine as $rowmachine)
                                                                     <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
                                                                 @endforeach
-                                                            </select>    
+                                                            </select>
                                                         </td>
                                                         <td class="center">
                                                             <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -2367,12 +2367,12 @@
                                                             </select>
                                                         </td>
                                                         <td class="right-align" id="row_wtax` + count + `">
-                                                            ` + val.wtax + `    
+                                                            ` + val.wtax + `
                                                         </td>
                                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                             ` + val.grandtotal + `
                                                         </td>
-                                                        
+
                                                         <td class="center">
                                                             ` + val.place_name + `
                                                         </td>
@@ -2422,7 +2422,7 @@
                                             if(!val.due_date && val.top && val.received_date){
                                                 addDays();
                                             }
-                                        });                        
+                                        });
                                     }else{
                                         $('.row_detail').remove();
                                         $('#total,#tax,#balance').text('0,00');
@@ -2462,7 +2462,7 @@
                                                     </td>
                                                 </tr>
                                             `);
-                                        });                        
+                                        });
                                     }else{
                                         $('#body-detail-dp').empty().append(`
                                             <tr id="empty-detail-dp">
@@ -2479,7 +2479,7 @@
                                 if(!$('#received_date').val()){
                                     addDays();
                                 }
-                                
+
                                 $('.modal-content').scrollTop(0);
                                 M.updateTextFields();
 
@@ -2528,7 +2528,7 @@
         qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")),
         conversion = parseFloat($(element).data('conversion').toString().replaceAll(".", "").replaceAll(",",".")),
         qtyConversion = conversion * qty;
-        
+
         $('#qty_stock' + code).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
     }
 
@@ -2537,14 +2537,14 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 loadingClose('.modal-content');
@@ -2579,12 +2579,12 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-
                     if(kind == '1'){
                         $('#modal4').modal('open');
                         $('#account_name').text($('#account_id').select2('data')[0].text);
 
                         if(response.details.length > 0){
+
                             $.each(response.details, function(i, val) {
                                 $('#body-detail-multi').append(`
                                     <tr data-type="` + val.type + `" data-id="` + val.id + `">
@@ -2644,10 +2644,10 @@
                                         </td>
                                     </tr>
                                 `);
-                            });                        
+                            });
                         }
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -2773,7 +2773,7 @@
                 <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                     0
                 </td>
-                
+
                 <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
@@ -2787,7 +2787,7 @@
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
@@ -2795,7 +2795,7 @@
                         @foreach ($machine as $rowmachine)
                             <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -2842,7 +2842,7 @@
     function countAll(){
         if($('#type_detail').val() == '1'){
             var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
-            
+
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
@@ -2934,7 +2934,7 @@
     function countGrandtotal(){
         if($('#type_detail').val() == '1'){
             let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), rounding_convert = rounding * currency_rate;
-            
+
             let grandtotal = total + tax - wtax + rounding;
 
             $('input[name^="arr_dp_code"]').each(function(index){
@@ -3128,11 +3128,11 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -3203,7 +3203,7 @@
                     });
 
                     $('input[name^="arr_code"]').each(function(){
-                        passed = true;                    
+                        passed = true;
                         if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
                             if($('#arr_coa' + $(this).data('id')).val()){
                                 formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
@@ -3287,12 +3287,12 @@
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
@@ -3324,7 +3324,7 @@
                                     $.each(response.error, function(field, errorMessage) {
                                         $('#' + field).addClass('error-input');
                                         $('#' + field).css('border', '1px solid red');
-                                        
+
                                     });
                                     swal({
                                         title: 'Ups! Validation',
@@ -3484,7 +3484,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -3549,7 +3549,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -3558,10 +3558,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function show(id){
@@ -3585,7 +3585,7 @@
                         html: response.message
                     });
                 }else{
-                
+
                     if(response.document){
                         const baseUrl = 'http://127.0.0.1:8000/storage/';
                         const filePath = response.document.replace('public/', '');
@@ -3605,7 +3605,7 @@
                     $('#post_date').val(response.post_date);
                     $('#received_date').val(response.received_date);
                     $('#due_date').val(response.due_date);
-                    $('#document_date').val(response.document_date);                
+                    $('#document_date').val(response.document_date);
                     $('#note').val(response.note);
                     $('#tax_no').val(response.tax_no);
                     $('#tax_cut_no').val(response.tax_cut_no);
@@ -3618,7 +3618,7 @@
                     $('#currency_rate').val(response.currency_rate);
                     $('#currency_id').val(response.currency_id).formSelect();
                     $('#top').val(response.top);
-                    
+
                     if(response.details.length > 0){
                         $('.row_detail').remove();
                         $.each(response.details, function(i, val) {
@@ -3718,7 +3718,7 @@
                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                             ` + val.grandtotal + `
                                         </td>
-                                        
+
                                         <td class="center">
                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                 @foreach ($place as $rowplace)
@@ -3732,7 +3732,7 @@
                                                 @foreach ($line as $rowline)
                                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                                 @endforeach
-                                            </select>    
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
@@ -3740,7 +3740,7 @@
                                                 @foreach ($machine as $rowmachine)
                                                     <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
                                                 @endforeach
-                                            </select>    
+                                            </select>
                                         </td>
                                         <td class="center">
                                             <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -3876,12 +3876,12 @@
                                             </select>
                                         </td>
                                         <td class="right-align" id="row_wtax` + count + `">
-                                            ` + val.wtax + `    
+                                            ` + val.wtax + `
                                         </td>
                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                             ` + val.grandtotal + `
                                         </td>
-                                        
+
                                         <td class="center">
                                             ` + val.place_name + `
                                         </td>
@@ -3942,11 +3942,11 @@
                                     </td>
                                 </tr>
                             `);
-                        });                        
+                        });
                     }
                 }
-                
-                
+
+
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
@@ -4090,7 +4090,7 @@
     }
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -4098,10 +4098,10 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
-    
+
     function printData(){
         var arr_id_invoice=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -4143,7 +4143,7 @@
                 });
             }
         });
-        
+
     }
 
     function addDays(){
@@ -4166,7 +4166,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -4210,128 +4210,128 @@
                 {
                     title : 'Tipe Detail',
                     element : document.querySelector('.step3'),
-                    intro : 'Tipe Detail dari invoice yang nantinya akan menentukan inputan dari invoice ini.' 
+                    intro : 'Tipe Detail dari invoice yang nantinya akan menentukan inputan dari invoice ini.'
                 },
                 {
                     title : 'Supplier',
                     element : document.querySelector('.step4'),
-                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis. Pada inputan disini akan menambahkan ke detail grpo po lc yang ada dibawah begitu juga pada tabel detail down payment yang berkaitan dengan supplier dan tipenya.' 
+                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis. Pada inputan disini akan menambahkan ke detail grpo po lc yang ada dibawah begitu juga pada tabel detail down payment yang berkaitan dengan supplier dan tipenya.'
                 },
                 {
                     title : 'Tipe',
                     element : document.querySelector('.step5'),
-                    intro : 'Tipe Pembayaran menggunakan cash / transfer / giro / check dari perusahaan.' 
+                    intro : 'Tipe Pembayaran menggunakan cash / transfer / giro / check dari perusahaan.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step6'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step7'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Tgl. Terima',
                     element : document.querySelector('.step8'),
-                    intro : 'Tanggal Terima dari Invoice ini.' 
+                    intro : 'Tanggal Terima dari Invoice ini.'
                 },
                 {
                     title : 'TOP',
                     element : document.querySelector('.step9'),
-                    intro : 'Tenggat waktu pembayaran dalam hari yang juga dapat terisi secara otomatis melalui GRPO .' 
+                    intro : 'Tenggat waktu pembayaran dalam hari yang juga dapat terisi secara otomatis melalui GRPO .'
                 },
                 {
                     title : 'Tgl. Jatuh Tempo',
                     element : document.querySelector('.step10'),
-                    intro : 'Tanggal berlaku  dari dokumen ini.' 
+                    intro : 'Tanggal berlaku  dari dokumen ini.'
                 },
                 {
                     title : 'Tgl. Dokumen',
                     element : document.querySelector('.step11'),
-                    intro : 'Tanggal yang nantinya digunakan saat dokumen dicetak.' 
+                    intro : 'Tanggal yang nantinya digunakan saat dokumen dicetak.'
                 },
                 {
                     title : 'No Fakur Pajak',
                     element : document.querySelector('.step12'),
-                    intro : ' No faktur pajak yang digunakan / terkait dalam invoice.' 
+                    intro : ' No faktur pajak yang digunakan / terkait dalam invoice.'
                 },
                 {
                     title : 'No Bukti Potong',
                     element : document.querySelector('.step13'),
-                    intro : ' No bukti potong yang digunakan dalam invoice.' 
+                    intro : ' No bukti potong yang digunakan dalam invoice.'
                 },
                 {
                     title : 'Tgl. Bukti Potong',
                     element : document.querySelector('.step14'),
-                    intro : ' Tanggal yang ada dalam bukti potong' 
+                    intro : ' Tanggal yang ada dalam bukti potong'
                 },
                 {
                     title : 'No SPK',
                     element : document.querySelector('.step15'),
-                    intro : ' Merupakan nomor perintah kerja dari dokumen (jika ada)' 
+                    intro : ' Merupakan nomor perintah kerja dari dokumen (jika ada)'
                 },
                 {
                     title : 'No Dokumen',
                     element : document.querySelector('.stepdokumen'),
-                    intro : 'No Dokumen berkaitan dengan form ini' 
+                    intro : 'No Dokumen berkaitan dengan form ini'
                 },
                 {
                     title : 'No Invoice',
                     element : document.querySelector('.step16'),
-                    intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
+                    intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)'
                 },
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.stepcurrency'),
-                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.'
                 },
                 {
                     title : 'Konversi',
                     element : document.querySelector('.stepconversion'),
-                    intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
+                    intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)'
                 },
-                
+
                 {
                     title : 'Scan Barcode',
                     element : document.querySelector('.step18'),
-                    intro : 'Digunakan untuk memasukan inputan detail ke form dengan menggunakan alat scanner barcode' 
+                    intro : 'Digunakan untuk memasukan inputan detail ke form dengan menggunakan alat scanner barcode'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step17'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa',
                     element : document.querySelector('.step19'),
-                    intro : 'Penambahan GRPO terotomisasi melalui pemilihan supplier/vendor yang nantinya akan masuk kesini .Penambahan GRPO LC PO jasa dan COA terkait secara manual dapat dilakukan disini' 
+                    intro : 'Penambahan GRPO terotomisasi melalui pemilihan supplier/vendor yang nantinya akan masuk kesini .Penambahan GRPO LC PO jasa dan COA terkait secara manual dapat dilakukan disini'
                 },
                 {
                     title : 'Detail Multi',
                     element : document.querySelector('.step20'),
-                    intro : 'Disini merupakan tempat untuk melakukan copy paste dari excel guna mempermudah penginputan.' 
+                    intro : 'Disini merupakan tempat untuk melakukan copy paste dari excel guna mempermudah penginputan.'
                 },
                 {
                     title : 'Detail Down Payment Partner Bisnis',
                     element : document.querySelector('.step21'),
-                    intro : 'Detail Purchase DP dari partner bisnis yang dipilih akan ditampilan disini.' 
+                    intro : 'Detail Purchase DP dari partner bisnis yang dipilih akan ditampilan disini.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step22'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Uang Muka dan Pembulatan',
                     element : document.querySelector('.step23'),
-                    intro : 'Pada inputan Uang muka tidak dapat di edit hanya pada pembulatan yang bisa di edit untuk melakukan pembulatan ke atas / ke bawah.' 
+                    intro : 'Pada inputan Uang muka tidak dapat di edit hanya pada pembulatan yang bisa di edit untuk melakukan pembulatan ke atas / ke bawah.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step24'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -4361,7 +4361,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -4433,6 +4433,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

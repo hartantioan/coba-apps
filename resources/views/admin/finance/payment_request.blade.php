@@ -1588,6 +1588,18 @@
                     <input type="text" name="arr_note_cost2[]" placeholder="Keterangan 2..." value="" data-id="` + countdetail + `">
                 </td>
                 <td class="center">
+                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="center">
                     <select class="browser-default" id="arr_cost_distribution_cost` + countdetail + `" name="arr_cost_distribution_cost[]"></select>
                 </td>
 
@@ -1624,18 +1636,6 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
-                </td>
-                <td class="center">
-                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

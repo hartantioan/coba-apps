@@ -23,6 +23,7 @@ use App\Models\InventoryTransferOut;
 use App\Models\InventoryTransferOutDetail;
 use App\Models\Item;
 use App\Models\ItemCogs;
+use App\Models\ItemStock;
 use App\Models\Journal;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
@@ -33,6 +34,7 @@ use App\Models\MarketingOrderReturnDetail;
 use App\Models\ProductionFgReceive;
 use App\Models\ProductionFgReceiveDetail;
 use App\Models\ProductionHandoverDetail;
+use App\Models\ProductionHandover;
 use App\Models\ProductionIssueDetail;
 use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
@@ -1022,31 +1024,28 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             }
         }
 
-        $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
-            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-        })->whereHas('productionFgReceiveDetail',function($query)use($item_id){
-            $query->whereHas('productionFgReceive',function($query)use($item_id){
-                $query->where('item_id',$item_id)->whereHas('item',function($query){
-                    $query->where('item_group_id','!=',7);
-                });
-            });
-        })->get();
+        $productionhandoverout = ProductionHandover::whereIn('status',['2','3'])
+                ->whereDate('post_date',$dateloop)->whereHas('productionFgReceive', function($query)use($item_id){
+                    $query->where('item_id',$item_id)->whereHas('item',function($query){
+                        $query->where('item_group_id','!=',7);
+                    });
+                })->get();
 
         foreach($productionhandoverout as $row){
-            $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
-            $price = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
-            $total = round($price * $qty,2);
+            $qty = $row->qtyM2();
+            $total = $row->totalHandover();
+            $price = round($total / $qty,5);
             $total_final = $totalBefore - $total;
             $qty_final = $qtyBefore - $qty;
             ItemCogs::create([
-                'lookable_type'		    => $row->productionHandover->getTable(),
-                'lookable_id'		    => $row->productionHandover->id,
+                'lookable_type'		    => $row->getTable(),
+                'lookable_id'		    => $row->id,
                 'detailable_type'	    => $row->getTable(),
                 'detailable_id'		    => $row->id,
-                'company_id'		    => $row->productionHandover->company_id,
-                'place_id'			    => $row->productionHandover->productionFgReceive->place_id,
-                'warehouse_id'		    => $row->productionHandover->productionFgReceive->item->warehouse(),
-                'item_id'			    => $row->productionHandover->productionFgReceive->item_id,
+                'company_id'		    => $row->company_id,
+                'place_id'			    => $row->productionFgReceive->place_id,
+                'warehouse_id'		    => $row->productionFgReceive->item->warehouse(),
+                'item_id'			    => $row->productionFgReceive->item_id,
                 'qty_out'			    => $qty,
                 'price_out'			    => $price,
                 'total_out'			    => $total,
@@ -1056,15 +1055,14 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                 'date'				    => $dateloop,
                 'type'				    => 'OUT',
             ]);
-            foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
+            if($row->journal()->exists()){
+                foreach($row->journal->journalDetail()->whereNull('detailable_type')->whereNull('detailable_id')->get() as $rowjournal){
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
+                }
             }
-            $row->update([
-                'total' => $total
-            ]);
             $totalBefore = $total_final;
             $qtyBefore = $qty_final;
             /* self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id); */
@@ -1179,11 +1177,11 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
         }
       }
       CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
-      /* $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->first();
+      $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
       if($itemstock){
           $itemstock->update([
               'qty'   => $qtyBefore,
           ]);
-      } */
+      }
     }
 }

@@ -355,10 +355,15 @@ class PurchaseInvoiceController extends Controller
 
         foreach($datapo as $row){
             $invoice = $row->totalInvoice();
+            $code_sj = '';
+            if($row->goodscale()->exists()){
+                $code_sj = $row->goodScale->getSalesSuratJalan();
+            }
             if(($row->grandtotal - $invoice) > 0){
                 $details[] = [
                     'type'          => 'purchase_orders',
                     'id'            => $row->id,
+                    'purchase_order'=> $code_sj,
                     'code'          => $row->code,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
@@ -373,12 +378,17 @@ class PurchaseInvoiceController extends Controller
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','3')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
+            $code_sj = '';
+            if($row->goodscale()->exists()){
+                $code_sj = $row->goodScale->getSalesSuratJalan();
+            }
             $invoice = $row->totalInvoice();
             if(($row->grandtotal - $invoice) > 0 && $row->goodScale->sjHasReturnDocument()){
                 $details[] = [
                     'type'          => 'purchase_orders',
                     'id'            => $row->id,
                     'code'          => $row->code,
+                    'purchase_order'=> $code_sj,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),

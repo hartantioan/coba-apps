@@ -4029,9 +4029,11 @@ class CustomHelper {
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();
 
-			$moi->marketingOrderDeliveryProcess->update([
-				'status'	=> '3'
-			]);
+			if($moi->marketingOrderDeliveryProcess()->exists()){
+				$moi->marketingOrderDeliveryProcess->update([
+					'status'	=> '3'
+				]);
+			}
 
 		}elseif($table_name == 'marketing_order_memos'){
 
@@ -5751,53 +5753,55 @@ class CustomHelper {
 					$row->item_shading_id,
 					$row->productionBatch->id,
 				);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->productionFgReceiveDetail->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'line_id'		=> $pir->productionFgReceive->line_id,
-					'item_id'		=> $row->item_id,
-					'warehouse_id'	=> $row->productionFgReceiveDetail->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-					'type'			=> '2',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> $row->total,
-					'note'			=> $pir->code,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-					'detailable_type'=> $row->getTable(),
-					'detailable_id'	=> $row->id,
-				]);
-
-
-				self::sendCogs($table_name,
-					$pir->id,
-					$pir->company_id,
-					$pir->productionFgReceive->place_id,
-					$pir->productionFgReceive->item->warehouse(),
-					$pir->productionFgReceive->item_id,
-					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
-					$row->total,
-					'OUT',
-					$pir->post_date,
-					NULL,
-					NULL,
-					NULL,
-					$row->getTable(),
-					$row->id,
-				);
-
-				self::sendStock(
-					$pir->productionFgReceive->place_id,
-					$pir->productionFgReceive->item->warehouse(),
-					$pir->productionFgReceive->item_id,
-					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
-					'OUT',
-					NULL,
-					NULL,
-					NULL,
-				);
 			}
+
+			$totalm2 = $pir->qtyM2();
+			$totalrp = $pir->totalHandover();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $row->productionFgReceiveDetail->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id,
+				'place_id'		=> $pir->productionFgReceive->place_id,
+				'line_id'		=> $pir->productionFgReceive->line_id,
+				'item_id'		=> $pir->productionFgReceive->item_id,
+				'warehouse_id'	=> $pir->productionFgReceive->item->warehouse(),
+				'type'			=> '2',
+				'nominal'		=> $totalrp,
+				'nominal_fc'	=> $totalrp,
+				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'detailable_type'=> NULL,
+				'detailable_id'	=> NULL,
+			]);
+
+			self::sendCogs($table_name,
+				$pir->id,
+				$pir->company_id,
+				$pir->productionFgReceive->place_id,
+				$pir->productionFgReceive->item->warehouse(),
+				$pir->productionFgReceive->item_id,
+				$totalm2,
+				$totalrp,
+				'OUT',
+				$pir->post_date,
+				NULL,
+				NULL,
+				NULL,
+				NULL,
+				NULL,
+			);
+
+			self::sendStock(
+				$pir->productionFgReceive->place_id,
+				$pir->productionFgReceive->item->warehouse(),
+				$pir->productionFgReceive->item_id,
+				$totalm2,
+				'OUT',
+				NULL,
+				NULL,
+				NULL,
+			);
 
 			$pir->update([
 				'status'	=> '3'

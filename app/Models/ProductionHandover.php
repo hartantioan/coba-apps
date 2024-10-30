@@ -214,6 +214,19 @@ class ProductionHandover extends Model
         return $qty;
     }
 
+    public function qtyM2(){
+        $qty = 0;
+        foreach($this->productionHandoverDetail as $row){
+            $qty += round($row->qty * $row->productionFgReceiveDetail->conversion,3);
+        }
+        return $qty;
+    }
+
+    public function totalHandover(){
+        $total = $this->productionHandoverDetail()->sum('total');
+        return $total;
+    }
+
     public function hasBalanceReceiveFg(){
         $qtyused = $this->productionFgReceive->qtyUsed();
         $qty = $this->productionFgReceive->qtySell() - $qtyused;

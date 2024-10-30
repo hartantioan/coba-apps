@@ -278,7 +278,6 @@
             }
             $total+=$row_5->endstock;
         }
-        info($brand_ht_exp['ALTHEA']);
     @endphp
     <tr>
         <td style="font-size:12px;" align="right"><strong></td>

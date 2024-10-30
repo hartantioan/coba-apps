@@ -14,12 +14,14 @@ class SendMailMarketingGlobal extends Mailable
     protected $data2;
     protected $data3;
     protected $data4;
-    public function __construct($data, $data2, $data3, $data4)
+    protected $data5;
+    public function __construct($data, $data2, $data3, $data4,$data5)
     {
         $this->data = $data;
         $this->data2 = $data2;
         $this->data3 = $data3;
         $this->data4 = $data4;
+        $this->data5 = $data5;
     }
 
     public function attachments(): array
@@ -44,6 +46,9 @@ class SendMailMarketingGlobal extends Mailable
             )->with(
                 'data4',
                 $this->data4
+            )->with(
+                'data5',
+                $this->data5
             );
     }
 }

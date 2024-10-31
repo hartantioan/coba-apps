@@ -16,6 +16,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Mockery\Undefined;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Jobs\StockMovementJob;
+
 class StockMovementController extends Controller
 {
     protected $dataplaces,$dataplacecode, $datawarehouses;
@@ -41,7 +43,7 @@ class StockMovementController extends Controller
             'item'      =>  Item::where('status','1')->get(),
             'warehouse' =>  Warehouse::where('status',1)->get()
         ];
-        
+
         return view('admin.layouts.index', ['data' => $data]);
 
     }
@@ -59,7 +61,7 @@ class StockMovementController extends Controller
                 });
 
                if($request->finish_date) {
-                   
+
                     $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
@@ -77,9 +79,9 @@ class StockMovementController extends Controller
                         $query->where('id',$request->warehouse);
                     });
                 }
-    
+
                 if($request->filter_group){
-                   
+
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('item_group_id', $request->filter_group);
                     });
@@ -117,7 +119,7 @@ class StockMovementController extends Controller
                         $query->where('id',$request->warehouse);
                     });
                 }
-    
+
                 if($request->filter_group){
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('item_group_id', $request->filter_group);
@@ -129,7 +131,7 @@ class StockMovementController extends Controller
             ->orderBy('id')
             ->get();
         }
-     
+
        // Initialize the previous ID variable
         $cum_qty = 0;
         $cum_val = 0 ;
@@ -140,7 +142,7 @@ class StockMovementController extends Controller
         $array_last_item = [];
         $array_first_item = [];
         foreach($query_data as $row){
-            
+
             if($row->type=='IN'){
                 $cum_qty=$row->qty_in;
                 $cum_val=$row->total_in;
@@ -148,7 +150,7 @@ class StockMovementController extends Controller
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=$row->total_out * -1;
             }
-            
+
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -170,14 +172,14 @@ class StockMovementController extends Controller
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            
+
             if ($row->item_id !== $previousId) {
-              
+
                 $query_first =
                 ItemCogs::where(function($query) use ( $request,$row) {
                     $query->where('item_id',$row->item_id)
                     ->where('date', '<', $row->date);
-                    
+
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -197,7 +199,7 @@ class StockMovementController extends Controller
                     'perlu'        => 1,
                     'item_id'      => $row->item->id,
                     'requester'    => '-',
-                    'id'           => $query_first->id ?? null, 
+                    'id'           => $query_first->id ?? null,
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                     'item'         => $row->item->name,
@@ -212,15 +214,15 @@ class StockMovementController extends Controller
 
             }
             $previousId = $row->item_id;
-            
+
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
-        
+
         if($request->type != 'final'){
             if(!$request->item_id){
-                $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {            
+                $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {
                     $query->selectRaw('MAX(id)')
                         ->from('item_cogs')
                         ->where('date', '<=', $request->finish_date)
@@ -233,7 +235,7 @@ class StockMovementController extends Controller
                     if($request->finish_date) {
                         $query->whereDate('date','<=', $request->finish_date);
                     }
-                    
+
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -244,18 +246,18 @@ class StockMovementController extends Controller
                             $query->where('id',$request->warehouse);
                         });
                     }
-        
+
                     if($request->filter_group){
-                       
+
                         $query->whereHas('item',function($query) use($request){
                             $query->whereIn('item_group_id', $request->filter_group);
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                    
+
                     if (!empty($excludeIds)) {
-                       
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -271,7 +273,7 @@ class StockMovementController extends Controller
                     if($request->finish_date) {
                         $query->whereDate('date','<=', $request->finish_date);
                     }
-                    
+
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -282,18 +284,18 @@ class StockMovementController extends Controller
                             $query->where('id',$request->warehouse);
                         });
                     }
-        
+
                     if($request->filter_group){
-                       
+
                         $query->whereHas('item',function($query) use($request){
                             $query->whereIn('item_group_id', $request->filter_group);
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                    
+
                     if (!empty($excludeIds)) {
-                       
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -303,7 +305,7 @@ class StockMovementController extends Controller
                 if($first){
                     $query_no[]=$first;
                 }
-               
+
             }
             foreach($query_no as $row_tidak_ada){
                 if($row_tidak_ada->qty_final)
@@ -312,7 +314,7 @@ class StockMovementController extends Controller
                         'perlu'        => 1,
                         'item_id'      => $row_tidak_ada->item->id,
                         'requester'    => '-',
-                        'id'           => $row_tidak_ada->id, 
+                        'id'           => $row_tidak_ada->id,
                         'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
                         'item'         => $row_tidak_ada->item->name,
@@ -322,8 +324,8 @@ class StockMovementController extends Controller
                         'shading'      => $row_tidak_ada->itemShading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? CustomHelper::formatConditionalQty($row_tidak_ada->qty_final) : 0,
-                    ]; 
-                } 
+                    ];
+                }
             }
         }
         $combinedArray = [];
@@ -344,7 +346,7 @@ class StockMovementController extends Controller
         usort($combinedArray, function ($a, $b) {
             // First, sort by 'kode' in ascending order
             $kodeComparison = strcmp($a['kode'], $b['kode']);
-            
+
             if ($kodeComparison !== 0) {
                 return $kodeComparison;
             }
@@ -373,11 +375,16 @@ class StockMovementController extends Controller
 		$plant = $request->plant ? $request->plant:'';
         $warehouse = $request->warehouse?$request->warehouse:'';
         $item = $request->item ? $request->item:'';
-        $start_date = $request->start_date ? $request->start_date:'';
-        $finish_date = $request->finish_date ? $request->finish_date:'';
+        $start_date = $request->startdate ? $request->startdate:'';
+        $finish_date = $request->finishdate ? $request->finishdate:'';
         $group = $request->group ? $request->group:'';
         $type = $request->type ? $request->type:'';
+        $user_id = session('bo_id');
+        info($request);
+        StockMovementJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
 
-		return Excel::download(new ExportStockMovement($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_movement'.uniqid().'.xlsx');
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+
+		// return Excel::download(new ExportStockMovement($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_movement'.uniqid().'.xlsx');
     }
 }

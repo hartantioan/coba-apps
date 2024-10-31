@@ -2242,7 +2242,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('stock_movement')->middleware('operation.access:stock_movement,view')->group(function () {
                         Route::get('/', [StockMovementController::class, 'index']);
                         Route::post('filter', [StockMovementController::class, 'filter']);
-                        Route::get('export', [StockMovementController::class, 'export']);
+                        Route::post('export', [StockMovementController::class, 'export']);
                     });
                     Route::prefix('stock_in_qty')->middleware('operation.access:stock_in_qty,view')->group(function () {
                         Route::get('/', [StockInQtyController::class, 'index']);

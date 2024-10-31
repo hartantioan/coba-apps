@@ -51,7 +51,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                         $query->where('id',$this->warehouse);
                     });
                 }
-    
+
                 if($this->group){
                     $groupIds = explode(',', $this->group);
                     $query->whereHas('item',function($query)use($groupIds){
@@ -93,7 +93,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 }
                 if($this->group){
                     $groupIds = explode(',', $this->group);
-    
+
                     $query->whereHas('item',function($query) use($groupIds){
                         $query->whereIn('item_group_id', $groupIds);
                     });
@@ -104,7 +104,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             ->orderBy('id')
             ->get();
         }
-        
+
         $previousId = null; // Initialize the previous ID variable
         $cum_qty = 0;
         $cum_val = 0 ;
@@ -114,7 +114,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         $array_last_item = [];
         $array_first_item = [];
         foreach($query_data as $row){
-          
+
             if($row->type=='IN'){
                 $cum_qty=$row->qty_in;
                 $cum_val=$row->total_in;
@@ -122,7 +122,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=$row->total_out * -1;
             }
-            
+
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -145,12 +145,12 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             ];
             $array_filter[]=$data_tempura;
             if ($row->item_id !== $previousId) {
-              
+
                 $query_first =
                 ItemCogs::where(function($query) use ( $row) {
                     $query->where('item_id',$row->item_id)
                     ->where('date', '<', $row->date);
-                    
+
                     if($this->plant != 'all'){
                         $query->whereHas('place',function($query){
                             $query->where('id',$this->plant);
@@ -191,7 +191,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         }
         if($this->type != 'final'){
             if(!$this->item){
-                $query_no = ItemCogs::whereIn('id', function ($query) {            
+                $query_no = ItemCogs::whereIn('id', function ($query) {
                     $query->selectRaw('MAX(id)')
                         ->from('item_cogs')
                         ->where('date', '<=', $this->finish_date)
@@ -204,7 +204,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     if($this->finish_date) {
                         $query->whereDate('date','<=', $this->finish_date);
                     }
-                    
+
                     if($this->plant != 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
@@ -215,19 +215,19 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
-        
+
                     if($this->group){
                         $groupIds = explode(',', $this->group);
-        
+
                         $query->whereHas('item',function($query) use($groupIds){
                             $query->whereIn('item_group_id', $groupIds);
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                    
+
                     if (!empty($excludeIds)) {
-                        
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -244,7 +244,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     if($this->finish_date) {
                         $query->whereDate('date','<=', $this->finish_date);
                     }
-                    
+
                     if($this->plant != 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
@@ -255,18 +255,18 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
-        
+
                     if($this->group){
-                       
+
                         $query->whereHas('item',function($query) {
                             $query->whereIn('item_group_id', explode(',',$this->group));
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                 
+
                     if (!empty($excludeIds)) {
-                        
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -277,16 +277,15 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     $query_no[]=$first;
                 }
             }
-           
-    
+
+
             foreach($query_no as $row_tidak_ada){
-                if($row_tidak_ada->qty_final)
                 if($row_tidak_ada->qty_final > 0){
                     $array_first_item[] = [
                         'perlu'        => 1,
                         'item_id'      => $row_tidak_ada->item->id,
                         'requester'    => '-',
-                        'id'           => $row_tidak_ada->id, 
+                        'id'           => $row_tidak_ada->id,
                         'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
                         'item'         => $row_tidak_ada->item->name,
@@ -296,7 +295,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                         'shading'      => $row_tidak_ada->itemShading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
-                    ]; 
+                    ];
                 }
             }
         }
@@ -320,11 +319,11 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         usort($combinedArray, function ($a, $b) {
             // First, sort by 'kode' in ascending order
             $kodeComparison = strcmp($a['kode'], $b['kode']);
-            
+
             if ($kodeComparison !== 0) {
                 return $kodeComparison;
             }
-        
+
             // If 'kode' is the same, prioritize 'perlu' in descending order
             return $b['perlu'] - $a['perlu'];
         });

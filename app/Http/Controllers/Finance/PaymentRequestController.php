@@ -946,7 +946,16 @@ class PaymentRequestController extends Controller
             'arr_coa.required'                  => 'Baris coa tidak boleh kosong.',
             'arr_coa.array'                     => 'Baris coa harus dalam bentuk array.',
 		]);
-
+        foreach($request->arr_coa_cost as $key => $row){
+            if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+                $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1;
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ];
+                return response()->json($response);
+            }
+        }
         if($validation->fails()) {
             $response = [
                 'status' => 422,

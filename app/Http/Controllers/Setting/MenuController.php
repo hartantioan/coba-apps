@@ -43,8 +43,8 @@ use App\Models\MaterialRequestDetail;
 use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
-use App\Models\ProductionBarcodeDetail;
-use App\Models\ProductionBatch;
+use App\Models\JournalDetail;
+use App\Models\Coa;
 use App\Models\ProductionFgReceive;
 use App\Models\ProductionHandover;
 use App\Models\ProductionIssue;
@@ -58,6 +58,28 @@ class MenuController extends Controller
 {
     public function index()
     {
+        $modp = MarketingOrderDeliveryProcess::whereIn("status",['2','3'])->get();
+
+        foreach($modp as $row){
+            foreach($row->journal as $journal){
+                $journal->update([
+                    'note'=> $row->marketingOrderDelivery->code,
+                ]);
+            }
+
+            foreach($row->marketingOrderDeliveryProcessDetail as $row_detail){
+                foreach($row_detail->journalDetail as $journalDetail){
+                    $journalDetail->update([
+                        'note'=> $row_detail->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                        'note2' => isset($row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail)
+                        ? $row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail->goodScale->code
+                        : '',
+                    ]);
+                }
+            }
+
+        }
+
         /* $user = User::where('type','3')->orderBy('id')->get();
 
         foreach($user as $key => $row){
@@ -177,7 +199,7 @@ class MenuController extends Controller
         /* $dataissue = ProductionIssue::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get();
 
         $datareceive = ProductionReceive::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get();
-        
+
         $datafgreceive = ProductionFgReceive::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get();
 
         $datahandover = ProductionHandover::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get(); */
@@ -251,7 +273,7 @@ class MenuController extends Controller
         } */
 
         /* CustomHelper::accumulateCogs('2024-09-20',1,1,5388); */
-        
+
         /* $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query){
             $query->whereIn('status',['2','3']);
         })->get();
@@ -287,9 +309,9 @@ class MenuController extends Controller
     function addToArr(&$arr, $data){
         if ($data['parent_id'] == 0){
             return $arr[] =  [
-                'id'        => $data['id'], 
-                'order'     => $data['order'], 
-                'name'      => $data['name'], 
+                'id'        => $data['id'],
+                'order'     => $data['order'],
+                'name'      => $data['name'],
                 'parent_id' => $data['parent_id'],
                 'children'  => []
             ];
@@ -297,15 +319,15 @@ class MenuController extends Controller
         foreach($arr as &$e) {
             if ($e['id'] == $data['parent_id']) {
                 $e['children'][] = [
-                    'id'        => $data['id'], 
+                    'id'        => $data['id'],
                     'order'     => $data['order'],
                     'name'      => $data['name'],
-                    'parent_id' => $data['parent_id'], 
+                    'parent_id' => $data['parent_id'],
                     'children'  => []
                 ];
                 break;
             }
-            $key_values = array_column($e['children'], 'order'); 
+            $key_values = array_column($e['children'], 'order');
             array_multisort($key_values, SORT_ASC, $e['children']);
             $this->addToArr($e['children'], $data);
         }
@@ -329,7 +351,7 @@ class MenuController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Menu::count();
-        
+
         $query_data = Menu::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -377,7 +399,7 @@ class MenuController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->name,
@@ -418,7 +440,7 @@ class MenuController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'name' 				=> 'required',
             'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
@@ -566,13 +588,13 @@ class MenuController extends Controller
                         'is_new'            => $request->new ? $request->new : NULL,
                         'whitelist'         => $request->maintenance ? $request->whitelist : NULL,
                     ]);
-                    
+
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -582,7 +604,7 @@ class MenuController extends Controller
                     ->log('Add / edit menu.');
 
                 $newdata = [];
-                
+
                 if($query->table_name){
                     ApprovalTemplateMenu::where('menu_id',$query->id)->update([
                         'table_name'    => $query->table_name
@@ -624,7 +646,7 @@ class MenuController extends Controller
                         }
                     }
                 }
-                
+
                 $newdata[] = '<option value="">Parent (Utama)</option>';
 
                 foreach(Menu::whereNull('parent_id')->get() as $m){
@@ -652,14 +674,14 @@ class MenuController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $menu = Menu::find($request->id);
         $menu['parent_id'] = $menu['parent_id'] ? $menu['parent_id'] : '';
-        				
+
 		return response()->json($menu);
     }
 
@@ -683,7 +705,7 @@ class MenuController extends Controller
 
     public function destroy(Request $request){
         $query = Menu::find($request->id);
-		
+
         if($query->delete()) {
             $query->menuUser()->delete();
 
@@ -750,7 +772,7 @@ class MenuController extends Controller
                         DB::commit();
                     }catch(\Exception $e){
                         DB::rollback();
-                    }                    
+                    }
                 }
             }
 
@@ -772,7 +794,7 @@ class MenuController extends Controller
     public function getPageStatusMaintenance(Request $request){
 
         $query = Menu::where('url',$request->value)->first();
-		
+
         if($query) {
             if($query->is_maintenance){
                 $response = [
@@ -797,12 +819,12 @@ class MenuController extends Controller
 
         return response()->json($response);
     }
-    
+
 
     public function saveOrderMenu(Request $request){
         function processNode($node, $parentId = null, $order = 0) {
             $id = $node['id'];
-            
+
             // info("Processing node: ID = $id, Parent ID = $parentId, Order = $order\n");
             $query = Menu::find($id);
             $query->parent_id = $parentId;
@@ -811,27 +833,27 @@ class MenuController extends Controller
             $query->save();
             // Perform any operation such as inserting into the database
             // Node::create(['id' => $id, 'parent_id' => $parentId, 'order' => $order]);
-        
+
             if (isset($node['children']) && is_array($node['children'])) {
                 foreach ($node['children'] as $index => $child) {
                     processNode($child, $id, $index);
                 }
             }
         }
-        
-        $data = $request->data; 
+
+        $data = $request->data;
 
         foreach ($data as $index => $row) {
             processNode($row, null, $index);
         }
-        
-        
+
+
 		$response = [
             'status'    => 200,
             'title'     => '',
             'message'   => ''
         ];
-        
+
         return response()->json($response);
     }
 }

@@ -7503,6 +7503,7 @@ class CustomHelper {
 				$datanew[] = $rownew;
 			}
 		}
+		info($datanew);
 		return $datanew;
 	}
 }

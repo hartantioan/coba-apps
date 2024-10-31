@@ -193,8 +193,8 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="type" name="type">
-                                <option value="1">BG</option>
-                                <option value="2">Check</option>
+                                <option value="1">Giro</option>
+                                <option value="2">Cek</option>
                             </select>
                             <label for="type">Tipe</label>
                         </div>

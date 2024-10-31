@@ -127,8 +127,8 @@ class ListBgCheck extends Model
 
     public function type(){
         $type = match ($this->type) {
-            '1' => 'BG',
-            '2' => 'Check',
+            '1' => 'Giro',
+            '2' => 'Cek',
             default => 'Invalid',
         };
 

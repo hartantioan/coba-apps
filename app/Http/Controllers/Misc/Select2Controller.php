@@ -3715,6 +3715,7 @@ class Select2Controller extends Controller {
                 }
             }
             if($hasBom){
+                info($details);
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)),
@@ -3722,7 +3723,6 @@ class Select2Controller extends Controller {
                     'details'       => CustomHelper::splitBomArray($details),
                     'code'          => $d->code,
                 ];
-                info(CustomHelper::splitBomArray($details));
             }
         }
 

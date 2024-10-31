@@ -3291,7 +3291,7 @@
                 if(!passedProject){
                     swal({
                         title: 'Ups! Validation',
-                        text: 'Project harus diisi.',
+                        text: 'Project harus diisi Proyek Plant 1 .',
                         icon: 'warning'
                     });
                     return false;

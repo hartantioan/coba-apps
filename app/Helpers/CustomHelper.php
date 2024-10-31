@@ -7451,6 +7451,7 @@ class CustomHelper {
 				$item_id = $row['item_id'];
 			}
 		}
+		info($item_id);
 		$newrow = NULL;
 		if($item_id){
 			$countQty = 0;

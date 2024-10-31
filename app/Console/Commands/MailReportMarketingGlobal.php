@@ -40,7 +40,7 @@ class MailReportMarketingGlobal extends Command
 	 */
 	public function handle()
 	{
-		$recipient = ['edp@superior.co.id'];
+		$recipient = ['henrianto@superior.co.id','hendra@superior.co.id','andrew@superior.co.id','haidong@superiorporcelain.co.id','billylaw@superior.co.id'];
 
 		//  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 

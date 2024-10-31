@@ -3173,7 +3173,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passedQty = true, passed = true;
+                var formData = new FormData($('#form_data')[0]), passedQty = true, passed = true, passedProject = true;
 
                 if($('#type_detail').val() == '1'){
                     formData.delete("arr_code[]");
@@ -3193,6 +3193,12 @@
                     formData.delete("arr_department[]");
                     formData.delete("arr_warehouse[]");
                     formData.delete("arr_project[]");
+
+                    $('select[name^="arr_project[]"]').each(function(){
+                        if(!$(this).val()){
+                            passedProject = false;
+                        }
+                    });
 
                     $('select[name^="arr_percent_tax"]').each(function(){
                         formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
@@ -3281,6 +3287,15 @@
                     formData.append('arr_dp_code[]',$(this).val());
                     formData.append('arr_nominal[]',$('input[name^="arr_nominal"]').eq(index).val());
                 });
+
+                if(!passedProject){
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Project harus diisi.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
 
                 if(passedQty == true){
                     if(passed == true){

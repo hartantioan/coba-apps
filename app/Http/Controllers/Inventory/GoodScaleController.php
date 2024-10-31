@@ -462,12 +462,12 @@ class GoodScaleController extends Controller
             ];
         } else {
             
-            /* if($request->post_date < date('Y-m-d')){
+            if($request->post_date < date('Y-m-d')){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Hari sudah berganti, jangan selalu melihat masa lalu, ayo segera diganti ke hari ini.'
                 ]);
-            } */
+            }
 
             DB::beginTransaction();
 

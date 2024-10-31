@@ -7469,7 +7469,7 @@ class CustomHelper {
 								$arrnewbom[0] = $rowbom;
 								$newrow = [
 									'mopd_id' 			=> '',
-									'item_id' 			=> $item_id,
+									'item_id' 			=> $rowitem,
 									'item_code' 		=> explode(' - ',$rowbom['item_name'])[0],
 									'item_name' 		=> explode(' - ',$rowbom['item_name'])[1],
 									'qty' 				=> CustomHelper::formatConditionalQty($countQty),
@@ -7488,8 +7488,10 @@ class CustomHelper {
 							}
 						}
 					}
-					$row['list_bom'] = $newarr;
-					$datanew[] = $row;
+					if(count($newarr) > 0){
+						$row['list_bom'] = $newarr;
+						$datanew[] = $row;
+					}
 				}
 				if($newrow){
 					$arrnewrow[] = $newrow;

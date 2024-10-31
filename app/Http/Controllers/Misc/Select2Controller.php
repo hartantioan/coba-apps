@@ -4680,8 +4680,9 @@ class Select2Controller extends Controller {
         $search   = $request->search;
 
         $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
-            $query->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-                ->whereIn('status',['2','3']);
+                $query->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                    ->whereIn('status',['2','3'])
+                    ->where('line_id',$request->line_id);
             if($request->production_order_detail_id){
                 $query->where('production_order_detail_id',$request->production_order_detail_id);
             }

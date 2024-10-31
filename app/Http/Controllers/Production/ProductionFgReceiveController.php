@@ -170,7 +170,7 @@ class ProductionFgReceiveController extends Controller
     public function getPalletBarcodeByScan(Request $request){
 
         $barcode = ProductionBarcodeDetail::where('pallet_no',$request->code)->whereHas('productionBarcode',function($query)use($request){
-            $query->where('production_order_detail_id',$request->production_order_detail_id)->whereIn('status',['2','3']);
+            $query->where('production_order_detail_id',$request->production_order_detail_id)->whereIn('status',['2','3'])->where('line_id',$request->line_id);
         })
         ->whereDoesntHave('productionFgReceiveDetail')
         ->where(column: function($query)use($request){
@@ -220,7 +220,7 @@ class ProductionFgReceiveController extends Controller
     public function getDocumentBarcode(Request $request){
 
         $barcode = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
-            $query->where('production_order_detail_id',$request->production_order_detail_id)->where('status','2');
+            $query->where('production_order_detail_id',$request->production_order_detail_id)->where('status','2')->where('line_id',$request->line_id);
         })
         ->whereDoesntHave('productionFgReceiveDetail')
         ->where(column: function($query)use($request){

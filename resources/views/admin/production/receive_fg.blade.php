@@ -1002,6 +1002,7 @@
                         search: params.term,
                         production_order_detail_id: $('#production_order_detail_id').val(),
                         batch_used: arrBatch,
+                        line_id: $('#line_id').val(),
                     };
                 },
                 processResults: function(data) {
@@ -1058,6 +1059,7 @@
                         code: code,
                         production_order_detail_id: $('#production_order_detail_id').val(),
                         batch_used: arrBatch,
+                        line_id: $('#line_id').val(),
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1726,6 +1728,7 @@
                 dataType: 'JSON',
                 data: {
                     production_barcode_detail_id: $('#production_barcode_detail_id').val(),
+                    line_id: $('#line_id').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2848,6 +2851,7 @@
                 data: {
                     production_order_detail_id: $('#production_order_detail_id').val(),
                     batch_used: arrBatch,
+                    line_id: $('#line_id').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -36,7 +36,7 @@ class ListBgCheckController extends Controller
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
 
         $data = [
-            'title'         => 'List BG Check',
+            'title'         => 'List Giro Cek',
             'content'       => 'admin.finance.list_bg_check',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),

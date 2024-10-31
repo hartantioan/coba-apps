@@ -2023,10 +2023,10 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#main');
             
                 makeTreeOrg(response.message,response.link);
                 

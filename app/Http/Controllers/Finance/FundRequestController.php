@@ -89,7 +89,7 @@ class FundRequestController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = FundRequest::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -134,7 +134,7 @@ class FundRequestController extends Controller
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
-        
+
         $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -219,7 +219,7 @@ class FundRequestController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
-           
+
             foreach($query_data as $val) {
                 $dis = '';
                 // if($val->isOpenPeriod()){
@@ -229,9 +229,9 @@ class FundRequestController extends Controller
                 //     color: #9f9f9f !important;
                 //     background-color: #dfdfdf !important;
                 //     box-shadow: none;"';
-                   
+
                 // }
-                
+
                 $totalReceivable = $val->totalReceivable();
                 $totalReceivableUsed = $val->totalReceivableUsedPaid();
                 $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
@@ -302,7 +302,7 @@ class FundRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
 					'
                 ];
 
@@ -336,7 +336,7 @@ class FundRequestController extends Controller
                     'additional_note_pic'   => $request->val,
                 ]);
             }
-            
+
             activity()
                     ->performedOn(new FundRequest())
                     ->causedBy(session('bo_id'))
@@ -416,16 +416,16 @@ class FundRequestController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>   
+                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalhargasatuan, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpph, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"></td>    
-            </tr>  
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"></td>
+            </tr>
         ';
-        
+
         $string .= '</tbody>
                         <tfoot>
                             <tr>
@@ -449,7 +449,7 @@ class FundRequestController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -457,7 +457,7 @@ class FundRequestController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -469,7 +469,7 @@ class FundRequestController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -492,13 +492,13 @@ class FundRequestController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function voidStatus(Request $request){
         $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             // if(!CustomHelper::checkLockAcc($request->post_date)){
@@ -529,13 +529,13 @@ class FundRequestController extends Controller
                 if($query->type == '1' && $query->account->type == '1'){
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
                 }
-    
+
                 activity()
                     ->performedOn(new FundRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the fund request data');
-    
+
                 CustomHelper::sendNotification('fund_requests',$query->id,'Permohonan Dana No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('fund_requests',$query->id);
 
@@ -561,7 +561,7 @@ class FundRequestController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -573,13 +573,13 @@ class FundRequestController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = FundRequest::where('code',$row)->first();
-                
+
                 if($pr){
                     $data = [
                         'title'     => 'Fund Request',
                         'data'      => $pr
                     ];
-                    
+
                     $pdf = PrintHelper::print($pr,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
@@ -588,7 +588,7 @@ class FundRequestController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -606,8 +606,8 @@ class FundRequestController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -636,7 +636,7 @@ class FundRequestController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -644,19 +644,19 @@ class FundRequestController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = FundRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
@@ -666,7 +666,7 @@ class FundRequestController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -677,21 +677,21 @@ class FundRequestController extends Controller
 
                     $result = $merger->merge();
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -700,7 +700,7 @@ class FundRequestController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -725,22 +725,22 @@ class FundRequestController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
-                    
-                    
+
+
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -753,24 +753,24 @@ class FundRequestController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = FundRequest::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
 
             $pdf = PrintHelper::print($pr,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual',$menuUser->mode);
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 760, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 770, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 790, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $temp_pdf[]=$content;
 
             #surat penjara
@@ -780,7 +780,7 @@ class FundRequestController extends Controller
             $font = $pdfjail->getFontMetrics()->get_font("helvetica", "bold");
             $pdfjail->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdfjail->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $contentjail = $pdfjail->download()->getOriginalContent();
 
             $temp_pdf[]=$contentjail;
@@ -791,17 +791,17 @@ class FundRequestController extends Controller
             }
 
             $result = $merger->merge(); */
-            
-            $randomString = Str::random(10); 
-         
+
+            $randomString = Str::random(10);
+
             $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
+
             Storage::put($filePath, $content);
-            
+
             $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -812,7 +812,7 @@ class FundRequestController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		
+
 		return Excel::download(new ExportFundRequest($post_date,$end_date,$mode), 'fund_request_'.uniqid().'.xlsx');
     }
 
@@ -879,7 +879,7 @@ class FundRequestController extends Controller
         $search = $request->input('search.value');
 
         $total_data = FundRequest::where('user_id',session('bo_id'))->count();
-        
+
         $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -899,7 +899,7 @@ class FundRequestController extends Controller
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
-                
+
             })
             ->where('user_id',session('bo_id'))
             ->offset($start)
@@ -972,7 +972,7 @@ class FundRequestController extends Controller
                     $val->status(),
                     $val->balanceStatus(),
                     '
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -1021,7 +1021,7 @@ class FundRequestController extends Controller
     }
 
     public function userCreate(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
@@ -1070,6 +1070,16 @@ class FundRequestController extends Controller
             'arr_place.required'                => 'Dist. Biaya Plant tidak boleh kosong.',
             'arr_place.array'                   => 'Dist. Biaya Plant total harus dalam bentuk array.',
 		]);
+        foreach($request->arr_item as $key => $row){
+            if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+                $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1;
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ];
+                return response()->json($response);
+            }
+        }
 
         if($validation->fails()) {
             $response = [
@@ -1109,7 +1119,7 @@ class FundRequestController extends Controller
                     ]);
                 }
             }
-                    
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -1154,7 +1164,7 @@ class FundRequestController extends Controller
                         } else {
                             $document = $query->document;
                         }
-                        
+
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
@@ -1184,7 +1194,7 @@ class FundRequestController extends Controller
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document_status = $request->document_status;
                         $query->status = '1';
-                        
+
                         $query->save();
 
                         foreach($query->fundRequestDetail as $row){
@@ -1257,7 +1267,7 @@ class FundRequestController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
                 DB::beginTransaction();
                 try {
@@ -1325,12 +1335,12 @@ class FundRequestController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function userFinish(Request $request){
-        
+
         DB::beginTransaction();
         try {
             $query = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
@@ -1338,14 +1348,14 @@ class FundRequestController extends Controller
                 /* if($query->document_status == '3'){ */
                     $query->status = '3';
                     $query->save();
-    
+
                     $response = [
                         'status'    => 200,
                         'message'   => 'Data successfully updated.',
                     ];
 
                     CustomHelper::sendNotification('fund_requests',$query->id,'Status Permohonan Dana No. '.$query->code.' dinyatakan SELESAI','Status dokumen anda telah dinyatakan selesai.',session('bo_id'));
-    
+
                     DB::commit();
                 /* }else{
                     return response()->json([
@@ -1369,7 +1379,7 @@ class FundRequestController extends Controller
     public function userRowDetail(Request $request){
         $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $menu = $this->menu;
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
@@ -1393,7 +1403,7 @@ class FundRequestController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
-        
+
         foreach($data->fundRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
@@ -1412,7 +1422,7 @@ class FundRequestController extends Controller
                 <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
-        
+
         $string .= '</tbody>
                         <tfoot>
                             <tr>
@@ -1446,7 +1456,7 @@ class FundRequestController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -1454,7 +1464,7 @@ class FundRequestController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -1466,7 +1476,7 @@ class FundRequestController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -1489,7 +1499,7 @@ class FundRequestController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -1543,7 +1553,7 @@ class FundRequestController extends Controller
 
         $fr['details'] = $arr;
         $fr['checklist'] = $arrChecklist;
-        				
+
 		return response()->json($fr);
     }
 
@@ -1587,7 +1597,7 @@ class FundRequestController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-            
+
             $query->fundRequestDetail()->delete();
             CustomHelper::removeApproval('fund_requests',$query->id);
 
@@ -1616,9 +1626,9 @@ class FundRequestController extends Controller
     }
 
     public function approval(Request $request,$id){
-        
+
         $pr = FundRequest::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $data = [
                 'title'     => 'Print Permohonan Dana',
@@ -1653,35 +1663,35 @@ class FundRequestController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
-        
-        
-        
+
+
+
 
         if($query) {
-           
-            
-           
+
+
+
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_frs',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2; 
+            $data_link = $array2;
 
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1690,8 +1700,8 @@ class FundRequestController extends Controller
                 'message' => $data_go_chart,
                 'link'    => $data_link
             ];
-            
-        
+
+
         } else {
             $data_good_receipt = [];
             $response = [
@@ -1710,9 +1720,9 @@ class FundRequestController extends Controller
                     $data->update([
                         'document_status'   => $request->status ? $request->status : NULL,
                     ]);
-    
+
                     CustomHelper::sendNotification('fund_requests',$data->id,'Status Dokumen Permohonan Dana No. '.$data->code.' telah diupdate','Status dokumen anda telah dinyatakan '.$data->documentStatus().'.',session('bo_id'));
-    
+
                     $response = [
                         'status'  => 200,
                         'message' => 'Status berhasil dirubah.',
@@ -1744,8 +1754,8 @@ class FundRequestController extends Controller
     }
 
     public function getOutstanding(Request $request){
-       
-		
+
+
 		return Excel::download(new ExportOutstandingFundRequest(), 'outstanding_fund_request_'.uniqid().'.xlsx');
     }
 
@@ -1760,13 +1770,13 @@ class FundRequestController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new FundRequest())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the FundRequest data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'

@@ -1087,6 +1087,16 @@ class PurchaseInvoiceController extends Controller
                 'arr_multi_coa.array'               => 'Coa harus dalam bentuk array.',
             ]);
         }
+        foreach($request->arr_type as $key => $row){
+            if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+                $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1;
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ];
+                return response()->json($response);
+            }
+        }
 
         if($validation->fails()) {
             $response = [

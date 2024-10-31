@@ -58,27 +58,27 @@ class MenuController extends Controller
 {
     public function index()
     {
-        // $modp = MarketingOrderDeliveryProcess::whereIn("status",['2','3'])->get();
+        $modp = MarketingOrderDeliveryProcess::whereIn("status",['2','3'])->get();
 
-        // foreach($modp as $row){
-        //     foreach($row->journal as $journal){
-        //         $journal->update([
-        //             'note'=> $row->marketingOrderDelivery->code,
-        //         ]);
-        //     }
+        foreach($modp as $row){
+            foreach($row->journal as $journal){
+                $journal->update([
+                    'note'=> "PENGIRIMAN ".$row->marketingOrderDelivery->code,
+                ]);
+            }
 
-        //     foreach($row->marketingOrderDeliveryProcessDetail as $row_detail){
-        //         foreach($row_detail->journalDetail as $journalDetail){
-        //             $journalDetail->update([
-        //                 'note'=> $row_detail->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
-        //                 'note2' => isset($row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail)
-        //                 ? $row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail->goodScale->code
-        //                 : '',
-        //             ]);
-        //         }
-        //     }
+            // foreach($row->marketingOrderDeliveryProcessDetail as $row_detail){
+            //     foreach($row_detail->journalDetail as $journalDetail){
+            //         $journalDetail->update([
+            //             'note'=> $row_detail->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+            //             'note2' => isset($row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail)
+            //             ? $row_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail->goodScale->code
+            //             : '',
+            //         ]);
+            //     }
+            // }
 
-        // }
+        }
 
         /* $user = User::where('type','3')->orderBy('id')->get();
 

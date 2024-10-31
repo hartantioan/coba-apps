@@ -7436,6 +7436,7 @@ class CustomHelper {
 	public static function splitBomArray($data){
 		$newarray = [];
 		$arritem = [];
+		$arrcount = [];
 		$datanew = [];
 		foreach($data as $row){
 			foreach($row['list_bom'] as $rowbom){
@@ -7443,53 +7444,64 @@ class CustomHelper {
 			}
 		}
 		$item_id = NULL;
+		$hasMore = false;
 		foreach($newarray as $row){
 			if(!in_array($row['item_id'],$arritem)){
 				$arritem[] = $row['item_id'];
-				$arrqty = 0;
+				$arrcount[] = 1;
 			}else{
-				$item_id = $row['item_id'];
+				$index = array_search($row['item_id'],$arritem);
+				$arrcount[$index]++;
+				$hasMore = true;
 			}
 		}
-		info($item_id);
-		$newrow = NULL;
-		if($item_id){
-			$countQty = 0;
-			foreach($data as $row){
-				$newarr = [];
-				foreach($row['list_bom'] as $key => $rowbom){
-					if($rowbom['item_id'] !== $item_id){
-						info($rowbom['item_id']);
-						$newarr[] = $rowbom;
-					}else{
-						$countQty += str_replace(',','.',str_replace('.','',$row['qty'])) * str_replace(',','.',str_replace('.','',$rowbom['qty']));
-						$arrnewbom[0] = $rowbom;
-						$newrow = [
-							'mopd_id' 			=> '',
-							'item_id' 			=> $item_id,
-							'item_code' 		=> explode(' - ',$rowbom['item_name'])[0],
-							'item_name' 		=> explode(' - ',$rowbom['item_name'])[1],
-							'qty' 				=> CustomHelper::formatConditionalQty($countQty),
-							'uom' 				=> $rowbom['unit'],
-							'request_date' 		=> $row['request_date'],
-							'note' 				=> '-',
-							'note2' 			=> '-',
-							'priority' 			=> NULL,
-							'has_bom' 			=> '1',
-							'place_id' 			=> '1',
-							'list_warehouse'	=> $rowbom['list_warehouse'],
-							'list_bom'			=> $arrnewbom,
-						];
+		$arrnewrow = [];
+		if($hasMore){
+			foreach($arritem as $key2 => $rowitem){
+				$countQty = 0;
+				$newrow = NULL;
+				foreach($data as $row){
+					$newarr = [];
+					foreach($row['list_bom'] as $key => $rowbom){
+						if($rowbom['item_id'] == $rowitem){
+							if($arrcount[$key2] > 1){
+								$countQty += str_replace(',','.',str_replace('.','',$row['qty'])) * str_replace(',','.',str_replace('.','',$rowbom['qty']));
+								$arrnewbom[0] = $rowbom;
+								$newrow = [
+									'mopd_id' 			=> '',
+									'item_id' 			=> $item_id,
+									'item_code' 		=> explode(' - ',$rowbom['item_name'])[0],
+									'item_name' 		=> explode(' - ',$rowbom['item_name'])[1],
+									'qty' 				=> CustomHelper::formatConditionalQty($countQty),
+									'uom' 				=> $rowbom['unit'],
+									'request_date' 		=> $row['request_date'],
+									'note' 				=> '-',
+									'note2' 			=> '-',
+									'priority' 			=> NULL,
+									'has_bom' 			=> '1',
+									'place_id' 			=> '1',
+									'list_warehouse'	=> $rowbom['list_warehouse'],
+									'list_bom'			=> $arrnewbom,
+								];
+							}else{
+								$newarr[] = $rowbom;
+							}
+						}
 					}
+					$row['list_bom'] = $newarr;
+					$datanew[] = $row;
 				}
-				$row['list_bom'] = $newarr;
-				$datanew[] = $row;
+				if($newrow){
+					$arrnewrow[] = $newrow;
+				}
 			}
 		}else{
 			$datanew = $data;
 		}
-		if($newrow){
-			$datanew[] = $newrow;
+		if(count($arrnewrow) > 0){
+			foreach($arrnewrow as $rownew){
+				$datanew[] = $rownew;
+			}
 		}
 		return $datanew;
 	}

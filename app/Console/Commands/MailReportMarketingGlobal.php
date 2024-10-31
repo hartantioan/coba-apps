@@ -328,7 +328,7 @@ class MailReportMarketingGlobal extends Command
 					SELECT a.name as tipe,z.name as grup, ifnull(b.qtyso,0) AS qtySO,ifnull(c.qtymod,0) AS qtyMOD,ifnull(d.qtysj,0) AS qtySJ ,
 					 ifnull(e.sisaso,0) AS sisaso, ifnull(f.osmod,0) AS sisamod, ifnull(g.qtysjm,0) AS sjm, ifnull(round(h.asp,2),0) AS asp
 
-					FROM types a CROSS JOIN (select name from groups WHERE TYPE='2') z left JOIN (
+					FROM types a CROSS JOIN (select name from groups WHERE type='2') z left JOIN (
 					SELECT d.name AS tipe, f.name AS grup, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
 					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
 					LEFT JOIN items c ON c.id=b.item_id

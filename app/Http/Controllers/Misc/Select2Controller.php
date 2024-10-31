@@ -3722,6 +3722,7 @@ class Select2Controller extends Controller {
                     'details'       => CustomHelper::splitBomArray($details),
                     'code'          => $d->code,
                 ];
+                info(CustomHelper::splitBomArray($details));
             }
         }
 

@@ -7451,7 +7451,6 @@ class CustomHelper {
 				$item_id = $row['item_id'];
 			}
 		}
-		info($item_id);
 		$newrow = NULL;
 		if($item_id){
 			$countQty = 0;
@@ -7459,6 +7458,7 @@ class CustomHelper {
 				$newarr = [];
 				foreach($row['list_bom'] as $key => $rowbom){
 					if($rowbom['item_id'] !== $item_id){
+						info($rowbom['item_id']);
 						$newarr[] = $rowbom;
 					}else{
 						$countQty += str_replace(',','.',str_replace('.','',$row['qty'])) * str_replace(',','.',str_replace('.','',$rowbom['qty']));

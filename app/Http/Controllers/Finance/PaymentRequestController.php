@@ -1270,8 +1270,8 @@ class PaymentRequestController extends Controller
 
             DB::commit();
         }catch(\Exception $e){
-            info($e->getMessage());
             DB::rollback();
+            info($e->getMessage());
         }
 		return response()->json($response);
     }

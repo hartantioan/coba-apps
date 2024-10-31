@@ -328,13 +328,13 @@ class MailReportMarketingGlobal extends Command
 					SELECT a.name as tipe,z.name as grup, ifnull(b.qtyso,0) AS qtySO,ifnull(c.qtymod,0) AS qtyMOD,ifnull(d.qtysj,0) AS qtySJ ,
 					 ifnull(e.sisaso,0) AS sisaso, ifnull(f.osmod,0) AS sisamod, ifnull(g.qtysjm,0) AS sjm, ifnull(round(h.asp,2),0) AS asp
 
-					FROM types a CROSS JOIN (select name from groups WHERE type='2') z left JOIN (
+					FROM types a CROSS JOIN (select name from `groups` WHERE type='2') z left JOIN (
 					SELECT d.name AS tipe, f.name AS grup, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
 					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users e ON e.id=a.account_id
-					LEFT JOIN groups f ON f.id=e.group_id
+					LEFT JOIN `groups` f ON f.id=e.group_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY d.name,f.name )b ON a.name=b.tipe AND b.grup=z.name
                LEFT JOIN (
@@ -346,7 +346,7 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users f ON f.id=a.customer_id
-					LEFT JOIN groups g ON g.id=f.group_id
+					LEFT JOIN `groups` g ON g.id=f.group_id
 
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY d.name,g.name
@@ -361,7 +361,7 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users g ON g.id=gg.account_id
-					LEFT JOIN groups h ON h.id=g.group_id
+					LEFT JOIN `groups` h ON h.id=g.group_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY d.name,h.name
 					)d ON d.tipe=a.name
@@ -377,7 +377,7 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items d ON d.id=b.item_id
 					LEFT JOIN types e ON e.id=d.type_id
 					LEFT JOIN users f ON f.id=a.account_id
-					LEFT JOIN groups g ON g.id=f.group_id
+					LEFT JOIN `groups` g ON g.id=f.group_id
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL
 					AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
 					   GROUP BY e.name,g.name
@@ -391,7 +391,7 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items e ON e.id=b.item_id
 					LEFT JOIN types f ON f.id=e.type_id
 					LEFT JOIN users g ON g.id=a.customer_id
-					LEFT JOIN groups h ON h.id=g.group_id
+					LEFT JOIN `groups` h ON h.id=g.group_id
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
 					AND d.id IS null
 				 GROUP BY f.name,h.name
@@ -406,7 +406,7 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 						LEFT JOIN users g ON g.id=gg.account_id
-					LEFT JOIN groups h ON h.id=g.group_id
+					LEFT JOIN `groups` h ON h.id=g.group_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
                	 GROUP BY d.name,h.name
 					)g ON g.tipe=a.name AND g.grup=z.name
@@ -421,10 +421,10 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users g ON g.id=gg.account_id
-					LEFT JOIN groups h ON h.id=g.group_id
+					LEFT JOIN `groups` h ON h.id=g.group_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
               	 GROUP BY d.name,h.name
-					)h ON h.tipe=a.name AND h.grup=z.name
+					)h ON h.tipe=a.name AND h.grup=z.name;
         ");
 
 

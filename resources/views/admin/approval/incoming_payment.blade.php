@@ -56,7 +56,7 @@
             background-color:white !important;
             zoom:0.8;
         }
-        
+
         .modal {
             background-color:white !important;
         }
@@ -88,7 +88,7 @@
             overflow: visible !important;
             min-width:100% !important;
         }
-        
+
         .modal-content {
             visibility: visible !important;
             overflow: visible !important;
@@ -223,6 +223,7 @@
                 <tr>
                     <th class="center-align">{{ __('translations.no') }}.</th>
                     <th class="center-align">{{ __('translations.reference') }}</th>
+                    <th class="center-align">{{ __('translations.reference') }}</th>
                     <th class="center-align">{{ __('translations.type') }}</th>
                     <th class="center-align">{{ __('translations.cost_distribution') }}</th>
                     <th class="center-align">{{ __('translations.total') }}</th>
@@ -235,7 +236,8 @@
                 @foreach($data->incomingPaymentDetail as $row)
                 <tr>
                     <td class="center-align">{{ $loop->iteration }}</td>
-                    <td class="center-align">{{ $row->lookable->code }}</td>
+                    <td class="center-align">{{ $row->lookable->getCode() }}
+                    </td>
                     <td class="center-align">{{ class_basename($row->lookable) }}</td>
                     <td class="center-align">{{ $row->cost_distribution_id ? $row->costDistribution->code : '-' }}</td>
                     <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
@@ -261,19 +263,19 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        
-                        
+
+
                         <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
-                       
+
                     </td>
                 </tr>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
                             @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                            <tr>    
+                            <tr>
                                 <td>
-                                        
-                                        
+
+
                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
                                             @if ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Dicek oleh,' &&  app()->getLocale() == 'chi')
                                             <br>
@@ -282,20 +284,20 @@
                                             <br>
                                                 由...批准,
                                             @endif
-                                            {{ $row->user->name }} 
+                                            {{ $row->user->name }}
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}
                                             @endif
                                             {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-').' Keterangan : '.$row->note }}</div>
                                         <div class="{{ $row->user->date_process ? '' : 'mt-2' }}"></div>
-                                        
+
                                 </td>
                             </tr>
                             @endforeach
                         @endforeach
                     @endif
-                
-            </table>   
+
+            </table>
         </div>
     </div>
 </div>

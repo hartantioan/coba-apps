@@ -938,7 +938,7 @@ document.addEventListener('focusin', function (event) {
         if($('#body-detail-' + id + ' tr').length == 0){
             $('#body-detail-' + id).append(`
                 <tr>
-                    <td colspan="4">Data tidak ditemukan.</td>    
+                    <td colspan="4">Data tidak ditemukan.</td>
                 </tr>
             `);
         }
@@ -1039,7 +1039,7 @@ document.addEventListener('focusin', function (event) {
                             var length = total_grandtotal.length - 1;
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
-                                
+
                                 let rowstock = ``;
                                 if(val.stock_by_shading.length > 0){
                                     $.each(val.stock_by_shading, function(j, value) {
@@ -1412,10 +1412,10 @@ document.addEventListener('focusin', function (event) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
 
@@ -1825,7 +1825,7 @@ document.addEventListener('focusin', function (event) {
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data')[0]), passed = true, passedStock = true;
 
                 formData.delete("arr_modi[]");

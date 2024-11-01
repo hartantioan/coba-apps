@@ -45,10 +45,10 @@
     }
 
     #table_multi_purchase_order_wrapper > .dataTables_scrollHeadInner {
-        width: 100% !important; 
+        width: 100% !important;
     }
     #table_multi_purchase_order_wrapper > .dataTable {
-        width: 100% !important; 
+        width: 100% !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -70,14 +70,14 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
-                        
+
+
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -230,7 +230,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -291,7 +291,7 @@
                                 <input id="top" name="top" type="number" value="0" onchange="addDays();">
                                 <label class="active" for="top">TOP</label>
                             </div>
-                            
+
                             <div class="input-field col m3 s12 step9">
                                 <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                     @foreach ($currency as $row)
@@ -312,7 +312,7 @@
                                 <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                     Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                     <br>
-                                    
+
                                 </div>
                                 <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                    Clear
@@ -391,7 +391,7 @@
                                         {{-- <tr>
                                             <td width="50%">Subtotal <b><i>(Masukkan nominal disini jika tanpa PO)</i></b></td>
                                             <td width="50%" class="right-align">
-                                                
+
                                             </td>
                                         </tr>
                                         <tr>
@@ -410,7 +410,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -429,7 +429,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -468,7 +468,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -515,7 +515,7 @@
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -551,7 +551,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -574,7 +574,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -591,7 +591,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -602,10 +602,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -727,7 +727,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -735,18 +735,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -754,16 +754,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -782,22 +782,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -829,13 +829,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -853,10 +853,10 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-       
+
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
@@ -866,7 +866,7 @@
         $('#modal6').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 table_multi = $('#table_multi').DataTable({
@@ -979,7 +979,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
-               
+
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -1023,7 +1023,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -1035,9 +1035,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -1050,13 +1050,13 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -1068,9 +1068,9 @@
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -1080,7 +1080,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -1090,7 +1090,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
@@ -1139,11 +1139,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1165,8 +1165,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1174,7 +1174,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1183,10 +1183,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1210,7 +1210,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1223,17 +1223,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1251,8 +1251,8 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     function printMultiSelect(){
@@ -1263,7 +1263,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1308,13 +1308,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1344,11 +1344,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1411,17 +1411,17 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 makeTreeOrg(response.message,response.link);
 
                 $('#modal3').modal('open');
@@ -1453,7 +1453,7 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
+
                     if(response.length > 0){
                         $('#empty-purchase').remove();
                         $('.row_purchase').remove();
@@ -1493,7 +1493,7 @@
                             `);
                         });
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -1570,7 +1570,7 @@
                             `);
                         });
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -1708,12 +1708,12 @@
                         }else{
                             $('#supplier_id').empty();
                         }
-                        
+
                         $('.modal-content').scrollTop(0);
                         M.updateTextFields();
 
                         $('#modal6').modal('close');
-                    }, 
+                    },
                     error: function() {
                         $('.modal-content').scrollTop(0);
                         loadingClose('.modal-content');
@@ -1891,7 +1891,7 @@
             ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -1965,12 +1965,12 @@
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -2002,7 +2002,7 @@
                             $.each(response.error, function(field, errorMessage) {
                                 $('#' + field).addClass('error-input');
                                 $('#' + field).css('border', '1px solid red');
-                                
+
                             });
                             swal({
                                 title: 'Ups! Validation',
@@ -2068,7 +2068,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2077,10 +2077,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function show(id){
@@ -2119,12 +2119,12 @@
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                
+
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
                 $("#wtax_id option[data-id='" + response.wtax_id + "']").prop("selected",true);
                 $('#is_include_tax').val(response.is_include_tax).formSelect();
                 $('#tax_id,#wtax_id').formSelect();
-                
+
                 $('#note').val(response.note);
                 /* $('#note_external').val(response.note_external);
                 M.textareaAutoResize($('#note_external')); */
@@ -2134,7 +2134,7 @@
                 $('#wtax').text(response.wtax);
                 $('#subtotal').val(response.subtotal);
                 $('#discount').text(response.discount);
-                
+
                 if(response.details.length > 0){
                     $('#body-purchase').empty();
                     $.each(response.details, function(i, val) {
@@ -2333,7 +2333,7 @@
     }
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2341,7 +2341,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2377,7 +2377,7 @@
                 });
             }
         });
-        
+
     }
 
     function viewJournal(id){
@@ -2388,7 +2388,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2432,34 +2432,34 @@
                 {
                     title : 'Supplier',
                     element : document.querySelector('.step3'),
-                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.'
                 },
                 {
                     title : 'Tipe',
                     element : document.querySelector('.step4'),
-                    intro : 'Tipe Pembayaran menggunakan cash / transfer / giro / check dari perusahaan.' 
+                    intro : 'Tipe Pembayaran menggunakan cash / transfer / giro / check dari perusahaan.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step5'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step6'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'TOP',
                     element : document.querySelector('.step7'),
-                    intro : 'Tanggal berlaku hingga, dari dokumen ini.' 
+                    intro : 'Tanggal berlaku hingga, dari dokumen ini.'
                 },
-                
-               
+
+
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step9'),
-                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.'
                 },
                 {
                     title : 'Konversi',
@@ -2469,33 +2469,33 @@
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step8'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Detail Purchase Order',
                     element : document.querySelector('.step13'),
-                    intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.' 
+                    intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step14'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
 
                 {
                     title : 'Checklist lampiran',
                     element : document.querySelector('.step16'),
-                    intro : 'Silahkan pilih dokumen yang dilampirkan dan akan muncul ketika dokumen dicetak.' 
+                    intro : 'Silahkan pilih dokumen yang dilampirkan dan akan muncul ketika dokumen dicetak.'
                 },
                 {
                     title : 'Subtotal & Diskon',
                     element : document.querySelector('.step17'),
-                    intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
+                    intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step18'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2508,7 +2508,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2581,6 +2581,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

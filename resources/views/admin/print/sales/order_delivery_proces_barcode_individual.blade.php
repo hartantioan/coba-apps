@@ -29,7 +29,8 @@
         <table border="0" width="100%" class="tbl-info">
             <tr>
                 <td align="center">
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($data->scan_barcode, 'C128')}}" alt="barcode" style="width:100%;" height="50px" />
+                    <div style="position: absolute; top: -10px;left:32%; font-size: 12px;">{{ $data->scan_barcode }}</div>
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($data->scan_barcode, 'C128')}}" alt="barcode" style="width:100%;margin-top:2px" height="50px" />
                     <div style="margin-top:5px;">{{ $data->code }}</div>
                 </td>
             </tr>

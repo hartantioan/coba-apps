@@ -177,6 +177,7 @@
                                                         <th>Tracking</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
+                                                        <th>Kode Barcode</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -1009,7 +1010,7 @@ document.addEventListener('focusin', function (event) {
 
         $('#modal8').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 table_stock = $('#table_stock').DataTable({
@@ -1045,7 +1046,7 @@ document.addEventListener('focusin', function (event) {
                         style: 'multi'
                     }
                 });
-                
+
                 $('#table_stock_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_stock_length"]').addClass('browser-default');
             },
@@ -1150,7 +1151,7 @@ document.addEventListener('focusin', function (event) {
                     $('#tempCode').val(code);
                     $('#tempModd').val(modd_id);
                     $('#item_name').text(response.item_name);
-                
+
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             $('#body-detail-stock').append(`
@@ -1177,7 +1178,7 @@ document.addEventListener('focusin', function (event) {
                             `);
                         });
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -2214,6 +2215,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'status_tracking', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note_external', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
         });

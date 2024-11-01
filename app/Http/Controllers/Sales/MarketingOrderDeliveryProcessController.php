@@ -161,7 +161,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrderDeliveryProcess::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MarketingOrderDeliveryProcess::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
 
         $query_data = MarketingOrderDeliveryProcess::where(function($query) use ($search, $request) {
                 if($search) {
@@ -221,7 +221,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 }
 
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -284,7 +284,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];

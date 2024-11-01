@@ -665,7 +665,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1" onclick="closeModalDocumentBarcode();">{{ __('translations.close') }}</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
         <button class="btn waves-effect waves-light purple right submit" onclick="applyDocumentBarcode();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>

@@ -128,6 +128,7 @@ class MarketingOrderInvoiceController extends Controller
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('downpayment', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -184,6 +185,7 @@ class MarketingOrderInvoiceController extends Controller
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('downpayment', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");

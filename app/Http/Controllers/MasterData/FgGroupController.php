@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+
+use App\Exports\ExportGroupFG;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportFgGroup;
 use Illuminate\Http\Request;
@@ -37,7 +39,7 @@ class FgGroupController extends Controller
         $search = $request->input('search.value');
 
         $total_data = FgGroup::count();
-        
+
         $query_data = FgGroup::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -75,7 +77,7 @@ class FgGroupController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->parent->code.' - '.$val->parent->name,
@@ -104,7 +106,7 @@ class FgGroupController extends Controller
 
     public function destroy(Request $request){
         $query = FgGroup::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new FgGroup())
@@ -157,7 +159,7 @@ class FgGroupController extends Controller
                 'status'    => 200,
                 'message'   => 'Import sukses!'
             ]);
-            
+
         } catch (ValidationException $e) {
             $failures = $e->failures();
 
@@ -183,5 +185,11 @@ class FgGroupController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+
+		return Excel::download(new ExportGroupFG($search), 'bom_map_'.uniqid().'.xlsx');
     }
 }

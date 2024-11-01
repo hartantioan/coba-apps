@@ -169,7 +169,7 @@
         </style>
     </head>
     <body>
-        <header style="margin-top:35px;">
+        <header style="margin-top:45px;">
             <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
                     <td width="66%" class="left-align" style="padding-top:15px;">

@@ -495,11 +495,12 @@ class GoodScale extends Model
 
             if($coahutangusahaekspedisi && $unit){
                 $total = 0;
-                foreach($this->goodScaleDetail as $row){
+                $tempQty = -1;
+                foreach($this->goodScaleDetail()->orderByDesc('qty')->get() as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         $total += $row->total;
                         $qty = $row->lookable->cost_delivery_type == '1' ? $row->qty : 1;
-                        $price = $row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : $row->total;
+                        $price = $tempQty < $qty ? ($row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : $row->total) : 0;
                         $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'                     => $purchaseOrder->id,
                             'marketing_order_delivery_process_id'   => $row->lookable->marketingOrderDeliveryProcess->id,
@@ -532,6 +533,7 @@ class GoodScale extends Model
                             'requester'                             => $this->user->name,
                             'project_id'                            => NULL,
                         ]);
+                        $tempQty = $qty;
                     }
                 }
 

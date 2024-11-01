@@ -19,6 +19,7 @@
             <th>Customer</th>
             <th>Item Code</th>
             <th>Item Name</th>
+            <th>Brand</th>
             <th>Plant</th>
             <th>Qty Delivery</th>
             {{-- <th>Konversi</th> --}}
@@ -48,6 +49,7 @@
             <th>No Timbangan</th>
             <th>Po.Customer</th>
             <th>SO</th>
+            <th>Tipe SO</th>
         </tr>
     </thead>
     <tbody>
@@ -71,6 +73,7 @@
                 <td>{{ $row['customer'] }}</td>
                 <td>{{ $row['itemcode'] }}</td>
                 <td>{{ $row['itemname'] }}</td>
+                <td>{{ $row['brand'] }}</td>
                 <td>{{ $row['plant'] }}</td>
                 <td>{{ $row['qtysj'] }}</td>
                 {{-- <td>{{ $row['qty_konversi'] }}</td> --}}
@@ -101,7 +104,7 @@
                 <td>{{ $row['no_timbangan'] }}</td>
                 <td>{{ $row['po_customer'] }}</td>
                 <td>{{ $row['so'] }}</td>
-
+                <td>{{ $row['so_type'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

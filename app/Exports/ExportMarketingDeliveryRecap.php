@@ -86,6 +86,8 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
                 'no_timbangan'=> $row->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
                 'po_customer' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,
+                'brand' => $row->itemStock->item->brand->name,
+                'so_type' => $row->marketingOrderDeliveryDetail->marketingOrderDelivery->soType(),
             ];
         }
 

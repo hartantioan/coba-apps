@@ -518,7 +518,7 @@ class GoodScale extends Model
                             'note'                                  => $row->lookable->code,
                             'note2'                                 => $this->code,
                             'note3'                                 => '',
-                            'total'                                 => $row->total,
+                            'total'                                 => $tempQty < $qty ? $row->total : 0,
                             'is_tax'                                => '0',
                             'is_include_tax'                        => '0',
                             'percent_tax'                           => 0,

@@ -376,6 +376,8 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+
+
     public function itemParentFg(Request $request)
     {
         $response = [];
@@ -394,6 +396,32 @@ class Select2Controller extends Controller {
                 'uom'               => $d->uomUnit->code,
                 'list_warehouse'    => $d->warehouseList(),
                 'list_bom'          => $d->bomRelation(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemForWeight(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->whereHas('itemShading',function($query){
+
+                })
+                ->where('is_sales_item','1')
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
             ];
         }
 

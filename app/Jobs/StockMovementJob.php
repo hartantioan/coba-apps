@@ -44,7 +44,7 @@ class StockMovementJob implements ShouldQueue
             'to_user_id'		=> $this->user_id,
             'lookable_type'		=> 'report',
             'lookable_id'		=> 0,
-            'title'				=> 'Report telah berhasil diproses Stock Shading Accounting',
+            'title'				=> 'Report telah berhasil diproses Stock Movement Mohon Ditunggu',
             'note'				=> env('APP_URL').'/storage/report/'.$filename,
             'status'			=> '1'
         ]);

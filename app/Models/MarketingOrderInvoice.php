@@ -27,6 +27,7 @@ class MarketingOrderInvoice extends Model
         'due_date_internal',
         'status',
         'type',
+        'invoice_type',
         'document',
         'tax_no',
         'tax_id',
@@ -124,6 +125,16 @@ class MarketingOrderInvoice extends Model
         return $type;
     }
 
+    public function invoiceType(){
+        $type = match ($this->invoice_type) {
+          '1' => 'Surat Jalan',
+          '2' => 'Manual',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
@@ -146,6 +157,11 @@ class MarketingOrderInvoice extends Model
     public function marketingOrderInvoiceDeliveryDetail()
     {
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
+    }
+
+    public function marketingOrderInvoiceDetailManual()
+    {
+        return $this->marketingOrderInvoiceDetail()->whereNull('lookable_type')->whereNull('lookable_id');
     }
 
     public function marketingOrderInvoiceDownPayment()

@@ -98,6 +98,16 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
+                                                <label for="filter_invoice_type" style="font-size:1rem;">Tipe :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_invoice_type" onchange="loadDataTable()">
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">Surat Jalan</option>
+                                                        <option value="2">Manual</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
                                                 <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
@@ -164,6 +174,7 @@
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
                                                         <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.type') }}</th>
+                                                        <th rowspan="2">Tipe Invoice</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Seri Pajak</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
@@ -226,21 +237,16 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="invoice_type" name="invoice_type" onchange="changeType();">
+                                            <option value="1">Surat Jalan</option>
+                                            <option value="2">Manual</option>
+                                        </select>
+                                        <label class="active" for="invoice_type">Tipe Invoice</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step3">
                                         <select class="browser-default" id="account_id" name="account_id" onchange="addDueDate();getDataCustomer();"></select>
                                         <label class="active" for="account_id">{{ __('translations.customer') }}</label>
-                                    </div>
-                                    <div class="row">
-                                        <div class="input-field col m6 s12">
-                                            <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id" onchange="getMarketingOrderDelivery();" ></select>
-                                            <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
-                                        </div>
-                                    </div>
-                                    <div class="input-field col m6 s12">
-                                        <select class="select2 browser-default" id="user_data_id" name="user_data_id">
-                                            <option value="">--Pilih customer ya--</option>
-                                        </select>
-                                        <label class="active" for="user_data_id">Alamat Tagih & NPWP (Otomatis dari SO paling akhir)</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="company_id" name="company_id">
@@ -249,6 +255,16 @@
                                             @endforeach
                                         </select>
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
+                                    </div>
+                                    <div class="input-field col m6 s12 div-sj">
+                                        <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id" onchange="getMarketingOrderDelivery();" ></select>
+                                        <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
+                                    </div>
+                                    <div class="input-field col m6 s12">
+                                        <select class="select2 browser-default" id="user_data_id" name="user_data_id">
+                                            <option value="">--Pilih customer ya--</option>
+                                        </select>
+                                        <label class="active" for="user_data_id">Alamat Tagih & NPWP (Otomatis dari SO paling akhir)</label>
                                     </div>
                                     <div class="input-field col m3 s12 step6">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
@@ -270,7 +286,7 @@
                                             <option value="1">DP</option>
                                             <option value="2">Credit</option>
                                         </select>
-                                        <label class="" for="type">{{ __('translations.type') }}</label>
+                                        <label class="" for="type">Tipe Penjualan</label>
                                     </div>
                                     <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
@@ -336,7 +352,7 @@
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">Qty Terkirim</th>
                                                         <th class="center">Qty Retur</th>
-                                                        <th class="center">Qty Sisa</th>
+                                                        <th class="center">Qty</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center">Harga@</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
@@ -354,12 +370,21 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot class="hide" id="div-manual">
+                                                    <tr>
+                                                        <td colspan="13">
+                                                            <a class="waves-effect waves-light green btn-small" onclick="addItem();" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Item
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </p>
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s12">
+                            <div class="col s12 div-sj">
                                 <fieldset style="min-width: 100%;overflow:auto;">
                                     <legend>5. AR Down Payment</legend>
                                     <div class="row">
@@ -1047,6 +1072,24 @@
         });
     });
 
+    function changeType(){
+        $('#marketing_order_delivery_process_id').empty();
+        $('#body-dp').empty().append(`
+            <tr id="last-row-dp">
+                <td colspan="10">
+                    Silahkan tambahkan AR Down Payment...
+                </td>
+            </tr>
+        `);
+        if($('#invoice_type').val() == '1'){
+            $('.div-sj').removeClass('hide');
+            $('#div-manual').addClass('hide');
+        }else if($('#invoice_type').val() == '2'){
+            $('.div-sj').addClass('hide');
+            $('#div-manual').removeClass('hide');
+        }
+    }
+
     function getDataCustomer(){
         $('#user_data_id').empty();
         if($('#account_id').val()){
@@ -1066,6 +1109,126 @@
                 <option value="">--Pilih customer ya--</option>
             `);
         }
+    }
+
+    function count(){
+        let total = 0, tax = 0, grandtotal = 0;
+        $('input[name^="arr_qty[]"]').each(function(index){
+            let rowqty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), rowprice = parseFloat($('input[name^="arr_price[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")), rowtotal = 0, rowtax = 0, rowgrandtotal = 0, row_percent_tax = $('select[name^="arr_tax_id[]"]').eq(index).find(':selected').data('value'), tax_id = $('select[name^="arr_tax_id[]"]').eq(index).val();
+            rowtotal = rowqty * rowprice;
+            if(row_percent_tax > 0){
+                if($('select[name^="arr_is_include_tax[]"]').eq(index).val() == '1'){
+                    rowtotal = rowtotal / (1 + (row_percent_tax / 100));
+                }
+                rowtax = Math.floor((rowtotal * (row_percent_tax / 100)).toFixed(2));
+            }
+            rowgrandtotal = rowtotal + rowtax;
+            $('input[name^="arr_total[]"]').eq(index).val(
+                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_tax[]"]').eq(index).val(
+                (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_total_after_tax[]"]').eq(index).val(
+                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
+            );
+            total += rowtotal;
+            tax += rowtax;
+            grandtotal += rowgrandtotal;
+            if($('select[name^="arr_tax_id[]"]').eq(index).val() !== '0'){
+                $('#tempTaxId').val(tax_id);
+            }
+        });
+
+        tax = Math.floor(tax);
+
+        $('#subtotal').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+
+        $('#total').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+
+        $('#tax').val(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
+        );
+
+        $('#grandtotal').val(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+        );
+
+        if(total > 0){
+            $('#textTax').show();
+            getTaxSeries();
+        }else{
+            $('#textTax').hide();
+            $('#tax_no').val('');
+        }
+    }
+
+    function addItem(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
+        if($('#last-row-item').length > 0){
+            $('#last-row-item').remove();
+        }
+        var count = makeid(10);
+        $('#body-item').append(`
+            <tr class="row_item" data-id="">
+                <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="">
+                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="">
+                <td>
+                    -
+                </td>
+                <td>
+                    <textarea class="materialize-textarea" name="arr_description[]" type="text" placeholder="Keterangan Barang"></textarea>
+                </td>
+                <td class="center-align">
+                    -
+                </td>
+                <td class="center-align">
+                    -
+                </td>
+                <td class="center-align">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();">
+                </td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                </td>
+                <td class="right-align">
+                    <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                </td>
+                <td class="right-align">
+                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                </td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
+                        <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                        @foreach ($tax as $row)
+                            <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" onchange="count();">
+                        <option value="0">--Tidak--</option>
+                        <option value="1">--Ya--</option>
+                    </select>
+                </td>
+                <td class="right-align">
+                    <input type="text" id="arr_tax` + count + `" name="arr_tax[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                </td>
+                <td class="right-align">
+                    <input type="text" id="arr_total_after_tax` + count + `" name="arr_total_after_tax[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                </td>
+                <td>
+                    <textarea class="materialize-textarea" name="arr_note[]" type="text" placeholder="Keterangan Tambahan"></textarea>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
     }
 
     function getMarketingOrderDelivery(){
@@ -1301,11 +1464,13 @@
 
     function addDueDate(){
         if($('#account_id').val()){
-            var result = new Date($('#post_date').val());
+            var result = new Date($('#post_date').val()), resultinternal = new Date($('#post_date').val());
             result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
+            resultinternal.setDate(resultinternal.getDate() + parseInt($('#account_id').select2('data')[0].top_internal));
             $('#due_date').val(result.toISOString().split('T')[0]);
+            $('#due_date_internal').val(resultinternal.toISOString().split('T')[0]);
         }else{
-            $('#due_date').val(null);
+            $('#due_date,#due_date_internal').val(null);
         }
     }
 
@@ -1563,7 +1728,7 @@
     }
 
     function getTaxSeries(){
-        if($('#company_id').val() && !$('#temp').val()){
+        if($('#company_id').val() && !$('#temp').val() && !$('#tax_no').val()){
             $.ajax({
                 url: '{{ Request::url() }}/get_tax_series',
                 type: 'POST',
@@ -1577,10 +1742,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     if(response.status == 200){
                         $('#tax_no').val(response.no);
                     }else{
@@ -1590,6 +1755,7 @@
                     }
                 },
                 error: function() {
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',
@@ -1792,6 +1958,8 @@
                     company_id : $('#filter_company').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    invoice_type : $('#filter_invoice_type').val(),
+                    type : $('#filter_type').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -1819,6 +1987,7 @@
                 { name: 'due_date', className: '' },
                 { name: 'due_date_internal', className: '' },
                 { name: 'type', className: '' },
+                { name: 'invoice_type', className: ''},
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'tax_no', className: '' },
                 { name: 'note', className: '' },
@@ -1919,11 +2088,44 @@
                     }
                 });
 
-                /* if(parseFloat($('#tax').val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                    if(!$('#tax_no').val()){
-                        passedTax = false;
+                if($('#invoice_type').val() == '2'){
+                    let passedManual = true;
+                    $('input[name^="arr_note[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedManual = false;
+                        }
+                        if(!$('input[name^="arr_description[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_qty[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(!$('select[name^="arr_unit[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_price[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_price[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_tax[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_total_after_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total_after_tax[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                    });
+
+                    if(!passedManual){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Untuk tipe Invoice Manual silahkan cek kembali form detail anda.',
+                            icon: 'error'
+                        });
+                        return false;
                     }
-                } */
+                }
 
                 if(passed){
                     if(passedTax){
@@ -2077,6 +2279,7 @@
                         <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
                     `);
                 }
+                $('#invoice_type').val(response.invoice_type).trigger('change');
 
                 $('#user_data_id').empty();
                 if(response.user_datas.length > 0){
@@ -2108,58 +2311,125 @@
                             </div>
                         `);
                     });
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-item').append(`
-                            <tr class="row_item" data-id="` + val.id + `">
-                                <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
-                                <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="` + val.total + `">
-                                <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="` + val.tax + `">
-                                <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.grandtotal + `">
-                                <input type="hidden" name="arr_grandtotal[]" class="browser-default" value="0">
-                                <td>
-                                    ` + val.code + `
-                                </td>
-                                <td>
-                                    ` + val.item_name + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_do + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_return + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_sent + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.price + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.percent_tax + `
-                                </td>
-                                <td class="center-align">
-                                    ` + (val.is_include_tax == '1' ? 'Ya' : 'Tidak') + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.tax + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td>
-                                    ` + val.note + `
-                                </td>
-                            </tr>
-                        `);
-                    });
+                    if(response.invoice_type == '2'){
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="">
+                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="">
+                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="">
+                                    <td>
+                                        -
+                                    </td>
+                                    <td>
+                                        <textarea class="materialize-textarea" name="arr_description[]" type="text" placeholder="Keterangan Barang">` + val.item_name + `</textarea>
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_sent + `" onkeyup="formatRupiahNoMinus(this);count();">
+                                    </td>
+                                    <td class="center-align">
+                                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                    </td>
+                                    <td class="right-align">
+                                        <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                    </td>
+                                    <td class="right-align">
+                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                    </td>
+                                    <td class="center-align">
+                                        <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
+                                            <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center-align">
+                                        <select class="browser-default" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" onchange="count();">
+                                            <option value="0">--Tidak--</option>
+                                            <option value="1">--Ya--</option>
+                                        </select>
+                                    </td>
+                                    <td class="right-align">
+                                        <input type="text" id="arr_tax` + count + `" name="arr_tax[]" value="` + val.tax + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                    </td>
+                                    <td class="right-align">
+                                        <input type="text" id="arr_total_after_tax` + count + `" name="arr_total_after_tax[]" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                    </td>
+                                    <td>
+                                        <textarea class="materialize-textarea" name="arr_note[]" type="text" placeholder="Keterangan Tambahan">` + val.note + `</textarea>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_tax_id' + count).val(val.tax_id);
+                            $('#arr_is_include_tax' + count).val(val.is_include_tax);
+                            if(val.unit_id){
+                                $('#arr_unit' + count).append(`
+                                    <option value="` + val.unit_id + `">` + val.unit + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
+                        });
+                    }else{
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + val.id + `">
+                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
+                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
+                                    <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="` + val.total + `">
+                                    <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="` + val.tax + `">
+                                    <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.grandtotal + `">
+                                    <input type="hidden" name="arr_grandtotal[]" class="browser-default" value="0">
+                                    <td>
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.qty_do + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.qty_return + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.qty_sent + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.unit + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.price + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.percent_tax + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + (val.is_include_tax == '1' ? 'Ya' : 'Tidak') + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td>
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });   
+                    }
                 }
 
                 if(response.dps.length > 0){

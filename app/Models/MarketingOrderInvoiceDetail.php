@@ -16,9 +16,11 @@ class MarketingOrderInvoiceDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'marketing_order_invoice_id',
+        'description',
         'lookable_type',
         'lookable_id',
         'qty',
+        'unit_id',
         'price',
         'is_include_tax',
         'percent_tax',
@@ -36,6 +38,11 @@ class MarketingOrderInvoiceDetail extends Model
     public function taxMaster()
     {
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo('App\Models\Unit', 'unit_id', 'id')->withTrashed();
     }
 
     public function marketingOrderInvoice()

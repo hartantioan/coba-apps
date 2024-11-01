@@ -7,6 +7,7 @@ use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
 
 use App\Exports\ExportTransactionPageMarketingOrderInvoice;
+use App\Models\Tax;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\TreeHelper;
 use App\Models\MarketingOrderDelivery;
@@ -69,7 +70,8 @@ class MarketingOrderInvoiceController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -98,6 +100,7 @@ class MarketingOrderInvoiceController extends Controller
             'due_date',
             'due_date_internal',
             'type',
+            'invoice_type',
             'document',
             'note',
             'subtotal',
@@ -153,6 +156,10 @@ class MarketingOrderInvoiceController extends Controller
                     $query->where('type',$request->type);
                 }
 
+                if($request->invoice_type){
+                    $query->where('invoice_type',$request->invoice_type);
+                }
+
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
@@ -205,6 +212,10 @@ class MarketingOrderInvoiceController extends Controller
                     $query->where('type',$request->type);
                 }
 
+                if($request->invoice_type){
+                    $query->where('invoice_type',$request->invoice_type);
+                }
+
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
@@ -251,7 +262,8 @@ class MarketingOrderInvoiceController extends Controller
                     date('d/m/Y',strtotime($val->due_date)),
                     $val->due_date_internal ? date('d/m/Y',strtotime($val->due_date_internal)) : '-',
                     $val->type(),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->invoiceType(),
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->tax_no,
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
@@ -342,7 +354,7 @@ class MarketingOrderInvoiceController extends Controller
                 /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
                 */'code_place_id'                 => 'required',
                 'company_id'			        => 'required',
-                'marketing_order_delivery_process_id' => 'required',
+                'marketing_order_delivery_process_id' => $request->invoice_type == '1' ? 'required' : '',
                 'user_data_id'                  => 'required',
                 'account_id'	                => 'required',
                 'post_date'		                => 'required',
@@ -462,6 +474,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->due_date_internal = $request->due_date_internal;
                         $query->status = '1';
                         $query->type = $request->type;
+                        $query->invoice_type = $request->invoice_type;
                         $query->tax_id = $request->tempTaxId ?? NULL;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
@@ -513,6 +526,7 @@ class MarketingOrderInvoiceController extends Controller
                         'due_date_internal'             => $request->due_date_internal,
                         'status'                        => '1',
                         'type'                          => $request->type,
+                        'invoice_type'                  => $request->invoice_type,
                         'tax_id'                        => $request->tempTaxId ?? NULL,
                         'subtotal'                      => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'downpayment'                   => str_replace(',','.',str_replace('.','',$request->downpayment)),
@@ -582,6 +596,26 @@ class MarketingOrderInvoiceController extends Controller
                                 'note'                          => $rowdata->code,
                             ]);
 
+                        }else{
+                            $percentTax = 0;
+                            $taxId = Tax::find($request->arr_tax_id[$key]);
+                            if($taxId){
+                                $percentTax = $taxId->percentage;
+                            } 
+                            MarketingOrderInvoiceDetail::create([
+                                'marketing_order_invoice_id'    => $query->id,
+                                'description'                   => $request->arr_description[$key],
+                                'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'unit_id'                       => $request->arr_unit[$key],
+                                'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                                'is_include_tax'                => $request->arr_is_include_tax[$key],
+                                'percent_tax'                   => $percentTax,
+                                'tax_id'                        => $taxId ? $taxId->id : NULL,
+                                'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
+                                'note'                          => $request->arr_note[$key],
+                            ]);
                         }
                     }
 
@@ -659,7 +693,7 @@ class MarketingOrderInvoiceController extends Controller
                 <td class="center-align">'.$row->lookable->itemStock->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty(round($row->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)).'</td>
                 <td class="center-align">'.$row->lookable->itemStock->item->uomUnit->code.'</td>
-                <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
+                <td class="">'.$row->note.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
@@ -677,7 +711,25 @@ class MarketingOrderInvoiceController extends Controller
                 <td class="center-align">'.$row->lookable->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty(round($row->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)).'</td>
                 <td class="center-align">'.$row->lookable->item->uomUnit->code.'</td>
-                <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+
+        foreach($data->marketingOrderInvoiceDetailManual as $key => $row){
+            $totalqty+=$row->qty;
+            $totals+=$row->total;
+            $totalppn+=$row->tax;
+            $totalgrandtotal+=$row->grandtotal;
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">-</td>
+                <td class="center-align">'.$row->description.'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.$row->unit->code.'</td>
+                <td class="">'.$row->note.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
@@ -1205,74 +1257,108 @@ class MarketingOrderInvoiceController extends Controller
         $arrDp = [];
         $arrUsed = [];
 
-        foreach($po->marketingOrderInvoiceDeliveryProcessDetail as $row){
-            $type = $row->lookable->marketingOrderDeliveryProcess->getTable();
-            $id = $row->lookable->marketingOrderDeliveryProcess->id;
-            $code = $row->lookable->marketingOrderDeliveryProcess->code;
+        if($po->marketingOrderInvoiceDeliveryProcessDetail()->exists()){
+            foreach($po->marketingOrderInvoiceDeliveryProcessDetail as $row){
+                $type = $row->lookable->marketingOrderDeliveryProcess->getTable();
+                $id = $row->lookable->marketingOrderDeliveryProcess->id;
+                $code = $row->lookable->marketingOrderDeliveryProcess->code;
 
-            $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
+                $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
 
-            if($cekIndex < 0){
-                $arrUsed[] = [
-                    'id'    => $id,
-                    'type'  => $type,
-                    'code'  => $code,
+                if($cekIndex < 0){
+                    $arrUsed[] = [
+                        'id'    => $id,
+                        'type'  => $type,
+                        'code'  => $code,
+                    ];
+                }
+
+                $arrSj[] = [
+                    'id'                                    => $id,
+                    'lookable_type'                         => $row->lookable_type,
+                    'lookable_id'                           => $row->lookable_id,
+                    'total'                                 => number_format($row->total,2,',','.'),
+                    'tax'                                   => number_format($row->tax,2,',','.'),
+                    'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
+                    'code'                                  => $code,
+                    'item_name'                             => $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name,
+                    'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                    'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                    'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                    'unit'                                  => $row->lookable->itemStock->item->uomUnit->code,
+                    'unit_id'                               => '',
+                    'price'                                 => number_format($row->price,2,',','.'),
+                    'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
+                    'is_include_tax'                        => $row->is_include_tax,
+                    'note'                                  => $row->note,
+                    'description'                           => $row->description,
+                    'tax_id'                                => $row->tax_id ?? '0',
                 ];
             }
-
-            $arrSj[] = [
-                'id'                                    => $id,
-                'lookable_type'                         => $row->lookable_type,
-                'lookable_id'                           => $row->lookable_id,
-                'total'                                 => number_format($row->total,2,',','.'),
-                'tax'                                   => number_format($row->tax,2,',','.'),
-                'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
-                'code'                                  => $code,
-                'item_name'                             => $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name,
-                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
-                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
-                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
-                'unit'                                  => $row->lookable->itemStock->item->uomUnit->code,
-                'price'                                 => number_format($row->price,2,',','.'),
-                'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
-                'is_include_tax'                        => $row->is_include_tax,
-                'note'                                  => $row->note,
-            ];
         }
 
-        foreach($po->marketingOrderInvoiceDeliveryDetail as $row){
-            $type = $row->lookable->marketingOrderDeliveryProcess->getTable();
-            $id = $row->lookable->marketingOrderDeliveryProcess->id;
-            $code = $row->lookable->marketingOrderDeliveryProcess->code;
-
-            $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
-
-            if($cekIndex < 0){
-                $arrUsed[] = [
-                    'id'    => $id,
-                    'type'  => $type,
-                    'code'  => $code,
+        if($po->marketingOrderInvoiceDeliveryDetail()->exists()){
+            foreach($po->marketingOrderInvoiceDeliveryDetail as $row){
+                $type = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->getTable();
+                $id = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->id;
+                $code = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+    
+                $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
+    
+                if($cekIndex < 0){
+                    $arrUsed[] = [
+                        'id'    => $id,
+                        'type'  => $type,
+                        'code'  => $code,
+                    ];
+                }
+    
+                $arrSj[] = [
+                    'id'                                    => $id,
+                    'lookable_type'                         => $row->lookable_type,
+                    'lookable_id'                           => $row->lookable_id,
+                    'total'                                 => number_format($row->total,2,',','.'),
+                    'tax'                                   => number_format($row->tax,2,',','.'),
+                    'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
+                    'code'                                  => $code,
+                    'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
+                    'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion),
+                    'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
+                    'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
+                    'unit'                                  => $row->lookable->item->uomUnit->code,
+                    'unit_id'                               => '',
+                    'price'                                 => number_format($row->price,2,',','.'),
+                    'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
+                    'is_include_tax'                        => $row->is_include_tax,
+                    'note'                                  => $row->note,
+                    'tax_id'                                => $row->tax_id ?? '0',
                 ];
             }
+        }
 
-            $arrSj[] = [
-                'id'                                    => $id,
-                'lookable_type'                         => $row->lookable_type,
-                'lookable_id'                           => $row->lookable_id,
-                'total'                                 => number_format($row->total,2,',','.'),
-                'tax'                                   => number_format($row->tax,2,',','.'),
-                'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
-                'code'                                  => $code,
-                'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
-                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion),
-                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
-                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
-                'unit'                                  => $row->lookable->item->uomUnit->code,
-                'price'                                 => number_format($row->price,2,',','.'),
-                'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
-                'is_include_tax'                        => $row->is_include_tax,
-                'note'                                  => $row->note,
-            ];
+        if($po->marketingOrderInvoiceDetailManual()->exists()){
+            foreach($po->marketingOrderInvoiceDetailManual as $row){
+                $arrSj[] = [
+                    'id'                                    => '',
+                    'lookable_type'                         => '',
+                    'lookable_id'                           => '',
+                    'total'                                 => number_format($row->total,2,',','.'),
+                    'tax'                                   => number_format($row->tax,2,',','.'),
+                    'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
+                    'code'                                  => '',
+                    'item_name'                             => $row->description,
+                    'qty_do'                                => 0,
+                    'qty_return'                            => 0,
+                    'qty_sent'                              => CustomHelper::formatConditionalQty($row->qty),
+                    'unit'                                  => $row->unit->code,
+                    'unit_id'                               => $row->unit_id,
+                    'price'                                 => number_format($row->price,2,',','.'),
+                    'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
+                    'is_include_tax'                        => $row->is_include_tax,
+                    'note'                                  => $row->note,
+                    'tax_id'                                => $row->tax_id ?? '0',
+                ];
+            }
         }
 
         foreach($po->marketingOrderInvoiceDownPayment as $row){

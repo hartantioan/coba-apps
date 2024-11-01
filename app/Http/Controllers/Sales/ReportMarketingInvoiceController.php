@@ -113,6 +113,7 @@ class ReportMarketingInvoiceController extends Controller
                 'jatuh_tempo'         => date('d/m/Y',strtotime($row->due_date)),
                 'jatuh_tempo_internal'           => $row->due_date_internal ? date('d/m/Y',strtotime($row->due_date_internal)) : '-',
                 'jenis'       => $row->type(),
+                'invoice_type' => $row->invoiceType(),
                 'seri_pajak'             => $row->tax_no,
                 'catatan'         => $row->note,
                 'subtotal'         => $row->subtotal,

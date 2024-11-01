@@ -30,7 +30,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
         $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice', function ($query) {
             $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
                 ->where('post_date', '<=', $this->end_date);
-        })->where('lookable_type','=','marketing_order_delivery_process_details')->get();
+        })->get();
 
 
         $code = [];
@@ -52,34 +52,70 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $checkdata=1;
             }
 
-            if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->include_tax == "0"){
-                $pricefinal=$row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
-            }
-            else
-            {
-                $pricefinal=Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
-            }
+            $item = '';
+            $qty = 0;
+            $uom = '';
+            $disc1 = 0;
+            $disc2 = 0;
+            $disc3 = 0;
+            $typesell = '-';
 
+            if($row->lookable_type == 'marketing_order_delivery_process_details'){
+                if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->include_tax == "0"){
+                    $pricefinal=$row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+                }
+                else
+                {
+                    $pricefinal=Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price/(($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) /100),2);
+                }
+                $item = $row->lookable->itemStock->item->name;
+                $qty = $row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+                $uom = $row->lookable->itemStock->item->uomUnit->code;
+                $disc1 = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1;
+                $disc2 = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2;
+                $disc3 = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3;
+                $typesell = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->type();
+            }elseif($row->lookable_type == 'marketing_order_delivery_details'){
+                if ($row->lookable->marketingOrderDetail->include_tax == "0"){
+                    $pricefinal=$row->lookable->marketingOrderDetail->price;
+                }
+                else
+                {
+                    $pricefinal=Round($row->lookable->marketingOrderDetail->price/(($row->lookable->marketingOrderDetail->percent_tax + 100) /100),2);
+                }
+                $item = $row->lookable->item->name;
+                $qty = $row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion;
+                $uom = $row->lookable->item->uomUnit->code;
+                $disc1 = $row->lookable->marketingOrderDetail->percent_discount_1;
+                $disc2 = $row->lookable->marketingOrderDetail->percent_discount_2;
+                $disc3 = $row->lookable->marketingOrderDetail->discount_3;
+                $typesell = $row->lookable->marketingOrderDetail->marketingOrder->type();
+            }else{
+                $pricefinal=$row->price;
+                $item = $row->description;
+                $qty = $row->qty;
+                $uom = $row->unit->code;
+            }
 
             $array_filter[] = [
                 'code'  => $row->marketingOrderInvoice->code,
                 'tglinvoice' => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
                 'tglduedate' => date('d/m/Y', strtotime($row->marketingOrderInvoice->due_date)),
                 'grandtotal' => $row->grandtotal,
-                'nosj' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->code,
-                'nomod' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
-                'pocust' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer(),
+                'nosj' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->code : '-',
+                'nomod' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-',
+                'pocust' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer() : '-',
                 'customer' => $row->marketingOrderInvoice->account->name,
-                'item' => $row->lookable->itemStock->item->name,
-                'qty' => $row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
-                'uom' => $row->lookable->itemStock->item->uomUnit->code,
+                'item' => $item,
+                'qty' => $qty,
+                'uom' => $uom,
                 'price'=>$pricefinal,
-                'disc1' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,
-                'disc2' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,
-                'disc3' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,
-                'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
-                'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
-                'typesell' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
+                'disc1' => $disc1,
+                'disc2' => $disc2,
+                'disc3' => $disc3,
+                'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType() : '-',
+                'tglsj' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess()->exists() ? date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)) : '-',
+                'typesell' => $typesell,
                 'totalbayar' => $row->marketingOrderInvoice->totalPay(),
                 'row' => $counts[$row->marketingOrderInvoice->code],
                 'checkdata'=>$checkdata,
@@ -92,74 +128,6 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
 
             $ceksama = $row->marketingOrderInvoice->code;
         }
-
-
-        $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice', function ($query) {
-            $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
-                ->where('post_date', '<=', $this->end_date);
-        })->where('lookable_type','=','marketing_order_delivery_details')->get();
-
-
-        $code = [];
-
-
-        foreach ($data as $row) {
-            $code[] = array_push($code, $row->marketingOrderInvoice->code);
-        }
-        $counts = array_count_values($code);
-        $checkdata = '1';
-        $ceksama = '';
-
-        foreach ($data as $row) {
-
-            if ($ceksama == $row->marketingOrderInvoice->code) {
-                $checkdata=2;
-            } else {
-                $checkdata=1;
-            }
-
-            if ($row->lookable->marketingOrderDetail->include_tax == "0"){
-                $pricefinal=$row->lookable->marketingOrderDetail->price;
-            }
-            else
-            {
-                $pricefinal=Round($row->lookable->marketingOrderDetail->price/(($row->lookable->marketingOrderDetail->percent_tax + 100) /100),2);
-            }
-
-
-            $array_filter[] = [
-                'code'  => $row->marketingOrderInvoice->code,
-                'tglinvoice' => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
-                'tglduedate' => date('d/m/Y', strtotime($row->marketingOrderInvoice->due_date)),
-                'grandtotal' => $row->grandtotal,
-                'nosj' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->code,
-                'nomod' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
-                'pocust' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer(),
-                'customer' => $row->marketingOrderInvoice->account->name,
-                'item' => $row->lookable->marketingOrderDetail->item->name ?? "",
-                'qty' => $row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,
-                'uom' => $row->lookable->marketingOrderDetail->item->uomUnit->code,
-                'price'=>$pricefinal,
-                'disc1' => $row->lookable->marketingOrderDetail->percent_discount_1,
-                'disc2' => $row->lookable->marketingOrderDetail->percent_discount_2,
-                'disc3' => $row->lookable->marketingOrderDetail->discount_3,
-                'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
-                'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
-                'typesell' => $row->lookable->marketingOrderDetail->marketingOrder->Type() ?? '',
-                'totalbayar' => $row->marketingOrderInvoice->totalPay(),
-                'row' => $counts[$row->marketingOrderInvoice->code],
-                'checkdata'=>$checkdata,
-                'totalinvoice'=>$row->marketingOrderInvoice->total,
-                'tax'=>$row->marketingOrderInvoice->tax,
-                'grandtotalinvoice'=>$row->marketingOrderInvoice->grandtotal,
-                'taxno'=>$row->marketingOrderInvoice->tax_no,
-               
-            ];
-
-            $ceksama = $row->marketingOrderInvoice->code;
-        }
-
-
 
         $data = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess', function ($query) {
             $query->whereIn('status', ['2'])->where('post_date', '>=', $this->start_date)

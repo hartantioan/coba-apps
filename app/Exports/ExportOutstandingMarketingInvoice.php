@@ -33,7 +33,7 @@ class ExportOutstandingMarketingInvoice implements FromView, WithEvents
                 'code'              => $row->code,
                 'post_date'         => date('d/m/Y', strtotime($row->post_date)),
                 'customer' =>$row->account->name,
-                'deliveraddress'=>$row->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address,
+                'deliveraddress'=>$row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address : '-',
                 'total' => $row->grandtotal,
                 'taxno' => $row->tax_no,
                 'payment'=>$row->type(),

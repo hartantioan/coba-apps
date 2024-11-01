@@ -220,7 +220,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="80%">
-                                            {{ $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code }}
+                                            {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -229,7 +229,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="80%">
-                                            {{ $data->marketingOrderDeliveryProcess->code }}
+                                            {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->code : '-' }}
                                         </td>
                                     </tr>
                                 </table>
@@ -283,6 +283,20 @@
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDetail->discount_3,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                </tr>
+                                @endforeach
+                                @foreach($data->marketingOrderInvoiceDetailManual as $key => $row)
+                                <tr>
+                                    <td style="width:5% !important">{{ ($key + 1) }}</td>
+                                    <td style="width:40% !important;padding-left:5px">{{ $row->description }}</td>
+                                    <td style="width:10% !important;padding-left:32px" align="right">0</td>
+                                    <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                    <td style="width:5% !important"align="right">{{ $row->unit->code }}</td>
+                                    <td style="width:10% !important" align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                    <td style="width:10% !important;padding-left:7px" align="center">0</td>
+                                    <td style="width:5% !important;padding-left:7px" align="">0</td>
+                                    <td style="width:5% !important" align="right">0</td>
+                                    <td style="width:20% !important" align="right">{{ number_format($row->total,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

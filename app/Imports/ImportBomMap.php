@@ -25,9 +25,11 @@ class ImportBomMap implements OnEachRow, WithHeadingRow, WithValidation, WithBat
         $child = Bom::where('code',$row['code_bom_child'])->first();
         $parent = Bom::where('code',$row['code_bom_parent'])->first();
         if($child && $parent){
-            $cek = BomMap::where('child_id',$child->id)->where('parent_id',$parent->id)->first();
+            $cek = BomMap::where('parent_id',$parent->id)->first();
             if($cek){
-
+                $cek->update([
+                    'child_id'  => $child->id,
+                ]);
             }else{
                 BomMap::create([
                     'parent_id' => $parent->id,

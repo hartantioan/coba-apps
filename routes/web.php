@@ -241,6 +241,7 @@ use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
 use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\BomStandardController;
+use App\Http\Controllers\MasterData\itemWeightController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\ItemPricelistController;
@@ -485,6 +486,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('sales_item_pallet_only', [Select2Controller::class, 'salesItemPalletOnly']);
                 Route::get('group_outlet', [Select2Controller::class, 'groupOutlet']);
                 Route::get('employee_for_brand', [Select2Controller::class, 'employeeForBrand']);
+                Route::get('item_for_weight', [Select2Controller::class, 'itemForWeight']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -933,6 +935,20 @@ Route::prefix('admin')->group(function () {
                         Route::get('get_import_excel', [BomStandardController::class, 'getImportExcel']);
                         Route::post('create', [BomStandardController::class, 'create'])->middleware('operation.access:bom_standard,update');
                         Route::post('destroy', [BomStandardController::class, 'destroy'])->middleware('operation.access:bom_standard,delete');
+                    });
+
+                    Route::prefix('item_weight_fg')->middleware('operation.access:item_weight_fg,view')->group(function () {
+                        Route::get('/', [itemWeightController::class, 'index']);
+                        Route::get('datatable', [itemWeightController::class, 'datatable']);
+                        Route::get('row_detail', [itemWeightController::class, 'rowDetail']);
+                        Route::post('show', [itemWeightController::class, 'show']);
+                        Route::post('print', [itemWeightController::class, 'print']);
+                        Route::get('export', [itemWeightController::class, 'export']);
+                        Route::get('export_from_page', [itemWeightController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [itemWeightController::class, 'import'])->middleware('operation.access:resource,update');
+                        Route::get('get_import_excel', [itemWeightController::class, 'getImportExcel']);
+                        Route::post('create', [itemWeightController::class, 'create'])->middleware('operation.access:item_weight_fg,update');
+                        Route::post('destroy', [itemWeightController::class, 'destroy'])->middleware('operation.access:item_weight_fg,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {

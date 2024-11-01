@@ -35,6 +35,11 @@
                             <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                            <i class="material-icons hide-on-med-and-up">view_headline</i>
+                            <span class="hide-on-small-onl">Export</span>
+                            <i class="material-icons right">view_headline</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -72,7 +77,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -171,13 +176,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -223,7 +228,7 @@
                         $('.modal-content').scrollTop(0);
 
                         $.each(response.error, function(i, val) {
-                            
+
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -265,7 +270,7 @@
                     if(response.status == 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
@@ -294,19 +299,19 @@
                     `).show();
 
                     }
-                    
-                   
+
+
                 }
             });
 
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -322,7 +327,7 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
@@ -375,7 +380,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -383,9 +388,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -412,7 +417,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -455,7 +460,7 @@
         loadDataTable();
         $('#modal1').modal('close');
     }
-    
+
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -497,5 +502,11 @@
                 });
             }
         });
+
+    }
+    function exportExcel(){
+        var search = table.search();
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search  ;
+
     }
 </script>

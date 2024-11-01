@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+
+use App\Exports\ExportBomMap;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportBomMap;
 use App\Models\BomMap;
@@ -35,7 +37,7 @@ class BomMapController extends Controller
         $search = $request->input('search.value');
 
         $total_data = BomMap::count();
-        
+
         $query_data = BomMap::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -73,7 +75,7 @@ class BomMapController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->parent->code.' - '.$val->parent->name,
@@ -102,7 +104,7 @@ class BomMapController extends Controller
 
     public function destroy(Request $request){
         $query = BomMap::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new BomMap())
@@ -155,7 +157,7 @@ class BomMapController extends Controller
                 'status'    => 200,
                 'message'   => 'Import sukses!'
             ]);
-            
+
         } catch (ValidationException $e) {
             $failures = $e->failures();
 
@@ -181,5 +183,11 @@ class BomMapController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+
+		return Excel::download(new ExportBomMap($search), 'bom_map_'.uniqid().'.xlsx');
     }
 }

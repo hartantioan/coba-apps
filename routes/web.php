@@ -967,6 +967,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('bom_map')->middleware('operation.access:bom_map,view')->group(function () {
                         Route::get('/', [BomMapController::class, 'index']);
                         Route::get('datatable', [BomMapController::class, 'datatable']);
+                        Route::get('export_from_page', [BomMapController::class, 'exportFromTransactionPage']);
                         Route::post('import', [BomMapController::class, 'import'])->middleware('operation.access:bom_map,update');
                         Route::post('destroy', [BomMapController::class, 'destroy'])->middleware('operation.access:bom_map,delete');
                     });
@@ -974,6 +975,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('fg_group')->middleware('operation.access:fg_group,view')->group(function () {
                         Route::get('/', [FgGroupController::class, 'index']);
                         Route::get('datatable', [FgGroupController::class, 'datatable']);
+                        Route::get('export_from_page', [FgGroupController::class, 'exportFromTransactionPage']);
                         Route::post('import', [FgGroupController::class, 'import'])->middleware('operation.access:fg_group,update');
                         Route::post('destroy', [FgGroupController::class, 'destroy'])->middleware('operation.access:fg_group,delete');
                     });

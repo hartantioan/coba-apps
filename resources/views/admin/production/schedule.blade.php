@@ -866,6 +866,10 @@
         });
     });
 
+    function removeRow(element){
+        $(this).parent().parent().remove();
+    }
+
     function countTarget(){
         let total = 0;
         $('input[name^="arr_qty[]"]').each(function(){
@@ -1147,6 +1151,7 @@
                     <table class="bordered">
                         <thead>
                             <tr>
+                                <th class="center" style="min-width:75px !important;">Hapus</th>
                                 <th class="center" style="min-width:150px !important;">Item</th>
                                 <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                 <th class="center" style="min-width:150px !important;">Satuan UoM</th>
@@ -1161,6 +1166,11 @@
                             <tr>
                                 <input type="hidden" name="arr_type[]" value="` + type + `">
                                 <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="">
+                                <td>
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this);">
+                                        <i class="material-icons">delete</i>
+                                    </a>    
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
                                 </td>
@@ -1336,6 +1346,7 @@
                             }
                             
                             let datanormal = `<table class="bordered"><thead><tr>
+                                        <th class="center" style="min-width:75px !important;">Hapus</th>
                                         <th class="center" style="min-width:150px !important;">Item</th>
                                         <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
@@ -1357,6 +1368,11 @@
                                     datanormal += `<tr>
                                         <input type="hidden" name="arr_type[]" value="normal">
                                         <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
+                                        <td>
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this);">
+                                                <i class="material-icons">delete</i>
+                                            </a>    
+                                        </td>
                                         <td>
                                             <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                         </td>
@@ -2216,6 +2232,7 @@
                                     </td>
                                     <td>
                                         <table class="bordered"><thead><tr>
+                                            <th class="center" style="min-width:75px !important;">Hapus</th>
                                             <th class="center" style="min-width:150px !important;">Item</th>
                                             <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                             <th class="center" style="min-width:150px !important;">Satuan UoM</th>
@@ -2229,7 +2246,11 @@
                                                 <tr>
                                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                                     <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
-                                                    
+                                                    <td>
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this);">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>    
+                                                    </td>
                                                     <td>
                                                         <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                                     </td>

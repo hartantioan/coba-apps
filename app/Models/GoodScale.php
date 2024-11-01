@@ -500,7 +500,7 @@ class GoodScale extends Model
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         $total += $row->total;
                         $qty = $row->lookable->cost_delivery_type == '1' ? $row->qty : 1;
-                        $price = $tempQty < $qty ? ($row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : $row->total) : 0;
+                        $price = $row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : ($tempQty < $qty ? $row->total : 0);
                         $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'                     => $purchaseOrder->id,
                             'marketing_order_delivery_process_id'   => $row->lookable->marketingOrderDeliveryProcess->id,
@@ -518,7 +518,7 @@ class GoodScale extends Model
                             'note'                                  => $row->lookable->code,
                             'note2'                                 => $this->code,
                             'note3'                                 => '',
-                            'total'                                 => $tempQty < $qty ? $row->total : 0,
+                            'total'                                 => $row->lookable->cost_delivery_type == '2' ? ($tempQty < $qty ? $row->total : 0) : $row->total,
                             'is_tax'                                => '0',
                             'is_include_tax'                        => '0',
                             'percent_tax'                           => 0,

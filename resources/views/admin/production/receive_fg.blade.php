@@ -2858,10 +2858,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-body');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     $('#modal_document_barcode').modal('open');
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
@@ -2903,7 +2903,7 @@
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',

@@ -990,11 +990,13 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             foreach($arrProductionIssue as $row){
                 $issue = ProductionIssue::find($row);
                 if($issue){
-                    foreach($issue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
-                        $rowjournal->update([
-                            'nominal_fc'  => $issue->total(),
-                            'nominal'     => $issue->total(),
-                        ]);
+                    if($issue->journal()->exists()){
+                        foreach($issue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $issue->total(),
+                                'nominal'     => $issue->total(),
+                            ]);
+                        }
                     }
                     if($issue->productionReceiveIssue()->exists()){
                         foreach($issue->productionReceiveIssue as $rowreceiveissue){

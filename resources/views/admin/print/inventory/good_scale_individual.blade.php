@@ -184,7 +184,7 @@
 
             </table>
         </header>
-        <main style="margin-top:15px;">
+        <main style="margin-top:30px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

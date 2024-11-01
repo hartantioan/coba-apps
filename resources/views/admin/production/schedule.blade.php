@@ -867,7 +867,7 @@
     });
 
     function removeRow(element){
-        $(this).parent().parent().remove();
+        $(element).parent().parent().remove();
     }
 
     function countTarget(){

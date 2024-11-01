@@ -241,6 +241,7 @@ class ProductionFgReceiveController extends Controller
                     'shading'       => $row->shading,
                     'qty'           => CustomHelper::formatConditionalQty($row->qty_sell),
                     'unit'          => $row->item->sellUnit(),
+                    'document_code' => $row->row->productionBarcode->code,
                 ];
             }
     

@@ -645,6 +645,7 @@
                                     <table id="table_db" class="display" width="100%">
                                         <thead>
                                             <tr>
+                                                <th class="center">No.Dokumen Barcode</th>
                                                 <th class="center">No.Batch Palet/Curah</th>
                                                 <th class="center">Kode Item</th>
                                                 <th class="center">Nama Item</th>
@@ -2866,6 +2867,9 @@
                         $.each(response.details, function(i, val) {
                             $('#body-detail-db').append(`
                                 <tr data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.document_code + `
+                                    </td>
                                     <td>
                                         ` + val.code + `
                                     </td>

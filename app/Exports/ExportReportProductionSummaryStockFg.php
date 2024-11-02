@@ -419,12 +419,12 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
         $arr = [];
         foreach($item as $index => $row){
 
-            // $handover_awal = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            // })->get();
+            $handover_awal = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->get();
 
-            $handover_awal = DB::select('CALL GetHandoverAwal(?, ?)', [$row->id, $this->start_date]);
+            /* $handover_awal = DB::select('CALL GetHandoverAwal(?, ?)', [$row->id, $this->start_date]); */
 
             $totalQty_handover_awal = 0;
 
@@ -439,44 +439,43 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
 
             // info($totalQty_handover_awal);
 
-            // $repack_in_awal = ProductionRepackDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionRepack',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            // })->sum('qty');
+            $repack_in_awal = ProductionRepackDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionRepack',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->sum('qty');
 
             $repack_in_awal = DB::select('CALL GetRepackInAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
             $repack_out_awal = DB::select('CALL GetRepackOutAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
 
-            // $repack_out_awal = ProductionRepackDetail::where('deleted_at',null)
-            // ->whereHas('itemStock',function ($query) use ($row) {
-            //     $query->where('item_shading_id',$row->id);
-            // })
-            // ->whereHas('productionRepack',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            // })->sum('qty');
+            $repack_out_awal = ProductionRepackDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('productionRepack',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->sum('qty');
 
+            /* $goodReceive_awal = DB::select('CALL GetGoodReceiveAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty; */
 
-            $goodReceive_awal = DB::select('CALL GetGoodReceiveAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
+            $goodReceive_awal = GoodReceiveDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodReceive',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->sum('qty') ?? 0;
 
-            // $goodReceive_awal = GoodReceiveDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodReceive',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            // })->sum('qty') ?? 0;
+            /* $delivery_process_awal = DB::select('CALL GetDeliveryProcessAwal(?, ?)', [$row->id, $this->start_date]); */
 
-            $delivery_process_awal = DB::select('CALL GetDeliveryProcessAwal(?, ?)', [$row->id, $this->start_date]);
-
-            // $delivery_process_awal = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
-            // ->whereHas('itemStock',function ($query) use ($row) {
-            //     $query->where('item_shading_id',$row->id);
-            // })
-            // ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            //     // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-            //     //     $query->whereIn('status',['2']);
-            //     // });
-            // })->get();
+            $delivery_process_awal = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+                // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                //     $query->whereIn('status',['2']);
+                // });
+            })->get();
 
             $total_sj_awal = 0;
             if($delivery_process_awal){
@@ -487,7 +486,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                     $total_sj_awal += round($row_sj->qty * $qtyConversion,3);
                 }
             }
-            $goodIssue_awal = DB::select('CALL GetGoodIssueAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
+            /* $goodIssue_awal = DB::select('CALL GetGoodIssueAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty; */
             // info($row->item->name);
             // info('1');
             // info($handover_awal);
@@ -505,19 +504,19 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             // info($total_sj_awal);
             // info('6');
             // info($goodIssue_awal);
-            // $goodIssue_awal = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '<', $this->start_date);
-            // })->sum('qty') ?? 0;
+            $goodIssue_awal = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->sum('qty') ?? 0;
 
             $awal =round(($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal) - ( $total_sj_awal+$goodIssue_awal  + $repack_out_awal),3);
 
-            $handover = DB::select('CALL GetHandoverDetails(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]);
-            // $handover = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date);
-            // })->get();
+            /* $handover = DB::select('CALL GetHandoverDetails(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]); */
+            $handover = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->get();
 
             $total_handover = 0;
             if($handover) {
@@ -530,47 +529,47 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 }
             }
 
-            $goodReceive = DB::select('CALL GetGoodReceiveTotal(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty;
+            /* $goodReceive = DB::select('CALL GetGoodReceiveTotal(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty; */
 
-            // $goodReceive = GoodReceiveDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodReceive',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date);
-            // })->sum('qty') ?? 0;
+            $goodReceive = GoodReceiveDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodReceive',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->sum('qty') ?? 0;
 
-            $delivery_process = DB::select('CALL GetDeliveryProcessDetails(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]);
+            /* $delivery_process = DB::select('CALL GetDeliveryProcessDetails(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]); */
 
-            // $delivery_process = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
-            // ->whereHas('itemStock',function ($query) use ($row) {
-            //     $query->where('item_shading_id',$row->id);
-            // })
-            // ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date)
-            //     ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-            //         $query->whereIn('status',['2']);
-            //     });
-            // })->get();
+            $delivery_process = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                    $query->whereIn('status',['2']);
+                });
+            })->get();
 
-            $delivery_process_no_scan = DB::select('CALL GetDeliveryProcessNoScan(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]);
+            /* $delivery_process_no_scan = DB::select('CALL GetDeliveryProcessNoScan(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date]); */
 
 
-            // $delivery_process_no_scan = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
-            // ->whereHas('itemStock',function ($query) use ($row) {
-            //     $query->where('item_shading_id',$row->id);
-            // })
-            // ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date)
-            //     ->whereHas('marketingOrderDeliveryProcessTrack', function ($query) {
-            //         $query->where('status', '1');
-            //     })
-            //     ->whereDoesntHave('marketingOrderDeliveryProcessTrack', function ($query) {
-            //         $query->where('status', '!=', '1');
-            //     });
-            // })->get();
+            $delivery_process_no_scan = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack', function ($query) {
+                    $query->where('status', '1');
+                })
+                ->whereDoesntHave('marketingOrderDeliveryProcessTrack', function ($query) {
+                    $query->where('status', '!=', '1');
+                });
+            })->get();
 
             // if($row->id == 48){
             //    info($delivery_process);
@@ -599,36 +598,35 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 }
             }
 
-            $goodIssue = DB::select('CALL GetGoodIssueSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty;
+            /* $goodIssue = DB::select('CALL GetGoodIssueSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty; */
 
 
-            // $goodIssue = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date);
-            // })->sum('qty') ?? 0;
+            $goodIssue = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->sum('qty') ?? 0;
 
-            $repack_in = DB::select('CALL GetRepackInSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty;
+            /* $repack_in = DB::select('CALL GetRepackInSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty; */
 
 
-            // $repack_in = ProductionRepackDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionRepack',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date);
-            // })->sum('qty');
+            $repack_in = ProductionRepackDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionRepack',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->sum('qty');
 
-            $repack_out = DB::select('CALL GetRepackOutSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty;
+            /* $repack_out = DB::select('CALL GetRepackOutSum(?, ? ,?)', [$row->id, $this->start_date , $this->finish_date])[0]->total_qty; */
 
-            // $repack_out = ProductionRepackDetail::where('deleted_at',null)
-            // ->whereHas('itemStock',function ($query) use ($row) {
-            //     $query->where('item_shading_id',$row->id);
-            // })
-            // ->whereHas('productionRepack',function ($query) use ($row) {
-            //     $query->whereIn('status',["2","3"])
-            //     ->where('post_date', '>=',$this->start_date)
-            //     ->where('post_date', '<=', $this->finish_date);
-            // })->sum('qty');
-
+            $repack_out = ProductionRepackDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('productionRepack',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->sum('qty');
 
             $total = round($awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out+$total_sj_no_scan)),3);
 

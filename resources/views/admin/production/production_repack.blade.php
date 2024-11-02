@@ -131,6 +131,7 @@
                                                         <th>Note</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
                                                 </thead>
@@ -1279,6 +1280,7 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },

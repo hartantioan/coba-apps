@@ -3035,8 +3035,8 @@ Route::prefix('admin')->group(function () {
                     });
 
                     Route::prefix('report_marketing_down_payment')->middleware('operation.access:report_marketing_down_payment,view')->group(function () {
-                        Route::get('/', [MarketingARDPrecapController::class, 'index']);
-                        Route::get('export', [MarketingARDPrecapController::class, 'export']);
+                        Route::get('/', [MarketingARDPRecapController::class, 'index']);
+                        Route::get('export', [MarketingARDPRecapController::class, 'export']);
                     });
 
                     Route::prefix('outstanding_sales_order')->middleware('operation.access:outstanding_sales_order,view')->group(function () {

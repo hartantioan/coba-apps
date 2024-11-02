@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\maintenance;
+namespace App\Http\Controllers\Maintenance;
 
 use App\Exports\ExportRequestSparepart;
 use App\Http\Controllers\Controller;

@@ -444,8 +444,8 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 ->where('post_date', '<', $this->start_date);
             })->sum('qty');
 
-            $repack_in_awal = DB::select('CALL GetRepackInAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
-            $repack_out_awal = DB::select('CALL GetRepackOutAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
+            /* $repack_in_awal = DB::select('CALL GetRepackInAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
+            $repack_out_awal = DB::select('CALL GetRepackOutAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty; */
 
             $repack_out_awal = ProductionRepackDetail::where('deleted_at',null)
             ->whereHas('itemStock',function ($query) use ($row) {

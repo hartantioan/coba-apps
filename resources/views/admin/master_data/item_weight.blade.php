@@ -140,10 +140,12 @@
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="gross_weight" name="gross_weight" type="text" placeholder="Berat Gross" onkeyup="formatRupiah(this)" value="0">
+                            <div class="form-control-feedback">/M2</div>
                             <label class="active" for="gross_weight">Berat Gross</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="netto_weight" name="netto_weight" type="text" placeholder="Berat Netto" onkeyup="formatRupiah(this)" value="0">
+                            <div class="form-control-feedback">/M2</div>
                             <label class="active" for="netto_weight">Berat Netto</label>
                         </div>
                         <div class="col s12 mt-3">

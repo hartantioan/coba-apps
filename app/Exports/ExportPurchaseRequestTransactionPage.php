@@ -107,7 +107,6 @@ class ExportPurchaseRequestTransactionPage implements FromCollection, WithTitle,
         $arr = [];
 
         foreach($data as $key => $row){
-            info($row->id);
             $arr[] = [
                 'no'                => ($key + 1),
                 'code'              => $row->purchaseRequest->code,

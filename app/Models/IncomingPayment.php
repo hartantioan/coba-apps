@@ -239,7 +239,6 @@ class IncomingPayment extends Model
                 $arr[] = $row->lookable->code;
             }
         }
-        info($arr);
         return implode(',',$arr);
     }
 }

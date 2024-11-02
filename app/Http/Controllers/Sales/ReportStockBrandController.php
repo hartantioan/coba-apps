@@ -67,7 +67,6 @@ class ReportStockBrandController extends Controller
         ->groupBy('item_stocks.item_id', 'items.code', 'items.name')
         ->get();
 
-        info($query_data);
         $newData = [];
 
         // foreach($query_data as $index_data =>$row){

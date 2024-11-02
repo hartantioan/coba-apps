@@ -353,7 +353,6 @@ class RevisionAttendanceHRDController extends Controller
         $arr = [];
         
         foreach($rev->attendance as $row){
-            info($row);
             $dateTime = new DateTime($row->date);
 
             $datePart = $dateTime->format('Y-m-d'); // Output: 2023-12-02

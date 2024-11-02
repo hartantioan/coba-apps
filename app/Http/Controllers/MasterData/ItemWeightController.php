@@ -107,7 +107,6 @@ class ItemWeightController extends Controller
     }
 
     public function create(Request $request){
-        info($request);
         $validation = Validator::make($request->all(), [
             'item_id'               => 'required',
             'gross_weight'            => 'required',

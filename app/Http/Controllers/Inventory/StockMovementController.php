@@ -380,7 +380,6 @@ class StockMovementController extends Controller
         $group = $request->group ? $request->group:'';
         $type = $request->type ? $request->type:'';
         $user_id = session('bo_id');
-        info($request);
         StockMovementJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
 
         return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);

@@ -962,6 +962,5 @@ class SendJournal extends Command
         }
         $end_time = microtime(true);
         $execution_time = ($end_time - $start_time);
-        info($execution_time);
     }
 }

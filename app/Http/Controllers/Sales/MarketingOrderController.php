@@ -101,7 +101,6 @@ class MarketingOrderController extends Controller
     }
 
     public function getSalesItemInformation(Request $request){
-        info($request);
         $item = Item::find($request->item_id);
         $place = Place::where('code',$request->place_code)->first();
         $account_id   = $request->account_id;

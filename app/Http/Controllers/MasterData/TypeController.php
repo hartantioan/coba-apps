@@ -25,6 +25,7 @@ class TypeController extends Controller
             'id',
             'code',
             'name',
+            'hs_code',
         ];
 
         $start  = $request->start;
@@ -39,7 +40,8 @@ class TypeController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('hs_code', 'like', "%$search%");
                     });
                 }
 
@@ -56,7 +58,8 @@ class TypeController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('hs_code', 'like', "%$search%");
                     });
                 }
 
@@ -75,6 +78,7 @@ class TypeController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
+                    $val->hs_code,
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -121,6 +125,7 @@ class TypeController extends Controller
                     $query = Type::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->hs_code         = $request->hs_code;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -133,6 +138,7 @@ class TypeController extends Controller
                     $query = Type::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'hs_code'       => $request->hs_code,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

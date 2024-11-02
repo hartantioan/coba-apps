@@ -71,6 +71,7 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>HS Code</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -108,6 +109,10 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="hs_code" name="hs_code" type="text" placeholder="HS Code">
+                            <label class="active" for="hs_code">HS Code</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -225,6 +230,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'hs_code', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -331,6 +337,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#hs_code').val(response.hs_code);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

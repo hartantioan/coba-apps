@@ -35,7 +35,7 @@
                 cekNotif('{{ URL::to('/') }}');
                 setInterval(function () {
                     cekNotif('{{ URL::to('/') }}');
-                },60000);
+                },25000);
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
                 var sessionLifetime = {{  config('session.lifetime') }};

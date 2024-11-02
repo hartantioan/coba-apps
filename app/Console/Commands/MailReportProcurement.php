@@ -29,7 +29,7 @@ class MailReportProcurement extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id', 'heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
+        $recipient = ['edp@superior.co.id', 'heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id','michael@superiorporcelain.co.id'];
 
             $scale = GoodScale::where('post_date', date('Y-m-d'))->where('type','=','1' )
                 ->selectRaw("SUM(qty_balance) as totalnet")->selectRaw("count(code) as truck")

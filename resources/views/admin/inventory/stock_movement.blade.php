@@ -200,7 +200,7 @@
 
         select2ServerSide('#item_id', '{{ url("admin/select2/simple_item") }}');
     });
-    $('#export_button').hide();
+    /* $('#export_button').hide(); */
 
     function filter() {
         var formData = new FormData($('#form_data')[0]);

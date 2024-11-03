@@ -127,14 +127,11 @@
         <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
         <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
         @endif
-        @if ($row->tipe=='HT' || $row->tipe=='GLAZED')
-        <td style="font-size:12px;" align="right">-</td>
-
-        @else
+       
 
         <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
 
-        @endif
+       
     </tr>
     @php
     $i++;

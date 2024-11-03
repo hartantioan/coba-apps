@@ -384,7 +384,7 @@ class MarketingOrderDelivery extends Model
         /* $level1Top = 7;
         $level2Top = 15; */
         $dueDays = 0;
-        $invoice = MarketingOrderInvoice::where('status',['2'])->where('account_id',$this->customer_id)->orderBy('due_date_internal')->first();
+        $invoice = MarketingOrderInvoice::where('status',['2'])->where('account_id',$this->customer_id)->orderBy('due_date_internal')->orderBy('id')->first();
         if($invoice){
             $lastDueDate = CustomHelper::countDays($invoice->due_date_internal,$today);
             if($lastDueDate > 0){

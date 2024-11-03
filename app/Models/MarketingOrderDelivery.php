@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -377,6 +378,20 @@ class MarketingOrderDelivery extends Model
         }else{
             return false;
         }
+    }
+    public function invoiceDueDate(): float|int{
+        $today = date('Y-m-d');
+        /* $level1Top = 7;
+        $level2Top = 15; */
+        $dueDays = 0;
+        $invoice = MarketingOrderInvoice::where('status',['2'])->where('account_id',$this->customer_id)->orderBy('due_date_internal')->first();
+        if($invoice){
+            $lastDueDate = CustomHelper::countDays($invoice->due_date_internal,$today);
+            if($lastDueDate > 0){
+                $dueDays = $lastDueDate;
+            }
+        }
+        return $dueDays;
     }
 
     public function reCreateDetail(){

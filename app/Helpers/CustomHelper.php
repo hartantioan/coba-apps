@@ -528,6 +528,15 @@ class CustomHelper {
 			}
 		}
 
+		$daysDueInvoiceMod = 0;
+
+		if($table_name == 'marketing_order_deliveries'){
+			$mod = MarketingOrderDelivery::find($table_id);
+			if($mod){
+				$daysDueInvoiceMod = $mod->invoiceDueDate();
+			}
+		}
+
 		$count = 0;
 
 		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
@@ -730,15 +739,6 @@ class CustomHelper {
 				}
 			}
 
-			#if sales order disini ya
-			/* if($table_name == 'marketing_orders'){
-				if($underEbitda){
-					$passed = true;
-				}else{
-					$passed = false;
-				}
-			} */
-
 			if($passed == true){
 
 				$count = 0;
@@ -748,6 +748,14 @@ class CustomHelper {
 					$check = true;
 					if($table_name == 'marketing_orders' && $rowTemplateStage->approvalStage->level == 2){
 						if(!$underEbitda){
+							$check = false;
+						}
+					}
+					if($table_name == 'marketing_order_deliveries' && $daysDueInvoiceMod > 0){
+						if($daysDueInvoiceMod <= 7 && $rowTemplateStage->approvalStage->level == 2){
+							$check = false;
+						}
+						if($daysDueInvoiceMod <= 15 && $rowTemplateStage->approvalStage->level == 3){
 							$check = false;
 						}
 					}

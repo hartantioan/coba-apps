@@ -40,14 +40,11 @@
         <td style="font-size:12px;" align="right">{{number_format($row->sisaso,0,",",".")}}</td>
         <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
         <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
-        @if ($i==0)
-        <td style="font-size:12px;" align="right">-</td>
-
-        @else
+       
 
         <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
 
-        @endif
+        
     </tr>
     @php
     $i++;
@@ -81,14 +78,11 @@
         <td style="font-size:12px;" align="right">{{number_format($row->sisaso,0,",",".")}}</td>
         <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
         <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
-        @if ($i==0)
-        <td style="font-size:12px;" align="right">-</td>
-
-        @else
+      
 
         <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
 
-        @endif
+       
     </tr>
     @php
     $i++;

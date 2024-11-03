@@ -52,6 +52,8 @@ class MailReportMarketingGlobal extends Command
 		$data5 = [];
 
 		$aspglobal = 0.00;
+		$aspht=0.00;
+		$aspgl=0.00;
 
 		//asp
 		$query = DB::select("SELECT sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
@@ -195,6 +197,14 @@ class MailReportMarketingGlobal extends Command
 				'sjm'  => $row->sjm,
 				'asp'  => $row->asp,
 			];
+
+			if ($row->name=='GLAZED'){
+				$aspgl=$row->asp;
+			}
+
+			if ($row->name=='HT'){
+				$aspht=$row->asp;
+			}
 		}
 
 
@@ -476,7 +486,7 @@ class MailReportMarketingGlobal extends Command
 			'sisaso' => $osso,
 			'sisamod' => $osmod,
 			'sjm' => $sjmtd,
-			'asp' => '',
+			'asp' => $aspht,
 		];
 
 		foreach ($query as $row) {
@@ -520,7 +530,7 @@ class MailReportMarketingGlobal extends Command
 			'sisaso' => $osso,
 			'sisamod' => $osmod,
 			'sjm' => $sjmtd,
-			'asp' => '',
+			'asp' => $aspgl,
 		];
 
 		foreach ($query as $row) {

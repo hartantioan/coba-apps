@@ -1234,7 +1234,7 @@
         $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
         $("#unit_stock" + val).empty();
-        $("#qty_stock" + val).empty().text('-');
+        $("#qty_stock" + val).text('-');
         if($("#arr_item" + val).val()){
             if($("#arr_item" + val).select2('data')[0].old_prices.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].old_prices, function(i, value) {
@@ -3084,7 +3084,7 @@
 
             let qtyConversion = qty * conversion;
 
-            $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+            /* $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))); */
 
             var finalpricedisc1 = price - (price * (disc1 / 100));
             var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));

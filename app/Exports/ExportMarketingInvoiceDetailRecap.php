@@ -94,7 +94,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $pricefinal=$row->price;
                 $item = $row->description;
                 $qty = $row->qty;
-                $uom = $row->unit->code;
+                $uom = $row->unit->code ?? '-';
             }
 
             $array_filter[] = [
@@ -123,7 +123,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'tax'=>$row->marketingOrderInvoice->tax,
                 'grandtotalinvoice'=>$row->marketingOrderInvoice->grandtotal,
                 'taxno'=>$row->marketingOrderInvoice->tax_no,
-               
+
             ];
 
             $ceksama = $row->marketingOrderInvoice->code;

@@ -7518,7 +7518,7 @@ class CustomHelper {
 
 		foreach($datanew as $key => $row){
 			if($row['item_id'] !== $row['list_bom'][0]['item_id']){
-				info('kambing');
+				info($row['item_id']);
 				$row['mopd_id']		= '';
 				$row['item_id'] 	= $row['list_bom'][0]['item_id'];
 				$row['item_code'] 	= explode(' - ',$row['list_bom'][0]['item_name'])[0];

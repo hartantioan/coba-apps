@@ -236,7 +236,7 @@
                 @foreach($data->incomingPaymentDetail as $row)
                 <tr>
                     <td class="center-align">{{ $loop->iteration }}</td>
-                    <td class="center-align">{{ $row->lookable->getCode() }}
+                    <td class="center-align">{{ $row->getCode() }}
                     </td>
                     <td class="center-align">{{ class_basename($row->lookable) }}</td>
                     <td class="center-align">{{ $row->cost_distribution_id ? $row->costDistribution->code : '-' }}</td>

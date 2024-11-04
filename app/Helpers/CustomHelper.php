@@ -7518,7 +7518,6 @@ class CustomHelper {
 
 		foreach($datanew as $key => $row){
 			if($row['item_id'] !== $row['list_bom'][0]['item_id']){
-				info($row['item_id']);
 				$row['mopd_id']		= '';
 				$row['item_id'] 	= $row['list_bom'][0]['item_id'];
 				$row['item_code'] 	= explode(' - ',$row['list_bom'][0]['item_name'])[0];
@@ -7526,10 +7525,9 @@ class CustomHelper {
 				$row['qty'] 		= CustomHelper::formatConditionalQty(round($row['list_bom'][0]['qty'] * str_replace(',','.',str_replace('.','',$row['qty'])),3));
 				$row['uom'] 		= $row['list_bom'][0]['unit'];
 				$row['list_warehouse'] = $row['list_bom'][0]['list_warehouse'];
+				info($row);
 			}
 		}
-
-		info($datanew);
 
 		return $datanew;
 	}

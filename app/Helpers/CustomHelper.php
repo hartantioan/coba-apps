@@ -7530,8 +7530,6 @@ class CustomHelper {
 			}
 		}
 
-		info($datanew);
-
 		return $datanew;
 	}
 }

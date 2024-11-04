@@ -7514,6 +7514,7 @@ class CustomHelper {
 			foreach($arrnewrow as $rownew){
 				$datanew[] = $rownew;
 			}
+			info(count($arrnewrow));
 		}
 		return $datanew;
 	}

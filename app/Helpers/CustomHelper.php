@@ -6231,9 +6231,11 @@ class CustomHelper {
 			if($ps){
 				if($ps->productionScheduleTarget()->exists()){
 					foreach($ps->productionScheduleTarget as $row){
-						$row->marketingOrderPlanDetail->marketingOrderPlan->update([
-							'status'	=> '3'
-						]);
+						if($row->marketingOrderPlanDetail->marketingOrderPlan->balanceQty() <= 0){
+							$row->marketingOrderPlanDetail->marketingOrderPlan->update([
+								'status'	=> '3'
+							]);
+						}
 					}
 				}
 			}

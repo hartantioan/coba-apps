@@ -4943,7 +4943,7 @@ class Select2Controller extends Controller {
             $query->whereHas('item',function($query){
                 $query->whereNotNull('is_sales_item');
             });
-            if($request){
+            if($request->line_id){
                 $query->where('line_id',$request->line_id);
             }
         })

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Exports\ExportListBGCheck;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ class ListBgCheckController extends Controller
 
     public function getCode(Request $request){
         $code = ListBgCheck::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -80,7 +81,7 @@ class ListBgCheckController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ListBgCheck::count();
-        
+
         $query_data = ListBgCheck::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -144,7 +145,7 @@ class ListBgCheckController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -221,19 +222,19 @@ class ListBgCheckController extends Controller
                     }
 
                     $query->code            = $request->code;
-                    $query->user_id         = session('bo_id'); 
-                    $query->account_id      = $request->account_id; 
-                    $query->company_id      = $request->company_id; 
-                    $query->post_date       = $request->post_date; 
-                    $query->valid_until_date = $request->valid_until_date; 
-                    $query->pay_date        = $request->pay_date; 
+                    $query->user_id         = session('bo_id');
+                    $query->account_id      = $request->account_id;
+                    $query->company_id      = $request->company_id;
+                    $query->post_date       = $request->post_date;
+                    $query->valid_until_date = $request->valid_until_date;
+                    $query->pay_date        = $request->pay_date;
                     $query->coa_id          = $request->coa_id;
                     $query->type            = $request->type;
-                    $query->document_no     = $request->document_no; 
-                    $query->document        = $document; 
-                    $query->note            = $request->note; 
-                    $query->nominal         = str_replace(',','.',str_replace('.','',$request->nominal)); 
-                    // $query->grandtotal      = str_replace(',','.',str_replace('.','',$request->grandtotal?? null)); 
+                    $query->document_no     = $request->document_no;
+                    $query->document        = $document;
+                    $query->note            = $request->note;
+                    $query->nominal         = str_replace(',','.',str_replace('.','',$request->nominal));
+                    // $query->grandtotal      = str_replace(',','.',str_replace('.','',$request->grandtotal?? null));
                     $query->status          = '1';
 
                     $query->save();
@@ -264,11 +265,11 @@ class ListBgCheckController extends Controller
                         // 'grandtotal'        => str_replace(',','.',str_replace('.','',$request->grandtotal?? null)),
                         'status'            => '1',
                     ]);
-                    
+
                     DB::commit();
-                
+
 			}
-			
+
 			if($query) {
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
@@ -291,23 +292,23 @@ class ListBgCheckController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $list = ListBgCheck::find($request->id);
         $list['code_place_id'] = substr($list->code,7,2);
-        $list['nominal'] = number_format($list->nominal,2,',','.');	
+        $list['nominal'] = number_format($list->nominal,2,',','.');
         $list['account_name'] = $list->account->name;
-        $list['grandtotal'] = number_format($list->grandtotal,2,',','.');				
+        $list['grandtotal'] = number_format($list->grandtotal,2,',','.');
         $list['coa_name'] = $list->coa->code.' - '.$list->coa->name;
 		return response()->json($list);
     }
 
     public function voidStatus(Request $request){
         $query = ListBgCheck::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             /* if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -336,13 +337,13 @@ class ListBgCheckController extends Controller
                 ]);
 
                 $query->updateRootDocumentStatusProcess();
-    
+
                 activity()
                     ->performedOn(new ListBgCheck())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the list bg check data');
-    
+
                 CustomHelper::sendNotification('list_bg_check',$query->id,'list bg check No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('list_bg_check',$query->id);
 
@@ -361,11 +362,9 @@ class ListBgCheckController extends Controller
         return response()->json($response);
     }
 
-
-
     public function destroy(Request $request){
         $query = ListBgCheck::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new ListBgCheck())
@@ -385,5 +384,11 @@ class ListBgCheckController extends Controller
         }
 
         return response()->json($response);
-    }  
+    }
+
+    public function export(Request $request){
+        $status = $request->status? $request->status : '';
+        $search= $request->search? $request->search : '';
+		return Excel::download(new ExportListBGCheck($search,$status), 'list_bg_check_'.uniqid().'.xlsx');
+    }
 }

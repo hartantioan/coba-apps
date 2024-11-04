@@ -42,7 +42,7 @@ class ExportListBGCheck implements FromCollection, WithTitle, WithHeadings, Shou
         'Tgl.Jatuh Tempo',
         'Tgl. Bayar',
         'Bank Tujuan',
-        'Grandtotal',
+        'Nominal',
     ];
 
     public function collection()
@@ -107,8 +107,8 @@ class ExportListBGCheck implements FromCollection, WithTitle, WithHeadings, Shou
                 'Tipe'=>$row->type(),
                 'Tgl.Jatuh Tempo'=>date('d/m/Y',strtotime($row->valid_until_date)),
                 'Tgl. Bayar'=>date('d/m/Y',strtotime($row->pay_date)),
-                'Bank Tujuan'=>$row->coa->code ?? '-' .' '.$row->coa->name ?? '',
-                'grandtotal'=>$row->grandtotal,
+                'Bank Tujuan' => ($row->coa->code ?? '-') . ' ' . ($row->coa->name ?? ''),
+                'nominal'=>$row->nominal,
             ];
 
         }

@@ -43,6 +43,14 @@ class MarketingOrderPlanDetail extends Model
         return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
     }
 
+    public function balanceDetail(){
+        $qty = $this->qty;
+        foreach($this->productionScheduleTarget as $row){
+            $qty -= $row->qty;
+        }
+        return $qty;
+    }
+
     public function totalScheduled()
     {
         $qty = 0;

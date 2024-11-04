@@ -3725,22 +3725,24 @@ class Select2Controller extends Controller {
                 if(!$cekBom){
                     $hasBom = false;
                 }else{
-                    $details[] = [
-                        'mopd_id'           => $row->id,
-                        'item_id'           => $row->item_id,
-                        'item_code'         => $row->item->code,
-                        'item_name'         => $row->item->name,
-                        'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                        'uom'               => $row->item->uomUnit->code,
-                        'request_date'      => date('d/m/Y',strtotime($row->request_date)),
-                        'note'              => $row->note ?? '',
-                        'note2'             => $row->note2 ?? '',
-                        'priority'          => $row->priority,
-                        'has_bom'           => $cekBom ? '1' : '',
-                        'place_id'          => $request->place_id,
-                        'list_warehouse'    => $row->item->warehouseList(),
-                        'list_bom'          => $row->item->listBom(),
-                    ];
+                    if($row->balanceDetail() > 0){
+                        $details[] = [
+                            'mopd_id'           => $row->id,
+                            'item_id'           => $row->item_id,
+                            'item_code'         => $row->item->code,
+                            'item_name'         => $row->item->name,
+                            'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                            'uom'               => $row->item->uomUnit->code,
+                            'request_date'      => date('d/m/Y',strtotime($row->request_date)),
+                            'note'              => $row->note ?? '',
+                            'note2'             => $row->note2 ?? '',
+                            'priority'          => $row->priority,
+                            'has_bom'           => $cekBom ? '1' : '',
+                            'place_id'          => $request->place_id,
+                            'list_warehouse'    => $row->item->warehouseList(),
+                            'list_bom'          => $row->item->listBom(),
+                        ];
+                    }
                 }
             }
             if($d->balanceQty() > 0 && $hasBom){

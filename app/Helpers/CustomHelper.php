@@ -7525,9 +7525,12 @@ class CustomHelper {
 				$row['qty'] 		= CustomHelper::formatConditionalQty(round($row['list_bom'][0]['qty'] * str_replace(',','.',str_replace('.','',$row['qty'])),3));
 				$row['uom'] 		= $row['list_bom'][0]['unit'];
 				$row['list_warehouse'] = $row['list_bom'][0]['list_warehouse'];
-				info($row);
+				$datanew[] = $row;
+				unset($datanew[$key]);
 			}
 		}
+
+		info($datanew);
 
 		return $datanew;
 	}

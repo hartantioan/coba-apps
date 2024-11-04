@@ -106,7 +106,7 @@ class ExportListBGCheck implements FromCollection, WithTitle, WithHeadings, Shou
                 'Nomor Dokumen'=>$row->document_no,
                 'Tipe'=>$row->type(),
                 'Tgl.Jatuh Tempo'=>date('d/m/Y',strtotime($row->valid_until_date)),
-                'Tgl. Bayar'=>date('d/m/Y',strtotime($row->pay_date)),
+                'Tgl. Bayar' => $row->pay_date ? date('d/m/Y', strtotime($row->pay_date)) : '-',
                 'Bank Tujuan' => ($row->coa->code ?? '-') . ' ' . ($row->coa->name ?? ''),
                 'nominal'=>$row->nominal,
             ];

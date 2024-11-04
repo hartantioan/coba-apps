@@ -203,6 +203,7 @@ use App\Http\Controllers\Inventory\GoodIssueController;
 use App\Http\Controllers\Inventory\GoodIssueRequestController;
 use App\Http\Controllers\Inventory\InventoryRevaluationController;
 use App\Http\Controllers\Inventory\StockMovementController;
+use App\Http\Controllers\Inventory\AdjustStockController;
 use App\Http\Controllers\Inventory\MaterialRequestController;
 
 use App\Http\Controllers\Accounting\JournalController;
@@ -2256,6 +2257,12 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('inventory_report')->middleware('direct.access')->group(function () {
                     Route::prefix('inventory_recap')->middleware('operation.access:inventory_recap,view')->group(function () {
                         Route::get('/', [InventoryReportController::class, 'index']);
+                    });
+                    Route::prefix('adjust_stock')->middleware('operation.access:adjust_stock,view')->group(function () {
+                        Route::get('/', [AdjustStockController::class, 'index']);
+                        Route::post('filter', [AdjustStockController::class, 'filter']);
+                        Route::post('adjust_stock_qty', [AdjustStockController::class, 'adjustStockQty']);
+                        Route::post('adjust_stock_nominal', [AdjustStockController::class, 'adjustStockNominal']);
                     });
                     Route::prefix('stock_movement')->middleware('operation.access:stock_movement,view')->group(function () {
                         Route::get('/', [StockMovementController::class, 'index']);

@@ -686,10 +686,13 @@ class ProductionBarcodeController extends Controller
                 ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
                 ->whereIn('status',['2']);
         })
-        ->whereHas('productionScheduleDetail',function($query){
+        ->whereHas('productionScheduleDetail',function($query)use($request){
             $query->whereHas('item',function($query){
                 $query->whereNotNull('is_sales_item');
             });
+            if($request->line_id){
+                $query->where('line_id',$request->line_id);
+            }
         })
         ->get();
 

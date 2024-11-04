@@ -2196,7 +2196,8 @@
             type: 'POST',
             dataType: 'JSON',
             data: {
-                id: $('#account_id').val()
+                id: $('#account_id').val(),
+                line_id: $('#line_id').val(),
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

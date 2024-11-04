@@ -7453,7 +7453,7 @@ class CustomHelper {
 				$newarray[] = $rowbom;
 			}
 		}
-		$item_id = NULL;
+		/* $item_id = NULL;
 		$hasMore = false;
 		foreach($newarray as $row){
 			if(!in_array($row['item_id'],$arritem)){
@@ -7514,8 +7514,10 @@ class CustomHelper {
 			foreach($arrnewrow as $rownew){
 				$datanew[] = $rownew;
 			}
-			info(count($arrnewrow));
-		}
-		return $datanew;
+		} */
+
+		info($data);
+
+		return $data;
 	}
 }

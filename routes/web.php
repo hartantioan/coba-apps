@@ -3497,7 +3497,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('subsidiary_ledger')->middleware('operation.access:subsidiary_ledger,view')->group(function () {
                         Route::get('/', [SubsidiaryLedgerController::class, 'index']);
                         Route::post('process', [SubsidiaryLedgerController::class, 'process']);
-                        Route::get('export', [SubsidiaryLedgerController::class, 'export']);
+                        Route::post('export', [SubsidiaryLedgerController::class, 'export']);
                     });
 
                     Route::prefix('report_accounting_summary_stock')->middleware('operation.access:report_accounting_summary_stock,view')->group(function () {

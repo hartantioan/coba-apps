@@ -6,6 +6,7 @@ use App\Exports\ExportSubsidiaryLedger;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
+use App\Jobs\SubsidiaryLedgerExportJob;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\IncomingPaymentDetail;
@@ -166,7 +167,10 @@ class SubsidiaryLedgerController extends Controller
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
         $closing_journal = $request->closing_journal ? $request->closing_journal : '';
+        $user_id = session('bo_id');
+        SubsidiaryLedgerExportJob::dispatch( $datestart,$dateend,$coastart,$coaend,$closing_journal,$user_id);
 
-		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend,$closing_journal), 'subsidiary_ledger_'.uniqid().'.xlsx');
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+
     }
 }

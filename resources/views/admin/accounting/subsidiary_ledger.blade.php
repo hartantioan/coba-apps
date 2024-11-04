@@ -227,12 +227,58 @@
     }
 
     function exportExcel(){
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
         var datestart = $('#date_start').val();
         var dateend = $('#date_end').val();
         var coastart = $('#coa_start').val();
         var coaend = $('#coa_end').val();
         var is_closing_journal = ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : '');
-
-        window.location = "{{ Request::url() }}/export?datestart=" + datestart + "&dateend=" + dateend+ "&coastart=" + coastart+ "&coaend=" + coaend + "&closing_journal=" + is_closing_journal;
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                datestart : datestart,
+                dateend: dateend,
+                coastart : coastart,
+                coaend : coaend,
+                is_closing_journal : is_closing_journal,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        // window.location = "{{ Request::url() }}/export?datestart=" + datestart + "&dateend=" + dateend+ "&coastart=" + coastart+ "&coaend=" + coaend + "&closing_journal=" + is_closing_journal;
     }
 </script>

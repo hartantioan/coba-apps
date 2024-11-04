@@ -53,12 +53,13 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\LandedCost;
 
 class MenuController extends Controller
 {
     public function index()
     {
-        $modp = MarketingOrderDeliveryProcess::whereIn("status",['2','3'])->get();
+        /* $modp = MarketingOrderDeliveryProcess::whereIn("status",['2','3'])->get(); */
 
         // foreach($modp as $row){
         //     foreach($row->journal as $journal){
@@ -122,6 +123,20 @@ class MenuController extends Controller
         foreach($item as $row){
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
+
+        /* $data = LandedCost::find(345);
+        
+        foreach($data->landedCostDetail as $row){
+            ResetCogsNew::dispatch('2024-09-04',1,1,$row->item_id,NULL,NULL,NULL);
+        } */
+
+        /* $data = GoodIssue::where('code','GISS-24P1-00004493')->first();
+
+        foreach($data->goodIssueDetail as $row){
+            ResetCogsNew::dispatch($data->post_date,1,1,$row->itemStock->item_id,NULL,NULL,NULL);
+        } */
+
+        /* CustomHelper::accumulateCogs('2024-09-03',1,1,5388); */
 
         $data = [
             'title'     => 'Menu',
@@ -213,7 +228,7 @@ class MenuController extends Controller
         /* $data = Item::where('item_group_id',2)->get();
 
         foreach($data as $item){
-            ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
+            ResetCogsNew::dispatch('2024-09-01',1,1,$item->id,NULL,NULL,NULL);
         } */
 
         /* $data = Item::whereHas('itemGroup',function($query){
@@ -221,7 +236,7 @@ class MenuController extends Controller
         })->get();
 
         foreach($data as $item){
-            ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
+            ResetCogsNew::dispatch('2024-09-01',1,1,$item->id,NULL,NULL,NULL);
         } */
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
@@ -254,7 +269,7 @@ class MenuController extends Controller
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = ProductionBatch::whereNotNull('lookable_type')->whereNotNull('area_id')->whereNotNull('item_shading_id')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
+        /* $data = ProductionBatch::whereNotNull('lookable_type')->whereNotNull('area_id')->whereNotNull('item_shading_id')->where('post_date','>=','2024-09-03')->where('post_date','<=','2024-09-30')->whereHas('item',function($query){
             $query->where('item_group_id',7);
         })->orderBy('post_date')->orderBy('id')->get();
 

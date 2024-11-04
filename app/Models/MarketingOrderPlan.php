@@ -193,8 +193,8 @@ class MarketingOrderPlan extends Model
         $total = 0;
 
         foreach($this->marketingOrderPlanDetail as $row){
-            $total += round($row->qty * $row->item->sell_convert);
-            $total -= round($row->totalScheduled());
+            $total += $row->qty;
+            $total -= $row->totalScheduled();
         }
 
         return $total;

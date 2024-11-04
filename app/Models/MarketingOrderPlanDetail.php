@@ -45,11 +45,14 @@ class MarketingOrderPlanDetail extends Model
 
     public function totalScheduled()
     {
-        $total = 0;
+        $qty = 0;
         
         //logika ter-produksi
+        foreach($this->productionScheduleTarget as $row){
+            $qty += $row->qty;
+        }
 
-        return $total;
+        return $qty;
     }
 
     public function productionScheduleTarget()

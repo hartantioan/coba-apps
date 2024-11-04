@@ -973,7 +973,7 @@ class Select2Controller extends Controller {
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'buy_units'         => $d->arrBuyUnits(),
                 'buy_price_now'     => $d->buyPriceNow(),
-                'stock'             => $d->getStockAll(),
+                'stock'             => CustomHelper::formatConditionalQty($d->getStockAll()),
             ];
         }
 
@@ -3743,7 +3743,7 @@ class Select2Controller extends Controller {
                     ];
                 }
             }
-            if($hasBom){
+            if($d->balanceQty() > 0 && $hasBom){
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)),

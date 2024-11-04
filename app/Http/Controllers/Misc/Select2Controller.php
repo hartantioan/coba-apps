@@ -973,6 +973,7 @@ class Select2Controller extends Controller {
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'buy_units'         => $d->arrBuyUnits(),
                 'buy_price_now'     => $d->buyPriceNow(),
+                'stock'             => $d->getStockAll(),
             ];
         }
 

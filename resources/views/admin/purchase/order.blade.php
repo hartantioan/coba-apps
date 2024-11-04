@@ -1275,6 +1275,7 @@
                 `);
             }
             $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
+            $("#qty_stock" + val).text($("#arr_item" + val).select2('data')[0].stock);
         }else{
             $("#arr_item" + val).empty();
             $("#arr_unit" + val).empty().append(`

@@ -2918,7 +2918,7 @@ class TreeHelper {
                                 "name"=>$row_ip_detail->incomingPayment->code,
                                 "key" => $row_ip_detail->incomingPayment->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->incomingPayment->code),
+                                'url'=>request()->root()."/admin/finance/incoming_payment?code=".CustomHelper::encrypt($row_ip_detail->incomingPayment->code),
                             ];
                             $data_go_chart[]=$mo_incoming_payment;
                             $data_link[]=[
@@ -3161,7 +3161,7 @@ class TreeHelper {
                                 "name"=>$ip_detail->incomingPayment->code,
                                 "key" => $ip_detail->incomingPayment->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/delivery_order/?code=".CustomHelper::encrypt($ip_detail->incomingPayment->code),
+                                'url'=>request()->root()."/admin/finance/incoming_payment/?code=".CustomHelper::encrypt($ip_detail->incomingPayment->code),
                             ];
 
                             $data_go_chart[]=$ip_tempura;

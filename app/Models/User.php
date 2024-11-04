@@ -247,6 +247,7 @@ class User extends Authenticatable
             }
 
             $query = User::withTrashed()->selectRaw('type, RIGHT(employee_no, 6) as code')
+                ->where('employee_no','like', "$prefix%")
                 ->where('type',$type)
                 ->orderByDesc('employee_no')
                 ->limit(1)

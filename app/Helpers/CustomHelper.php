@@ -7516,9 +7516,17 @@ class CustomHelper {
 			}
 		}
 
-		/* foreach($datanew as $row){
-			if($row[])
-		} */
+		foreach($datanew as $key => $row){
+			if($row['item_id'] !== $row['list_bom'][0]['item_id']){
+				$row['mopd_id']		= '';
+				$row['item_id'] 	= $row['list_bom'][0]['item_id'];
+				$row['item_code'] 	= explode(' - ',$row['list_bom'][0]['item_name'])[0];
+				$row['item_name'] 	= explode(' - ',$row['list_bom'][0]['item_name'])[1];
+				$row['qty'] 		= CustomHelper::formatConditionalQty(round($row['list_bom'][0]['qty'] * str_replace(',','.',str_replace('.','',$row['qty'])),3));
+				$row['uom'] 		= $row['list_bom'][0]['unit'];
+				$row['list_warehouse'] = $row['list_bom'][0]['list_warehouse'];
+			}
+		}
 
 		info($datanew);
 

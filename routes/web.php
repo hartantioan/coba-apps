@@ -9,6 +9,7 @@ use App\Http\Controllers\HR\EmployeeLeaveQuotasController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 use App\Http\Controllers\HR\EmployeeRewardPunishmentController;
 use App\Http\Controllers\HR\OvertimeRequestController;
+use App\Http\Controllers\Sales\ApprovalCreditLimitController;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\AdjustRateController;
@@ -242,7 +243,7 @@ use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
 use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\BomStandardController;
-use App\Http\Controllers\MasterData\itemWeightController;
+use App\Http\Controllers\MasterData\ItemWeightController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\ItemPricelistController;
@@ -939,17 +940,17 @@ Route::prefix('admin')->group(function () {
                     });
 
                     Route::prefix('item_weight_fg')->middleware('operation.access:item_weight_fg,view')->group(function () {
-                        Route::get('/', [itemWeightController::class, 'index']);
-                        Route::get('datatable', [itemWeightController::class, 'datatable']);
-                        Route::get('row_detail', [itemWeightController::class, 'rowDetail']);
-                        Route::post('show', [itemWeightController::class, 'show']);
-                        Route::post('print', [itemWeightController::class, 'print']);
-                        Route::get('export', [itemWeightController::class, 'export']);
-                        Route::get('export_from_page', [itemWeightController::class, 'exportFromTransactionPage']);
-                        Route::post('import', [itemWeightController::class, 'import'])->middleware('operation.access:resource,update');
-                        Route::get('get_import_excel', [itemWeightController::class, 'getImportExcel']);
-                        Route::post('create', [itemWeightController::class, 'create'])->middleware('operation.access:item_weight_fg,update');
-                        Route::post('destroy', [itemWeightController::class, 'destroy'])->middleware('operation.access:item_weight_fg,delete');
+                        Route::get('/', [ItemWeightController::class, 'index']);
+                        Route::get('datatable', [ItemWeightController::class, 'datatable']);
+                        Route::get('row_detail', [ItemWeightController::class, 'rowDetail']);
+                        Route::post('show', [ItemWeightController::class, 'show']);
+                        Route::post('print', [ItemWeightController::class, 'print']);
+                        Route::get('export', [ItemWeightController::class, 'export']);
+                        Route::get('export_from_page', [ItemWeightController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [ItemWeightController::class, 'import'])->middleware('operation.access:resource,update');
+                        Route::get('get_import_excel', [ItemWeightController::class, 'getImportExcel']);
+                        Route::post('create', [ItemWeightController::class, 'create'])->middleware('operation.access:item_weight_fg,update');
+                        Route::post('destroy', [ItemWeightController::class, 'destroy'])->middleware('operation.access:item_weight_fg,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {
@@ -2641,6 +2642,20 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('sales')->middleware('direct.access')->group(function () {
+                Route::prefix('approval_credit_limit')->middleware(['operation.access:approval_credit_limit,view', 'lockacc'])->group(function () {
+                    Route::get('/', [ApprovalCreditLimitController::class, 'index']);
+                    Route::get('datatable', [ApprovalCreditLimitController::class, 'datatable']);
+                    Route::get('row_detail', [ApprovalCreditLimitController::class, 'rowDetail']);
+                    Route::post('show', [ApprovalCreditLimitController::class, 'show']);
+                    Route::post('get_code', [ApprovalCreditLimitController::class, 'getCode']);
+                    Route::post('print', [ApprovalCreditLimitController::class, 'print']);
+                    Route::post('done', [ApprovalCreditLimitController::class, 'done'])->middleware('operation.access:approval_credit_limit,update');
+                    Route::post('create', [ApprovalCreditLimitController::class, 'create'])->middleware('operation.access:approval_credit_limit,update');
+                    Route::get('approval/{id}', [ApprovalCreditLimitController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ApprovalCreditLimitController::class, 'voidStatus'])->middleware('operation.access:approval_credit_limit,void');
+                    Route::post('destroy', [ApprovalCreditLimitController::class, 'destroy'])->middleware('operation.access:approval_credit_limit,delete');
+                });
+                
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {
                     Route::get('/', [MarketingOrderController::class, 'index']);
                     Route::post('datatable', [MarketingOrderController::class, 'datatable']);

@@ -8,50 +8,56 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class ExportAgingAR implements FromView , WithEvents
+class ExportAgingAR implements FromView, WithEvents
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function __construct(string $date, int $interval, int $column, string $type)
     {
-       $this->date = $date ? $date : '';
+        $this->date = $date ? $date : '';
         $this->interval = $interval ? $interval : 0;
-		$this->column = $column ? $column : 0;
+        $this->column = $column ? $column : 0;
         $this->type = $type ? $type : 1;
     }
     public function view(): View
     {
-        $totalAll=0;
+        $totalAll = 0;
         $array_filter = [];
-       $query_data = DB::select("
-            SELECT 
-            *,
-            IFNULL((SELECT 
-                SUM(ipd.subtotal) 
-                FROM incoming_payment_details ipd 
-                JOIN incoming_payments ip
-                    ON ip.id = ipd.incoming_payment_id
+        $query_data = DB::select("
+              SELECT 
+                moi.*,u.*,gr.name as grup,ifnull(oc.outstandcheck,0) as outstandcheck,
+                IFNULL((SELECT 
+                    SUM(ipd.subtotal) 
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
+                    WHERE 
+                        ipd.lookable_id = moi.id 
+                        AND ipd.lookable_type = 'marketing_order_invoices'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
+                ),0) AS total_payment,
+                0 AS total_memo,
+                u.name AS account_name,
+                u.employee_no AS account_code, datediff(:date3,post_date) as invoiceage,
+                datediff(:date4,due_date_internal) as dueage
+                FROM marketing_order_invoices moi
+                JOIN users u
+                    ON u.id = moi.account_id
+                JOIN `groups` gr on u.group_id=gr.id
+                LEFT JOIN (select account_id,sum(nominal-coalesce(grandtotal,0)) as outstandcheck 
+                      from list_bg_checks where void_date is null and deleted_at is null group by account_id)oc on oc.account_id=u.id
                 WHERE 
-                    ipd.lookable_id = moi.id 
-                    AND ipd.lookable_type = 'marketing_order_invoices'
-                    AND ip.post_date <= :date1
-                    AND ip.status IN ('2','3')
-            ),0) AS total_payment,
-            0 AS total_memo,
-            u.name AS account_name,
-            u.employee_no AS account_code
-            FROM marketing_order_invoices moi
-            JOIN users u
-                ON u.id = moi.account_id
-            WHERE 
-                moi.post_date <= :date2
-                AND moi.grandtotal > 0
-                AND moi.status IN ('2','3')
+                    moi.post_date <= :date2
+                    AND moi.grandtotal > 0
+                    AND moi.status IN ('2','3')
             ", array(
-                'date1' => $this->date,
-                'date2' => $this->date,
-            ));
+            'date1' => $this->date,
+            'date2' => $this->date,
+            'date3' => $this->date,
+            'date4' => $this->date,
+        ));
 
         $countPeriod = 1;
         $column = intval($this->column);
@@ -65,18 +71,18 @@ class ExportAgingAR implements FromView , WithEvents
             'end'       => 0,
             'total'     => 0,
         ];
-        for($i=1;$i<=$column;$i++){
+        for ($i = 1; $i <= $column; $i++) {
             $end = $i * $interval;
             $start = ($end - $interval) + 1;
             $arrColumn[] = [
-                'name'   => ''.$start.'-'.$end.' hari',
+                'name'   => '' . $start . '-' . $end . ' hari',
                 'start'  => $start,
                 'end'    => $end,
                 'total'  => 0,
             ];
         }
         $arrColumn[] = [
-            'name'      => 'Diatas '.$totalDays.' hari',
+            'name'      => 'Diatas ' . $totalDays . ' hari',
             'start'     => $totalDays + 1,
             'end'       => 999999999999999999,
             'total'     => 0,
@@ -84,26 +90,27 @@ class ExportAgingAR implements FromView , WithEvents
 
         $newData = [];
 
-        if($this->type == 1){
-            foreach($query_data as $row){
+        if ($this->type == 1) {
+            foreach ($query_data as $row) {
                 $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
-                if($balance > 0){
+                if ($balance > 0) {
                     $totalAll += $balance;
-                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
-                    $index = $this->findDuplicate($row->account_code,$newData);
-                    if($index >= 0){
-                        foreach($newData[$index]['data'] as $key => $rowdata){
-                            if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
+                    $daysDiff = $this->dateDiffInDays($row->due_date, $this->date);
+                    $index = $this->findDuplicate($row->account_code, $newData);
+                    if ($index >= 0) {
+                        foreach ($newData[$index]['data'] as $key => $rowdata) {
+                            if ($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']) {
                                 $newData[$index]['data'][$key]['balance'] += $balance;
                                 $newData[$index]['total'] += $balance;
                                 $arrColumn[$key]['total'] += $balance;
+                                $newData[$index]['credit_balance'] -= $balance;
                                 $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                             }
                         }
-                    }else{
+                    } else {
                         $arrDetail = [];
-                        foreach($arrColumn as $key => $rowcolumn){
-                            if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                        foreach ($arrColumn as $key => $rowcolumn) {
+                            if ($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']) {
                                 $arrDetail[] = [
                                     'name'          => $rowcolumn['name'],
                                     'start'         => $rowcolumn['start'],
@@ -112,7 +119,7 @@ class ExportAgingAR implements FromView , WithEvents
                                     'list_invoice'  => array($row->code),
                                 ];
                                 $arrColumn[$key]['total'] += $balance;
-                            }else{
+                            } else {
                                 $arrDetail[] = [
                                     'name'          => $rowcolumn['name'],
                                     'start'         => $rowcolumn['start'],
@@ -125,28 +132,32 @@ class ExportAgingAR implements FromView , WithEvents
                         $newData[] = [
                             'customer_code'         => $row->account_code,
                             'customer_name'         => $row->account_name,
+                            'customer_group'        => $row->grup,
                             'data'                  => $arrDetail,
                             'total'                 => $balance,
+                            'credit_balance'        => $row->limit_credit - $balance,
+                            'limit_credit'          => $row->limit_credit,
+                            'outstand_check'          => $row->outstandcheck ?? 0,
                         ];
                     }
                 }
             }
-    
+
             return view('admin.exports.aging_ar', [
                 'data'          => $newData,
                 'column'        => $arrColumn,
                 'countPeriod'   => $countPeriod,
                 'totalall'      => $totalAll
             ]);
-        }else{
-            foreach($query_data as $row){
+        } else {
+            foreach ($query_data as $row) {
                 $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
-                if($balance > 0){
-                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                if ($balance > 0) {
+                    $daysDiff = $this->dateDiffInDays($row->due_date, $this->date);
                     $arrDetail = [];
                     $totalAll += $balance;
-                    foreach($arrColumn as $key => $rowcolumn){
-                        if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                    foreach ($arrColumn as $key => $rowcolumn) {
+                        if ($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']) {
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
@@ -154,7 +165,7 @@ class ExportAgingAR implements FromView , WithEvents
                                 'balance'       => $balance,
                             ];
                             $arrColumn[$key]['total'] += $balance;
-                        }else{
+                        } else {
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
@@ -166,13 +177,17 @@ class ExportAgingAR implements FromView , WithEvents
                     $newData[] = [
                         'customer_code'         => $row->account_code,
                         'customer_name'         => $row->account_name,
+                        'customer_group'         => $row->grup,
                         'invoice'               => $row->code,
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
+                        'date' =>$row->post_date,
+                        'invoice_age' =>$row->invoiceage,
+                        'due_age' =>$row->dueage,
                     ];
                 }
             }
-    
+
             return view('admin.exports.aging_ar_detail', [
                 'data'          => $newData,
                 'column'        => $arrColumn,
@@ -194,7 +209,7 @@ class ExportAgingAR implements FromView , WithEvents
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 // Auto-fit columns A to Z
                 $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
                 $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -204,21 +219,23 @@ class ExportAgingAR implements FromView , WithEvents
         ];
     }
 
-    function findDuplicate($value,$array){
+    function findDuplicate($value, $array)
+    {
         $index = -1;
-        foreach($array as $key => $row){
-            if($row['customer_code'] == $value){
+        foreach ($array as $key => $row) {
+            if ($row['customer_code'] == $value) {
                 $index = $key;
             }
         }
         return $index;
     }
 
-    function dateDiffInDays($date1, $date2) {
-    
+    function dateDiffInDays($date1, $date2)
+    {
+
         // Calculating the difference in timestamps
         $diff = strtotime($date2) - strtotime($date1);
-      
+
         // 1 day = 24 hours
         // 24 * 60 * 60 = 86400 seconds
         return round($diff / 86400);

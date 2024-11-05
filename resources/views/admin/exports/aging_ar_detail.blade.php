@@ -36,7 +36,7 @@
             </tr>
         @endforeach
         <tr id="text-grandtotal">
-            <td align="right" colspan="7">Total</td>
+            <td align="right" colspan="8">Total</td>
             <td align="right">{{ round($totalall,2) }}</td>
             @foreach($column as $row)
                 <td align="right">{{ round($row['total'],2) }}</td>

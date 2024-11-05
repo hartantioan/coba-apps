@@ -524,6 +524,11 @@ class Item extends Model
         return $this->hasOne('App\Models\FgGroup','item_id','id');
     }
 
+    public function itemWeightFg()
+    {
+        return $this->hasOne('App\Models\ItemWeightFg','item_id','id');
+    }
+
     public function benchmarkPrice()
     {
         return $this->hasMany('App\Models\BenchmarkPrice','item_id','id')->where('status','1');

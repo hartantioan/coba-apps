@@ -3049,6 +3049,24 @@ document.addEventListener('focusin', function (event) {
 
     }
 
+    function printPackingList(code){
+
+        $.ajax({
+            url: '{{ Request::url() }}/print_packing_list/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
+    }
+
     function done(id){
         var msg = '';
         swal({

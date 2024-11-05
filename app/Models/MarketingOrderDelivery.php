@@ -77,6 +77,14 @@ class MarketingOrderDelivery extends Model
         return $top;
     }
 
+    public function getMaxTaxType(){
+        $data = "";
+        foreach($this->marketingOrderDeliveryDetail()->orderBy('id')->get() as $row){
+            $data = $row->marketingOrderDetail->marketingOrder->userData->tax_type;
+        }
+        return $data;
+    }
+
     public function deliveryType(){
         $type = match ($this->type_delivery) {
             '1' => 'LOCO',

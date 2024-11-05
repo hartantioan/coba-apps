@@ -799,6 +799,7 @@ class UserController extends Controller
                             UserData::find(intval($request->arr_id_data[$key]))->update([
                                 'title'         => $row,
                                 'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
+                                'tax_type'      => $request->arr_tax_type[$key] ,
                                 'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
                                 'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
                                 'country_id'    => $request->arr_country[$key] ? $request->arr_country[$key]: NULL,
@@ -811,6 +812,7 @@ class UserController extends Controller
                             UserData::create([
                                 'user_id'	    => $query->id,
                                 'title'         => $row,
+                                'tax_type'      => $request->arr_tax_type[$key] ,
                                 'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
                                 'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
                                 'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
@@ -1415,6 +1417,7 @@ class UserController extends Controller
 			$datas[] = [
                 'id'                => $row->id,
                 'title'             => $row->title,
+                'tax_type'          => $row->tax_type,
                 'content'           => $row->content,
                 'npwp'              => $row->npwp,
                 'address'           => $row->address,

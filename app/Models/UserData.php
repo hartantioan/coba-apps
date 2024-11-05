@@ -19,6 +19,7 @@ class UserData extends Model
         'title',
         'content',
         'npwp',
+        'tax_type',
         'address',
         'country_id',
         'province_id',
@@ -32,6 +33,15 @@ class UserData extends Model
           '1' => '<i class="material-icons" style="font-size: inherit !important;color:red;">star</i>',
           '0' => '',
           default => 'Invalid',
+        };
+        return $default;
+    }
+
+    public function taxType(){
+        $default = match ($this->tax_type) {
+          '1' => 'Normal',
+          '2' => 'Perdagangan Bebas',
+          default => 'Normal',
         };
         return $default;
     }

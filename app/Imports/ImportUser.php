@@ -67,17 +67,17 @@ class handleUser implements OnEachRow, WithHeadingRow
                 $district_id = Region::where('code',$district)->first()->id;
                 if (!isset($row['no']) && !$row['no']) {
                     $sheet='Header';
-                    throw new RowImportException("data kurang lengkap", $row->getIndex(),'tidak ada nomor',$sheet); 
+                    throw new RowImportException("data kurang lengkap", $row->getIndex(),'tidak ada nomor',$sheet);
                 }
                 $city = str_replace(',', '.', explode('#', $row['kota_pic'])[0]);
-                $city_id = Region::where('code',$city)->first()->id; 
-                
+                $city_id = Region::where('code',$city)->first()->id;
+
                 $province = str_replace(',', '.', explode('#', $row['provinsi_pic'])[0]);
                 $province_id = Region::where('code',$province)->first()->id;
-                 
+
                 $country =  explode('#', $row['negara_asal'])[0];
                 $country_id= Country::where('code',$country)->first()->id;
-               
+
                 $gender =  explode('#', $row['jenis_kelamin'])[0];
                 $status_married =  explode('#', $row['status_pernikahan'])[0] ?? null;
                 $type_group =  explode('#', $row['group_bp'])[0];
@@ -85,7 +85,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                 $type_pegawai = explode('#', $row['tipe_pegawai'])[0];
 
                 $payment_type = explode('#', $row['payment_type'])[0];
-                
+
                 $place = Place::where('code', explode('#', $row['plant'])[1]  ?? null)->first() ?? '-';
 
                 $group = Group::where('code', $type_group)->first();
@@ -98,7 +98,7 @@ class handleUser implements OnEachRow, WithHeadingRow
 
                 $provinceArea = str_replace(',', '.', explode('#', $row['provinsi_pemasaran'])[0]);
                 $province_area_id = Region::where('code',$provinceArea)->first()->id;
-                
+
                 if(!$district_id && $this->error ==null){
                     $this->error = "Kecamatan.";
                 }elseif(!$city_id && $this->error ==null){
@@ -120,7 +120,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                 if (!$this->error) {
                     $dateTime = DateTime::createFromFormat('U', ($row['tgl_pernikahan'] - 25569) * 86400);
                     $dateFormatted = $dateTime->format('Y/m/d');
-                  
+
                     $query = User::create([
                         'employee_no'       => $row['code_bp'] ?? User::generateCode($type, $type_pegawai, $place->id),
                         'password'          => bcrypt($row['password']),
@@ -162,7 +162,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'no' => $row['no']
                     ];
 
-                    
+
                 }else{
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
@@ -175,10 +175,10 @@ class handleUser implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
-    
+
     public function startRow(): int
     {
-        return 2; 
+        return 2;
     }
 }
 
@@ -208,7 +208,7 @@ class handleUsebankSheet implements OnEachRow, WithHeadingRow
                         ]);
                     }
                 }
-              
+
             }
 
             DB::commit();
@@ -218,7 +218,7 @@ class handleUsebankSheet implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
-   
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)
@@ -242,11 +242,11 @@ class handleUserData implements OnEachRow, WithHeadingRow
                 foreach($this->temp as $row1){
                     if ($row1['no'] == $row['no_header']) {
                         $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
-                        $district_id = Region::where('code',$district)->first()->id; 
+                        $district_id = Region::where('code',$district)->first()->id;
                         $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
-                        $city_id = Region::where('code',$city)->first()->id; 
+                        $city_id = Region::where('code',$city)->first()->id;
                         $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
-                        $province_id = Region::where('code',$province)->first()->id; 
+                        $province_id = Region::where('code',$province)->first()->id;
                         $country =  explode('#', $row['negara'])[0];
                         $country_id= Country::where('code',$country)->first()->id;
                         if(!$district_id && $this->error ==null){
@@ -263,6 +263,7 @@ class handleUserData implements OnEachRow, WithHeadingRow
                                 'user_id' => $row1['id'],
                                 'title'              => $row['nama'],
                                 'content' => $row['catatan'],
+                                'tax_type' => $row['tipe_pajak'],
                                 'npwp' => $row['npwp'],
                                 'address'   => $row['alamat'],
                                 'province_id'       => $province_id,
@@ -270,7 +271,7 @@ class handleUserData implements OnEachRow, WithHeadingRow
                                 'district_id'       => $district_id,
                                 'country_id'        => $country_id,
                                 'is_default' => empty($row['default']) ? '0' : $row['default'],
-                                
+
                             ]);
                         }else{
                             $sheet='User Data';
@@ -286,7 +287,7 @@ class handleUserData implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
-   
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)
@@ -308,15 +309,15 @@ class handleUserDestination implements OnEachRow, WithHeadingRow
         try {
             if ($row['no_header']) {
                 foreach($this->temp as $row1){
-                  
+
                     if ($row1['no'] == $row['no_header']) {
-                       
+
                         $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
-                        $district_id = Region::where('code',$district)->first()->id; 
+                        $district_id = Region::where('code',$district)->first()->id;
                         $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
-                        $city_id = Region::where('code',$city)->first()->id; 
+                        $city_id = Region::where('code',$city)->first()->id;
                         $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
-                        $province_id = Region::where('code',$province)->first()->id; 
+                        $province_id = Region::where('code',$province)->first()->id;
                         $country =  explode('#', $row['negara'])[0];
                         $country_id= Country::where('code',$country)->first()->id;
                         if(!$district_id && $this->error ==null){
@@ -329,7 +330,7 @@ class handleUserDestination implements OnEachRow, WithHeadingRow
                             $this->error = "Negara.";
                         }
                         if (!$this->error) {
-                           
+
                             $query = UserDestination::create([
                                 'user_id' => $row1['id'],
                                 'address'           => $row['alamat'],
@@ -339,14 +340,14 @@ class handleUserDestination implements OnEachRow, WithHeadingRow
                                 'country_id'        => $country_id,
                                 'is_default'        => empty($row['default']) ? '0' : $row['default'],
                             ]);
-                            
+
                         }else{
                             $sheet='User Destination';
                             throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
                         }
                     }
                 }
-            } 
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
@@ -354,7 +355,7 @@ class handleUserDestination implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
-   
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)
@@ -376,17 +377,17 @@ class handleUserDriver implements OnEachRow, WithHeadingRow
         try {
             if ($row['no_header']) {
                 foreach($this->temp as $row1){
-                  
+
                     if ($row1['no'] == $row['no_header']) {
-                        
-                        
+
+
                         $query = UserDriver::create([
                             'user_id' => $row1['id'],
                             'name'   => $row['nama'],
                             'hp'       => $row['no_hp']
                         ]);
-                        
-                        
+
+
                     }
                 }
             }
@@ -397,7 +398,7 @@ class handleUserDriver implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
-   
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)
@@ -419,15 +420,15 @@ class handleUserDestinationDocument implements OnEachRow, WithHeadingRow
         try {
             if ($row['no_header']) {
                 foreach($this->temp as $row1){
-                  
+
                     if ($row1['no'] == $row['no_header']) {
-                       
+
                         $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
-                        $district_id = Region::where('code',$district)->first()->id; 
+                        $district_id = Region::where('code',$district)->first()->id;
                         $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
-                        $city_id = Region::where('code',$city)->first()->id; 
+                        $city_id = Region::where('code',$city)->first()->id;
                         $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
-                        $province_id = Region::where('code',$province)->first()->id; 
+                        $province_id = Region::where('code',$province)->first()->id;
                         $country =  explode('#', $row['negara'])[0];
                         $country_id= Country::where('code',$country)->first()->id;
                         if(!$district_id && $this->error ==null){
@@ -440,7 +441,7 @@ class handleUserDestinationDocument implements OnEachRow, WithHeadingRow
                             $this->error = "Negara.";
                         }
                         if (!$this->error) {
-                           
+
                             $query = UserDestinationDocument::create([
                                 'user_id'           => $row1['id'],
                                 'address'           => $row['alamat'],
@@ -450,14 +451,14 @@ class handleUserDestinationDocument implements OnEachRow, WithHeadingRow
                                 'country_id'        => $country_id,
                                 'is_default'        => empty($row['default']) ? '0' : $row['default'],
                             ]);
-                            
+
                         }else{
                             $sheet='User Destination Document';
                             throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
                         }
                     }
                 }
-            } 
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
@@ -465,7 +466,7 @@ class handleUserDestinationDocument implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
-   
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)

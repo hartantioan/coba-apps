@@ -2746,6 +2746,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('{id}/driver_update', [MarketingOrderDeliveryProcessController::class, 'driverUpdate']);
                     });
                     Route::get('print_individual/{id}', [MarketingOrderDeliveryProcessController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_packing_list/{id}', [MarketingOrderDeliveryProcessController::class, 'printPackingList'])->withoutMiddleware('direct.access');
                     Route::get('print_barcode/{id}', [MarketingOrderDeliveryProcessController::class, 'printBarcode'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryProcessController::class, 'voidStatus'])->middleware('operation.access:delivery_order,void');
                     Route::post('destroy', [MarketingOrderDeliveryProcessController::class, 'destroy'])->middleware('operation.access:delivery_order,delete');

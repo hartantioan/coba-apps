@@ -154,7 +154,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -255,7 +255,7 @@
                             <label class="active" for="sppkp">SPPKP</label>
                         </div>
                         <div class="input-field col s12 m6" id="manager_select">
-                            
+
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col s12 m3 employee_inputs">
@@ -290,7 +290,7 @@
                             </select>
                             <label for="gender">Jenis Kelamin</label>
                         </div>
-                        
+
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="pic" name="pic" type="text" placeholder="PIC">
                             <label class="active" for="pic">PIC</label>
@@ -327,7 +327,7 @@
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
                             <label class="active" for="top_internal">TOP Internal</label>
                         </div>
-                       
+
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                             <label class="active" for="province_id">{{ __('translations.province') }} PIC</label>
@@ -464,6 +464,7 @@
                                             <tr>
                                                 <th class="center">Default</th>
                                                 <th class="center">Nama (Sesuai NPWP)</th>
+                                                <th class="center" >Tipe Pajak</th>
                                                 <th class="center">{{ __('translations.note') }}</th>
                                                 <th class="center">NPWP</th>
                                                 <th class="center">{{ __('translations.address') }}</th>
@@ -471,13 +472,13 @@
                                                 <th class="center">{{ __('translations.province') }}</th>
                                                 <th class="center">{{ __('translations.city') }}</th>
                                                 <th class="center">{{ __('translations.district') }}</th>
-                                                
+
                                                 <th width="5%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-info">
                                             <tr id="last-row-info">
-                                                <td colspan="10" class="center">
+                                                <td colspan="11" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addInfo()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
@@ -593,7 +594,7 @@
                     @csrf
                 </form>
                 <div class="row mt-3" id="list-images">
-			
+
                 </div>
             </div>
         </div>
@@ -785,7 +786,7 @@
                                                             </tr>
                                                             @foreach($msub->sub()->where('status','1')->oldest('order')->get() as $msub2)
                                                                 @if($msub2->sub()->exists())
-    
+
                                                                 @else
                                                                     <tr>
                                                                         <td>
@@ -1072,7 +1073,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -1102,13 +1103,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -1140,13 +1141,13 @@
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('#type').trigger('change').formSelect();
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -1169,14 +1170,14 @@
                 $('.row_info,.row_bank,.row_destination,.row_destination_doc,.row_driver').remove();
             }
         });
-       
+
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
-                
+            onOpenEnd: function(modal, trigger) {
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#tempuser').val('');
@@ -1185,21 +1186,21 @@
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
             }
         });
-        
+
         $('#modal3').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('.tabs').tabs();
                 $('.modal-content').scrollTop(0);
             },
@@ -1215,10 +1216,10 @@
         $('#modal4').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
-                
+            onOpenEnd: function(modal, trigger) {
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#validation_alertImport').hide();
@@ -1256,8 +1257,8 @@
                     } else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
-                       
+
+
                     } else {
                         M.toast({
                             html: response.message
@@ -1295,9 +1296,9 @@
                     }else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                       
-                        let errorMessage = response.status === 400 ? 
-                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+
+                        let errorMessage = response.status === 400 ?
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` :
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
 
                         $('#validation_alertImport').append(`
@@ -1322,7 +1323,7 @@
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#province_area_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
-        
+
         $('#district_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1444,7 +1445,7 @@
                     if(response.status == 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
@@ -1644,9 +1645,9 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data_access')[0]);
-                
+
                 $.ajax({
                     url: '{{ Request::url() }}/create_access',
                     type: 'POST',
@@ -1674,7 +1675,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_access').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -1758,7 +1759,7 @@
 						</div>
 					`);
 				}
-				
+
 				loadingClose('.modal-content');
 			 },
 			 error: function() {
@@ -1865,7 +1866,7 @@
     function addDestination(){
         var count = $('input[name^="arr_address_destination"]').length;
         var checked = '';
-       
+
         if(count < 1){
             checked = 'checked';
         }
@@ -1971,7 +1972,7 @@
     function addDestinationDoc(){
         var count = $('input[name^="arr_address_document"]').length;
         var checked = '';
-       
+
         if(count < 1){
             checked = 'checked';
         }
@@ -2077,7 +2078,7 @@
     function addBank(){
         var count = $('input[name^="arr_bank"]').length;
         var checked = '';
-       
+
         if(count < 1){
             checked = 'checked';
         }
@@ -2102,7 +2103,7 @@
                 <td>
                     <input autocomplete="off" name="arr_branch[]" type="text" placeholder="Cabang">
                 </td>
-                
+
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bank" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -2116,7 +2117,7 @@
     function addInfo(){
         var length = $('input[name^="arr_npwp[]"]').length;
         var checked = '';
-       
+
         if(length < 1){
             checked = 'checked';
         }
@@ -2132,6 +2133,12 @@
                 </td>
                 <td>
                     <input autocomplete="off" name="arr_title[]" type="text" style="width:200px !important;">
+                </td>
+                <td>
+                    <select style="width: 200px !important;" class="browser-default" id="arr_tax_type" name="arr_tax_type[]">
+                        <option value="1">Normal</option>
+                        <option value="2">Perdagangan Bebas</option>
+                    </select>
                 </td>
                 <td class="center">
                     <input autocomplete="off" name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;">
@@ -2159,7 +2166,7 @@
                 <td class="center">
                     <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
                 </td>
-                
+
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -2300,7 +2307,7 @@
             buttons: [
                 'columnsToggle',
                 'selectAll',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -2348,7 +2355,7 @@
     }
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
         let type =  document.getElementById('type').value;
         let typeBody = document.getElementById('type_body').value;
@@ -2383,7 +2390,7 @@
                 $(this).val() ? $(this).val() : ''
             );
         });
-        
+
         $('input[name^="arr_id_bank[]"]').each(function(){
             formData.append('arr_id_bank[]',
                 $(this).val() ? $(this).val() : ''
@@ -2456,7 +2463,7 @@
                     } else if(response.status == 422) {
                         $('#validation_alert').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
@@ -2500,7 +2507,7 @@
                 icon: 'error'
             });
         }
-       
+
     }
 
     function success(){
@@ -2525,7 +2532,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#name').val(response.name);
                 $('#username').val(response.username);
@@ -2533,7 +2540,7 @@
                 $('#phone').val(response.phone);
                 $('#email').val(response.email);
                 $("#address").val(response.address);
-                
+
                 $('#no_pic_finance').val(response.no_pic_finance);
                 $('#pic_finance').val(response.pic_finance);
 
@@ -2565,7 +2572,7 @@
                     `);
                     select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
                 }
-                
+
                 $('#district_id,#city_id').empty();
 
                 if(response.cities){
@@ -2642,7 +2649,7 @@
                                 <td>
                                     <input name="arr_branch[]" type="text" placeholder="Cabang" value="` + val.branch + `">
                                 </td>
-                                
+
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bank" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -2672,6 +2679,12 @@
                                 <td>
                                     <input name="arr_title[]" type="text" style="width:200px !important;" value="` + val.title + `">
                                 </td>
+                                <td>
+                                    <select style="width: 200px !important;" class="browser-default" id="arr_tax_type` + count + `" name="arr_tax_type[]">
+                                        <option value="1">Normal</option>
+                                        <option value="2">Perdagangan Bebas</option>
+                                    </select>
+                                </td>
                                 <td class="center">
                                     <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;" value="` + val.content + `">
                                 </td>
@@ -2698,7 +2711,7 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
                                 </td>
-                               
+
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -2716,6 +2729,9 @@
                             dropdownAutoWidth: true,
                             width: '100%',
                         });
+                        if(val.tax_type){
+                            $('#arr_tax_type' + count).val(val.tax_type).trigger('change').formSelect();
+                        }
 
                         if(val.province_id){
                             $('#arr_province' + count).val(val.province_id).trigger('change');
@@ -2825,7 +2841,7 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_district_destination` + count + `" name="arr_district_destination[]"></select>
                                 </td>
-                                
+
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-destination" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -2950,7 +2966,7 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_district_document` + count + `" name="arr_district_document[]"></select>
                                 </td>
-                                
+
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-document" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -3084,7 +3100,7 @@
 
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
-                
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -3144,7 +3160,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -3152,7 +3168,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -3162,10 +3178,10 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(4)').text().trim();
             arr_id_temp.push(poin);
-           
-           
+
+
         });
-        
+
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -3184,8 +3200,8 @@
                     'type': 'INVOICE',
                     'url': response.message
                 })
-                
-               
+
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -3224,7 +3240,7 @@
         if(mode == 'journal'){
             param = 'checkboxJournal';
         }
-        
+
         if($(element).is(':checked')){
             $('input[name^="' + param + '"][data-parent="' + parent + '"]').each(function(){
                 if(!$(this).is(':checked')){

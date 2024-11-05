@@ -65,7 +65,8 @@ class MarketingOrderDeliveryProcess extends Model
     public function qtyPerShading(){
         $arr = [];
         $totalQty = 0;
-        $totalPalet = 0;
+        $totalPalet = 0;$totalGross = 0;
+        $totalBox = 0;$totalNetto = 0;
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if($row->itemStock->item->pallet->box_conversion > 1){
                 $totalPalet += $row->qty;
@@ -77,24 +78,44 @@ class MarketingOrderDeliveryProcess extends Model
             if (!isset($arr[$row->itemStock->item_shading_id])) {
                 $arr[$row->itemStock->item_shading_id] = [
                     'item'=> $row->itemStock->item->name,
+                    'hs_code'=> $row->itemStock->item->type->hs_code ?? '',
                     'shading'=>$row->itemStock->itemShading->code,
                     'total_box'=> 0,
                     'total_conversion'=> 0,
+                    'total_gross'=> 0,
+                    'total_netto'=> 0,
                     'unit_code'=> $row->itemStock->item->uomUnit->code,
                     'total_palet'=> 0,
                     'satuan_terakir'=> $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                 ];
+
             }
+            if($row->itemStock->item->itemWeightFg){
+                $gross = $row->itemStock->item->itemWeightFg->gross_weight ?? 0;
+                $netto = $row->itemStock->item->itemWeightFg->netto_weight ?? 0;
+            }else{
+                $gross = 0;
+                $netto = 0;
+            }
+            $conversion = ($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion);
+            $totalBox +=($row->qty * $row->itemStock->item->pallet->box_conversion);
             $arr[$row->itemStock->item_shading_id]['total_box'] += ($row->qty * $row->itemStock->item->pallet->box_conversion);
-            $arr[$row->itemStock->item_shading_id]['total_conversion'] += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3);
+            $arr[$row->itemStock->item_shading_id]['total_conversion'] += round($conversion,3);
             $arr[$row->itemStock->item_shading_id]['total_palet'] += $qty;
+            $arr[$row->itemStock->item_shading_id]['total_gross'] += round($conversion*$gross,3);
+            $arr[$row->itemStock->item_shading_id]['total_netto'] += round($conversion*$netto,3);
+            $totalNetto+=round($conversion*$netto,3);$totalGross+=round($conversion*$gross,3);
         }
 
         $data = [
             'data'=>$arr,
             'total_qty'=>$totalQty,
             'total_palet'=>$totalPalet,
+            'total_box'=>$totalBox,
+            'total_gross'=>$totalGross,
+            'total_netto'=>$totalNetto,
         ];
+        info($data);
         return $data;
     }
 
@@ -121,6 +142,22 @@ class MarketingOrderDeliveryProcess extends Model
                 if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no){
 
                 $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
+                }
+            }
+        }
+
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getPoCustomerDate(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array(date('d/m/Y',strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date)),$arr)){
+                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date){
+                    $arr[] =  date('d/m/Y',strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date));
                 }
             }
         }

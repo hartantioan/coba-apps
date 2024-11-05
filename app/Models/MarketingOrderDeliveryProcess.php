@@ -115,7 +115,6 @@ class MarketingOrderDeliveryProcess extends Model
             'total_gross'=>$totalGross,
             'total_netto'=>$totalNetto,
         ];
-        info($data);
         return $data;
     }
 

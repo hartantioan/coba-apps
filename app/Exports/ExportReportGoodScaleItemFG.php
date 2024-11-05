@@ -113,7 +113,7 @@ class ExportReportGoodScaleItemFG implements FromCollection, WithTitle, WithHead
                 'qty' => $row->qty * $row->marketingOrderDeliveryDetail->getQtyM2(),
 
                 'satuan' => $row->itemStock->item->uomUnit->code,
-                'berat' => round(($row->marketingOrderDeliveryDetail->getQtyM2() / $row->marketingOrderDeliveryProcess->totalQty()) * $row->marketingOrderDeliveryProcess->weight_netto,3),
+                'berat' => round(($row->qty *$row->marketingOrderDeliveryDetail->getQtyM2() / $row->marketingOrderDeliveryProcess->totalQty()) * $row->marketingOrderDeliveryProcess->weight_netto,3),
                 'gudang' => $row->itemStock->warehouse->name,
                 'area' => $row->itemStock->area->name,
                 'shading' => $row->itemStock->itemShading->code,

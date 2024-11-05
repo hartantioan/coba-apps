@@ -6878,6 +6878,160 @@ class CustomHelper {
 			}
 
 			$pi->updateRootDocumentStatusProcess();
+		}elseif($data->lookable_type == 'landed_costs'){
+			/* $lc = LandedCost::find($data->lookable_id);
+
+			if($lc){
+				$arrNote = [];
+
+				$otherLc = NULL;
+
+				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
+
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $lc->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $data->getTable(),
+					'lookable_id'	=> $data->id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->note,
+					'status'		=> '3',
+					'currency_id'	=> $lc->currency_id,
+					'currency_rate'	=> $lc->currency_rate,
+				]);
+
+				$totalitem = 0;
+				$totalcost = 0;
+				$totalfcitem = 0;
+				$totalfccost = 0;
+
+				foreach($lc->landedCostDetail as $rowdetail){
+					$rowfc = $rowdetail->nominal;
+					if($rowdetail->lookable_type == 'landed_cost_details'){
+						$otherLc = $rowdetail->lookable->landedCost;
+						$rowfc = round($rowdetail->nominal - $rowdetail->lookable->nominal,2);
+						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2) - round($rowdetail->lookable->nominal * $rowdetail->lookable->landedCost->currency_rate,2);
+					}else{
+						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
+						$rowdetail->lookable->goodReceipt->update([
+							'status_lc' 		=> '2',
+							'is_multiple_lc'	=> NULL,
+						]);
+					}
+					$totalitem += $rowtotal;
+					$totalfcitem += $rowfc;
+
+					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
+					if($itemdata){
+						if($itemdata->qty_final > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
+								'type'			=> '1',
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
+							]);
+							self::sendCogs('landed_costs',
+								$lc->id,
+								$rowdetail->place->company_id,
+								$rowdetail->place_id,
+								$rowdetail->warehouse_id,
+								$rowdetail->item_id,
+								0,
+								-1 * $rowtotal,
+								'IN',
+								$lc->post_date,
+								NULL,
+								NULL,
+								NULL,
+								$rowdetail->getTable(),
+								$rowdetail->id,
+							);
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coaselisihhargabahan->id,
+								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+								'account_id'	=> $coaselisihhargabahan->bp_journal ? $lc->account_id : NULL,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
+								'type'			=> '1',
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
+							]);
+						}
+					}
+				}
+
+				if($otherLc){
+					foreach($otherLc->landedCostFeeDetail as $rowfee){
+						$dataother = $lc->landedCostFeeDetail()->where('landed_cost_fee_id',$rowfee->landed_cost_fee_id)->first();
+						if($dataother){
+							$rowfc = round($dataother->total - $rowfee->total,2);
+							$rowtotal = round($dataother->total * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
+							$totalcost += $rowtotal;
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $dataother->landedCostFee->coa_id,
+								'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
+								'note'			=> $dataother->landedCostFee->name,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowfee->getTable(),
+								'detailable_id'	=> $rowfee->id,
+							]);
+							$totalfccost += $rowfc;
+						}
+					}
+				}else{
+					foreach($lc->landedCostFeeDetail as $rowdetail){
+						$totalcost += round($rowdetail->total * $lc->currency_rate,2);
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
+							'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
+							'note'			=> $rowdetail->landedCostFee->name,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
+						]);
+						$totalfccost += $rowdetail->total;
+					}
+				}
+
+				$balance = round($totalitem - $totalcost,2);
+				$balancefc = round($totalfcitem - $totalfccost,2);
+				if($balance < 0 || $balance > 0){
+					$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$lc->company_id)->first();
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding->id,
+						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+						'type'			=> $balance < 0 ? '1' : '2',
+						'nominal'		=> abs($balance),
+						'nominal_fc'	=> abs($balancefc),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+					]);
+				}
+			} */
 		}
 	}
 

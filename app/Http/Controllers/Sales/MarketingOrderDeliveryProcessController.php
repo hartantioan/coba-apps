@@ -301,6 +301,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                     box-shadow: none;"';
 
                 }
+                if($val->marketingORderDelivery->getMaxTaxType() == 2){
+                    $btn_pack_list = '<button type="button" class="btn-floating mb-1 btn-flat  orange darken-4 white-text btn-small" data-popup="tooltip" title="Packing List" onclick="printPackingList(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">apps</i></button>';
+                }else{
+                    $btn_pack_list = '';
+                }
 
                 // <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
 				if($val->journal()->exists()){
@@ -351,6 +356,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     '
                     <!-- <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button> -->
                         <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Barcode" onclick="barcode(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">style</i></button>
+                        '.$btn_pack_list.'
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <!-- <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Switch ke MOD lain" onclick="switchDocument(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">call_split</i></button> -->
@@ -915,6 +921,30 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
 
             return view('admin.approval.marketing_order_delivery_process', $data);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function printPackingList(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+
+        $pr = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
+
+        if($pr){
+
+            $pdf = PrintHelper::print($pr,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_packing_list');
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+
+
+            $content = $pdf->download()->getOriginalContent();
+
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+
+            return $document_po;
         }else{
             abort(404);
         }

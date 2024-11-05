@@ -145,13 +145,12 @@ class MarketingOrderAgingController extends Controller
                         'credit_balance'        => $row->limit_credit - $balance,
                         'limit_credit'          => $row->limit_credit,
                         'outstand_check'          => $row->outstandcheck ?? 0,
-                        
+
                     ];
                 }
             }
         }
 
-        info($newData);
 
         $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
         <thead id="head_detail">
@@ -321,9 +320,9 @@ class MarketingOrderAgingController extends Controller
                     'customer_code'         => $row->account_code,
                     'customer_name'         => $row->account_name,
                     'customer_group'         => $row->grupcust,
-                    'date' =>$row->post_date,
-                    'invoice_age' =>$row->invoiceage,
-                    'due_age' =>$row->dueage,
+                    'date' => $row->post_date,
+                    'invoice_age' => $row->invoiceage,
+                    'due_age' => $row->dueage,
                     'invoice'               => $row->invoice,
                     'data'                  => $arrDetail,
                     'total'                 => $balance,

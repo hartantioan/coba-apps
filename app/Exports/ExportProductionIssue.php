@@ -17,7 +17,6 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
         $this->mode = $mode ? $mode : '';
         $this->nominal = $nominal ?? '';
         $this->line_id = $line_id ?? '';
-        info($this->line_id);
     }
 
     public function view(): View

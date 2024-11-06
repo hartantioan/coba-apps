@@ -24,7 +24,7 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
         $this->type = $type ? $type : '';
         $this->account_id = $account_id ? $account_id : '';
         $this->company = $company ? $company : '';
-        
+
     }
 
     private $headings = [
@@ -49,6 +49,7 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
         'Jenis',
         'Tipe Invoice',
         'Seri Pajak',
+        'No PJB',
         'Catatan',
         'Subtotal',
         'Downpayment',
@@ -119,7 +120,7 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
 
         $arr=[];
         foreach($query_data as $key => $row){
-            
+
             $arr[] = [
                 'no'                => ($key + 1),
                 'kode'              => $row->code,
@@ -142,6 +143,7 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
                 'jenis'       => $row->type(),
                 'invoice_type' => $row->invoiceType(),
                 'seri_pajak'             => $row->tax_no,
+                'no_pjb'             => $row->no_pjb ?? '',
                 'catatan'         => $row->note,
                 'subtotal'         => $row->subtotal,
                 'downpayment'        => $row->downpayment,
@@ -152,10 +154,10 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
                 'total_fp'           => floor($row->total),
                 'ppn_fp'        => floor($row->tax),
             ];
-        
-            
+
+
         }
-        
+
         return collect($arr);
     }
 

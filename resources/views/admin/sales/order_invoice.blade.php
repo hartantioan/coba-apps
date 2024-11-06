@@ -170,6 +170,7 @@
                                                         <th rowspan="2">{{ __('translations.code') }}</th>
                                                         <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">{{ __('translations.customer') }}</th>
+                                                        <th rowspan="2">No PJB</th>
                                                         <th rowspan="2">Alamat Penagihan & NPWP</th>
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
                                                         <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
@@ -485,6 +486,39 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal_update_pjb" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} PJB</h4>
+                <form class="row" id="form_pjb" onsubmit="return false;">
+                    <div class="col s12">
+
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="input-field col m12 s12">
+
+                                <input type="hidden" id="temp_pjb_invoice" name="temp_pjb_invoice">
+                                <input id="no_pjb" name="no_pjb" type="text" >
+
+                                <label class="" for="no_pjb">No PJB</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s12 mt-3">
+                        <button class="btn waves-effect waves-light right submit step18" onclick="savePJB();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -928,6 +962,17 @@
                         </td>
                     </tr>
                 `);
+            }
+        });
+
+        $('#modal_update_pjb').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_pjb')[0].reset();
             }
         });
 
@@ -1981,7 +2026,7 @@
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'account_id', className: '' },
-                { name: 'user_data_id', className: '' },
+                { name: 'user_data_id', className: '' }, { name: 'user_data_id', className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'due_date', className: '' },
@@ -2067,6 +2112,82 @@
             }
         });
 	}
+
+    function savePJB(){
+
+        var formData = new FormData($('#form_pjb')[0]);
+		$.ajax({
+            url: '{{ Request::url() }}/update_no_pjb',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('#modal_update_pjb');
+            },
+            success: function(response) {
+                loadingClose('#modal_update_pjb');
+                if(response.status == 200) {
+                    loadDataTable();
+
+                    $('#modal_update_pjb').modal('close');
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('input').css('border', 'none');
+                    $('input').css('border-bottom', '0.5px solid black');
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    $.each(response.error, function(field, errorMessage) {
+                        $('#' + field).addClass('error-input');
+                        $('#' + field).css('border', '1px solid red');
+
+                    });
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#modal1');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function save(){
 		swal({
@@ -2428,7 +2549,7 @@
                                     </td>
                                 </tr>
                             `);
-                        });   
+                        });
                     }
                 }
 
@@ -2481,6 +2602,41 @@
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function showPjb(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                $('#modal_update_pjb').modal('open');
+                $('#temp_pjb_invoice').val(id);
+                $('#no_pjb').val(response.no_pjb);
+
                 M.updateTextFields();
             },
             error: function() {

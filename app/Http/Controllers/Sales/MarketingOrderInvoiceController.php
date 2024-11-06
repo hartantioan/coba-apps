@@ -296,7 +296,7 @@ class MarketingOrderInvoiceController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat   yellow darken-3 white-text btn-small" data-popup="tooltip" title="Preview Full" onclick="fullPrint(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-4 white-text btn-small" data-popup="tooltip" title="No PJB" onclick="showPjb(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">mode_edit</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-4 white-text btn-small" data-popup="tooltip" title="No Ppbj" onclick="showPjb(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">mode_edit</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -1734,12 +1734,12 @@ class MarketingOrderInvoiceController extends Controller
             ]);
             $response = [
                 'status'  => 200,
-                'message' => 'Data PJB Berhasil Disimpan.'
+                'message' => 'Data Ppbj Berhasil Disimpan.'
             ];
         }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Data PJB Tidak Berhasil Disimpan.'
+                'message' => 'Data Ppbj Tidak Berhasil Disimpan.'
             ];
         }
 

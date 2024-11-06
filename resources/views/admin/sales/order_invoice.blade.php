@@ -170,7 +170,7 @@
                                                         <th rowspan="2">{{ __('translations.code') }}</th>
                                                         <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">{{ __('translations.customer') }}</th>
-                                                        <th rowspan="2">No PJB</th>
+                                                        <th rowspan="2">No Ppbj</th>
                                                         <th rowspan="2">Alamat Penagihan & NPWP</th>
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
                                                         <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
@@ -494,7 +494,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} PJB</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Ppbj</h4>
                 <form class="row" id="form_pjb" onsubmit="return false;">
                     <div class="col s12">
 
@@ -506,7 +506,7 @@
                                 <input type="hidden" id="temp_pjb_invoice" name="temp_pjb_invoice">
                                 <input id="no_pjb" name="no_pjb" type="text" >
 
-                                <label class="" for="no_pjb">No PJB</label>
+                                <label class="" for="no_pjb">No Ppbj</label>
                             </div>
                         </div>
                     </div>

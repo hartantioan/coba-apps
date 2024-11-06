@@ -49,7 +49,7 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
         'Jenis',
         'Tipe Invoice',
         'Seri Pajak',
-        'No PJB',
+        'No Ppbj',
         'Catatan',
         'Subtotal',
         'Downpayment',

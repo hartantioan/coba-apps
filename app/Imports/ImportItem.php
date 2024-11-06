@@ -38,13 +38,13 @@ class ImportItem implements WithMultipleSheets
         ->causedBy(session('bo_id'))
         ->withProperties('')
         ->log('Add / edit from excel item data.');
-        
+
         return [
             0 => new handleItemSheet(),
             1 => new handleConversionSheet(),
         ];
     }
-    
+
 }
 
 class handleItemSheet implements OnEachRow, WithHeadingRow
@@ -62,7 +62,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                 }
                 $item_group_code = explode('#',$row['item_group'])[0];
                 $item_group_id = ItemGroup::where('code',$item_group_code)->first();
-                
+
                 $item_unit_code = explode('#',$row['unit'])[0];
                 $item_unit_id= Unit::where('code',$item_unit_code)->first();
                 $type = Type::where('code',explode('#',$row['type_fg'])[0])->first();
@@ -99,7 +99,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         'max_stock' => $row['max_stock'],
                         'status' => '1',
                     ]);
-        
+
                     foreach($query->itemGroup->itemGroupWarehouse as $row){
                         ItemStock::create([
                             'place_id'      => 1,
@@ -108,8 +108,8 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                             'qty'           => 0
                         ]);
                     }
-        
-                     
+
+
                 }else{
 
                     if(!$check->hasChildDocument()){
@@ -135,20 +135,21 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         $check->note =  $row['note'];
                         $check->min_stock = $row['min_stock'];
                         $check->max_stock = $row['max_stock'];
+                        $check->deleted_at = null;
                         $check->save();
-                    }              
+                    }
                 }
             }
             else{
                 return null;
-            }  
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
-           
+
         }
     }
-    
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)
@@ -156,7 +157,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 }
 
 class handleConversionSheet implements OnEachRow, WithHeadingRow{
-    
+
     public static function beforeImport(BeforeImport $event)
     {
         $worksheet = $event->getReader()->getActiveSheet();
@@ -194,7 +195,7 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                                 'is_buy_unit'   => $row['beli'],
                                 'is_sell_unit'   => $row['jual'],
                                 'is_default'    => $row['default'],
-                            ]);    
+                            ]);
                         }
                     }
                 }
@@ -205,9 +206,9 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
-           
-        }  
-       
+
+        }
+
     }
     public function startRow(): int
     {

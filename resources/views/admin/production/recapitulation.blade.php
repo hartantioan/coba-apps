@@ -67,6 +67,7 @@
                                                 <div class="col s12 m12"></div>
                                                 <div class="input-field col m4 s12">
                                                     <select class="browser-default" id="line_id" name="line_id" >
+                                                        <option value="" data-line="{{ $row->line_id }}">ALL LINE</option>
                                                         @foreach ($line as $row)
                                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
                                                         @endforeach

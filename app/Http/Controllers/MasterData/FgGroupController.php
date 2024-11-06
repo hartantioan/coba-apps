@@ -190,6 +190,6 @@ class FgGroupController extends Controller
     public function exportFromTransactionPage(Request $request){
         $search = $request->search? $request->search : '';
 
-		return Excel::download(new ExportGroupFG($search), 'bom_map_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGroupFG($search), 'group_fg_'.uniqid().'.xlsx');
     }
 }

@@ -45,6 +45,7 @@ class MarketingOrderInvoice extends Model
         'done_id',
         'done_date',
         'done_note',
+        'no_pjb',
     ];
 
     public function taxMaster()

@@ -258,6 +258,7 @@ class MarketingOrderInvoiceController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->account->name,
+                    $val->no_pjb ?? '-',
                     $val->userData->title.' - '.$val->userData->npwp.' - '.$val->userData->address,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
@@ -295,6 +296,7 @@ class MarketingOrderInvoiceController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat   yellow darken-3 white-text btn-small" data-popup="tooltip" title="Preview Full" onclick="fullPrint(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-4 white-text btn-small" data-popup="tooltip" title="No PJB" onclick="showPjb(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">mode_edit</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -603,7 +605,7 @@ class MarketingOrderInvoiceController extends Controller
                             $taxId = Tax::find($request->arr_tax_id[$key]);
                             if($taxId){
                                 $percentTax = $taxId->percentage;
-                            } 
+                            }
                             MarketingOrderInvoiceDetail::create([
                                 'marketing_order_invoice_id'    => $query->id,
                                 'description'                   => $request->arr_description[$key],
@@ -1304,9 +1306,9 @@ class MarketingOrderInvoiceController extends Controller
                 $type = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->getTable();
                 $id = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->id;
                 $code = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
-    
+
                 $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
-    
+
                 if($cekIndex < 0){
                     $arrUsed[] = [
                         'id'    => $id,
@@ -1314,7 +1316,7 @@ class MarketingOrderInvoiceController extends Controller
                         'code'  => $code,
                     ];
                 }
-    
+
                 $arrSj[] = [
                     'id'                                    => $id,
                     'lookable_type'                         => $row->lookable_type,
@@ -1722,5 +1724,25 @@ class MarketingOrderInvoiceController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
 
 		return Excel::download(new ExportTransactionPageMarketingOrderInvoice($search,$status,$account_id,$type,$company,$end_date,$start_date), 'marketing_order_invoices_'.uniqid().'.xlsx');
+    }
+
+    public function updateNoPJB(Request $request){
+        $invoice = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->temp_pjb_invoice))->first();
+        if($invoice){
+            $invoice->update([
+                'no_pjb'=>$request->no_pjb,
+            ]);
+            $response = [
+                'status'  => 200,
+                'message' => 'Data PJB Berhasil Disimpan.'
+            ];
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data PJB Tidak Berhasil Disimpan.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

@@ -2662,7 +2662,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [ApprovalCreditLimitController::class, 'voidStatus'])->middleware('operation.access:approval_credit_limit,void');
                     Route::post('destroy', [ApprovalCreditLimitController::class, 'destroy'])->middleware('operation.access:approval_credit_limit,delete');
                 });
-                
+
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {
                     Route::get('/', [MarketingOrderController::class, 'index']);
                     Route::post('datatable', [MarketingOrderController::class, 'datatable']);
@@ -2810,6 +2810,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('update_no_pjb', [MarketingOrderInvoiceController::class, 'updateNoPJB'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::get('approval/{id}', [MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_full_individual/{id}', [MarketingOrderInvoiceController::class, 'printFullIndividual'])->withoutMiddleware('direct.access');

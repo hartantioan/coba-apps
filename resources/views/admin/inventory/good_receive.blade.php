@@ -1407,7 +1407,7 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').removeAttr('min');
                 if(response.document){
-                    const baseUrl = 'http://127.0.0.1:8000/storage/';
+                    const baseUrl = '{{ URL::to("/") }}/storage/';
                     const filePath = response.document.replace('public/', '');
                     const fileUrl = baseUrl + filePath;
                     displayFile(fileUrl);

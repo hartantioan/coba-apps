@@ -1168,6 +1168,7 @@
                 refreshGroup();
                 $('#name').prop('readonly',false);
                 $('.row_info,.row_bank,.row_destination,.row_destination_doc,.row_driver').remove();
+                $('#limit_credit').attr('readonly',false);
             }
         });
 
@@ -2600,6 +2601,7 @@
                 $('#gender').val(response.gender).formSelect();
                 $('#group_id').val(response.group_id).formSelect();
                 $('#limit_credit').val(response.limit_credit);
+                $('#limit_credit').attr('readonly',true);
 
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();

@@ -2657,6 +2657,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [ApprovalCreditLimitController::class, 'print']);
                     Route::post('done', [ApprovalCreditLimitController::class, 'done'])->middleware('operation.access:approval_credit_limit,update');
                     Route::post('create', [ApprovalCreditLimitController::class, 'create'])->middleware('operation.access:approval_credit_limit,update');
+                    Route::get('export_from_page', [ApprovalCreditLimitController::class, 'exportFromTransactionPage']);
                     Route::get('approval/{id}', [ApprovalCreditLimitController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ApprovalCreditLimitController::class, 'voidStatus'])->middleware('operation.access:approval_credit_limit,void');
                     Route::post('destroy', [ApprovalCreditLimitController::class, 'destroy'])->middleware('operation.access:approval_credit_limit,delete');

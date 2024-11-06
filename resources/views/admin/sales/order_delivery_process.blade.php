@@ -1865,7 +1865,7 @@ document.addEventListener('focusin', function (event) {
                 success: function(response) {
                     $('#modal7').modal('open');
                     if(response.document){
-                        const baseUrl = 'http://127.0.0.1:8000/storage/';
+                        const baseUrl = '{{ URL::to("/") }}/storage/';
                         const filePath = response.document.replace('public/', '');
                         const fileUrl = baseUrl + filePath;
                         displayFile(fileUrl);
@@ -2912,7 +2912,7 @@ document.addEventListener('focusin', function (event) {
                 loadingClose('#main');
                 if(response.responseStatus == 200){
                     if(response.document){
-                        const baseUrl = 'http://127.0.0.1:8000/storage/';
+                        const baseUrl = '{{ URL::to("/") }}/storage/';
                         const filePath = response.document.replace('public/', '');
                         const fileUrl = baseUrl + filePath;
                         displayFile(fileUrl);

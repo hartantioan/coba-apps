@@ -123,6 +123,7 @@ class AppServiceProvider extends ServiceProvider
             'production_repack_details'             => 'App\Models\ProductionRepackDetail',
             'production_barcodes'                   => 'App\Models\ProductionBarcode',
             'production_barcode_details'            => 'App\Models\ProductionBarcodeDetail',
+            'approval_credit_limits'                => 'App\Models\ApprovalCreditLimit',
         ]);
     }
 }

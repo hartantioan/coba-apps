@@ -43,6 +43,7 @@ use App\Models\IncomingPayment;
 use App\Models\InventoryRevaluation;
 use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
+use App\Models\ApprovalCreditLimit;
 use App\Models\Item;
 use App\Models\ItemGroupWarehouse;
 use App\Models\LeaveRequest;
@@ -1006,6 +1007,15 @@ class CustomHelper {
 					'status'	=> '3'
 				]);
 			}
+		}elseif($table_name == 'approval_credit_limits'){
+
+			$acl = ApprovalCreditLimit::find($table_id);
+			if($acl){
+				$acl->account->update([
+					'limit_credit'	=> $acl->new_credit_limit,
+				]);
+			}
+			
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 

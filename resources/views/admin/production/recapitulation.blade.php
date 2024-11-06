@@ -8,7 +8,7 @@
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -33,7 +33,7 @@
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">
-                                        Rekap Produksi 
+                                        Rekap Produksi
                                     </h4>
                                     <form class="row" id="form_data" onsubmit="return false;">
                                         <div class="col s12">
@@ -63,6 +63,15 @@
                                                 <div class="input-field col m3 s12">
                                                     <input id="end_date" name="end_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                                     <label class="active" for="end_date">Tanggal Akhir</label>
+                                                </div>
+                                                <div class="col s12 m12"></div>
+                                                <div class="input-field col m4 s12">
+                                                    <select class="browser-default" id="line_id" name="line_id" >
+                                                        @foreach ($line as $row)
+                                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label class="active" for="line_id">Line (Untuk Issue, Receive , Receive FG , Serah Terima)</label>
                                                 </div>
                                                 <div class="col s12 mt-3">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Download Rekap <i class="material-icons right">file_download</i></button>
@@ -94,13 +103,14 @@
 
 <!-- END: Page Main-->
 <script>
-     
+
     function exportExcel(){
         var tipe = $('#type').val();
         var startDate = $('#start_date').val();
         var endDate = $('#end_date').val();
         var mode = $('#mode').val();
-        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + startDate + "&end_date=" + endDate + "&mode=" + mode;
+        var line_id = $('#line_id').val();
+        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + startDate + "&end_date=" + endDate + "&mode=" + mode+ "&line_id=" + line_id;
     }
 
     function getOutstanding(){
@@ -181,7 +191,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -190,9 +200,9 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 </script>

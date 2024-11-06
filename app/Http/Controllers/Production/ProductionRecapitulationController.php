@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
+use App\Models\Line;
 use App\Models\Menu;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class ProductionRecapitulationController extends Controller
         $menu = Menu::where('url', $parentSegment)->first();
         $data = [
             'title'     => 'Laporan Produksi',
+            'line'          => Line::where('status','1')->get(),
             'content'   => 'admin.production.recapitulation',
             'menus'     => Menu::where('parent_id',$menu->id)
                             ->whereHas('menuUser', function ($query) {

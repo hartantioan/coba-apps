@@ -56,7 +56,7 @@ class ProductionHandoverController extends Controller
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Serah Terima',
@@ -75,7 +75,7 @@ class ProductionHandoverController extends Controller
 
     public function getCode(Request $request){
         $code = ProductionHandover::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -100,7 +100,7 @@ class ProductionHandoverController extends Controller
                     'place_id'      => $data->productionFgReceive->place_id,
                     'place_code'    => $data->productionFgReceive->place->code,
                 ];
-                
+
                 $response = [
                     'status'    => 200,
                     'data'      => $arr,
@@ -118,7 +118,7 @@ class ProductionHandoverController extends Controller
                 'message'   => 'Data tidak ditemukan.',
             ];
         }
-        				
+
 		return response()->json($response);
     }
 
@@ -139,7 +139,7 @@ class ProductionHandoverController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ProductionHandover::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = ProductionHandover::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -315,9 +315,9 @@ class ProductionHandoverController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                
+
                 $passedDate = true;
-                
+
                 $arrQty = [];
                 foreach($request->arr_qty as $key => $row){
                     $index = -1;
@@ -337,7 +337,7 @@ class ProductionHandoverController extends Controller
                 }
 
                 $arrMessageQty = [];
-                
+
                 foreach($arrQty as $row){
                     $data = ProductionFgReceiveDetail::find($row['prfd_id']);
                     if($data){
@@ -415,7 +415,7 @@ class ProductionHandoverController extends Controller
                         $query->status = '1';
 
                         $query->save();
-                        
+
                         foreach($query->productionHandoverDetail as $row){
                             if($row->productionBatchUsage()->exists()){
                                 CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
@@ -434,7 +434,7 @@ class ProductionHandoverController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=ProductionHandover::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = ProductionHandover::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -446,9 +446,9 @@ class ProductionHandoverController extends Controller
                         'status'                    => '1',
                     ]);
                 }
-                
+
                 if($query) {
-                    
+
                     foreach($request->arr_qty as $key => $row){
                         $prfgd = ProductionFgReceiveDetail::find($request->arr_prfd_id[$key]);
                         if($prfgd){
@@ -476,7 +476,7 @@ class ProductionHandoverController extends Controller
                                 'total'                             => $rowcost,
                                 'item_shading_id'                   => $itemShading->id,
                             ]);
-                            
+
                             ProductionBatchUsage::create([
                                 'production_batch_id'   => $prfgd->productionBatch->id,
                                 'lookable_type'         => $querydetail->getTable(),
@@ -502,7 +502,7 @@ class ProductionHandoverController extends Controller
                             ]);
                         }
                     }
-                    
+
                     CustomHelper::sendApproval($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code);
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Serah Terima Produksi No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
@@ -523,7 +523,7 @@ class ProductionHandoverController extends Controller
                     ];
                 }
             }
-        
+
             /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
@@ -555,7 +555,7 @@ class ProductionHandoverController extends Controller
                     'unit'          => $row->itemUnit->unit->code,
                 ];
             }
-    
+
             return response()->json([
                 'status'    => 200,
                 'details'   => $result,
@@ -630,14 +630,14 @@ class ProductionHandoverController extends Controller
         $po['code_place_id']                    = substr($po->code,7,2);
         $po['production_fg_receive_code']       = $po->productionFgReceive->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionFgReceive->post_date)).' - Plant : '.$po->productionFgReceive->place->code.' - Line : '.$po->productionFgReceive->line->code.' - '.$po->productionFgReceive->item->code.' - '.$po->productionFgReceive->item->name;
         $po['details']                          = $detail_receive;
-        
+
 		return response()->json($po);
     }
 
     public function approval(Request $request,$id){
-        
+
         $pr = ProductionHandover::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $data = [
                 'title'     => 'Serah Terima Produksi',
@@ -654,7 +654,7 @@ class ProductionHandoverController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
@@ -730,7 +730,7 @@ class ProductionHandoverController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -738,7 +738,7 @@ class ProductionHandoverController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -750,7 +750,7 @@ class ProductionHandoverController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -767,27 +767,27 @@ class ProductionHandoverController extends Controller
         }
 
         $string .= '</tbody></table></div></div>';
-		
+
         return response()->json($string);
     }
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = ProductionHandover::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Serah Terima Produksi','a4','portrait','admin.print.production.handover_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -796,7 +796,7 @@ class ProductionHandoverController extends Controller
 
     public function voidStatus(Request $request){
         $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
             $stockUsed = false;
             foreach($query->productionHandoverDetail as $row){
@@ -864,7 +864,7 @@ class ProductionHandoverController extends Controller
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the Serah Terima Produksi data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -916,9 +916,9 @@ class ProductionHandoverController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()){
-            
+
             $query->update([
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
@@ -961,7 +961,7 @@ class ProductionHandoverController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -973,7 +973,7 @@ class ProductionHandoverController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = ProductionReceive::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Production Receive','a4','portrait','admin.print.production.handover_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -998,8 +998,8 @@ class ProductionHandoverController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -1027,7 +1027,7 @@ class ProductionHandoverController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1035,19 +1035,19 @@ class ProductionHandoverController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = ProductionReceive::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.handover_individual');
@@ -1057,7 +1057,7 @@ class ProductionHandoverController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1068,21 +1068,21 @@ class ProductionHandoverController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1091,7 +1091,7 @@ class ProductionHandoverController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1111,18 +1111,18 @@ class ProductionHandoverController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1136,7 +1136,7 @@ class ProductionHandoverController extends Controller
 
     public function viewStructureTree(Request $request){
         $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $data_go_chart=[];
         $data_link=[];
 
@@ -1150,7 +1150,7 @@ class ProductionHandoverController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/production/production_handover?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/production/production_handover?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_core;
@@ -1158,21 +1158,21 @@ class ProductionHandoverController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;  
+            $data_link = $array2;
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1192,7 +1192,7 @@ class ProductionHandoverController extends Controller
 
     public function sendUsedData(Request $request){
         $mop = ProductionBatch::find($request->id);
-       
+
         if(!$mop->used()->exists()){
             CustomHelper::sendUsedData($request->type,$request->id,'Form Serah Terima Produksi');
             return response()->json([
@@ -1247,7 +1247,7 @@ class ProductionHandoverController extends Controller
                     $total_kredit_asli += $row->nominal_fc;
                     $total_kredit_konversi += $row->nominal;
                 }
-                
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -1266,7 +1266,7 @@ class ProductionHandoverController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
 
-                
+
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
@@ -1280,7 +1280,7 @@ class ProductionHandoverController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -1296,13 +1296,13 @@ class ProductionHandoverController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new ProductionReceive())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Production Receive data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1324,7 +1324,7 @@ class ProductionHandoverController extends Controller
         $details = [];
         $downpayments = [];
         $data = ProductionFgReceive::where(function($query){
-           
+
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -1344,7 +1344,7 @@ class ProductionHandoverController extends Controller
                 'status'        => $d->status(),
             ];
         }
-        
+
         if($response){
             $account['details'] = $response;
         }
@@ -1357,7 +1357,7 @@ class ProductionHandoverController extends Controller
         $status = $request->status? $request->status : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
     }
 
@@ -1369,6 +1369,7 @@ class ProductionHandoverController extends Controller
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $modedata = $menuUser->mode ?? '';
         $nominal = $menuUser->show_nominal ?? '';
-		return Excel::download(new ExportProductionHandover($post_date,$end_date,$mode,$modedata,$nominal), 'production_handover'.uniqid().'.xlsx');
+        $line_id = $request->line_id ? $request->line_id : '';
+		return Excel::download(new ExportProductionHandover($post_date,$end_date,$mode,$modedata,$nominal,$line_id), 'production_handover'.uniqid().'.xlsx');
     }
 }

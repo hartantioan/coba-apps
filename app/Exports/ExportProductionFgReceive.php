@@ -9,14 +9,15 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportProductionFgReceive implements  FromView, ShouldAutoSize
 {
-    protected $start_date, $end_date, $mode, $modedata, $nominal;
-    public function __construct(string $start_date, string $end_date, string $mode, string $modedata, string $nominal)
+    protected $start_date, $end_date, $mode, $modedata, $nominal, $line_id;
+    public function __construct(string $start_date, string $end_date, string $mode, string $modedata, string $nominal,string $line_id)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->mode = $mode ? $mode : '';
         $this->modedata = $modedata ?? '';
         $this->nominal = $nominal ?? '';
+        $this->line_id = $line_id ?? '';
     }
 
     public function view(): View
@@ -27,6 +28,9 @@ class ExportProductionFgReceive implements  FromView, ShouldAutoSize
                     ->where('post_date', '<='   , $this->end_date);
                     if(!$this->modedata){
                         $query->where('user_id',session('bo_id'));
+                    }
+                    if($this->line_id){
+                        $query->where('line_id',$this->line_id);
                     }
             })
             ->get();
@@ -45,6 +49,9 @@ class ExportProductionFgReceive implements  FromView, ShouldAutoSize
                     ->where('post_date', '<=', $this->end_date);
                     if(!$this->modedata){
                         $query->where('user_id',session('bo_id'));
+                    }
+                    if($this->line_id){
+                        $query->where('line_id',$this->line_id);
                     }
             })
             ->get();

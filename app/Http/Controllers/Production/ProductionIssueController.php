@@ -44,7 +44,7 @@ class ProductionIssueController extends Controller
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Issue',
@@ -66,7 +66,7 @@ class ProductionIssueController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = ProductionIssue::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -87,7 +87,7 @@ class ProductionIssueController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ProductionIssue::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = ProductionIssue::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -241,10 +241,10 @@ class ProductionIssueController extends Controller
             'shift_id_edit'                  => 'required',
             'group_edit'                     => 'required'
         ], [
-           
+
             'shift_id_edit'                          => 'Shift tidak boleh kosong.',
             'group_edit'                             => 'Grup tidak boleh kosong.',
-           
+
         ]);
         if($validation->fails()) {
             $response = [
@@ -255,24 +255,24 @@ class ProductionIssueController extends Controller
 
 
             if($request->temp_edit){
-          
+
                 $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp_edit))->first();
-             
+
                 $approved = false;
                 $revised = false;
 
-                
+
 
                     $query->user_id = session('bo_id');
                     $query->shift_id = $request->shift_id_edit;
                     $query->group = $request->group_edit;
-                 
+
                     $query->note = $request->note_edit;
 
                     $query->save();
 
             }
-            
+
             if($query) {
 
                 /* CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code); */
@@ -379,7 +379,7 @@ class ProductionIssueController extends Controller
                         'message' => 'Mohon maaf, item '.implode(', ',$arrNotPassedQty).' tidak mencukupi stok yang ada. Silahkan atur qty yang ingin diproduksi.'
                     ]);
                 }
-                
+
                 if($request->temp){
                     $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -435,7 +435,7 @@ class ProductionIssueController extends Controller
                         $query->status = '1';
 
                         $query->save();
-                        
+
                         foreach($query->productionIssueDetail as $row){
                             foreach($row->productionBatchUsage as $rowdetail){
                                 CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
@@ -450,11 +450,11 @@ class ProductionIssueController extends Controller
                         ]);
                     }
                 }else{
-                    
+
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=ProductionIssue::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = ProductionIssue::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -472,7 +472,7 @@ class ProductionIssueController extends Controller
                         'status'                    => '1',
                     ]);
                 }
-                
+
                 if($query) {
                     $grandtotal = 0;
                     foreach($request->arr_qty as $key => $row){
@@ -506,7 +506,7 @@ class ProductionIssueController extends Controller
                                         $nominal_planned = $itemstock->priceDate($query->post_date);
                                         $itemstockkuy = $itemstock;
                                     }
-                                    
+
                                     $nominal = $nominal_planned;
                                     $total_planned = round($nominal_planned * $qty_planned,2);
                                     $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
@@ -659,14 +659,14 @@ class ProductionIssueController extends Controller
         $po['line_code']                        = $po->line->code;
         $po['target_item']                      = $po->productionOrderDetail->productionScheduleDetail->item->code.' - '.$po->productionOrderDetail->productionScheduleDetail->item->name;
         $po['target_qty']                       = CustomHelper::formatConditionalQty($po->productionOrderDetail->productionScheduleDetail->qty).' - '.$po->productionOrderDetail->productionScheduleDetail->item->uomUnit->code;
-        
+
 		return response()->json($po);
     }
 
     public function approval(Request $request,$id){
-        
+
         $pr = ProductionIssue::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $data = [
                 'title'     => 'Production Issue',
@@ -684,8 +684,8 @@ class ProductionIssueController extends Controller
 
         $details = [];
         $downpayments = [];
-        $data = ProductionOrderDetail::where(function($query){  
-            
+        $data = ProductionOrderDetail::where(function($query){
+
         })
         ->whereHas('productionOrder',function($query){
             $query->whereDoesntHave('used')
@@ -705,7 +705,7 @@ class ProductionIssueController extends Controller
             });
         })
         ->get();
-        
+
         foreach($data as $d) {
             $bomdetail = [];
             $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
@@ -767,7 +767,7 @@ class ProductionIssueController extends Controller
                 'note'                          => 'PRODUCTION ORDER NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
-       
+
 
         $account['details'] = $response;
 
@@ -776,7 +776,7 @@ class ProductionIssueController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
@@ -817,7 +817,7 @@ class ProductionIssueController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
                 <td colspan="4"></td>
-            </tr>  
+            </tr>
         ';
 
         $string .= '</tbody></table></div>';
@@ -835,7 +835,7 @@ class ProductionIssueController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -843,7 +843,7 @@ class ProductionIssueController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -855,7 +855,7 @@ class ProductionIssueController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -872,27 +872,27 @@ class ProductionIssueController extends Controller
         }
 
         $string .= '</tbody></table></div></div>';
-		
+
         return response()->json($string);
     }
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = ProductionIssue::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Production Issue','a4','portrait','admin.print.production.issue_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -901,7 +901,7 @@ class ProductionIssueController extends Controller
 
     public function voidStatus(Request $request){
         $query = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
             if(!CustomHelper::checkLockAcc($query->post_date)){
                 return response()->json([
@@ -955,13 +955,13 @@ class ProductionIssueController extends Controller
                     'total_additional_time'     => 0,
                     'total_run_time'            => 0,
                 ]); */
-    
+
                 activity()
                     ->performedOn(new ProductionIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the production issue data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Production Issue No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -1013,9 +1013,9 @@ class ProductionIssueController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()){
-            
+
             $query->update([
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
@@ -1065,7 +1065,7 @@ class ProductionIssueController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -1077,7 +1077,7 @@ class ProductionIssueController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = ProductionIssue::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Production Issue','a4','portrait','admin.print.production.issue_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1102,8 +1102,8 @@ class ProductionIssueController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -1131,7 +1131,7 @@ class ProductionIssueController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1139,19 +1139,19 @@ class ProductionIssueController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = ProductionIssue::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Production Issue','a4','portrait','admin.print.production.issue_individual');
@@ -1161,7 +1161,7 @@ class ProductionIssueController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1172,21 +1172,21 @@ class ProductionIssueController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1195,7 +1195,7 @@ class ProductionIssueController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1215,18 +1215,18 @@ class ProductionIssueController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1240,7 +1240,7 @@ class ProductionIssueController extends Controller
 
     public function viewStructureTree(Request $request){
         $query = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $data_go_chart=[];
         $data_link=[];
 
@@ -1254,7 +1254,7 @@ class ProductionIssueController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/production/production_issue?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/production/production_issue?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_core;
@@ -1262,21 +1262,21 @@ class ProductionIssueController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;  
+            $data_link = $array2;
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1330,7 +1330,7 @@ class ProductionIssueController extends Controller
                     $total_kredit_asli += $row->nominal_fc;
                     $total_kredit_konversi += $row->nominal;
                 }
-                
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -1349,7 +1349,7 @@ class ProductionIssueController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
 
-                
+
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
@@ -1363,7 +1363,7 @@ class ProductionIssueController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -1379,13 +1379,13 @@ class ProductionIssueController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new ProductionIssue())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Production Issue data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1405,7 +1405,7 @@ class ProductionIssueController extends Controller
         $status = $request->status? $request->status : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
     }
 
@@ -1416,6 +1416,7 @@ class ProductionIssueController extends Controller
         $menu = Menu::where('url','production_issue')->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $nominal = $menuUser->show_nominal ?? '';
-		return Excel::download(new ExportProductionIssue($post_date,$end_date,$mode,$nominal), 'production_issue'.uniqid().'.xlsx');
+        $line_id = $request->line_id ? $request->line_id : '';
+		return Excel::download(new ExportProductionIssue($post_date,$end_date,$mode,$nominal,$line_id), 'production_issue'.uniqid().'.xlsx');
     }
 }

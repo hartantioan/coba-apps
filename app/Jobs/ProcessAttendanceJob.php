@@ -32,7 +32,6 @@ class ProcessAttendanceJob implements ShouldQueue
         $output = [];
         $exitCode = 0;
         $command = "node D:\\\\absen_node\\\\testComma.js " . $ipAddress . ' ' . $machineId;
-        info($command);
         exec($command, $output, $exitCode);
     }
 }

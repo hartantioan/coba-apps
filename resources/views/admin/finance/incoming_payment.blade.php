@@ -1658,7 +1658,7 @@
     function save(){
 		swal({
             title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            text: "Silahkan cek kembali KETERANGAN DETAIL, KETERANGAN HEADER, dan NOMINALnya!",
             icon: 'warning',
             dangerMode: true,
             buttons: {

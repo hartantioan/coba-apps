@@ -81,7 +81,10 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'tracking'=>$row->marketingOrderDeliveryProcess->statusTrackingRaw(),
                 'status_item_sent'=>$row->marketingOrderDeliveryProcess->isItemSent() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->post_date)) : '',
                 'status_received_by_customer'=>$row->marketingOrderDeliveryProcess->isDelivered() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->receive_date)) : '',
-                'status_returned_document'=>$row->marketingOrderDeliveryProcess->isReturnedSj() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date)) : '',
+                'status_returned_document' =>
+                $row->marketingOrderDeliveryProcess && $row->marketingOrderDeliveryProcess->return_date
+                    ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date))
+                    : '',
                 'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
                 'no_timbangan'=> $row->marketingOrderDeliveryDetail->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',

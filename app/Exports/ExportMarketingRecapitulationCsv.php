@@ -75,6 +75,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
         }
 
         foreach ($invoice as $key => $row) {
+            $freeAreaTax = $row->marketingOrderDeliveryProcess()->exists() ? ($row->marketingOrderDeliveryProcess->marketingOrderDelivery->getMaxTaxType() == '2' ? '18' : '') : '';
             $arrTemp = explode('.', $row->tax_no);
             $firstcode = preg_replace('/\s+/', '', $arrTemp[0]);
             $transactionCode = substr_count($firstcode, '0') == 2 ? substr($firstcode, 0, 2) : intval($firstcode);
@@ -85,11 +86,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;;0;0;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;'.$freeAreaTax.';0;0;0;0;' . $row->code . ';;'
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*($row->taxMaster->percentage/100)) . ';0;;2;0;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*($row->taxMaster->percentage/100)) . ';0;'.$freeAreaTax.';2;0;0;0;' . $row->code . ';;'
                 ];
             }
             $balance = floor($row->tax);
@@ -99,8 +100,12 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 }else{
                     $tax = $rowdetail->proportionalTaxFromHeader();
                 }
+                $hscode = '';
+                if($freeAreaTax){
+                    $hscode = ' '.$rowdetail->lookable->itemStock->item->type->hs_code;
+                }
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name. $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }
@@ -110,8 +115,12 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 }else{
                     $tax = $rowdetail->proportionalTaxFromHeader();
                 }
+                $hscode = '';
+                if($freeAreaTax){
+                    $hscode = ' '.$rowdetail->lookable->item->type->hs_code;
+                }
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name. $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }

@@ -301,7 +301,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     box-shadow: none;"';
 
                 }
-                if($val->marketingORderDelivery->getMaxTaxType() == 2){
+                if($val->marketingOrderDelivery->getMaxTaxType() == '2'){
                     $btn_pack_list = '<button type="button" class="btn-floating mb-1 btn-flat  orange darken-4 white-text btn-small" data-popup="tooltip" title="Packing List" onclick="printPackingList(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">apps</i></button>';
                 }else{
                     $btn_pack_list = '';

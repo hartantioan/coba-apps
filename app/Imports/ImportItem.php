@@ -56,7 +56,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
             $check = null;
             $row = $row->toArray();
             if(isset($row['code']) && $row['code']){
-                $check = Item::where('code',$row['code'])->first();
+                $check = Item::withTrashed()->where('code',$row['code'])->first();
                 if($check){
                     $check->itemUnit()->delete();
                 }
@@ -72,6 +72,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                 $pallet = Pallet::where('code',explode('#',$row['pallet_fg'])[0])->first();
                 $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
                 $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
+
                 if(!$check){
                     $query = Item::create([
                         'code' => $row['code'],
@@ -113,6 +114,9 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                 }else{
 
                     if(!$check->hasChildDocument()){
+                        if ($check->trashed()) {
+                            $check->restore();
+                        }
                         $check->name = $row['name'];
                         $check->other_name=$row['other_name'];
                         $check->item_group_id=$item_group_id->id;
@@ -135,8 +139,9 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         $check->note =  $row['note'];
                         $check->min_stock = $row['min_stock'];
                         $check->max_stock = $row['max_stock'];
-                        $check->deleted_at = null;
+
                         $check->save();
+
                     }
                 }
             }

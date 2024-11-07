@@ -262,17 +262,17 @@
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                                 @php
                                     $boxQty = '';
-                                    if($row->lookable->isPallet()){
+                                    /* if($row->lookable->isPallet()){
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->itemStock->item->pallet->box_conversion).' BOX )';
-                                    }
+                                    } */
                                     $hscode = '';
-                                    if($freeAreaTax){
+                                    /* if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->itemStock->item->type->hs_code;
-                                    }
+                                    } */
                                 @endphp
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
-                                    <td align="">{{ $row->lookable->itemStock->item->name.$boxQty.$hscode }}</td>
+                                    <td align="">{{ $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name.$boxQty.$hscode }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td align="center">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
@@ -286,17 +286,17 @@
                                 @foreach($data->marketingOrderInvoiceDeliveryDetail as $key => $row)
                                 @php
                                     $boxQty = '';
-                                    if($row->lookable->isPallet()){
+                                    /* if($row->lookable->isPallet()){
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->item->pallet->box_conversion).' BOX )';
-                                    }
+                                    } */
                                     $hscode = '';
-                                    if($freeAreaTax){
+                                    /* if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->item->type->hs_code;
-                                    }
+                                    } */
                                 @endphp
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
-                                    <td align="">{{ $row->lookable->item->name.$boxQty.$hscode }}</td>
+                                    <td align="">{{ $row->lookable->item->code.' - '.$row->lookable->item->name.$boxQty.$hscode }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td align="center">{{ $row->lookable->item->uomUnit->code }}</td>

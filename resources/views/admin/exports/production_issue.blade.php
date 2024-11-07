@@ -3,7 +3,7 @@
         <tr align="center">
             <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
-           
+
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
@@ -59,15 +59,15 @@
                     <td>{{ $row->user->employee_no }}</td>
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
-                    
+
                     <td>{{ $row->note }}</td>
                     <td>{{ $row_detail->typeItem()}}</td>
                     <td>{{ $row_detail->lookable->code}}</td>
                     <td>{{ $row_detail->lookable->name }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->code}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->name }}</td>
-                    <td>{{ $row_detail->qty_planned}}</td>
-                    <td>{{ $row_detail->qty}}</td>
+                    <td>{{ CustomHelper::formatConditionalQty($row_detail->qty_planned)}}</td>
+                    <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->itemGroup->code }}</td>
                     <td>{{ $row_detail->lookable->uomUnit->code }}</td>
                     <td>{{ $nominal ? number_format($row_detail->total_planned ,3,',','.') : '-' }}</td>
@@ -84,7 +84,7 @@
                     $no++;
                 @endphp
             @endforeach
-            
+
         @endforeach
     </tbody>
 </table>

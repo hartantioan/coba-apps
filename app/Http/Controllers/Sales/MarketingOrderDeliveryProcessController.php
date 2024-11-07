@@ -136,6 +136,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $column = [
             'id',
             'code',
+            'revision_counter',
             'user_id',
             'company_id',
             'customer_id',
@@ -316,6 +317,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
+                    $val->revision_counter,
                     $val->user->name,
                     $val->company->name,
                     $val->marketingOrderDelivery->customer->name,
@@ -428,7 +430,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $data['vehicle_no'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->vehicle_no : '';
                 $data['driver_name'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->driver : '';
                 $data['vehicle_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
-                $data['has_void_do'] = $data->marketingOrderDeliveryProcessVoid()->count() > 0 ? '1' : '';
+                /* $data['has_void_do'] = $data->marketingOrderDeliveryProcessVoid()->count() > 0 ? '1' : ''; */
+                /* $data['has_void_do'] = '1'; */
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada MOD No. '.$data->code.' sudah dikirimkan. Data tidak bisa ditambahkan.';
@@ -514,43 +517,46 @@ class MarketingOrderDeliveryProcessController extends Controller
 
 
                 }
-                $arrStockId = [];
-                $arrQtyNeeded = [];
-                if($request->arr_item_stock_id){
-                    foreach($request->arr_item_stock_id as $key => $row){
-                        $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
-                        $qtyNeeded = round($modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),3);
-                        if(!in_array($row,$arrStockId)){
-                            $arrStockId[] = $row;
-                            $arrQtyNeeded[] = $qtyNeeded;
-                        }else{
-                            $index = array_search($row,$arrStockId);
-                            $arrQtyNeeded[$index] += $qtyNeeded;
-                        }
-                    }
-                }
 
-                if($request->arr_item_stock_id){
-                    $arrItemError = [];
-                    $passedQty = true;
-                    foreach($arrStockId as $key => $row){
-                        $itemstock = ItemStock::find($row);
-                        $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
-                        if($itemcogs){
-                            if(round($itemcogs->infoFg()['qty'],3) < round($arrQtyNeeded[$key],3)){
-                                $passedQty = false;
-                                $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
+                if(!$request->temp){
+                    $arrStockId = [];
+                    $arrQtyNeeded = [];
+                    if($request->arr_item_stock_id){
+                        foreach($request->arr_item_stock_id as $key => $row){
+                            $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
+                            $qtyNeeded = round($modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),3);
+                            if(!in_array($row,$arrStockId)){
+                                $arrStockId[] = $row;
+                                $arrQtyNeeded[] = $qtyNeeded;
+                            }else{
+                                $index = array_search($row,$arrStockId);
+                                $arrQtyNeeded[$index] += $qtyNeeded;
                             }
-                        }else{
-                            $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
-                            $passedQty = false;
                         }
                     }
-                    if(!$passedQty){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih. Daftar item : '.implode(', ',$arrItemError)
-                        ]);
+
+                    if($request->arr_item_stock_id){
+                        $arrItemError = [];
+                        $passedQty = true;
+                        foreach($arrStockId as $key => $row){
+                            $itemstock = ItemStock::find($row);
+                            $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                            if($itemcogs){
+                                if(round($itemcogs->infoFg()['qty'],3) < round($arrQtyNeeded[$key],3)){
+                                    $passedQty = false;
+                                    $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
+                                }
+                            }else{
+                                $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
+                                $passedQty = false;
+                            }
+                        }
+                        if(!$passedQty){
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih. Daftar item : '.implode(', ',$arrItemError)
+                            ]);
+                        }
                     }
                 }
 
@@ -561,14 +567,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ]);
                 }
 
-                /* if($mod->goodScaleDetail()->exists()){
+                if($mod->goodScaleDetail()->exists()){
                     if($request->post_date < $mod->goodScaleDetail->goodScale->post_date){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari Timbangan.'
                         ]);
                     }
-                } */
+                }
 
                 if($request->temp){
                     $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -597,7 +603,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         ]);
                     }
 
-                    if($request->tempSwitch){
+                    /* if($request->tempSwitch){
                         $error = [];
                         if($mod->account_id !== $query->marketingOrderDelivery->account_id){
                             $error[] = 'Ekspeditor MOD baru dan ekspeditor MOD lama tidak sama.';
@@ -635,20 +641,26 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 'void_date'     => date('Y-m-d H:i:s'),
                             ]);
                         }
-                    }
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
+                    } */
+                    if(!CustomHelper::checkLockAcc($query->post_date)){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if($query->isItemSent()){
+                    if(in_array($query->latestTracking(),['3','5'])){
+                        return response()->json([
+                            'responseStatus'    => 500,
+                            'message'           => 'Fitur edit diluar status SJ.'
+                        ]);
+                    }
+                    /* if($query->isItemSent()){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Dokumen DO/SJ telah dikirimkan, anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
-                    if(in_array($query->status,['1','6']) || $request->tempSwitch){
+                    } */
+                    if(in_array($query->status,['1','2','6']) || $request->tempSwitch){
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
@@ -670,12 +682,32 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->tax = $mod->getTax();
                         $query->rounding = $mod->getRounding();
                         $query->grandtotal = $mod->getGrandtotal();
+                        $query->revision_counter = $query->revision_counter + 1;
+                        $query->weight_netto = 0;
 
                         $query->save();
 
                         if(!$request->tempSwitch){
                             foreach($query->marketingOrderDeliveryProcessTrack as $row){
                                 $row->delete();
+                            }
+                        }
+
+                        if($query->marketingOrderDelivery->goodScaleDetail()->exists()){
+                            if($query->marketingOrderDelivery->goodScaleDetail->goodScale->time_scale_out){
+                                $query->marketingOrderDelivery->goodScaleDetail->update([
+                                    'qty'   => 0,
+                                    'total' => 0,
+                                ]);
+                                $query->marketingOrderDelivery->goodScaleDetail->goodScale->update([
+                                    'qty_in'        => 0,
+                                    'qty_balance'   => 0,
+                                    'qty_final'     => 0,
+                                    'qty_qc'        => 0,
+                                    'time_scale_out'=> NULL,
+                                    'image_out'     => NULL,
+                                    'status'        => '2',
+                                ]);
                             }
                         }
 
@@ -686,6 +718,15 @@ class MarketingOrderDeliveryProcessController extends Controller
                             }
                             $row->delete();
                         }
+
+                        if($query->journal()->exists()){
+                            foreach($query->journal as $journal){
+                                $journal->journalDetail()->delete();
+                                $journal->delete();
+                            }
+                            CustomHelper::removeCogs($query->getTable(),$query->id);
+                        }
+                        
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -719,6 +760,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'tax'                           => $mod->getTax(),
                         'rounding'                      => $mod->getRounding(),
                         'grandtotal'                    => $mod->getGrandtotal(),
+                        'revision_counter'              => 0,
                     ]);
                 }
 
@@ -745,22 +787,22 @@ class MarketingOrderDeliveryProcessController extends Controller
                         CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
                     }
 
-                    if($request->has_void_do){
+                    if($request->temp){
                         $query->marketingOrderDelivery->reCreateDetail();
                     }
 
-                    if(!$request->tempSwitch){
+                    /* if(!$request->tempSwitch){ */
                         MarketingOrderDeliveryProcessTrack::create([
                             'user_id'                               => session('bo_id'),
                             'marketing_order_delivery_process_id'   => $query->id,
                             'status'                                => '1',
                         ]);
                         CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                    }
+                    /* } */
 
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
-                    if($request->tempSwitch){
+                    /* if($request->tempSwitch){
                         $mod = MarketingOrderDelivery::find(intval($request->marketing_order_delivery_id));
                         if($query->journal()->exists()){
                             foreach($query->journal as $row){
@@ -771,7 +813,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 }
                             }
                         }
-                    }
+                    } */
 
                     activity()
                         ->performedOn(new MarketingOrderDeliveryProcess())
@@ -1294,7 +1336,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
     public function show(Request $request){
         $po = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
-        if($po->isItemSent()){
+        /* if($po->isItemSent()){
             return response()->json([
                 'responseStatus'=> 500,
                 'message'       => 'Dokumen DO/SJ telah dikirimkan, anda tidak bisa melakukan perubahan.'
@@ -1307,12 +1349,25 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'message'       => 'Dokumen DO/SJ telah terhubung dengan Timbangan yang sudah ditimbang keluar, anda tidak bisa melakukan perubahan.'
                 ]);
             }
+        } */
+        if($po->revision_counter > 0){
+            return response()->json([
+                'responseStatus'    => 500,
+                'message'           => 'Fitur edit SJ hanya untuk SJ yang belum pernah revisi.'
+            ]);
         }
         if($request->type){
-            if(in_array($po->statusTrackingRaw(),['1','3','4','5'])){
+            if(in_array($po->latestTracking(),['1','3','5'])){
                 return response()->json([
                     'responseStatus'    => 500,
                     'message'           => 'Fitur switch hanya untuk status *Barang telah dikirimkan*.'
+                ]);
+            }
+        }else{
+            if(in_array($po->latestTracking(),['3','5'])){
+                return response()->json([
+                    'responseStatus'    => 500,
+                    'message'           => 'Fitur edit diluar status SJ.'
                 ]);
             }
         }

@@ -52,6 +52,7 @@ class MarketingOrderDeliveryProcess extends Model
         'done_date',
         'done_note',
         'scan_barcode',
+        'revision_counter',
     ];
 
     public function getTypePayment(){
@@ -367,6 +368,15 @@ class MarketingOrderDeliveryProcess extends Model
             return $status->status();
         }else{
             return 'Status tracking tidak ditemukan.';
+        }
+    }
+
+    public function latestTracking(){
+        $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
+        if($status){
+            return $status->status;
+        }else{
+            return '';
         }
     }
 

@@ -155,6 +155,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
+                                                        <th>Revisi</th>
                                                         <th>Petugas</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Customer</th>
@@ -1245,7 +1246,7 @@ document.addEventListener('focusin', function (event) {
                         $('#vehicle_name').val(response.vehicle_name);
                         $('#vehicle_no').val(response.vehicle_no);
                         $('#driver_name').val(response.driver_name);
-                        $('#has_void_do').val(response.has_void_do);
+                        /* $('#has_void_do').val(response.has_void_do); */
 
                         if(response.details.length > 0){
                             $('#body-item').empty();
@@ -2193,6 +2194,7 @@ document.addEventListener('focusin', function (event) {
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
+                { name: 'revision_counter', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'customer_id', orderable: false, className: '' },
@@ -2298,7 +2300,7 @@ document.addEventListener('focusin', function (event) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]), passedQty = true, passedEditQty = true;
 
-                if($('#has_void_do').val()){
+                if($('#temp').val()){
                     $(".main-qty").each(function(){
                         let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
                         $(".rowQtyDetail" + id).each(function(index){

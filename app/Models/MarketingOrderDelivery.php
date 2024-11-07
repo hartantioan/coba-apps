@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\WaBlas;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -404,22 +405,27 @@ class MarketingOrderDelivery extends Model
 
     public function reCreateDetail(){
         $arrMo = [];
+        $listChanges = [];
         foreach($this->marketingOrderDeliveryDetail as $row){
             $marketing_order_detail_id = $row->marketing_order_detail_id;
             $arrShading = [];
             $newQty = 0;
+            
             foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
                 $newQty += $modpd->qty;
                 if(!in_array($modpd->itemStock->itemShading->code, $arrShading)){
-                    $arrShading[] = $modpd->itemStock->itemShading->code;
+                    $arrShading[] = 'SHADING '.$modpd->itemStock->itemShading->code;
                 }
             }
+            
+            $listChanges[] = '*'.$row->item->name.' dari '.CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDetail->itemUnit->unit->code.' ke '.CustomHelper::formatConditionalQty($newQty).' '.$row->marketingOrderDetail->itemUnit->unit->code.'*';
+
             $newmodd = MarketingOrderDeliveryDetail::create([
                 'marketing_order_delivery_id'   => $this->id,
                 'marketing_order_detail_id'     => $marketing_order_detail_id,
                 'item_id'                       => $row->item_id,
                 'qty'                           => $newQty,
-                'note'                          => 'CHANGE FROM SJ : '.$this->getModVoid().' SHADING : '.implode(', ',$arrShading),
+                'note'                          => implode(', ',$arrShading),
                 'place_id'                      => $row->place_id,
             ]);
             foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
@@ -438,6 +444,13 @@ class MarketingOrderDelivery extends Model
                 $mo->update([
                     'status'    => '2',
                 ]);
+            }
+        }
+        #send WA
+        if($this->marketingOrderDeliveryProcess()->exists()){
+            $arr = array('0895606527070','085695531137','081388189015','081284273855','081365590831');
+            foreach($arr as $rownumber){
+                WaBlas::kirim_wa($rownumber,'*Revisi Muatan* \nNo MOD '.$this->code.' telah dirubah oleh admin SJ dengan mengedit SJ '.$this->marketingOrderDeliveryProcess->code.' dengan rincian : '.implode(', ',$listChanges).'. \nIni adalah pesan otomatis, jangan membalas pesan ini.');
             }
         }
     }

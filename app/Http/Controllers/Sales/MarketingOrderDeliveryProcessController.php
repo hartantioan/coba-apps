@@ -648,7 +648,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->latestTracking(),['3','5'])){
+                    if(in_array($query->latestTracking(),['2','3','5'])){
                         return response()->json([
                             'responseStatus'    => 500,
                             'message'           => 'Fitur edit diluar status SJ.'

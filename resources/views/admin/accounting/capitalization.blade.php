@@ -875,7 +875,7 @@
                                                         ` +val.name + `
                                                     </td>
                                                     <td>
-                                                        ` +val.place_code + `
+                                                        ` +valdetail.place_code + `
                                                     </td>
                                                     <td>
                                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">

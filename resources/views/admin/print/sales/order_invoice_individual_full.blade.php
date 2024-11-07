@@ -266,9 +266,9 @@
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->itemStock->item->pallet->box_conversion).' BOX )';
                                     } */
                                     $hscode = '';
-                                    /* if($freeAreaTax){
+                                    if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->itemStock->item->type->hs_code;
-                                    } */
+                                    }
                                 @endphp
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
@@ -290,9 +290,9 @@
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->item->pallet->box_conversion).' BOX )';
                                     } */
                                     $hscode = '';
-                                    /* if($freeAreaTax){
+                                    if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->item->type->hs_code;
-                                    } */
+                                    }
                                 @endphp
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>

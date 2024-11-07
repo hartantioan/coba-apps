@@ -307,10 +307,10 @@
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
                                     <div class="input-field col m4 s12 step2">
-                                        <table border="0" style="border: none;border-collapse: collapse;" id="table_deposit">
+                                        <table border="0" style="border: none;border-collapse: collapse;max-width:100%" id="table_deposit">
                                             <tr>
-                                                <td style="color: red;font-weight:bold;font-size:1vh">DEPOSIT</td>
-                                                <td  style="color: red;font-weight:bold;font-size:1vh" id="user_deposit"></td>
+                                                <td style="color: red;font-weight:bold;font-size:20px !important;width:30%">DEPOSIT</td>
+                                                <td  style="color: red;font-weight:bold;font-size:20px !important" id="user_deposit"></td>
                                             </tr>
                                         </table>
                                     </div>

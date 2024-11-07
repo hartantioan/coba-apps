@@ -1092,7 +1092,7 @@ class CapitalizationController extends Controller
     public function getAsset(Request $request){
         foreach($request->arr_asset_id as $row){
             $data = Asset::find(intval($row));
-
+            info($data);
 
             $capital = $data->getUnitFromCapitalization();
             $details[] = [

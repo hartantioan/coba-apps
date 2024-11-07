@@ -849,12 +849,11 @@
                             if(passed){
                                 $.each(response, function(i, val) {
 
-                                console.log(val);
                                     if(val.details.length > 0){
                                         $('#list-used-data').append(`
                                             <div class="chip purple darken-4 gradient-shadow white-text">
-                                                ` + val.code + `
-                                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.lookable_type + `','` + val.id + `')">close</i>
+                                                ` + valdetail.code + `
+                                                <i class="material-icons close data-used" onclick="removeUsedData('` + valdetail.lookable_type + `','` + valdetail.id + `')">close</i>
                                             </div>
                                         `);
 
@@ -869,10 +868,10 @@
                                                         ` + no + `
                                                     </td>
                                                     <td>
-                                                        ` +val.code + `
+                                                        ` +valdetail.code + `
                                                     </td>
                                                     <td>
-                                                        ` +val.name + `
+                                                        ` +valdetail.name + `
                                                     </td>
                                                     <td>
                                                         ` +valdetail.place_code + `

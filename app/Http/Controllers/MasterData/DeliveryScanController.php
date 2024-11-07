@@ -104,14 +104,28 @@ class DeliveryScanController extends Controller
         $mop = MarketingOrderDeliveryProcess::where('scan_barcode', $barcode)->first();
         /* $mop = MarketingOrderDeliveryProcess::where('code', $barcode)->first(); */
         $detail = [];
+
         if($mop){
+            $good_scale = '';
+            $time_scale_out = '';
+            if($mop->marketingOrderDelivery->goodScaleDetail()->exists()){
+                $good_scale = $mop->marketingOrderDelivery->goodScaleDetail->goodScale->code;
+                $time_scale_out = $mop->marketingOrderDelivery->goodScaleDetail->goodScale->time_scale_out;
+            }
+            if($time_scale_out == ''){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Barcode Belum Di Timbang Keluar'
+                ];
+                return response()->json($response);
+            }
             foreach ($mop->marketingOrderDeliveryProcessDetail as $key => $value) {
 
                 $detail[] = [
-                    'item_code'=> $value->itemStock->item->code,
-                    'item_name'=> $value->itemStock->item->name,
-                    'qty_jual'=>CustomHelper::formatConditionalQty($value->qty),
-                    'satuan'=> $value->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                    'item_code' => $value->itemStock->item->code,
+                    'item_name' => $value->itemStock->item->name,
+                    'qty_jual'  => CustomHelper::formatConditionalQty($value->qty),
+                    'satuan'    => $value->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                 ];
 
             }
@@ -129,6 +143,8 @@ class DeliveryScanController extends Controller
             $response = [
                 'status'    => 200,
                 'mop'       => $mop ,
+                'good_scale'=> $good_scale ,
+                'time_out'       => $time_scale_out ,
                 'status_s'  => $status,
                 'detail'    => $detail,
                 'shipping_type'        => $mop->marketingOrderDelivery->deliveryType(),

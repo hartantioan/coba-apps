@@ -306,7 +306,13 @@
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
-                                    <div class="input-field col m9 s12 step2">
+                                    <div class="input-field col m4 s12 step2">
+                                        <table border="0" style="border: none;border-collapse: collapse;" id="table_deposit">
+                                            <tr>
+                                                <td style="color: red;font-weight:bold;font-size:1vh">DEPOSIT</td>
+                                                <td  style="color: red;font-weight:bold;font-size:1vh" id="user_deposit"></td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </fieldset>
                             </div>
@@ -882,6 +888,18 @@
         }
     });
     $(function() {
+
+        const typeSelect = document.getElementById('type');
+        typeSelect.addEventListener('change', function() {
+
+            const selectedValue = typeSelect.value;
+
+            if (selectedValue == '2') {
+                $('#table_deposit').hide();
+            } else {
+                $('#table_deposit').show();
+            }
+        });
         $("#table-detail th,#table-detail1 th").resizable({
             minWidth: 100,
         });
@@ -1071,6 +1089,8 @@
                     $('.data-used').trigger('click');
                 }
             }
+            $('#user_deposit').empty();
+            $('#user_deposit').append($('#account_id').select2('data')[0].deposit);
         });
 
         $('#marketing_order_down_payment_id').select2({

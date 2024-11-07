@@ -1842,7 +1842,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 "color"=>"lightblue",
                 'properties'=> [
                     ['name'=> "Tanggal :".$query->post_date],
-                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
+                    /* ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')] */
                  ],
                 'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($query->code),
             ];

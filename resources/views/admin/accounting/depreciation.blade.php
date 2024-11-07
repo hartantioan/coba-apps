@@ -672,7 +672,9 @@
                             `);
                         });
 
-                        countAll();
+                        setTimeout(function(){
+                            countAll();
+                        }, 1000);                        
                     }else{
                         resetDetailForm();
                     }

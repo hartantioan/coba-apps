@@ -6,8 +6,9 @@ use App\Models\ProductionIssue;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportProductionIssue implements FromView, ShouldAutoSize
+class ExportProductionIssue extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromView, ShouldAutoSize, WithCustomValueBinder
 {
     protected $start_date, $end_date, $mode, $nominal, $line_id;
     public function __construct(string $start_date, string $end_date, string $mode, string $nominal,string $line_id)

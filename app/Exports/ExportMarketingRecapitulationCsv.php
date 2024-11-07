@@ -86,7 +86,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;'.$freeAreaTax.';0;0;0;0;' . $row->code. ($row->no_pjb ? ' '.$row->no_pjb : '') . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;'.$freeAreaTax.';0;0;0;0;' . $row->code. ($row->no_pjb ? '/PPJB : '.$row->no_pjb : '') . ';;'
                 ];
             } else {
                 $arr[] = [

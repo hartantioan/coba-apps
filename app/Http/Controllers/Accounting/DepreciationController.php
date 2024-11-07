@@ -201,8 +201,10 @@ class DepreciationController extends Controller
 
         $arr = [];
 
+        $total = 0;
         foreach($data as $row){
             if(!$row->checkDepreciationByMonth($request->period)){
+                $nominal = $row->nominalDepreciation();
                 $arr[] = [
                     'asset_id'      => $row->id,
                     'asset_code'    => $row->code,
@@ -210,10 +212,13 @@ class DepreciationController extends Controller
                     'asset_place'   => $row->place->code,
                     'method'        => $row->method,
                     'method_name'   => $row->method(),
-                    'nominal'       => number_format($row->nominalDepreciation(),2,',','.'),
+                    'nominal'       => number_format($nominal,2,',','.'),
                 ];
+                $total += $nominal;
             }
         }
+
+        info($total);
 
         return response()->json($arr);
     }

@@ -513,7 +513,7 @@
 
                     <div style="position: fixed;bottom: 137px; left: 40px; right: 0px;">
 
-                        {{ date('d/m/Y H:i') }} <span style="padding-left: 80px">{{$data->user->name}}</span><span style="padding-left: 80px">Print Ke-{{$data->printCounter()->count()}}</span>
+                        {{ date('d/m/Y H:i') }} <span style="padding-left: 80px">{{$data->user->name}}</span><span style="padding-left: 80px">Print Ke-{{$data->printCounter()->count()}} | Revisi Ke-{{ $data->revision_counter }}</span>
 
 
                     </div>

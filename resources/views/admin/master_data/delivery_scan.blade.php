@@ -93,27 +93,39 @@
                                                     <div id="validation_alert" style="display:none;"></div>
                                                 </div>
                                                 <div class="col s12">
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m6">
 
                                                         <input type="hidden" id="temp" name="temp">
                                                         <input id="code" name="code" type="text" placeholder="Code">
                                                         <label class="active" for="code">No. Dokumen</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m6">
                                                         <input id="shipping_type" name="shipping_type" type="text" placeholder="Tipe Pengiriman">
                                                         <label class="active" for="shipping_type">Tipe Pengiriman</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m6">
                                                         <input id="no_pol" name="no_pol" type="text" placeholder="No Pol">
                                                         <label class="active" for="no_pol">No. Pol</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m6">
                                                         <input id="driver" name="driver" type="text" placeholder="Nama Supir">
                                                         <label class="active" for="driver">Supir</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m6">
                                                         <input id="type" name="type" type="text" placeholder="Truk">
                                                         <label class="active" for="type">Truk</label>
+                                                    </div>
+                                                    <div class="input-field col s12 m6">
+                                                        <input id="code_good_scale" name="code_good_scale" type="text" placeholder="Timbangan">
+                                                        <label class="active" for="code_good_scale">No Timbangan</label>
+                                                    </div>
+                                                    <div class="input-field col s12 m6">
+                                                        <input id="time_out" name="time_out" type="text" placeholder="Waktu Timbang Keluar">
+                                                        <label class="active" for="time_out">Waktu Timbang Keluar</label>
+                                                    </div>
+                                                    <div class="input-field col s12 m6">
+                                                        <input id="weight" name="weight" type="text" placeholder="Berat">
+                                                        <label class="active" for="weight">Berat</label>
                                                     </div>
                                                     <div class="row" id="table_detail">
                                                         <table class="bordered" style="font-size:10px;">
@@ -346,6 +358,10 @@
                             $('#driver').val(response.mop['driver_name']);
                             $('#type').val(response.mop['vehicle_name']);
                             $('#table_body').empty();
+
+                            $('#weight').val(response.mop['weight_netto']);
+                            $('#code_good_scale').val(response.good_scale);
+                            $('#time_out').val(response.time_out);
                             $.each(response.detail, function(i, val) {
                                 $('#table_body').append(`
                                     <tr>
@@ -509,6 +525,10 @@
                         $('#shipping_type').val(response.shipping_type);
                         $('#driver').val(response.mop['driver_name']);
                         $('#type').val(response.mop['vehicle_name']);
+                        $('#weight').val(response.mop['weight_netto']);
+                        $('#code_good_scale').val(response.good_scale);
+                        $('#time_out').val(response.time_out);
+
 
                         $.each(response.detail, function(i, val) {
                             $('#table_body').append(`

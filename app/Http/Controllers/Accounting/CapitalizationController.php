@@ -102,7 +102,7 @@ class CapitalizationController extends Controller
                 'count_balance'         =>  number_format($d->count_balance,0,',','.'),
                 'method'                => $d->method(),
                 'note'                  => $d->note,
-                'item_code'             => $d->hardwareItem->code,
+                'item_code'             => $d->hardwareItem->code ?? '-',
                 'status'                => $d->status(),
                 'unit_name'             => $capital ? $capital->unit->name : '',
                 'unit_id'               => $capital ? $capital->unit_id : '',
@@ -1092,7 +1092,6 @@ class CapitalizationController extends Controller
     public function getAsset(Request $request){
         foreach($request->arr_asset_id as $row){
             $data = Asset::find(intval($row));
-
 
             $capital = $data->getUnitFromCapitalization();
             $details[] = [

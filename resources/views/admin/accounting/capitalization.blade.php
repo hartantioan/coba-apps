@@ -869,13 +869,13 @@
                                                         ` + no + `
                                                     </td>
                                                     <td>
-                                                        ` +val.code + `
+                                                        ` +valdetail.code + `
                                                     </td>
                                                     <td>
-                                                        ` +val.name + `
+                                                        ` +valdetail.name + `
                                                     </td>
                                                     <td>
-                                                        ` +val.place_code + `
+                                                        ` +valdetail.place_code + `
                                                     </td>
                                                     <td>
                                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">

@@ -710,6 +710,7 @@
         $('#total').text(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
+        alert(total);
     }
 
     function rowDetail(data) {

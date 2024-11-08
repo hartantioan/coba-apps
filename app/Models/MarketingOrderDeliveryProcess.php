@@ -215,6 +215,45 @@ class MarketingOrderDeliveryProcess extends Model
         return implode(', ',$arr);
     }
 
+    public function getBrand(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->itemStock->item->brand->name,$arr)){
+                $arr[] = $row->itemStock->item->brand->name;
+            }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getBatch(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->itemStock->productionBatch->code,$arr)){
+                $arr[] = $row->itemStock->productionBatch->code;
+            }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getShading(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->itemStock->itemShading->code,$arr)){
+                $arr[] = $row->itemStock->itemShading->code;
+            }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
     public function getSalesOrderCode(){
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){

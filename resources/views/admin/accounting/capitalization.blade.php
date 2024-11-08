@@ -864,7 +864,7 @@
                                             var no = $('.row_asset').length + 1;
                                             $('#body-asset').append(`
                                                 <tr class="row_asset">
-                                                    <input type="hidden" name="arr_asset_id[]" value="` +val.id + `">
+                                                    <input type="hidden" name="arr_asset_id[]" value="` +valdetail.id + `">
                                                     <td class="center">
                                                         ` + no + `
                                                     </td>

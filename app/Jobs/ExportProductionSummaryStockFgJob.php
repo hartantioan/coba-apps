@@ -26,6 +26,7 @@ class ExportProductionSummaryStockFgJob implements ShouldQueue
         $this->start_date = $start_date;
         $this->end_date = $end_date;
         $this->user_id = $user_id;
+        $this->queue = 'report';
     }
 
     public function handle()

@@ -30,6 +30,7 @@ class StockMovementJob implements ShouldQueue
         $this->type = $type ? $type : '';
         $this->group = $group ? $group : '';
         $this->user_id = $user_id;
+        $this->queue = 'report';
     }
 
     public function handle()

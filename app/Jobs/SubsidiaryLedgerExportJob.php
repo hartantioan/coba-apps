@@ -28,6 +28,7 @@ class SubsidiaryLedgerExportJob implements ShouldQueue
         $this->coaend = $coaend ? $coaend : '';
         $this->closing_journal = $closing_journal ? $closing_journal : '';
         $this->user_id = $user_id;
+        $this->queue = 'report';
     }
 
     public function handle()

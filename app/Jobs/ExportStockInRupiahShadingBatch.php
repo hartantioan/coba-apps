@@ -26,6 +26,7 @@ class ExportStockInRupiahShadingBatch implements ShouldQueue
         $this->place_id = $place_id;
         $this->warehouse_id = $warehouse_id;
         $this->user_id = $user_id;
+        $this->queue = 'report';
     }
 
     public function handle()

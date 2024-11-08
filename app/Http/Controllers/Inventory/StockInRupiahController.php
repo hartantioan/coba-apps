@@ -382,9 +382,9 @@ class StockInRupiahController extends Controller
         $type = $request->type ? $request->type:'';
         $user_id = session('bo_id');
 
-        StockInRupiahJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
+        /* StockInRupiahJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
 
-        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
-		// return Excel::download(new ExportStockInRupiah($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_in_rupiah'.uniqid().'.xlsx');
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']); */
+		return Excel::download(new ExportStockInRupiah($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_in_rupiah'.uniqid().'.xlsx');
     }
 }

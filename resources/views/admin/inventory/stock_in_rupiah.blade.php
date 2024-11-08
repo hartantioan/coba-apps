@@ -387,7 +387,7 @@
     }
 
     function exportExcel() {
-        swal({
+        /* swal({
             title: 'ALERT',
             text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
@@ -442,8 +442,8 @@
                     icon: 'error'
                 });
             }
-        });
+        }); */
 
-       /*  window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group; */
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group;
     }
 </script>

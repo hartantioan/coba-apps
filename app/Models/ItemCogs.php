@@ -91,7 +91,7 @@ class ItemCogs extends Model
         $qty = 0;
         $total = 0;
         $arr = [];
-        $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderBy('date')->orderBy('id')->get();
+        $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('date','<=',$this->date)->orderBy('date')->orderBy('id')->get();
         foreach($cogs as $row){
             if($row->type == 'IN'){
                 $qty += round($row->qty_in,3);

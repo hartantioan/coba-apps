@@ -424,7 +424,11 @@ class ResetCogsNewByDate implements ShouldQueue/* , ShouldBeUnique */
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->where('item_id',$item_id)->get();
 
+        $arrHandover = [];
         foreach($productionhandover as $row){
+            if(!in_array($row->productionHandover->id,$arrHandover)){
+                $arrHandover[] = $row->productionHandover->id;
+            }
             $total = $row->productionFgReceiveDetail->total;
             $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
             $total_final = $totalBefore + $total;
@@ -469,6 +473,21 @@ class ResetCogsNewByDate implements ShouldQueue/* , ShouldBeUnique */
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+        }
+
+        if(count($arrHandover) > 0){
+            foreach($arrHandover as $rowhandover){
+                $datahandover = ProductionHandover::find($rowhandover);
+                if($datahandover){
+                    if($datahandover->journal()->exists()){
+                        $totalhandover = $datahandover->totalHandover();
+                        $datahandover->journal->journalDetail()->whereNull('detailable_type')->whereNull('detailable_id')->update([
+                            'nominal'       => $totalhandover,
+                            'nominal_fc'    => $totalhandover,
+                        ]);
+                    }
+                }
+            }
         }
 
         $productionrepack = ProductionRepackDetail::whereHas('productionRepack',function($query)use($dateloop){

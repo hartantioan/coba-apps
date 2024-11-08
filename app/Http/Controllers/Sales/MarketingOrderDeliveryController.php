@@ -766,7 +766,7 @@ class MarketingOrderDeliveryController extends Controller
     public function show(Request $request){
         $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
         if(!$request->revision){
-            if($po->status !== '2' || $po->stage_status == '2'){
+            if($po->status !== '2'/*  || $po->stage_status == '2' */){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',

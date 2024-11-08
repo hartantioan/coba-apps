@@ -5,8 +5,9 @@ namespace App\Exports;
 use App\Models\Bom;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportBom implements FromView
+class ExportBom implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

@@ -1993,6 +1993,7 @@ class CustomHelper {
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$op->company_id)->first();
 				#start journal rounding
 				if($op->rounding > 0 || $op->rounding < 0){
+					$totalReal += $op->rounding * $op->currency_rate;
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coarounding->id,
@@ -2007,9 +2008,9 @@ class CustomHelper {
 			}
 
 			#perbaiki disini
-			if($op->balance >= $totalMustPay && $op->currency_rate > 1){
-				$balanceKurs = $totalReal - $totalPay;
-				if($balanceKurs < 0 || $balanceKurs > 0){
+			$balanceKurs = $totalReal - $totalPay;
+			if($balanceKurs < 0 || $balanceKurs > 0){
+				if($op->currency_rate > 1){
 					$coaselisihkurs = Coa::where('code','700.01.01.01.02')->where('company_id',$op->company_id)->first();
 					JournalDetail::create([
 						'journal_id'	=> $query->id,

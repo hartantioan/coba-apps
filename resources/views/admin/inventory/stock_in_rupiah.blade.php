@@ -173,7 +173,6 @@
 </div>
 
 <script>
-    $('#export_button').hide();
     $(function() {
         $('#type').on('change', function () {
             var selectedType = $(this).val();
@@ -211,7 +210,6 @@
                 loadingOpen('#main');
             },
             success: function(response) {
-                $('#export_button').show();
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#table_body').empty();

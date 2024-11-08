@@ -794,7 +794,6 @@ class IncomingPaymentController extends Controller
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Total Tagihan</th>
-                                <th class="center-align">Pembulatan</th>
                                 <th class="center-align">Total Diterima</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
@@ -812,7 +811,6 @@ class IncomingPaymentController extends Controller
                 <td class="center-align">'.class_basename($row->lookable).'</td>
                 <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code : '-').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->rounding,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
@@ -820,7 +818,6 @@ class IncomingPaymentController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpembulatan, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>
             </tr>
@@ -830,52 +827,26 @@ class IncomingPaymentController extends Controller
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
+
                             <tr>
-                                <th class="center-align" colspan="5">Approval</th>
+                                <td>Total</td>
+                                <td class="right-align">
+                                    '.number_format($totals,2,',','.').'
+                                </td>
                             </tr>
                             <tr>
-                                <th class="center-align">Level</th>
-                                <th class="center-align">Kepada</th>
-                                <th class="center-align">Status</th>
-                                <th class="center-align">Catatan</th>
-                                <th class="center-align">Tanggal</th>
+                                <td>Pembulatan</td>
+                                <td class="right-align">
+                                    '.number_format($data->rounding,2,',','.').'
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Grandtotal</td>
+                                <td class="right-align">
+                                    '.number_format($data->grandtotal,2,',','.').'
+                                </td>
                             </tr>
                         </thead><tbody>';
-
-        if($data->approval() && $data->hasDetailMatrix()){
-            foreach($data->approval() as $detail){
-                $string .= '<tr>
-                    <td class="center-align" colspan="5"><h6>'.$detail->getTemplateName().'</h6></td>
-                </tr>';
-                foreach($detail->approvalMatrix as $key => $row){
-                    $icon = '';
-
-                    if($row->status == '1' || $row->status == '0'){
-                        $icon = '<i class="material-icons">hourglass_empty</i>';
-                    }elseif($row->status == '2'){
-                        if($row->approved){
-                            $icon = '<i class="material-icons">thumb_up</i>';
-                        }elseif($row->rejected){
-                            $icon = '<i class="material-icons">thumb_down</i>';
-                        }elseif($row->revised){
-                            $icon = '<i class="material-icons">border_color</i>';
-                        }
-                    }
-
-                    $string .= '<tr>
-                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                        <td class="center-align">'.$icon.'<br></td>
-                        <td class="center-align">'.$row->note.'</td>
-                        <td class="center-align">' . ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') . '</td>
-                    </tr>';
-                }
-            }
-        }else{
-            $string .= '<tr>
-                <td class="center-align" colspan="5">Approval tidak ditemukan.</td>
-            </tr>';
-        }
 
         $string .= '</tbody></table></div>
             ';

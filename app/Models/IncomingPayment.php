@@ -123,6 +123,23 @@ class IncomingPayment extends Model
         return $status;
     }
 
+    public function getInvoice(){
+        $arr = [];
+        foreach($this->incomingPaymentDetail as $row){
+            if($row->lookable_type == 'marketing_order_invoices'){
+
+                if(!in_array($row->lookable->code,$arr)){
+                    $arr[] = $row->lookable->code;
+                }
+
+            }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
+        return implode(', ',$arr);
+    }
+
     public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {

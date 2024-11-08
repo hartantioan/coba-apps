@@ -545,7 +545,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 if(round($itemcogs->infoFg()['qty'],3) < round($arrQtyNeeded[$key],3)){
                                     $passedQty = false;
                                     $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
-                                    info($itemcogs->infoFg()['qty'].' - '.$arrQtyNeeded[$key].' - '.$itemstock->id);
                                 }
                             }else{
                                 $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;

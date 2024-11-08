@@ -2601,8 +2601,10 @@
                 $('#gender').val(response.gender).formSelect();
                 $('#group_id').val(response.group_id).formSelect();
                 $('#limit_credit').val(response.limit_credit);
-                $('#limit_credit').attr('readonly',true);
-
+                if(response.type !== '1'){
+                    $('#limit_credit').attr('readonly',true);
+                }
+                
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();
                     $('#position_id').val(response.position_id).formSelect();

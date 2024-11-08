@@ -1419,7 +1419,7 @@ class CustomHelper {
 									'note'			=> $row->lookable->tax_no,
 								]);
 							}
-							self::addDeposit($row->lookable->account_id,floatval($row->lookable->total * $ip->currency_rate));
+							self::addDeposit($row->lookable->account_id,round($row->lookable->total * $ip->currency_rate,2));
 							$row->lookable->update([
 								'status'	=> '3'
 							]);

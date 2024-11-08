@@ -400,7 +400,7 @@
                 </div>
             </div>
         `);
-        $('#export_button').hide();
+        $('#export_button').hide(); */
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
         var item = $('#item_id').val() ? $('#item_id').val() : '';
@@ -408,7 +408,7 @@
         var group = $('#filter_group').val() ? $('#filter_group').val() : '';
         var startdate = $('#start_date').val() ? $('#start_date').val() : '';
         var finishdate = $('#finish_date').val() ? $('#finish_date').val() : '';
-        $.ajax({
+        /* $.ajax({
             url: '{{ Request::url() }}/export',
             type: 'POST',
             dataType: 'JSON',

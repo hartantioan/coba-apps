@@ -386,14 +386,64 @@
 
     }
 
-    function exportExcel(){
+    function exportExcel() {
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
-        var item = $('#item_id').val() ? $('#item_id').val():'';
-        var type = $('#type').val() ? $('#type').val():'';
-        var group = $('#filter_group').val() ? $('#filter_group').val():'';
-        var startdate = $('#start_date').val() ? $('#start_date').val():'';
-        var finishdate = $('#finish_date').val() ? $('#finish_date').val():'';
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item+"&start_date=" + startdate+"&finish_date=" + finishdate+ "&type=" + type+ "&group=" + group;
+        var item = $('#item_id').val() ? $('#item_id').val() : '';
+        var type = $('#type').val() ? $('#type').val() : '';
+        var group = $('#filter_group').val() ? $('#filter_group').val() : '';
+        var startdate = $('#start_date').val() ? $('#start_date').val() : '';
+        var finishdate = $('#finish_date').val() ? $('#finish_date').val() : '';
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                plant : plant,
+                warehouse: warehouse,
+                item : item,
+                type : type,
+                group : group,
+                startdate : startdate,
+                finishdate : finishdate,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+       /*  window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group; */
     }
 </script>

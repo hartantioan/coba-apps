@@ -14,6 +14,7 @@ use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Jobs\StockInRupiahJob;
 
 class StockInRupiahController extends Controller
 {
@@ -39,15 +40,15 @@ class StockInRupiahController extends Controller
             'place'     =>  Place::where('status','1')->get(),
             'warehouse' =>  Warehouse::where('status',1)->get()
         ];
-        
+
         return view('admin.layouts.index', ['data' => $data]);
 
     }
-    
+
     public function filter(Request $request){
         $start_time = microtime(true);
         $array_filter = [];
-        
+
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
@@ -60,7 +61,7 @@ class StockInRupiahController extends Controller
                 }
             })->pluck('id');
 
-            $arr = [];            
+            $arr = [];
             foreach($item as $row){
                 $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
@@ -109,7 +110,7 @@ class StockInRupiahController extends Controller
                         $query->where('id',$request->warehouse);
                     });
                 }
-    
+
                 if($request->filter_group){
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('item_group_id', $request->filter_group);
@@ -123,16 +124,16 @@ class StockInRupiahController extends Controller
         }
         $cum_qty = 0;
         $cum_val = 0 ;
-        
+
         $firstDate = null;
         $uom_unit = null;
         $previousId = null;
         $array_last_item = [];
         $array_first_item = [];
         $all_total = 0;
-   
+
         foreach($query_data as $row){
-            
+
             if($row->type=='IN'){
                 $priceNow = $row->price_in;
                 $cum_qty=$row->qty_in;
@@ -142,7 +143,7 @@ class StockInRupiahController extends Controller
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=round($row->total_out,2) * -1;
             }
-        
+
             if($request->type == "final"){
                 $all_total += round($row->total_final,2);
             }
@@ -166,15 +167,15 @@ class StockInRupiahController extends Controller
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            
+
             if($request->type !== "final"){
                 if ($row->item_id !== $previousId) {
-                
+
                     $query_first =
                     ItemCogs::where(function($query) use ( $request,$row) {
                         $query->where('item_id',$row->item_id)
                         ->where('date', '<', $row->date);
-                        
+
                         if($request->plant != 'all'){
                             $query->whereHas('place',function($query) use($request){
                                 $query->where('id',$request->plant);
@@ -192,7 +193,7 @@ class StockInRupiahController extends Controller
                     $array_last_item[] = [
                         'perlu'                 => 1,
                         'item_id'               => $row->item->id,
-                        'id'                    => $query_first->id ?? null, 
+                        'id'                    => $query_first->id ?? null,
                         'date'                  => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                         'last_nominal'          => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                         'item'                  => $row->item->name,
@@ -208,7 +209,7 @@ class StockInRupiahController extends Controller
                 }
             }
             $previousId = $row->item_id;
-            
+
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }
@@ -216,7 +217,7 @@ class StockInRupiahController extends Controller
 
         if($request->type !== 'final'){
             if(!$request->item_id){
-                $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {            
+                $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {
                     $query->selectRaw('MAX(id)')
                         ->from('item_cogs')
                         ->where('date', '<=', $request->finish_date)
@@ -229,7 +230,7 @@ class StockInRupiahController extends Controller
                     if($request->finish_date) {
                         $query->whereDate('date','<=', $request->finish_date);
                     }
-                    
+
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -240,18 +241,18 @@ class StockInRupiahController extends Controller
                             $query->where('id',$request->warehouse);
                         });
                     }
-        
+
                     if($request->filter_group){
-                    
+
                         $query->whereHas('item',function($query) use($request){
                             $query->whereIn('item_group_id', $request->filter_group);
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                
+
                     if (!empty($excludeIds)) {
-                    
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -267,7 +268,7 @@ class StockInRupiahController extends Controller
                     if($request->finish_date) {
                         $query->whereDate('date','<=', $request->finish_date);
                     }
-                    
+
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -278,18 +279,18 @@ class StockInRupiahController extends Controller
                             $query->where('id',$request->warehouse);
                         });
                     }
-        
+
                     if($request->filter_group){
-                       
+
                         $query->whereHas('item',function($query) use($request){
                             $query->whereIn('item_group_id', $request->filter_group);
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                    
+
                     if (!empty($excludeIds)) {
-                       
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -300,14 +301,14 @@ class StockInRupiahController extends Controller
                     $query_no[]=$first;
                 }
             }
-    
+
             foreach($query_no as $row_tidak_ada){
-                
+
                 if($row_tidak_ada->qty_final > 0){
                     $array_first_item[] = [
                         'perlu'        => 1,
                         'item_id'      => $row_tidak_ada->item->id,
-                        'id'           => $row_tidak_ada->id, 
+                        'id'           => $row_tidak_ada->id,
                         'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
                         'item'         => $row_tidak_ada->item->name,
@@ -317,9 +318,9 @@ class StockInRupiahController extends Controller
                         'shading' => $row->shading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? CustomHelper::formatConditionalQty($row_tidak_ada->qty_final) : 0,
-                    ]; 
+                    ];
                 }
-                
+
             }
         }
         $combinedArray = [];
@@ -338,27 +339,27 @@ class StockInRupiahController extends Controller
         foreach ($array_first_item as $item) {
             $combinedArray[] = $item;
         }
-        
+
         usort($combinedArray, function ($a, $b) {
             // First, sort by 'kode' in ascending order
             $kodeComparison = strcmp($a['kode'], $b['kode']);
-            
+
             if ($kodeComparison !== 0) {
                 return $kodeComparison;
             }
-        
+
             // If 'kode' is the same, prioritize 'perlu' in descending order
             return $b['perlu'] - $a['perlu'];
         });
-       
+
         if($request->type == 'final'){
             $combinedArray=$array_filter;
         }
-      
+
         $end_time = microtime(true);
-       
+
         $execution_time = ($end_time - $start_time);
-       
+
         $response =[
             'status'=>200,
             'message'       => $combinedArray,
@@ -379,7 +380,11 @@ class StockInRupiahController extends Controller
         $finish_date = $request->finish_date ? $request->finish_date:'';
         $group = $request->group ? $request->group:'';
         $type = $request->type ? $request->type:'';
+        $user_id = session('bo_id');
 
-		return Excel::download(new ExportStockInRupiah($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_in_rupiah'.uniqid().'.xlsx');
+        StockInRupiahJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportStockInRupiah($plant,$item,$warehouse,$start_date,$finish_date,$type,$group), 'stock_in_rupiah'.uniqid().'.xlsx');
     }
 }

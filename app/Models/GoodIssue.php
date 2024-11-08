@@ -156,7 +156,10 @@ class GoodIssue extends Model
         return $ada;
     }
 
-    
+    public function qty(){
+        $qty = $this->goodIssueDetail()->sum('qty');
+        return $qty;
+    }
 
     public function hasBalance(){
         $qty = 0;

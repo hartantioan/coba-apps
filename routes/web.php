@@ -2285,7 +2285,8 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('stock_in_rupiah')->middleware('operation.access:stock_in_rupiah,view')->group(function () {
                         Route::get('/', [StockInRupiahController::class, 'index']);
                         Route::post('filter', [StockInRupiahController::class, 'filter']);
-                        Route::post('export', [StockInRupiahController::class, 'export']);
+                        /* Route::post('export', [StockInRupiahController::class, 'export']); */
+                        Route::get('export', [StockInRupiahController::class, 'export']);
                     });
                     Route::prefix('dead_stock')->middleware('operation.access:dead_stock,view')->group(function () {
                         Route::get('/', [DeadStockController::class, 'index']);

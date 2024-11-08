@@ -242,9 +242,9 @@
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                                 @php
                                     $boxQty = '';
-                                    /* if($row->lookable->isPallet()){
+                                    if($row->lookable->isPallet()){
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->itemStock->item->pallet->box_conversion).' BOX )';
-                                    } */
+                                    }
                                     $hscode = '';
                                     if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->itemStock->item->type->hs_code;
@@ -269,9 +269,9 @@
                                 @foreach($data->marketingOrderInvoiceDeliveryDetail as $key => $row)
                                 @php
                                     $boxQty = '';
-                                    /* if($row->lookable->isPallet()){
+                                    if($row->lookable->isPallet()){
                                         $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->item->pallet->box_conversion).' BOX )';
-                                    } */
+                                    }
                                     $hscode = '';
                                     if($freeAreaTax){
                                         $hscode = ' '.$row->lookable->item->type->hs_code;

@@ -192,6 +192,15 @@ class ResetCogsNewByDate implements ShouldQueue/* , ShouldBeUnique */
                     'item_shading_id'           => $row->item_shading_id ?? NULL,
                     'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
                 ]);
+
+                if($row->journalDetail()->exists()){
+                    foreach($row->journalDetail as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $total,
+                            'nominal'     => $total,
+                        ]);
+                    }
+                }
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;

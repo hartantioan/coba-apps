@@ -651,6 +651,7 @@ class UserController extends Controller
                     $query->pic_position    = $request->pic_position ? $request->pic_position : NULL;
                     $query->pic_no          = $request->pic_no ? $request->pic_no : NULL;
                     $query->office_no       = $request->office_no ? $request->office_no : NULL;
+                    $query->limit_credit    = $request->type == '1' ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : $query->limit_credit;
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
 
@@ -670,6 +671,7 @@ class UserController extends Controller
                     $query->type_body       = $request->type_body;
                     $query->nib             = $request->nib;
                     $query->sppkp            = $request->sppkp;
+
 
                     $query->married_status  = $request->type == '1' ? $request->married_status : NULL;
                     $query->married_date    = $request->type == '1' ? $request->married_date : NULL;

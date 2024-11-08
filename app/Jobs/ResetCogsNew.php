@@ -667,11 +667,11 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
                 $price = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
-                if($tempgiprice > 0){
+                /* if($tempgiprice > 0){
                    $price = $tempgiprice;
-               }else{
-                   $tempgiprice = $price;
-               }
+                }else{
+                    $tempgiprice = $price;
+                } */
             }
             $total = round($row->qty * $price,2);
             $qty = $row->qty;

@@ -30,7 +30,7 @@ class MailReportMarketingOEM extends Command
 	public function handle()
 	{
 		//$recipient = ['henrianto@superior.co.id', 'hendra@superior.co.id', 'andrew@superior.co.id', 'haidong@superiorporcelain.co.id', 'billylaw@superior.co.id'];
-		$recipient = ['edp@superior.co.id'];
+		$recipient = ['iwan@superiorporcelain.co.id','henrianto@superior.co.id','eunike@superior.co.id'];
 		//  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 
 		// foreach ($akun as $pangsit) {

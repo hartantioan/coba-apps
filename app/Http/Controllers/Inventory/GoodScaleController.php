@@ -1042,11 +1042,11 @@ class GoodScaleController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            /* }elseif($query->status_qc){
+            }elseif($query->status_qc){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah dicek QC dan tidak bisa dirubah.'
-                ]; */
+                ];
             }else{
                 foreach($query->goodScaleDetail as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){

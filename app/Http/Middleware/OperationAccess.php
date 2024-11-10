@@ -44,6 +44,7 @@ class OperationAccess
             if($access->menu->is_maintenance){
                 $passed = false;
                 $whitelists = $access->menu->whitelist ? explode(',',$access->menu->whitelist) : [];
+                info($request->ip());
                 if(in_array($request->ip(),$whitelists)){
                     $passed = true;
                 }

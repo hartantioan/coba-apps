@@ -347,7 +347,8 @@ class ProductionIssueController extends Controller
                                     $itemstock = $item->itemCogs()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->where('production_batch_id',$request->arr_batch_id[$keybatch])->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                     $qty = str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keybatch]));
                                     if($itemstock){
-                                        if(round($qty,3) > $itemstock->qty_final){
+                                        $qtyFinal = $itemstock->infoFg()['qty'];
+                                        if(round($qty,3) > $qtyFinal){
                                             $passedQty = false;
                                             $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                         }
@@ -361,7 +362,8 @@ class ProductionIssueController extends Controller
                             $itemstock = $item->itemCogs()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                             $qty = str_replace(',','.',str_replace('.','',$row));
                             if($itemstock){
-                                if(round($qty,3) > $itemstock->qty_final){
+                                $qtyFinal = $itemstock->infoFg()['qty'];
+                                if(round($qty,3) > $qtyFinal){
                                     $passedQty = false;
                                     $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                 }

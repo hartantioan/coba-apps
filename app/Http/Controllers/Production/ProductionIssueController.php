@@ -348,7 +348,7 @@ class ProductionIssueController extends Controller
                                     $qty = str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keybatch]));
                                     if($itemstock){
                                         $qtyFinal = $itemstock->infoFg()['qty'];
-                                        if(round($qty,3) > $qtyFinal){
+                                        if(round($qty,3) > round($qtyFinal,3)){
                                             $passedQty = false;
                                             $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                         }
@@ -363,7 +363,7 @@ class ProductionIssueController extends Controller
                             $qty = str_replace(',','.',str_replace('.','',$row));
                             if($itemstock){
                                 $qtyFinal = $itemstock->infoFg()['qty'];
-                                if(round($qty,3) > $qtyFinal){
+                                if(round($qty,3) > round($qtyFinal,3)){
                                     $passedQty = false;
                                     $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                 }

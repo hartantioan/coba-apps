@@ -1986,11 +1986,11 @@ class MarketingOrderDeliveryProcessController extends Controller
             $data = ItemStock::where('item_id',$query->item_id)
                     ->where('place_id',$query->place_id)
                     ->where('qty','>',0)
-                    ->where(function($query)use($request){
+                    /* ->where(function($query)use($request){
                         if($request->arr_stock){
                             $query->whereNotIn('id',$request->arr_stock);
                         }
-                    })
+                    }) */
                     ->get();
 
             foreach($data as $item){

@@ -5,7 +5,9 @@
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
+            <th class="center-align">TOP (Internal)</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo</th>
+            <th class="center-align">Tipe SO</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Keterangan</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
@@ -20,7 +22,9 @@
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['customer'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
+                <td>{{ $row['top'] }}</td>
                 <td>{{ $row['due_date'] }}</td>
+                <td>{{ $row['type'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['total'] }}</td>
                 <td>{{ $row['payment'] }}</td>

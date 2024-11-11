@@ -84,7 +84,9 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
+                                                        <th class="center-align">TOP (Internal)</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo</th>
+                                                        <th class="center-align">Tipe SO</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Keterangan</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
@@ -93,7 +95,7 @@
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="11">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -154,7 +156,9 @@
                                     <td>`+val.code+`</td>
                                     <td>`+val.customer+`</td>
                                     <td class="center-align">`+val.post_date+`</td>
+                                    <td class="center-align">`+val.top+`</td>
                                     <td class="center-align">`+val.due_date+`</td>
+                                    <td class="center-align">`+val.type+`</td>
                                     <td>`+val.note+`</td>
                                     <td class="right-align">`+val.total+`</td>
                                     <td class="right-align">`+val.payment+`</td>
@@ -164,13 +168,13 @@
                         });
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="right-align" colspan="8"><b><h6>TOTAL</h6></b></td>
+                                <td class="right-align" colspan="10"><b><h6>TOTAL</h6></b></td>
                                 <td class="right-align"><b><h6>` + response.grandtotal + `</h6></b></td>
                             </tr>
                         `);
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="" colspan="9">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
+                                <td class="" colspan="11">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
                             </tr>
                         `);
                     }else{

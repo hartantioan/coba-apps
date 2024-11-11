@@ -980,7 +980,7 @@ class Item extends Model
     public function arrayStockByShading($conversion){
         $arr = [];
         foreach($this->itemShading as $row){
-            $balance = round($row->itemStock()->sum('qty') / $conversion,3)/*  - $row->totalUnsentMOd() */;
+            $balance = round($row->itemStock()->sum('qty') / $conversion,3) - $row->totalUnsentMOd();
             $arr[] = [
                 'item_shading_id'   => $row->id,
                 'item_shading_code' => $row->code,

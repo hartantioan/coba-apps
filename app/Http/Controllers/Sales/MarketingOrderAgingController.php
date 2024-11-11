@@ -51,7 +51,7 @@ class MarketingOrderAgingController extends Controller
                         AND ip.status IN ('2','3')
                 ),0) AS total_payment,
                 IFNULL((SELECT 
-                    SUM(lbc.nominal-coalesce(lbc.grandtotal,0))
+                    SUM(lbc.nominal - IFNULL(lbc.grandtotal,0))
                     FROM list_bg_checks lbc
                     WHERE 
                         lbc.account_id = moi.account_id

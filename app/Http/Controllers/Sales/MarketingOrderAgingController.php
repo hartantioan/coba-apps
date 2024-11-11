@@ -38,7 +38,7 @@ class MarketingOrderAgingController extends Controller
 
         $results = DB::select("
             SELECT 
-                moi.*,u.*,gr.name as grup,ifnull(oc.outstandcheck,0) as outstandcheck,
+                moi.*,u.*,gr.name as grup,
                 IFNULL((SELECT 
                     SUM(ipd.subtotal) 
                     FROM incoming_payment_details ipd 
@@ -57,8 +57,7 @@ class MarketingOrderAgingController extends Controller
                 JOIN users u
                     ON u.id = moi.account_id
                 JOIN `groups` gr on u.group_id=gr.id
-                LEFT JOIN (select account_id,sum(nominal-coalesce(grandtotal,0)) as outstandcheck 
-                      from list_bg_checks where void_date is null and deleted_at is null group by account_id)oc on oc.account_id=u.id
+                
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

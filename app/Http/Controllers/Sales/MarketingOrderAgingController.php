@@ -155,7 +155,7 @@ class MarketingOrderAgingController extends Controller
                         'total'                 => $balance,
                         'credit_balance'        => $row->limit_credit - $balance,
                         'limit_credit'          => $row->limit_credit,
-                        'outstand_check'          => $row->outstandcheck ?? 0,
+                        'outstand_check'        => $row->outstandcheck ?? 0,
 
                     ];
                 }

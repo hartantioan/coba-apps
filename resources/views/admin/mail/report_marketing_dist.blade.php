@@ -1,31 +1,30 @@
+
 <html>
 
 <head>
-    <style>
-        table {
-            font-family: arial, sans-serif;
-            border-collapse: collapse;
-            width: 70%;
-        }
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 70%;
+    }
 
-        td,
-        th {
-            border: 2px solid #dddddd;
-            padding: 8px;
-        }
+    td,
+    th {
+        border: 2px solid #dddddd;
+        padding: 8px;
+    }
 
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
-    </style>
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
 </head>
 
 <body>
-
     <p><strong>SALES REPORT - GLOBAL</strong></p>
-
-    <table>
-        <tr>
+    <table style='border:1px solid black;'>
+        <tr style="border:1px solid black;">
             <th style="font-size:12px;">Tipe</th>
             <th style="font-size:12px;">SO Daily (M2)</th>
             <th style="font-size:12px;">MOD Daily (M2)</th>
@@ -102,57 +101,57 @@
     <br>
     <br>
 
+
+
     @php
 
-    $brand = [];
+    $kota=[];
+
+    foreach($data6 as $row)
+    {
+    if (!in_array($row->kota, $kota)) {
+    $kota[] = $row->kota;
+    }
+    }
+
+    sort($kota);
+
     $ossoht = [];
+    $ossogl = [];
     $osmodht = [];
+    $osmodgl = [];
     $sjht = [];
-    $ossogp = [];
-    $osmodgp = [];
-    $sjgp = [];
-    $totalossoht=0;
-    $totalossogp=0;
-    $totalosmodht=0;
-    $totalosmodgp=0;
-    $totalsjht=0;
-    $totalsjgp=0;
+    $sjgl = [];
 
+    foreach ($data6 as $row){
+    if ($row->tipe=='HT')
+    {
+    $ossoht[$row->kota]=$row->sisaso;
+    $osmodht[$row->kota]=$row->sisamod;
+    $sjht[$row->kota]=$row->sj;
 
-    foreach ($data3 as $row) {
-
-    if (!in_array($row->brand, $brand)) {
-    $brand[] = $row->brand;
     }
-    if ($row->tipe == 'HT') {
-    $ossoht[$row->brand] = $row->osso;
-    $osmodht[$row->brand] = $row->osmod;
-    $sjht[$row->brand] = $row->sj;
-    $totalossoht+=$row->osso;
-    $totalosmodht+=$row->osmod;
-    $totalsjht+=$row->sj;
-    } else {
-    $ossogp[$row->brand] = $row->osso;
-    $osmodgp[$row->brand] = $row->osmod;
-    $sjgp[$row->brand] = $row->sj;
-    $totalossogp+=$row->osso;
-    $totalosmodgp+=$row->osmod;
-    $totalsjgp+=$row->sj;
+    if ($row->tipe=='GLAZED')
+    {
+    $ossogl[$row->kota]=$row->sisaso;
+    $osmodgl[$row->kota]=$row->sisamod;
+    $sjgl[$row->kota]=$row->sj;
     }
     }
+
     @endphp
 
-    <p><strong>SALES REPORT - BRAND</strong></p>
+    <p><strong>SALES REPORT - PROVINCE</strong></p>
 
     <table>
         <tr>
-            <th style="font-size:12px;">OEM</th>
+            <th style="font-size:12px;">PROVINCE</th>
             <th style="font-size:12px;" colspan="2">OS SO</th>
             <th style="font-size:12px;" colspan="2">OS MOD</th>
             <th style="font-size:12px;" colspan="2">SJ</th>
         </tr>
         <tr>
-            <th style="font-size:12px;">Brand</th>
+            <th style="font-size:12px;"></th>
             <th style="font-size:12px;">HT</th>
             <th style="font-size:12px;">GP</th>
             <th style="font-size:12px;">HT</th>
@@ -162,31 +161,26 @@
 
         </tr>
 
-        <tr>
-            <td style="font-size:12px;" align="left">TOTAL</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalossoht,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalossogp,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalosmodht,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalosmodgp,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalsjht,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalsjgp,0,",",".")}}</td>
-        </tr>
-        @foreach ($brand as $row)
+        @foreach ($kota as $row)
+        @if ($ossoht[$row]==0 and $ossogl[$row]==0 and $osmodht[$row]==0 and $osmodgl[$row]==0 and $sjht[$row]==0 and $sjgl[$row]==0)
+
+        @else
 
         <tr>
             <td style="font-size:12px;" align="left">{{$row}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($ossoht[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($ossogp[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($osmodht[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($osmodgp[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($sjht[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($sjgp[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($ossoht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($ossogl[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($osmodht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($osmodgl[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($sjht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($sjgl[$row],0,",",".")}}</td>
 
 
 
 
 
         </tr>
+        @endif
 
         @endforeach
     </table>
@@ -195,295 +189,123 @@
 
 
 
+
+
+
     @php
 
-    $jenis = [];
-    $carlo = [];
-    $core = [];
-    $eod = [];
-    $mahesa = [];
-    $remo = [];
-    $valda = [];
-    $valerio = [];
-    $totalcarlo=0;
-    $totalcore=0;
-    $totaleod=0;
-    $totalmahesa=0;
-    $totalremo=0;
-    $totalvalda=0;
-    $totalvalerio=0;
+    $dist=[];
 
-
-    foreach ($data4 as $row) {
-
-    if (!in_array($row->jenis, $jenis)) {
-    $jenis[] = $row->jenis;
-    }
-    if ($row->jenis == 'HT PLAIN') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-
-    }
-
-    if ($row->jenis == 'GLAZED SPECIAL MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
+    foreach($data3 as $row)
+    {
+    if (!in_array($row->cust, $dist)) {
+    $dist[] = $row->cust;
     }
     }
 
-    if ($row->jenis == 'GLAZED LIGHT MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    sort($dist);
+
+    $ossoht = [];
+    $ossogl = [];
+    $osmodht = [];
+    $osmodgl = [];
+    $sjht = [];
+    $sjgl = [];
+
+    foreach ($data3 as $row){
+    if ($row->tipe=='HT')
+    {
+    $ossoht[$row->cust]=$row->sisaso;
+    $osmodht[$row->cust]=$row->sisamod;
+    $sjht[$row->cust]=$row->sj;
+
     }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
+    if ($row->tipe=='GLAZED')
+    {
+    $ossogl[$row->cust]=$row->sisaso;
+    $osmodgl[$row->cust]=$row->sisamod;
+    $sjgl[$row->cust]=$row->sj;
     }
     }
 
-    if ($row->jenis == 'GLAZED DARK MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-    }
-
-    if ($row->jenis == 'GLAZED SATIN LIGHT') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-    }
-
-    if ($row->jenis == 'GLAZED SATIN DARK') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-    }
-
-    if ($row->jenis == 'GLAZED MEDIUM MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-    }
-
-    if ($row->jenis == 'GLAZED REGULAR MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $core[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $remo[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $valda[$row->jenis] = $row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-    $valerio[$row->jenis] = $row->endstock;
-    }
-    }
-
-    if ($row->brand=='CARLO'){
-    $totalcarlo+=$row->endstock;
-    }
-    if ($row->brand=='CORE'){
-    $totalcore+=$row->endstock;
-    }
-    if ($row->brand=='EOD'){
-    $totaleod+=$row->endstock;
-    }
-    if ($row->brand=='MAHESA'){
-    $totalmahesa+=$row->endstock;
-    }
-    if ($row->brand=='REMO'){
-    $totalremo+=$row->endstock;
-    }
-    if ($row->brand=='VALDA'){
-    $totalvalda+=$row->endstock;
-    }
-    if ($row->brand=='VALERIO'){
-
-    $totalvalerio+=$row->endstock;
-    }}
     @endphp
+
+    <p><strong>SALES REPORT - KEY ACCOUNT</strong></p>
+
+    <table>
+        <tr>
+            <th style="font-size:12px;">DISTRIBUTOR</th>
+            <th style="font-size:12px;" colspan="2">OS SO</th>
+            <th style="font-size:12px;" colspan="2">OS MOD</th>
+            <th style="font-size:12px;" colspan="2">SJ</th>
+        </tr>
+        <tr>
+            <th style="font-size:12px;"></th>
+            <th style="font-size:12px;">HT</th>
+            <th style="font-size:12px;">GP</th>
+            <th style="font-size:12px;">HT</th>
+            <th style="font-size:12px;">GP</th>
+            <th style="font-size:12px;">HT</th>
+            <th style="font-size:12px;">GP</th>
+
+        </tr>
+
+        @foreach ($dist as $row)
+        @if ($ossoht[$row]==0 and $ossogl[$row]==0 and $osmodht[$row]==0 and $osmodgl[$row]==0 and $sjht[$row]==0 and $sjgl[$row]==0)
+
+        @else
+
+        <tr>
+            <td style="font-size:12px;" align="left">{{$row}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($ossoht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($ossogl[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($osmodht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($osmodgl[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($sjht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($sjgl[$row],0,",",".")}}</td>
+
+
+
+
+
+        </tr>
+        @endif
+
+        @endforeach
+    </table>
+    <br>
+    <br>
 
 
     <p><strong>INVENTORY STOCK - GLOBAL</strong></p>
 
+
     <table>
-
         <tr>
-            <th style="font-size:12px;">BRAND</th>
-            <th style="font-size:12px;">CARLO</th>
-            <th style="font-size:12px;">CORE</th>
-            <th style="font-size:12px;">EOD</th>
-            <th style="font-size:12px;">MAHESA</th>
-            <th style="font-size:12px;">REMO</th>
-            <th style="font-size:12px;">VALDA</th>
-            <th style="font-size:12px;">VALERIO</th>
-
-        </tr>
-        <tr>
-            <td style="font-size:12px;" align="left">TOTAL</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalcarlo?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalcore?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totaleod?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalmahesa?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalremo?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalvalda?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalvalerio?? 0,0,",",".")}}</td>
-
-
-
-
+            <th style="font-size:12px;">Tipe</th>
+            <th style="font-size:12px;">PHP (M2)</th>
+            <th style="font-size:12px;">SALES (M2)</th>
+            <th style="font-size:12px;">END STOCK (M2)</th>
+            <th style="font-size:12px;">SALES VS STOCK (M2)</th>
 
         </tr>
 
-
-        @foreach ($jenis as $row)
+        @foreach ($data4 as $row)
 
         <tr>
-            <td style="font-size:12px;" align="left">{{$row}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($carlo[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($core[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($eod[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($mahesa[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($remo[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($valda[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($valerio[$row]?? 0,0,",",".")}}</td>
-
-
-
-
+            @if ($row->name=='TOTAL')
+            <td style="font-size:12px;" align="left"><strong>{{$row->name}}</td>
+            <td style="font-size:12px;" align="right"><strong>{{number_format($row->php,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right"><strong>{{number_format($row->sales,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right"><strong>{{number_format($row->stock,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right"><strong>{{number_format($row->life,0,",",".")}}</td>
+            @else
+            <td style="font-size:12px;" align="left">{{$row->name}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->php,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->sales,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->stock,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->life,0,",",".")}}</td>
+            @endif
 
         </tr>
 

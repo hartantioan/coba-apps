@@ -254,14 +254,18 @@ class MarketingOrderAgingController extends Controller
                         AND ip.post_date <= :date1
                         AND ip.status IN ('2','3')
                 ),0) AS total_payment,
+                IFNULL((SELECT 
+                    gr.name 
+                    FROM groups gr
+                    WHERE gr.id = u.group_id
+                ),'-') AS grupcust,
                 0 AS total_memo,
                 u.name AS account_name,
-                u.employee_no AS account_code, gr.name as grupcust, datediff(:date3,post_date) as invoiceage,
+                u.employee_no AS account_code, datediff(:date3,post_date) as invoiceage,
                 datediff(:date4,due_date_internal) as dueage, moi.code as invoice
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
-                JOIN `groups` gr on gr.id=u.group_id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

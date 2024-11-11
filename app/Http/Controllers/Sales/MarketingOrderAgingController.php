@@ -54,6 +54,8 @@ class MarketingOrderAgingController extends Controller
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM marketing_order_invoices moi
+                JOIN users u
+                    ON u.id = moi.account_id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

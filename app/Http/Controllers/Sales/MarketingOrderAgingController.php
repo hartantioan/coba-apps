@@ -38,7 +38,7 @@ class MarketingOrderAgingController extends Controller
 
         $results = DB::select("
             SELECT 
-                moi.*,
+                moi.*,u.*,gr.name as grup,
                 IFNULL((SELECT 
                     SUM(ipd.subtotal) 
                     FROM incoming_payment_details ipd 
@@ -50,12 +50,21 @@ class MarketingOrderAgingController extends Controller
                         AND ip.post_date <= :date1
                         AND ip.status IN ('2','3')
                 ),0) AS total_payment,
+                IFNULL((SELECT 
+                    SUM(lbc.nominal-coalesce(lbc.grandtotal,0))
+                    FROM list_bg_checks lbc
+                    WHERE 
+                        lbc.account_id = moi.account_id
+                        AND lbc.status IN ('2','3')
+                        AND lbc.deleted_at IS NULL
+                ),0) AS outstandcheck,
                 0 AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
+                JOIN `groups` gr on u.group_id=gr.id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
@@ -137,11 +146,11 @@ class MarketingOrderAgingController extends Controller
                     $newData[] = [
                         'customer_code'         => $row->account_code,
                         'customer_name'         => $row->account_name,
-                        'customer_group'        => '',
+                        'customer_group'        => $row->grup,
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
-                        'credit_balance'        => $balance,
-                        'limit_credit'          => 0,
+                        'credit_balance'        => $row->limit_credit - $balance,
+                        'limit_credit'          => $row->limit_credit,
                         'outstand_check'          => $row->outstandcheck ?? 0,
 
                     ];

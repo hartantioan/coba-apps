@@ -119,6 +119,27 @@
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                                     </div> --}}
+                                                    <div class="col m4 s6 ">
+                                                        <label for="filter_place" style="font-size:1rem;">Filter Plant :</label>
+                                                        <div class="input-field col s12">
+                                                            <select class="browser-default" id="filter_place" onchange="addItemFromStock()">
+                                                                @foreach ($place as $row)
+                                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col m4 s6 ">
+                                                        <label for="filter_warehouse" style="font-size:1rem;">Warehouse :</label>
+                                                        <div class="input-field col s12">
+                                                            <select class="browser-default" id="filter_warehouse">
+                                                                @foreach ($warehouse as $row)
+                                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col m12 s12"></div>
                                                     <div class="col m3 s6 ">
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Awal :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
@@ -228,42 +249,11 @@
     });
     function exportExcel(){
 
-        $('#export_button').hide();
-        var finish_date = $('#finish_date').val();
+        var warehouse_id = $('#filter_warehouse').val();
+        var place_id = $('#filter_place').val();
         var start_date = $('#start_date').val();
-        var $search = '';
-        $.ajax({
-            url: '{{ Request::url() }}/export',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                finish_date: finish_date,
-                start_date : start_date,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main-display');
-            },
-            success: function(response) {
-                loadingClose('#main-display');
-                M.toast({
-                    html: response.message
-                });
-            },
-            error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-
-        // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
+        var end_date = $('#finish_date').val();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
 
     }
     function exportCsv(){

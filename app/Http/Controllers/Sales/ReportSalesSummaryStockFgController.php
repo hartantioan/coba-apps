@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportReportSalesSummaryStockFg;
+use App\Jobs\StockSummaryPenjualanJob;
 
 class ReportSalesSummaryStockFgController extends Controller
 {
@@ -125,8 +126,14 @@ class ReportSalesSummaryStockFgController extends Controller
     }
 
     public function export(Request $request){
+
         $start_date = $request->start_date;
-        $finish_date = $request->end_date;
-		return Excel::download(new ExportReportSalesSummaryStockFg($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+        $finish_date = $request->finish_date;
+
+        $user_id = session('bo_id');
+
+        StockSummaryPenjualanJob::dispatch($start_date, $finish_date,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
 }

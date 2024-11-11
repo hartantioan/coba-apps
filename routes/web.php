@@ -3015,7 +3015,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('sales_summary_stock_fg')->middleware('operation.access:sales_summary_stock_fg,view')->group(function () {
                         Route::get('/', [ReportSalesSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportSalesSummaryStockFgController::class, 'filter']);
-                        Route::get('export', [ReportSalesSummaryStockFgController::class, 'export']);
+                        Route::post('export', [ReportSalesSummaryStockFgController::class, 'export']);
                     });
 
 

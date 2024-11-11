@@ -281,8 +281,8 @@ class ProductionRepackController extends Controller
                         $itemstock = ItemStock::find($row);
                         if($itemstock){
                             $qtyStock = $itemstock->stockByDate($request->post_date);
-                            if($qtyStock < $arrItemQty[$key]){
-                                $arrErrorItem[] = 'Item '.$itemstock->item->name.' qty stock tidak mencukupi pada tanggal terpilih. Stok : '.CustomHelper::formatConditionalQty($qtyStock).' - kebutuhan '.CustomHelper::formatConditionalQty($arrItemQty[$key]);
+                            if(round($qtyStock,3) < $arrItemQty[$key]){
+                                $arrErrorItem[] = 'Item '.$itemstock->item->name.' qty stock tidak mencukupi pada tanggal terpilih. Stok : '.CustomHelper::formatConditionalQty(round($qtyStock,3)).' - kebutuhan '.CustomHelper::formatConditionalQty($arrItemQty[$key]);
                             }
                         }else{
                             $arrErrorItem[] = 'Data item stock tidak ditemukan.';

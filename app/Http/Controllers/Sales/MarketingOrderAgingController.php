@@ -38,7 +38,7 @@ class MarketingOrderAgingController extends Controller
 
         $results = DB::select("
             SELECT 
-                moi.*,u.*,gr.name as grup,
+                moi.*,
                 IFNULL((SELECT 
                     SUM(ipd.subtotal) 
                     FROM incoming_payment_details ipd 
@@ -54,10 +54,6 @@ class MarketingOrderAgingController extends Controller
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM marketing_order_invoices moi
-                JOIN users u
-                    ON u.id = moi.account_id
-                JOIN `groups` gr on u.group_id=gr.id
-                
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

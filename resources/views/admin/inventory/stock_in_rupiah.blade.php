@@ -387,7 +387,7 @@
     }
 
     function exportExcel() {
-        /* swal({
+        swal({
             title: 'ALERT',
             text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
@@ -400,7 +400,7 @@
                 </div>
             </div>
         `);
-        $('#export_button').hide(); */
+        $('#export_button').hide();
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
         var item = $('#item_id').val() ? $('#item_id').val() : '';
@@ -408,7 +408,7 @@
         var group = $('#filter_group').val() ? $('#filter_group').val() : '';
         var startdate = $('#start_date').val() ? $('#start_date').val() : '';
         var finishdate = $('#finish_date').val() ? $('#finish_date').val() : '';
-        /* $.ajax({
+        $.ajax({
             url: '{{ Request::url() }}/export',
             type: 'POST',
             dataType: 'JSON',
@@ -418,8 +418,8 @@
                 item : item,
                 type : type,
                 group : group,
-                startdate : startdate,
-                finishdate : finishdate,
+                start_date : startdate,
+                finish_date : finishdate,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -442,8 +442,8 @@
                     icon: 'error'
                 });
             }
-        }); */
+        });
 
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group;
+        // window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group;
     }
 </script>

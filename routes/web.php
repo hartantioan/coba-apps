@@ -2286,7 +2286,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [StockInRupiahController::class, 'index']);
                         Route::post('filter', [StockInRupiahController::class, 'filter']);
                         /* Route::post('export', [StockInRupiahController::class, 'export']); */
-                        Route::get('export', [StockInRupiahController::class, 'export']);
+                        Route::post('export', [StockInRupiahController::class, 'export']);
                     });
                     Route::prefix('dead_stock')->middleware('operation.access:dead_stock,view')->group(function () {
                         Route::get('/', [DeadStockController::class, 'index']);
@@ -3572,17 +3572,17 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [LedgerController::class, 'index']);
                         Route::get('datatable', [LedgerController::class, 'datatable']);
                         Route::get('row_detail', [LedgerController::class, 'rowDetail']);
-                        Route::get('export', [LedgerController::class, 'export']);
+                        Route::post('export', [LedgerController::class, 'export']);
                     });
                     Route::prefix('trial_balance')->middleware('operation.access:trial_balance,view')->group(function () {
                         Route::get('/', [TrialBalanceController::class, 'index']);
                         Route::post('process', [TrialBalanceController::class, 'process']);
-                        Route::get('export', [TrialBalanceController::class, 'export']);
+                        Route::post('export', [TrialBalanceController::class, 'export']);
                     });
                     Route::prefix('profit_loss')->middleware('operation.access:profit_loss,view')->group(function () {
                         Route::get('/', [ProfitLossController::class, 'index']);
                         Route::post('process', [ProfitLossController::class, 'process']);
-                        Route::get('export', [ProfitLossController::class, 'export']);
+                        Route::post('export', [ProfitLossController::class, 'export']);
                     });
                 });
             });

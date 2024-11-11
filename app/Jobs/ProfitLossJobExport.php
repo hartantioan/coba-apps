@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Exports\ExportReportSalesSummaryStockFg;
+use App\Exports\ExportProfitLoss;
+use App\Models\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,29 +12,29 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
-use App\Models\Notification;
 
-class StockSummaryPenjualanJob implements ShouldQueue
+class ProfitLossJobExport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $start_date;
-    protected $end_date;
-    protected $user_id;
+    protected $month_start,$month_end,$level,$company, $user_id;
 
-    public function __construct($start_date, $end_date,$user_id)
+
+    public function __construct(string $month_start, string $month_end,string $level,string $company, string $user_id)
     {
-        $this->start_date = $start_date;
-        $this->end_date = $end_date;
+        $this->month_start = $month_start ? $month_start : '';
+		$this->month_end = $month_end ? $month_end : '';
+        $this->level = $level ? $level : '';
+        $this->company = $company ? $company : '';
         $this->user_id = $user_id;
         $this->queue = 'report';
     }
 
     public function handle()
     {
-        $filename = 'summary_stock_fg_sales_' . uniqid() . '.xlsx';
+        $filename = 'profit_loss_' . uniqid() . '.xlsx';
 
-        Excel::store(new ExportReportSalesSummaryStockFg($this->start_date, $this->end_date), 'public/report/'.$filename);
+        Excel::store(new ExportProfitLoss($this->month_start,$this->month_end,$this->level,$this->company), 'public/report/'.$filename);
         Notification::create([
             'code'				=> Str::random(20),
             'menu_id'			=> 0,
@@ -41,7 +42,7 @@ class StockSummaryPenjualanJob implements ShouldQueue
             'to_user_id'		=> $this->user_id,
             'lookable_type'		=> 'report',
             'lookable_id'		=> 0,
-            'title'				=> 'Report telah berhasil diproses Stock Summary Fg Penjualan',
+            'title'				=> 'Report telah berhasil diproses Profit LOSS Mohon Ditunggu',
             'note'				=> env('APP_URL').'/storage/report/'.$filename,
             'status'			=> '1'
         ]);

@@ -90,7 +90,7 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
-                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="exportExcel();" data-position="top" data-tooltip="Export Excel">
+                                                <a id="export_button" class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="exportExcel();" data-position="top" data-tooltip="Export Excel">
                                                     <i class="material-icons center">view_list</i>
                                                 </a>
                                             </div>
@@ -120,21 +120,64 @@
 
 <script>
     $(function(){
-        
+
     });
 
     function exportExcel(){
         var month_start = $('#month_start').val(), month_end = $('#month_end').val(), level = $('#level').val(), company = $('#company').val();
-        window.location = "{{ Request::url() }}/export?month_start=" + month_start + "&month_end=" + month_end + "&level=" + level + "&company=" + company;
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                month_start : month_start,
+                month_end: month_end,
+                level : level,
+                company : company,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function reset(){
         $('#company').val($("#company option:first").val()).formSelect();
         $('#level').val($("#level option:first").val()).formSelect();
         $('#month_start,#month_end').val('{{ date("Y-m") }}');
-        $('#result').html('
-            Silahkan pilih bulan dan tekan tombol hijau.
-        ');
+        $('#result').html(' Silahkan pilih bulan dan tekan tombol hijau.');
     }
 
     function process(){

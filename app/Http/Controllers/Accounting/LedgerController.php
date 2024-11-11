@@ -12,12 +12,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportLedger;
+use App\Jobs\LedgerExportJob;
 
 class LedgerController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $data = [
             'title'     => 'Buku Besar (Ledger)',
             'content'   => 'admin.accounting.ledger',
@@ -42,7 +43,7 @@ class LedgerController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Coa::where('status','1')->where('level','5')->count();
-        
+
         $query_data = Coa::where(function($query) use ($search, $request) {
                     if($search) {
                         $query->where(function($query) use ($search) {
@@ -69,7 +70,7 @@ class LedgerController extends Controller
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('name', 'like', "%$search%");
                         });
-                    }     
+                    }
 
                     if($request->coa) {
                         $query->where('id', $request->coa);
@@ -87,7 +88,7 @@ class LedgerController extends Controller
 
                 $balance_debit = 0;
                 $balance_credit = 0;
-				
+
                 if($request->start_date && $request->finish_date) {
                     $periode = "DATE(post_date) >= '$request->start_date' AND DATE(post_date) <= '$request->finish_date'";
                 } else if($request->start_date) {
@@ -97,7 +98,7 @@ class LedgerController extends Controller
                 } else {
                     $periode = "";
                 }
-                
+
                 $balance_debit = $val->getBalanceFromDateDebit($request->start_date);
                 $balance_credit = $val->getBalanceFromDateCredit($request->start_date);
 
@@ -126,7 +127,7 @@ class LedgerController extends Controller
                 foreach($ending_debit as $rowdebit){
                     $total_debit += round($rowdebit->nominal,2);
                 }
-    
+
                 foreach($ending_credit as $rowcredit){
                     $total_credit += round($rowcredit->nominal,2);
                 }
@@ -162,7 +163,7 @@ class LedgerController extends Controller
 
     public function rowDetail(Request $request){
         $coa   = Coa::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -183,7 +184,7 @@ class LedgerController extends Controller
                                 <th class="center-align">Saldo</th>
                             </tr>
                         </thead><tbody>';
-        
+
         $beginning_total = 0;
         $no = 2;
 
@@ -258,9 +259,9 @@ class LedgerController extends Controller
             </tr>';
             $no++;
         }
-        
+
         $string .= '</tbody></table></div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -271,7 +272,12 @@ class LedgerController extends Controller
         $company_id = $request->company_id ? $request->company_id : '';
         $search = $request->search ? $request->search : '';
         $closing_journal = $request->closing_journal ? $request->closing_journal : '';
+        $user_id = session('bo_id');
 
-		return Excel::download(new ExportLedger($start_date,$end_date,$coa_id,$company_id,$search,$closing_journal), 'ledger_'.uniqid().'.xlsx');
+        LedgerExportJob::dispatch($start_date,$end_date,$coa_id,$company_id,$search,$closing_journal,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+
+		// return Excel::download(new ExportLedger($start_date,$end_date,$coa_id,$company_id,$search,$closing_journal), 'ledger_'.uniqid().'.xlsx');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Exports\ExportReportSalesSummaryStockFg;
+use App\Exports\ExportLedger;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,27 +13,28 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use App\Models\Notification;
 
-class StockSummaryPenjualanJob implements ShouldQueue
+class LedgerExportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    protected $start_date,$end_date,$coa_id,$company_id,$search,$closing_journal,$user_id;
 
-    protected $start_date;
-    protected $end_date;
-    protected $user_id;
-
-    public function __construct($start_date, $end_date,$user_id)
+    public function __construct($start_date,$end_date,$coa_id,$company_id,$search,$closing_journal,$user_id)
     {
         $this->start_date = $start_date;
         $this->end_date = $end_date;
         $this->user_id = $user_id;
+        $this->coa_id = $coa_id;
+        $this->company_id = $company_id;
+        $this->search = $search;
+        $this->closing_journal = $closing_journal;
         $this->queue = 'report';
     }
 
     public function handle()
     {
-        $filename = 'summary_stock_fg_sales_' . uniqid() . '.xlsx';
+        $filename = 'ledger_report_' . uniqid() . '.xlsx';
 
-        Excel::store(new ExportReportSalesSummaryStockFg($this->start_date, $this->end_date), 'public/report/'.$filename);
+        Excel::store(new ExportLedger($this->start_date,$this->end_date,$this->coa_id,$this->company_id,$this->search,$this->closing_journal), 'public/report/'.$filename);
         Notification::create([
             'code'				=> Str::random(20),
             'menu_id'			=> 0,
@@ -41,9 +42,10 @@ class StockSummaryPenjualanJob implements ShouldQueue
             'to_user_id'		=> $this->user_id,
             'lookable_type'		=> 'report',
             'lookable_id'		=> 0,
-            'title'				=> 'Report telah berhasil diproses Stock Summary Fg Penjualan',
+            'title'				=> 'Report telah berhasil diproses Ledger',
             'note'				=> env('APP_URL').'/storage/report/'.$filename,
             'status'			=> '1'
         ]);
     }
+
 }

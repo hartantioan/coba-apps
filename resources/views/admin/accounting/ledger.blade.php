@@ -75,7 +75,7 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
-                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                <a id="export_button" class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                     <i class="material-icons center">view_list</i>
                                                 </a>
                                             </div>
@@ -185,9 +185,9 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#data_detail').empty();
@@ -201,7 +201,56 @@
 
     function exportExcel(){
         var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search(), is_closing_journal = ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : '');
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search + "&closing_journal=" + is_closing_journal;
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                closing_journal: is_closing_journal,
+                search : search,
+                company_id : company_id,
+                coa_id : coa_id,
+                start_date : start_date,
+                end_date : finish_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+        // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search + "&closing_journal=" + is_closing_journal;
     }
 
     function reset(){
@@ -282,7 +331,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             select: {
                 style: 'multi'

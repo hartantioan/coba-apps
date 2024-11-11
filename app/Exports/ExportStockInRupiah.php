@@ -25,6 +25,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
         $this->group = $group ? $group : '';
+
     }
 
     public function view(): View
@@ -32,7 +33,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         DB::statement("SET SQL_MODE=''");
         if($this->type == 'final'){
             $perlu = 0 ;
-           
+
             $query_data = ItemCogs::where(function($query)  {
                 $query->whereHas('item',function($query) {
                     $query->whereIn('status',['1','2']);
@@ -55,18 +56,19 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->where('id',$this->warehouse);
                     });
                 }
-    
+
                 if($this->group){
-                   
-                    $query->whereHas('item',function($query) {
-                        $query->whereIn('item_group_id', $this->filter_group);
+                    $groupIds = explode(',', $this->group);
+
+                    $query->whereHas('item',function($query) use($groupIds) {
+                        $query->whereIn('item_group_id', $groupIds);
                     });
                 }
             })
             ->groupBy('item_id')
             ->pluck('item_id');
 
-            $arr = [];            
+            $arr = [];
             foreach($query_data as $row){
                 $data = ItemCogs::where('date','<=',$this->finish_date)->where('item_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
@@ -106,7 +108,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
                 if($this->group){
                     $groupIds = explode(',', $this->group);
-    
+
                     $query->whereHas('item',function($query) use($groupIds){
                         $query->whereIn('item_group_id', $groupIds);
                     });
@@ -117,8 +119,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             ->orderBy('id')
             ->get();
         }
-      
-        
+
+
         $previousId = null; // Initialize the previous ID variable
         $cum_qty = 0;
         $cum_val = 0 ;
@@ -128,7 +130,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         $array_last_item = [];
         $array_first_item = [];
         foreach($query_data as $row){
-           
+
             if($row->type=='IN'){
                 $priceNow = $row->price_in;
                 $cum_qty=$row->qty_in;
@@ -138,7 +140,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=round($row->total_out,2) * -1;
             }
-            
+
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -159,15 +161,15 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            
+
             if($this->type !== 'final'){
                 if ($row->item_id !== $previousId) {
-                
+
                     $query_first =
                     ItemCogs::where(function($query) use ( $row) {
                         $query->where('item_id',$row->item_id)
                         ->where('date', '<', $row->date);
-                        
+
                         if($this->plant !== 'all'){
                             $query->whereHas('place',function($query){
                                 $query->where('id',$this->plant);
@@ -202,16 +204,16 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
             }
             $previousId = $row->item_id;
-            
+
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }
-            
-            
+
+
         }
         if( $this->type !== 'final'){
             if(!$this->item){
-                $query_no = ItemCogs::whereIn('id', function ($query) {            
+                $query_no = ItemCogs::whereIn('id', function ($query) {
                     $query->selectRaw('MAX(id)')
                         ->from('item_cogs')
                         ->where('date', '<=', $this->finish_date)
@@ -224,7 +226,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     if($this->finish_date) {
                         $query->whereDate('date','<=', $this->finish_date);
                     }
-                    
+
                     if($this->plant !== 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
@@ -235,18 +237,18 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
-        
+
                     if($this->group){
-                       
+
                         $query->whereHas('item',function($query) {
                             $query->whereIn('item_group_id', explode(',',$this->group));
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                 
+
                     if (!empty($excludeIds)) {
-                        
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -263,7 +265,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     if($this->finish_date) {
                         $query->whereDate('date','<=', $this->finish_date);
                     }
-                    
+
                     if($this->plant !== 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
@@ -274,18 +276,18 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
-        
+
                     if($this->group){
-                       
+
                         $query->whereHas('item',function($query) {
                             $query->whereIn('item_group_id', explode(',',$this->group));
                         });
                     }
                     $array_last_item = collect($array_last_item);
                     $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-                 
+
                     if (!empty($excludeIds)) {
-                        
+
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
@@ -296,16 +298,16 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     $query_no[]=$first;
                 }
             }
-            
+
             if(count($query_no) > 0 ){
-                
+
                 foreach($query_no as $row_tidak_ada){
-                  
+
                     if($row_tidak_ada->qty_final > 0){
                         $array_first_item[] = [
                             'perlu'        => 1,
                             'item_id'      => $row_tidak_ada->item->id,
-                            'id'           => $row_tidak_ada->id, 
+                            'id'           => $row_tidak_ada->id,
                             'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                             'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
                             'item'         => $row_tidak_ada->item->name,
@@ -315,14 +317,14 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                             'satuan'       => $row_tidak_ada->item->uomUnit->code,
                             'kode'         => $row_tidak_ada->item->code,
                             'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
-                        ]; 
+                        ];
                     }
-                    
+
                 }
             }
-            
+
         }
-        
+
         $combinedArray = [];
 
         // Merge $array_filter into $combinedArray
@@ -342,11 +344,11 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         usort($combinedArray, function ($a, $b) {
             // First, sort by 'kode' in ascending order
             $kodeComparison = strcmp($a['kode'], $b['kode']);
-            
+
             if ($kodeComparison !== 0) {
                 return $kodeComparison;
             }
-        
+
             // If 'kode' is the same, prioritize 'perlu' in descending order
             return $b['perlu'] - $a['perlu'];
         });

@@ -12,12 +12,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportTrialBalance;
+use App\Jobs\TrialBalanceJobExport;
 
 class TrialBalanceController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $data = [
             'title'     => 'Neraca Saldo (Trial Balance)',
             'content'   => 'admin.accounting.trial_balance',
@@ -138,7 +139,7 @@ class TrialBalanceController extends Controller
                     if($coas[$keymain + 1]->parent_id !== $row->parent_id){
                         $html .= '<tr>
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->name.'</b></td>';
-                        
+
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
@@ -146,7 +147,7 @@ class TrialBalanceController extends Controller
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
-                        
+
                         $html .= '</tr>';
                     }
                 }else{
@@ -214,7 +215,7 @@ class TrialBalanceController extends Controller
                     if($coas[$keymain + 1]->parentSub->parent_id !== $row->parentSub->parent_id){
                         $html .= '<tr>
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->name.'</b></td>';
-                        
+
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
@@ -222,7 +223,7 @@ class TrialBalanceController extends Controller
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
-                        
+
                         $html .= '</tr>';
                     }
                 }else{
@@ -298,14 +299,14 @@ class TrialBalanceController extends Controller
                     if($coas[$keymain + 1]->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parent_id){
                         $html .= '<tr>
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
-                        
+
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
-                        
+
                         $html .= '</tr>';
                     }
                 }else{
@@ -388,14 +389,14 @@ class TrialBalanceController extends Controller
                     if($coas[$keymain + 1]->parentSub->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parentSub->parent_id){
                         $html .= '<tr>
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
-                        
+
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
-                        
+
                         $html .= '</tr>';
                     }
                 }else{
@@ -438,7 +439,7 @@ class TrialBalanceController extends Controller
 
                 element.css("position", "relative");
                 element.css("border", "1px solid;");
-                
+
                 $(window).on("scroll", function(event) {
                     var scrollTop = $(window).scrollTop();
                     var imgtop = scrollTop < originalY ? 0 : scrollTop - originalY + topMargin;
@@ -446,7 +447,7 @@ class TrialBalanceController extends Controller
                 });
             </script>
         ';
-        
+
 
         #end logic
 
@@ -468,7 +469,10 @@ class TrialBalanceController extends Controller
         $month_end = $request->month_end ? $request->month_end : '';
         $level = $request->level ? $request->level : '';
         $company = $request->company ? $request->company : '';
+        $user_id = session('bo_id');
+        TrialBalanceJobExport::dispatch($month_start,$month_end,$level,$company, $user_id);
 
-		return Excel::download(new ExportTrialBalance($month_start,$month_end,$level,$company), 'trial_balance_'.uniqid().'.xlsx');
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportTrialBalance($month_start,$month_end,$level,$company), 'trial_balance_'.uniqid().'.xlsx');
     }
 }

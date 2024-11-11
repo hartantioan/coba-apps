@@ -2746,11 +2746,11 @@ class Select2Controller extends Controller {
                         ->where('item_id',$item)
                         ->where('place_id',$place)
                         ->where('qty','>',0)
-                        ->where(function($query)use($request){
+                        /* ->where(function($query)use($request){
                             if($request->arr_stock){
                                 $query->whereNotIn('id',$request->arr_stock);
                             }
-                        })
+                        }) */
                         ->get();
 
         foreach($data as $d) {

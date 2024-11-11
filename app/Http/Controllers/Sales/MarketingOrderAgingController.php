@@ -58,7 +58,7 @@ class MarketingOrderAgingController extends Controller
                     ON u.id = moi.account_id
                 JOIN `groups` gr on u.group_id=gr.id
                 LEFT JOIN (select account_id,sum(nominal-coalesce(grandtotal,0)) as outstandcheck 
-                      from list_bg_checks where void_date is null and deleted_at is null group by account_id)oc on oc.account_id=u.id
+                      from list_bg_checks where status IN ('2','3') and deleted_at is null group by account_id)oc on oc.account_id=u.id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

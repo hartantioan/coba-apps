@@ -38,7 +38,7 @@ class MarketingOrderAgingController extends Controller
 
         $results = DB::select("
             SELECT 
-                moi.*,u.*,gr.name as grup,
+                *,
                 IFNULL((SELECT 
                     SUM(ipd.subtotal) 
                     FROM incoming_payment_details ipd 
@@ -50,6 +50,11 @@ class MarketingOrderAgingController extends Controller
                         AND ip.post_date <= :date1
                         AND ip.status IN ('2','3')
                 ),0) AS total_payment,
+                IFNULL((SELECT 
+                    gr.name 
+                    FROM groups gr
+                    WHERE gr.id = u.group_id
+                ),'-') AS grup,
                 IFNULL((SELECT 
                     SUM(lbc.nominal - IFNULL(lbc.grandtotal,0))
                     FROM list_bg_checks lbc
@@ -64,8 +69,6 @@ class MarketingOrderAgingController extends Controller
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
-                JOIN groups gr 
-                    ON u.group_id=gr.id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

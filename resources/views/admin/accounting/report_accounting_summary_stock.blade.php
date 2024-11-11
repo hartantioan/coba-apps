@@ -119,6 +119,27 @@
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                                     </div> --}}
+                                                    <div class="col m4 s6 ">
+                                                        <label for="filter_place" style="font-size:1rem;">Filter Plant :</label>
+                                                        <div class="input-field col s12">
+                                                            <select class="browser-default" id="filter_place" onchange="addItemFromStock()">
+                                                                @foreach ($place as $row)
+                                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col m4 s6 ">
+                                                        <label for="filter_warehouse" style="font-size:1rem;">Warehouse :</label>
+                                                        <div class="input-field col s12">
+                                                            <select class="browser-default" id="filter_warehouse">
+                                                                @foreach ($warehouse as $row)
+                                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col m12 s12"></div>
                                                     <div class="col m3 s6 ">
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Awal :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
@@ -138,7 +159,7 @@
                                                             <span class="hide-on-small-onl">Reset</span>
                                                             <i class="material-icons right">loop</i>
                                                         </a> --}}
-                                                        <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
@@ -227,55 +248,12 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
     });
     function exportExcel(){
-        swal({
-            title: 'ALERT',
-            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
-        });
-        $('#validation_alert').show();
-        $('#validation_alert').append(`
-            <div class="card-alert card red">
-                <div class="card-content white-text">
-                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
-                </div>
-            </div>
-        `);
-        $('#export_button').hide();
-        var finish_date = $('#finish_date').val();
+        var warehouse_id = $('#filter_warehouse').val();
+        var place_id = $('#filter_place').val();
         var start_date = $('#start_date').val();
-        var $search = '';
-        $.ajax({
-            url: '{{ Request::url() }}/export',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                finish_date: finish_date,
-                start_date : start_date,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main-display');
-            },
-            success: function(response) {
-                loadingClose('#main-display');
-                M.toast({
-                    html: response.message
-                });
-            },
-            error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-
-        // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
+        var end_date = $('#finish_date').val();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
 
     }
     function exportCsv(){

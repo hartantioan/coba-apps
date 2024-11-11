@@ -40,7 +40,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
 
         // }
         $key = 0;
-        foreach ($mo as $row) {
+        foreach ($mo as $key => $row) {
 
             $array_filter[] = [
                 'no'                => ($key+1),

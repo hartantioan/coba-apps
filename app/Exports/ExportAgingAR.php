@@ -26,7 +26,7 @@ class ExportAgingAR implements FromView, WithEvents
         $array_filter = [];
         $query_data = DB::select("
               SELECT 
-                moi.*,u.*,gr.name as grup,ifnull(oc.outstandcheck,0) as outstandcheck,
+                moi.*,u.*,ifnull(oc.outstandcheck,0) as outstandcheck,
                 IFNULL((SELECT 
                     SUM(ipd.subtotal) 
                     FROM incoming_payment_details ipd 
@@ -38,6 +38,11 @@ class ExportAgingAR implements FromView, WithEvents
                         AND ip.post_date <= :date1
                         AND ip.status IN ('2','3')
                 ),0) AS total_payment,
+                IFNULL((SELECT 
+                    gr.name 
+                    FROM groups gr
+                    WHERE gr.id = u.group_id
+                ),'-') AS grup,
                 0 AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code, datediff(:date3,post_date) as invoiceage,
@@ -45,7 +50,6 @@ class ExportAgingAR implements FromView, WithEvents
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
-                JOIN `groups` gr on u.group_id=gr.id
                 LEFT JOIN (select account_id,sum(nominal-coalesce(grandtotal,0)) as outstandcheck 
                       from list_bg_checks where void_date is null and deleted_at is null group by account_id)oc on oc.account_id=u.id
                 WHERE 

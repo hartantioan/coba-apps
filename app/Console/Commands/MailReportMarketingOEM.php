@@ -427,7 +427,7 @@ class MailReportMarketingOEM extends Command
 			];
 		}
 
-		//global 2b
+		//oem 2b
 		$query = DB::select("	
                SELECT brand ,tipe ,jenis,pattern,grade,CODE, SUM(qty) AS endstock FROM (
                 SELECT e.`name` AS tipe, f.name AS brand, g.name AS jenis,i.name AS pattern,j.`name` AS grade,k.code, coalesce(SUM(b.qty*c.conversion),0) AS Qty

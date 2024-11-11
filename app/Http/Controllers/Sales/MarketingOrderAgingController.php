@@ -64,7 +64,8 @@ class MarketingOrderAgingController extends Controller
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
-                JOIN `groups` gr on u.group_id=gr.id
+                JOIN groups gr 
+                    ON u.group_id=gr.id
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0

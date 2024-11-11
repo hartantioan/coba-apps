@@ -117,6 +117,11 @@ class GoodReceiptPOController extends Controller
                                 })
                                 ->orWhereHas('goodScale',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%");
+                                })
+                                ->orWhereHas('purchaseOrderDetail',function($query) use($search, $request){
+                                    $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -186,6 +191,11 @@ class GoodReceiptPOController extends Controller
                                 })
                                 ->orWhereHas('goodScale',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%");
+                                })
+                                ->orWhereHas('purchaseOrderDetail',function($query) use($search, $request){
+                                    $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){

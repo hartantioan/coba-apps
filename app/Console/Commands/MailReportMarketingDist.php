@@ -41,7 +41,7 @@ class MailReportMarketingDist extends Command
             }
 
             if ($merk == 4) {
-                $recipient = ['andrianto@superiorporcelain.co.id','eunike@superior.co.id'];
+                $recipient = ['adrianto@superiorporcelain.co.id','eunike@superior.co.id'];
             }
 
             if ($merk == 13) {

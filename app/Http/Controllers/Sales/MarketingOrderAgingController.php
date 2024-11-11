@@ -101,6 +101,7 @@ class MarketingOrderAgingController extends Controller
 
         foreach ($results as $row) {
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            info($row->code);
             if ($balance > 0) {
                 $daysDiff = $this->dateDiffInDays($row->due_date, $date);
                 $index = $this->findDuplicate($row->account_code, $newData);

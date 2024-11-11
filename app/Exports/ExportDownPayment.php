@@ -39,6 +39,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                             pid.purchase_down_payment_id = pdp.id
                             AND pi.post_date <= :date1
                             AND pi.status IN ('2','3','7')
+                            AND pid.deleted_at IS NULL
                     ),0) AS total_used,
                     IFNULL((
                         SELECT

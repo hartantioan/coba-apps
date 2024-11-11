@@ -137,7 +137,7 @@ class MarketingOrderAgingController extends Controller
                     $newData[] = [
                         'customer_code'         => $row->account_code,
                         'customer_name'         => $row->account_name,
-                        'customer_group'        => $row->grup,
+                        'customer_group'        => '',
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
                         'credit_balance'        => $row->limit_credit - $balance,

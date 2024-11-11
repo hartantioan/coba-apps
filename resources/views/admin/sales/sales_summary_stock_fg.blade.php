@@ -138,7 +138,7 @@
                                                             <span class="hide-on-small-onl">Reset</span>
                                                             <i class="material-icons right">loop</i>
                                                         </a> --}}
-                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                        <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
@@ -227,7 +227,19 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
     });
     function exportExcel(){
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
         $('#export_button').hide();
         var finish_date = $('#finish_date').val();
         var start_date = $('#start_date').val();

@@ -1754,7 +1754,7 @@
                                     }
 
                                     if(val.lookable_type == 'landed_costs'){
-                                        $('#vendor_id').empty().append(`
+                                        $('#account_id').empty().append(`
                                             <option value="` + val.account_id + `">` + val.account_name + `</option>
                                         `);
                                     }

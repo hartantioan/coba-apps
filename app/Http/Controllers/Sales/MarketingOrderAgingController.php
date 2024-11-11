@@ -140,8 +140,8 @@ class MarketingOrderAgingController extends Controller
                         'customer_group'        => '',
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
-                        'credit_balance'        => $row->limit_credit - $balance,
-                        'limit_credit'          => $row->limit_credit,
+                        'credit_balance'        => $balance,
+                        'limit_credit'          => 0,
                         'outstand_check'          => $row->outstandcheck ?? 0,
 
                     ];

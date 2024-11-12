@@ -283,7 +283,7 @@ class LandedCostController extends Controller
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => CustomHelper::formatConditionalQty($row->qty),
-                            'totalrow'                  => $row->lookable->total,
+                            'totalrow'                  => $row->nominal,
                             'qtyRaw'                    => $row->qty,
                             'unit'                      => $row->item->uomUnit->code,
                             'place_name'                => $row->place->code,

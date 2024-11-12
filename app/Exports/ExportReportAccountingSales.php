@@ -22,6 +22,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
     private $headings = [
         'No',
         'Status',
+        'Tipe Invoice',
         'Dokumen',
         'Voider',
         'Tanggal Void',
@@ -96,7 +97,17 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 $pricefirst = 0;
                 $discount = $row->lookable->discount ?? 0;
                 $total = $row->lookable->grandtotal;
-            }else{
+            }if($row->lookable_type == null){
+                if($row->is_include_tax == 1) {
+                    $price = $row->price / (($row->percent_tax + 100) / 100);
+                }else{
+                    $price = $row->price;
+                }
+                $pricefirst=$row->price;
+                $discount = 0;
+                $total = $row->grandtotal;
+            }
+            else{
 
                 if($row->is_include_tax == 1) {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
@@ -111,7 +122,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
                 }
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
-                $total = $row->getQtyM2() * $price;
+                $total = $row->getQtyM2() ?? 1 * $price;
             }
 
 
@@ -128,6 +139,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 $arr[] = [
                     'no'=> ($key+1),
                     'status'              => $row->marketingOrderInvoice->statusRaw(),
+                    'Tipe' =>  $row->marketingOrderInvoice->invoiceType(),
                     'code'              => $row->marketingOrderInvoice->code,
                     'voider'            => $row->marketingOrderInvoice->voidUser()->exists() ? $row->marketingOrderInvoice->voidUser->name : '',
                     'tgl_void'         => $row->marketingOrderInvoice->voidUser()->exists() ? $row->marketingOrderInvoice->void_date : '',

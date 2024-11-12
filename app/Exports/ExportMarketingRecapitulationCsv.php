@@ -34,14 +34,14 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)
             ->whereNotNull('tax_no')
-            ->where('tax_no', '!=', '')->where('code', '')
+            ->where('tax_no', '!=', '')
             ->get();
 
         $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)
             ->whereNotNull('tax_no')
-            ->where('tax_no', '!=', '')->where('code', 'ARIN-24P1-00000869')
+            ->where('tax_no', '!=', '')
             ->get();
 
         $arr = [];

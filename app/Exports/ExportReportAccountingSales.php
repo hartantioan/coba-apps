@@ -166,7 +166,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'Tipe Penjualan' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->soType() ?? '',
                     'Tipe Pengiriman' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->deliveryType() ?? '',
                     'Transport' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->transportation->name ?? '',
-                    'Ekspedisi' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->vehicle_name?? '',
+                    'Ekspedisi' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->account->name?? '',
                     'Nopol' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->vehicle_no ?? '',
                     'Supir' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->driver_name ?? '',
                     'Payment' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->getTypePaymentStatus()?? '',

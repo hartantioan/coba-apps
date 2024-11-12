@@ -1742,7 +1742,7 @@ class CustomHelper {
 
 					if($row->lookable_type == 'purchase_invoices'){
 						$mustpay = $row->lookable->getTotalPaidExcept($row->id);
-						$balanceReal = round($row->nominal * $row->lookable->latestCurrencyRateByDate($op->pay_date),3);
+						$balanceReal = round($row->nominal * $row->lookable->currency_rate,2);
 						if($row->lookable->getTotalPaid() <= 0){
 							$row->lookable->update([
 								'status'	=> '3'
@@ -1777,7 +1777,7 @@ class CustomHelper {
 						$balanceReal = $row->nominal * $op->currency_rate;
 					}elseif($row->lookable_type == 'purchase_down_payments'){
 						$mustpay = $row->lookable->balancePaidExcept($row->id);
-						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->latestCurrencyRateByDate($op->pay_date),2);
+						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2);
 						if($row->lookable->getTotalPaid() <= 0){
 							$row->lookable->update([
 								'status'	=> '3'
@@ -4556,7 +4556,7 @@ class CustomHelper {
 				}else{
 					$type = $pi->currency->type;
 
-					$currency_rate = $row->lookable->goodReceipt->latestCurrencyRateByDate($pi->post_date);
+					$currency_rate = $row->lookable->goodReceipt->journal->currency_rate;
 
 					$totalgrpo = round($row->total * $currency_rate,2);
 					$totalinvoice = round($row->total * $pi->currency_rate,2);
@@ -4729,7 +4729,7 @@ class CustomHelper {
 			if($pi->downpayment > 0){
 				foreach($pi->purchaseInvoiceDp as $row){
 					/* $downpayment += $row->nominal * $row->purchaseDownPayment->currency_rate; */
-					$currencydp = $row->purchaseDownPayment->latestCurrencyRate();
+					$currencydp = $row->purchaseDownPayment->currency_rate;
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -5998,8 +5998,8 @@ class CustomHelper {
 							'detailable_type'=> $row->getTable(),
 							'detailable_id'	=> $row->id,
 						]);
-						if($row->lookable_type == 'purchase_down_payments'){
-							if($row->lookable->balanceInvoice() <= 0){
+						/* if($row->lookable_type == 'purchase_down_payments'){
+							if($row->lookable->balanceInvoice() <= 0){ */
 								$queryreverse = Journal::create([
 									'user_id'		=> session('bo_id'),
 									'company_id'	=> $ar->company_id,
@@ -6038,8 +6038,8 @@ class CustomHelper {
 									'detailable_type'=> $row->getTable(),
 									'detailable_id'	=> $row->id,
 								]);
-							}
-						}
+							/* }
+						} */
 					}
 					if($row->type == '2'){
 						$totalBefore = round($row->nominal_fc * $row->nominal_rate,2);
@@ -6071,8 +6071,8 @@ class CustomHelper {
 							'detailable_type'=> $row->getTable(),
 							'detailable_id'	=> $row->id,
 						]);
-						if($row->lookable_type == 'purchase_down_payments'){
-							if($row->lookable->balancePayment() <= 0){
+						/* if($row->lookable_type == 'purchase_down_payments'){
+							if($row->lookable->balancePayment() <= 0){ */
 								$queryreverse = Journal::create([
 									'user_id'		=> session('bo_id'),
 									'company_id'	=> $ar->company_id,
@@ -6111,8 +6111,8 @@ class CustomHelper {
 									'detailable_type'=> $row->getTable(),
 									'detailable_id'	=> $row->id,
 								]);
-							}
-						}
+							/* }
+						} */
 					}
 					$row->update([
 						'nominal'	=> $row->nominal < 0 ? -1 * $nominal : $nominal,
@@ -6440,7 +6440,7 @@ class CustomHelper {
 			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
 			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
 
-			$currency_rate = $pdp->latestCurrencyRateByDate($date);
+			$currency_rate = $pdp->currency_rate;
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -6479,7 +6479,7 @@ class CustomHelper {
 
 			$account_id = $pi->account_id;
 
-			$currency_rate_invoice = $pi->latestCurrencyRateByDate($date);
+			$currency_rate_invoice = $pi->currency_rate;
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -6715,7 +6715,7 @@ class CustomHelper {
 				}else{
 					$type = $pi->currency->type;
 
-					$currency_rate = $row->lookable->goodReceipt->latestCurrencyRateByDate($pi->post_date);
+					$currency_rate = $row->lookable->goodReceipt->journal->currency_rate;
 
 					$totalgrpo = $row->total * $currency_rate;
 					$totalinvoice = $row->total * $currency_rate_invoice;
@@ -6833,7 +6833,7 @@ class CustomHelper {
 			if($pi->downpayment > 0){
 				foreach($pi->purchaseInvoiceDp as $row){
 					/* $downpayment += $row->nominal * $row->purchaseDownPayment->currency_rate; */
-					$currencydp = $row->purchaseDownPayment->latestCurrencyRateByDate($pi->post_date);
+					$currencydp = $row->purchaseDownPayment->currency_rate;
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,

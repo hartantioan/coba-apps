@@ -66,6 +66,7 @@ class PaymentRequestDateReportController extends Controller
                         <th class="center-align">Tgl.Bayar</th>
                         <th class="center-align">Tgl.OPYM</th>
                         <th class="center-align">Status</th>
+                        <th class="center-align">Nominal</th>
                     </tr>
                 </thead><tbody>';
         if($query_data){
@@ -85,6 +86,7 @@ class PaymentRequestDateReportController extends Controller
                     <td class="center-align">'.date('d/m/Y',strtotime($row->paymentRequest->pay_date)).'</td>
                     <td class="center-align">'.$date.'</td>
                     <td class="center-align">'.$row->paymentRequest->status().'</td>
+                    <td class="center-align">'.number_format($row->nominal,2,',','.').'</td>
                 </tr>';
             }
         }else{

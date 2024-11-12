@@ -10,6 +10,7 @@
             <th class="center-align">Tgl.Bayar</th>
             <th class="center-align">Tgl.OPYM</th>
             <th class="center-align">Status</th>
+            <th class="center-align">Nominal</th>
         </tr>
     </thead>
     <tbody>
@@ -26,6 +27,7 @@
                 <td >{{ $row['pay_date'] }}</td>
                 <td >{{ $row['opym_date'] }}</td>
                 <td >{{ $row['status'] }}</td>
+                <td >{{ $row['nominal'] }}</td>
 
             </tr>
         @endforeach

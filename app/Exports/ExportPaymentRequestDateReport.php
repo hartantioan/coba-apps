@@ -59,6 +59,7 @@ class ExportPaymentRequestDateReport implements FromView,ShouldAutoSize
                     'vendor' => $row->lookable->account->name,
                     'pay_date' => date('d/m/Y',strtotime($row->paymentRequest->pay_date)),
                     'opym_date'=> $date,
+                    'nominal'=> $row->nominal,
                     'note' => $row->paymentRequest->note
                 ];
 

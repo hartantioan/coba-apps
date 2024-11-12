@@ -34,14 +34,14 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)
             ->whereNotNull('tax_no')
-            ->where('tax_no','!=','')
+            ->where('tax_no', '!=', '')->where('code', '')
             ->get();
 
         $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)
             ->whereNotNull('tax_no')
-            ->where('tax_no','!=','')
+            ->where('tax_no', '!=', '')->where('code', 'ARIN-24P1-00000869')
             ->get();
 
         $arr = [];
@@ -79,7 +79,9 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $freeAreaTax = $row->marketingOrderDeliveryProcess()->exists() ? ($row->marketingOrderDeliveryProcess->marketingOrderDelivery->getMaxTaxType() == '2' ? '18' : '') : '';
             $arrTemp = explode('.', $row->tax_no);
             $firstcode = preg_replace('/\s+/', '', $arrTemp[0]);
-            $transactionCode = substr_count($firstcode, '0') == 2 ? substr($firstcode, 0, 2) : intval($firstcode);
+            $transactionCode = substr($firstcode, 0, 2);
+            //revCode untuk penanda kalau invoicenya 011 - direvisi
+            $revCode = substr_count($firstcode, '0') == 2 ? 0 : 1;
             array_splice($arrTemp, 0, 1);
             $tax_no = implode('', $arrTemp);
             $month = date('n', strtotime($row->post_date));
@@ -87,49 +89,52 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;'.$freeAreaTax.';0;0;0;0;' . $row->code . ';'.($row->no_pjb ?? '').';'
+                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*($row->taxMaster->percentage/100)) . ';0;'.$freeAreaTax.';2;0;0;0;' . $row->code . ';'.($row->no_pjb ?? '').';'
+                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal * ($row->taxMaster->percentage / 100)) . ';0;' . $freeAreaTax . ';2;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
             }
             $balance = floor($row->tax);
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key => $rowdetail) {
-                if($key == ($row->marketingOrderInvoiceDetail()->count() - 1)){
+                if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
-                }else{
+                } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
                 }
                 $hscode = '';
-                if($freeAreaTax){
-                    $hscode = ' '.$rowdetail->lookable->itemStock->item->type->hs_code;
+                if ($freeAreaTax) {
+                    $hscode = ' ' . $rowdetail->lookable->itemStock->item->type->hs_code;
                 }
                 $boxQty = '';
-                if($rowdetail->lookable->isPallet()){
-                    $boxQty = ' ( '.CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion).' BOX )';
+                if ($rowdetail->lookable->isPallet()) {
+                    $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
                 }
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name.$boxQty.$hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . $boxQty . $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {
-                if($key == ($row->marketingOrderInvoiceDetail()->count() - 1)){
+
+                if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
-                }else{
+                } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
                 }
+
+
                 $hscode = '';
-                if($freeAreaTax){
-                    $hscode = ' '.$rowdetail->lookable->item->type->hs_code;
+                if ($freeAreaTax) {
+                    $hscode = ' ' . $rowdetail->lookable->item->type->hs_code;
                 }
                 $boxQty = '';
-                if($rowdetail->lookable->isPallet()){
-                    $boxQty = ' ( '.CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion).' BOX )';
+                if ($rowdetail->lookable->isPallet()) {
+                    $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
                 }
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name.$boxQty.$hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name . $boxQty . $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }

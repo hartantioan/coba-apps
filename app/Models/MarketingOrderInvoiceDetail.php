@@ -131,7 +131,7 @@ class MarketingOrderInvoiceDetail extends Model
     public function proportionalTaxFromHeader()
     {
         $tax = $this->marketingOrderInvoice->tax;
-        //tax > 0 ,, karna DP,, tax nya pasti 0
+        //tax > 0 ,, karna DP 100%,, tax nya pasti 0, sedangkan FP,, tetap minta ada PPN nya di detail
         if ($tax > 0) {
             $bobot = $this->marketingOrderInvoice->total > 0 ? $this->total / $this->marketingOrderInvoice->total : 0;
             $rowtax = round($tax * $bobot, 0);

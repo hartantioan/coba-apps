@@ -65,10 +65,13 @@ class MarketingOrderInvoice extends Model
 
     public function getlistSO(){
         $arr = [];
-        $mod = $this->marketingOrderDeliveryProcess->marketingOrderDelivery;
-        foreach ($mod->marketingOrderDeliveryDetail as $key => $row) {
-            $arr[] = $row->marketingOrderDetail->marketingOrder->code;
+        $mod = $this->marketingOrderDeliveryProcess->marketingOrderDelivery ?? null;
+        if($mod){
+            foreach ($mod->marketingOrderDeliveryDetail as $key => $row) {
+                $arr[] = $row->marketingOrderDetail->marketingOrder->code;
+            }
         }
+
 
         return implode(',', $arr);
     }

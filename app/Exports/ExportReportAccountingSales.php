@@ -116,9 +116,13 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
 
 
             if($row->lookable_type != 'marketing_order_down_payments'){
-                if($row->getMoDetail()->is_include_tax == 1){
-                    $taxy ="include";
-                } else{
+                if($row->lookable_type){
+                    if($row->getMoDetail()->is_include_tax == 1){
+                        $taxy ="include";
+                    } else{
+                        $taxy ="exclude";
+                    }
+                }else{
                     $taxy ="exclude";
                 }
                 $arr[] = [
@@ -140,26 +144,26 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'Due Date Internal' =>  date('d/m/Y', strtotime($row->marketingOrderInvoice->due_date_internal)),
 
                     'No SO' =>  $row->marketingOrderInvoice->getlistSO(),
-                    'No MOD' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
-                    'No SJ' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->code,
+                    'No MOD' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->code ?? '',
+                    'No SJ' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->code ?? '',
                     'Tax No' =>  $row->marketingOrderInvoice->tax_no ?? '-',
                     'Customer Code' =>  $row->marketingOrderInvoice->account->employee_no,
                     'Customer' =>  $row->marketingOrderInvoice->account->name,
                     'No NPWP' =>  $row->marketingOrderInvoice->getNpwp(),
                     'Nama NPWP' =>  $row->marketingOrderInvoice->userData->user->name,
-                    'Tipe Penjualan' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->soType(),
-                    'Tipe Pengiriman' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
-                    'Transport' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->transportation->name,
-                    'Ekspedisi' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->vehicle_name,
-                    'Nopol' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->vehicle_no,
-                    'Supir' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->driver_name,
-                    'Payment' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->getTypePaymentStatus(),
-                    'Deliver Address' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address,
+                    'Tipe Penjualan' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->soType() ?? '',
+                    'Tipe Pengiriman' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->deliveryType() ?? '',
+                    'Transport' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->transportation->name ?? '',
+                    'Ekspedisi' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->vehicle_name?? '',
+                    'Nopol' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->vehicle_no ?? '',
+                    'Supir' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->driver_name ?? '',
+                    'Payment' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->getTypePaymentStatus()?? '',
+                    'Deliver Address' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->destination_address ?? '',
                     'Alamat NPWP' =>  $row->marketingOrderInvoice->userData->address,
-                    'itemcode' => $row->getItemCode() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->code,
-                    'itemname' => $row->getItem() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->name,
+                    'itemcode' => $row->getItemCode() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->code ?? '',
+                    'itemname' => $row->getItem() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->name ?? '',
                     'qty' => $row->qty,
-                    'satuan' => $row->getItemReal()->unit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code,
+                    'satuan' => $row->getItemReal()->unit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code ?? '',
                     'qtym2' => $row->getQtyM2(),
                     'include'=> $taxy,
                     'value' => $pricefirst,

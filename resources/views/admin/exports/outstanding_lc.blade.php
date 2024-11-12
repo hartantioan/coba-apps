@@ -30,34 +30,32 @@
     </thead>
     <tbody>
         @if(count($data) > 0)
-        @foreach($data as $key => $row)
-            <tr>
-                <td>{{ $key + 1 }}.</td>
-                <td>{{ $row['code'] }}</td>
-                <td>{{ $row['post_date'] }}</td>
-                <td>{{ $row['note'] }}</td>
-                <td>{{ $row['status'] }}</td>
-                <td>{{ $row['user_code'] }}</td>
-                <td>{{ $row['user_name'] }}</td>
-                <td>{{ $row['due_date'] }}</td>
-                <td>{{ $row['kode_bp'] }}</td>
-                <td>{{ $row['nama_bp'] }}</td>
-                <td>{{ $row['kode_vendor'] }}</td>
-                <td>{{ $row['nama_vendor'] }}</td>
-                <td>{{ $row['total_rupiah'] }}</td>
-                <td>{{ $row['currency'] }}</td>
-                <td>{{ $row['kode_biaya'] }}</td>
-                <td>{{ $row['nama_biaya'] }}</td>
-                <td>{{ $row['kode_coa'] }}</td>
-                <td>{{ $row['nama_coa'] }}</td>
-                <td>{{ $row['tagihan'] }}</td>
-                <td>{{ $row['dibayar'] }}</td>
-                <td>{{ $row['sisa'] }}</td>
-                <td>{{ $row['grpo_no'] }}</td>
-
-
-            </tr>
-        @endforeach
+            @foreach($data as $key => $row)
+                <tr>
+                    <td>{{ $key + 1 }}.</td>
+                    <td>{{ $row['code'] }}</td>
+                    <td>{{ $row['post_date'] }}</td>
+                    <td>{{ $row['note'] }}</td>
+                    <td>{{ $row['status'] }}</td>
+                    <td>{{ $row['user_code'] }}</td>
+                    <td>{{ $row['user_name'] }}</td>
+                    <td>{{ $row['due_date'] }}</td>
+                    <td>{{ $row['kode_bp'] }}</td>
+                    <td>{{ $row['nama_bp'] }}</td>
+                    <td>{{ $row['kode_vendor'] }}</td>
+                    <td>{{ $row['nama_vendor'] }}</td>
+                    <td>{{ $row['total_rupiah'] }}</td>
+                    <td>{{ $row['currency'] }}</td>
+                    <td>{{ $row['kode_biaya'] }}</td>
+                    <td>{{ $row['nama_biaya'] }}</td>
+                    <td>{{ $row['kode_coa'] }}</td>
+                    <td>{{ $row['nama_coa'] }}</td>
+                    <td>{{ $row['tagihan'] }}</td>
+                    <td>{{ $row['dibayar'] }}</td>
+                    <td>{{ $row['sisa'] }}</td>
+                    <td>{{ $row['grpo_no'] }}</td>
+                </tr>
+            @endforeach
 
         @endif
     </tbody>

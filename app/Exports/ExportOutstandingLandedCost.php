@@ -35,7 +35,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             $entry = [];
             $entry["code"]=$row->landedCost->code;
             $entry["post_date"] = date('d/m/Y',strtotime($row->landedCost->post_date));
-            $entry["note"] = $row->landedCost->note;
+            $entry["note"] = preg_replace('/[\x00-\x1F\x7F]/', '', $row->landedCost->note ?? '');
             $entry["user_code"] = $row->landedCost->user->employee_no;
             $entry["user_name"] = $row->landedCost->user->name;
             $entry["status"] = $row->landedCost->statusRaw();

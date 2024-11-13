@@ -620,7 +620,7 @@ class MailReportMarketingGlobal extends Command
 					 WHERE a.void_date IS NULL AND a.deleted_at IS null
                 GROUP BY concat(concat(e.name,' '),f.name)
                 UNION ALL
-                SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(c.qty),0)*-1 AS GI
+                SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(b.qty),0)*-1 AS GI
                 FROM good_issues a
                 LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
                 LEFT JOIN item_stocks c ON c.id=b.item_stock_id
@@ -726,7 +726,7 @@ class MailReportMarketingGlobal extends Command
 					 WHERE a.void_date IS NULL AND a.deleted_at IS null
                 GROUP BY e.name,f.name,g.name
                 UNION ALL
-                SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(c.qty),0)*-1 AS GI
+                SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(b.qty),0)*-1 AS GI
                 FROM good_issues a
                 LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
                 LEFT JOIN item_stocks c ON c.id=b.item_stock_id

@@ -29,15 +29,15 @@ class ExportAgingAP implements FromView, ShouldAutoSize
         $totalAll=0;
         $array_filter = [];
         $results = DB::select("
-            SELECT 
+            SELECT
                 *,
-                IFNULL((SELECT 
-                    SUM(prd.nominal) 
-                    FROM payment_request_details prd 
+                IFNULL((SELECT
+                    SUM(prd.nominal)
+                    FROM payment_request_details prd
                     JOIN outgoing_payments op
                         ON op.payment_request_id = prd.payment_request_id
-                    WHERE 
-                        prd.lookable_id = pi.id 
+                    WHERE
+                        prd.lookable_id = pi.id
                         AND prd.lookable_type = 'purchase_invoices'
                         AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
@@ -89,13 +89,13 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
-                    WHERE 
+                    WHERE
                         ar.post_date <= :date5
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_invoices'
                         AND ard.lookable_id = pi.id
                         AND (
-                            CASE 
+                            CASE
                                 WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
                                 WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                             END
@@ -104,7 +104,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 IFNULL((SELECT
                     '1'
                     FROM cancel_documents cd
-                    WHERE 
+                    WHERE
                         cd.post_date <= :date6
                         AND cd.lookable_type = 'purchase_invoices'
                         AND cd.lookable_id = pi.id
@@ -124,7 +124,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
-                WHERE 
+                WHERE
                     pi.post_date <= :date7
                     AND pi.balance > 0
                     AND pi.status IN ('2','3','7','8')
@@ -140,16 +140,16 @@ class ExportAgingAP implements FromView, ShouldAutoSize
         ));
 
         $results2 = DB::select("
-            SELECT 
+            SELECT
                 *,
                 pi.top AS topdp,
-                IFNULL((SELECT 
-                    SUM(prd.nominal) 
-                    FROM payment_request_details prd 
+                IFNULL((SELECT
+                    SUM(prd.nominal)
+                    FROM payment_request_details prd
                     JOIN outgoing_payments op
                         ON op.payment_request_id = prd.payment_request_id
-                    WHERE 
-                        prd.lookable_id = pi.id 
+                    WHERE
+                        prd.lookable_id = pi.id
                         AND prd.lookable_type = 'purchase_down_payments'
                         AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
@@ -185,13 +185,13 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
-                    WHERE 
+                    WHERE
                         ar.post_date <= :date4
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pi.id
                         AND (
-                            CASE 
+                            CASE
                                 WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
                                 WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                             END
@@ -200,7 +200,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 IFNULL((SELECT
                     '1'
                     FROM cancel_documents cd
-                    WHERE 
+                    WHERE
                         cd.post_date <= :date5
                         AND cd.lookable_type = 'purchase_down_payments'
                         AND cd.lookable_id = pi.id
@@ -250,7 +250,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
-                WHERE 
+                WHERE
                     pi.post_date <= :date8
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
@@ -351,7 +351,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                     }
                 }
             }
-    
+
             foreach($results2 as $row){
                 $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
                 $balance = $row->grandtotal - $totalPayed;
@@ -404,7 +404,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                     }
                 }
             }
-    
+
             return view('admin.exports.aging_ap', [
                 'data'          => $newData,
                 'column'        => $arrColumn,
@@ -442,15 +442,15 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                         }
                     }
                     $newData[] = [
-                        'supplier_name'         => $row->account_code,
-                        'supplier_code'         => $row->account_name,
+                        'supplier_name'         => $row->account_name,
+                        'supplier_code'         => $row->account_code,
                         'invoice'               => $row->code,
                         'data'                  => $arrDetail,
                         'total'                 => $balance_after_adjust,
                     ];
                 }
             }
-    
+
             foreach($results2 as $row){
                 $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
                 $balance = $row->grandtotal - $totalPayed;
@@ -490,7 +490,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                     ];
                 }
             }
-    
+
             return view('admin.exports.aging_ap_detail', [
                 'data'          => $newData,
                 'column'        => $arrColumn,
@@ -512,10 +512,10 @@ class ExportAgingAP implements FromView, ShouldAutoSize
     }
 
     function dateDiffInDays($date1, $date2) {
-    
+
         // Calculating the difference in timestamps
         $diff = strtotime($date2) - strtotime($date1);
-      
+
         // 1 day = 24 hours
         // 24 * 60 * 60 = 86400 seconds
         return round($diff / 86400);

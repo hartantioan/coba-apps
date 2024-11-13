@@ -6,7 +6,7 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
-    
+
     table.bordered th {
         padding: 5px !important;
     }
@@ -60,13 +60,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            
+
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
@@ -154,7 +154,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -213,6 +213,7 @@
                                         </select>
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
+                                    <div class="col m12 s12"></div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
@@ -234,6 +235,7 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
+                                    <div class="col m12 s12"></div>
                                     <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
@@ -393,7 +395,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -456,7 +458,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -479,7 +481,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -496,7 +498,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -507,10 +509,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -526,7 +528,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -573,7 +575,7 @@
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -690,13 +692,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -711,7 +713,7 @@
     });
 
     var arrBatch = [];
-    
+
     $(function() {
 
         $("#table-detail-item th,#table-detail-item-receive th").resizable({
@@ -725,7 +727,7 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
@@ -771,13 +773,13 @@
                         style: 'single'
                     }
                 });
-                
+
                 $('#table_pdo_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_pdo_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-detail-pdo').empty();
-                
+
                 $('#table_pdo').DataTable().clear().destroy();
             }
         });
@@ -790,7 +792,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 table_multi_db = $('#table_db').on('init.dt', function() {
-                        
+
                     }).DataTable({
                     "responsive": true,
                     scrollY: '50vh',
@@ -832,16 +834,16 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-detail-db').empty();
-                
+
                 $('#table_db').DataTable().clear().destroy();
             }
         });
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -850,9 +852,9 @@
         });
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -865,9 +867,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -876,13 +878,13 @@
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -895,7 +897,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -905,7 +907,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
@@ -958,7 +960,7 @@
                 $('#total-batch-used').text('0,000');
             }
         });
-        
+
         $('#production_order_detail_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1018,7 +1020,7 @@
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
-            var codeToRemove = $(this).closest('tr').data('code'); 
+            var codeToRemove = $(this).closest('tr').data('code');
             $(this).closest('tr').remove();
             arrBatch = arrBatch.filter(function(code) {
                 return code !== codeToRemove;
@@ -1152,7 +1154,7 @@
                                 countAll();
                             }
 
-                            $('#pallet_id').empty(); 
+                            $('#pallet_id').empty();
                             $('#grade_id').empty();
                             $('#qty,#qty_sell').val('0,000');
                             $('#shading').val('-');
@@ -1321,7 +1323,7 @@
                                     countAll();
                                 }
 
-                                $('#pallet_id').empty(); 
+                                $('#pallet_id').empty();
                                 $('#grade_id').empty();
                                 $('#qty,#qty_sell').val('0,000');
                                 $('#shading').val('-');
@@ -1381,7 +1383,7 @@
         if($('#production_order_detail_id').val()){
             if($('.row_batch').length == 0){
                 $('#body-batch').empty();
-            }   
+            }
             let no = $('.row_batch').length + 1;
             var count = makeid(10);
             $('#body-batch').append(`
@@ -1393,7 +1395,7 @@
                         <select class="browser-default" id="arr_production_batch_id` + count + `" name="arr_production_batch_id[]" onchange="applyQty('` + count + `')"></select>
                     </td>
                     <td>
-                        <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">    
+                        <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">
                     </td>
                     <td id="arr_unit_batch` + count + `">
                         -
@@ -1569,11 +1571,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1595,8 +1597,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1604,7 +1606,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1613,10 +1615,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1640,7 +1642,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1653,17 +1655,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1821,7 +1823,7 @@
                             countAll();
                         }
 
-                        $('#pallet_id').empty(); 
+                        $('#pallet_id').empty();
                         $('#grade_id').empty();
                         $('#qty,#qty_sell').val('0,000');
                         $('#shading').val('-');
@@ -1854,7 +1856,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -1862,7 +1864,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
 
@@ -1891,7 +1893,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1936,13 +1938,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1972,11 +1974,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function printData(){
@@ -1985,7 +1987,7 @@
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
         });
-        
+
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -2012,7 +2014,7 @@
                 });
             }
         });
-        
+
     }
 
     function viewStructureTree(id){
@@ -2020,7 +2022,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -2031,9 +2033,9 @@
             },
             success: function(response) {
                 loadingClose('#main');
-            
+
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -2177,14 +2179,14 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data')[0]);
 
                 let passedInput = true, passedQty = true, totalBatch = 0, totalUsed = 0;
 
                 $('select[name^="arr_production_batch_id[]"]').each(function(index){
                     if(!$(this).val()){
-                       passedInput = false; 
+                       passedInput = false;
                     }
                     if(parseFloat($('input[name^="arr_qty_batch[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0 || !$('input[name^="arr_qty_batch[]"]').eq(index).val()){
                         passedInput = false;
@@ -2229,12 +2231,12 @@
                     var path = window.location.pathname;
                         path = path.replace(/^\/|\/$/g, '');
 
-                        
+
                         var segments = path.split('/');
                         var lastSegment = segments[segments.length - 1];
-                    
+
                         formData.append('lastsegment',lastSegment);
-                        
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -2266,7 +2268,7 @@
                                 $.each(response.error, function(field, errorMessage) {
                                     $('#' + field).addClass('error-input');
                                     $('#' + field).css('border', '1px solid red');
-                                    
+
                                 });
                                 swal({
                                     title: 'Ups! Validation',
@@ -2350,9 +2352,9 @@
                 $('#item_name').val(response.item_parent_name);
 
                 $('.row_item').remove();
-                        
+
                 $('#last-row-item').remove();
-                
+
                 $('#body-batch').empty();
 
                 $.each(response.batches, function(i, val) {
@@ -2366,7 +2368,7 @@
                                 <select class="browser-default" id="arr_production_batch_id` + count + `" name="arr_production_batch_id[]" onchange="applyQty('` + count + `')"></select>
                             </td>
                             <td>
-                                <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="` + val.qty_max + `" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">    
+                                <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="` + val.qty_max + `" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">
                             </td>
                             <td id="arr_unit_batch` + count + `">
                                 ` + val.unit + `
@@ -2624,7 +2626,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2633,15 +2635,15 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2649,7 +2651,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2674,32 +2676,32 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.' 
+                    intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step5'),
-                    intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Daftar Order Produksi',
                     element : document.querySelector('.step6'),
-                    intro : 'Silahkan pilih dokumen Order Produksi yang ingin ditarik komposisi bahannya dari BOM untuk diproses.' 
+                    intro : 'Silahkan pilih dokumen Order Produksi yang ingin ditarik komposisi bahannya dari BOM untuk diproses.'
                 },
                 {
                     title : 'Tombol tambah Order Produksi',
                     element : document.querySelector('.step7'),
-                    intro : 'Tombol untuk menambahkan data BOM dari Order Produksi terpilih ke dalam tabel Issue dan Receive.' 
+                    intro : 'Tombol untuk menambahkan data BOM dari Order Produksi terpilih ke dalam tabel Issue dan Receive.'
                 },
                 {
                     title : 'Data Order Produksi Terpakai',
                     element : document.querySelector('.step8'),
-                    intro : 'Data Order Produksi yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus bisa diakses oleh pengguna lainnya.' 
+                    intro : 'Data Order Produksi yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus bisa diakses oleh pengguna lainnya.'
                 },
                 {
                     title : 'Detail Issue Item/Resource dan Receive Item',
@@ -2709,7 +2711,7 @@
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2723,7 +2725,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2740,7 +2742,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2757,7 +2759,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2799,7 +2801,7 @@
 
                 if(kind == '1'){
                     $('#modal_pdo').modal('open');
-                
+
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             $('#body-detail-pdo').append(`
@@ -2827,7 +2829,7 @@
                         });
                     }
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
             },

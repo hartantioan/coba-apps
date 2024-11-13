@@ -244,8 +244,8 @@ class MarketingOrderDeliveryProcess extends Model
     public function getShading(){
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->itemShading->code,$arr)){
-                $arr[] = $row->itemStock->itemShading->code;
+            if(!in_array($row->itemStock->itemShading->item->name.'-'.$row->itemStock->itemShading->code,$arr)){
+                $arr[] = $row->itemStock->itemShading->item->name.'-'.$row->itemStock->itemShading->code;
             }
         }
         if(count($arr) == 0){

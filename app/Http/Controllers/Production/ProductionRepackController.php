@@ -447,6 +447,8 @@ class ProductionRepackController extends Controller
                                 'lookable_id'           => $prd->id,
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             ]);
+
+                            CustomHelper::updateProductionBatch($itemStock->production_batch_id,str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),'OUT');
                         }
                     }
 
@@ -698,6 +700,7 @@ class ProductionRepackController extends Controller
                 }
 
                 foreach($query->productionRepackDetail as $rowdetail){
+                    CustomHelper::updateProductionBatch($rowdetail->itemStock->production_batch_id,$rowdetail->qty,'IN');
                     $rowdetail->productionBatchUsage()->delete();
                     $rowdetail->productionBatch()->delete();
                 }

@@ -260,6 +260,8 @@ use App\Http\Controllers\Production\ProductionBatchStockController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionHandoverController;
 use App\Http\Controllers\Production\ProductionIssueController;
+use App\Http\Controllers\Production\ProductionReceiveGPController;
+use App\Http\Controllers\Production\ProductionIssueGPController;
 use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 use App\Http\Controllers\Production\ProductionRecapitulationController;
@@ -2396,6 +2398,52 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [ProductionOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionOrderController::class, 'voidStatus'])->middleware('operation.access:production_order,void');
                     Route::post('destroy', [ProductionOrderController::class, 'destroy'])->middleware('operation.access:production_order,delete');
+                });
+
+                Route::prefix('receive_gp')->middleware(['operation.access:receive_gp,view', 'lockacc'])->group(function () {
+                    Route::get('/', [ProductionReceiveGPController::class, 'index']);
+                    Route::get('datatable', [ProductionReceiveGPController::class, 'datatable']);
+                    Route::get('row_detail', [ProductionReceiveGPController::class, 'rowDetail']);
+                    Route::post('show', [ProductionReceiveGPController::class, 'show']);
+                    Route::post('save_edit', [ProductionReceiveGPController::class, 'saveEdit'])->middleware('operation.access:receive_gp,update');
+                    Route::post('get_code', [ProductionReceiveGPController::class, 'getCode']);
+                    Route::post('get_account_data', [ProductionReceiveGPController::class, 'getAccountData']);
+                    Route::post('print', [ProductionReceiveGPController::class, 'print']);
+                    Route::post('done', [ProductionReceiveGPController::class, 'done'])->middleware('operation.access:receive_gp,update');
+                    Route::post('print_by_range', [ProductionReceiveGPController::class, 'printByRange']);
+                    Route::get('export', [ProductionReceiveGPController::class, 'export']);
+                    Route::get('export_from_page', [ProductionReceiveGPController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [ProductionReceiveGPController::class, 'viewStructureTree']);
+                    Route::post('create', [ProductionReceiveGPController::class, 'create'])->middleware('operation.access:receive_gp,update');
+                    Route::post('send_used_data', [ProductionReceiveGPController::class, 'sendUsedData'])->middleware('operation.access:receive_gp,update');
+                    Route::get('view_journal/{id}', [ProductionReceiveGPController::class, 'viewJournal'])->middleware('operation.access:receive_gp,journal');
+                    Route::get('approval/{id}', [ProductionReceiveGPController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [ProductionReceiveGPController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionReceiveGPController::class, 'voidStatus'])->middleware('operation.access:receive_gp,void');
+                    Route::post('destroy', [ProductionReceiveGPController::class, 'destroy'])->middleware('operation.access:receive_gp,delete');
+                });
+
+                Route::prefix('issue_gp')->middleware(['operation.access:issue_gp   ,view', 'lockacc'])->group(function () {
+                    Route::get('/', [ProductionIssueGPController::class, 'index']);
+                    Route::get('datatable', [ProductionIssueGPController::class, 'datatable']);
+                    Route::get('row_detail', [ProductionIssueGPController::class, 'rowDetail']);
+                    Route::post('show', [ProductionIssueGPController::class, 'show']);
+                    Route::post('save_edit', [ProductionIssueGPController::class, 'saveEdit'])->middleware('operation.access:issue_gp,update');
+                    Route::post('get_code', [ProductionIssueGPController::class, 'getCode']);
+                    Route::post('get_account_data', [ProductionIssueGPController::class, 'getAccountData']);
+                    Route::post('print', [ProductionIssueGPController::class, 'print']);
+                    Route::post('done', [ProductionIssueGPController::class, 'done'])->middleware('operation.access:issue_gp,update');
+                    Route::post('print_by_range', [ProductionIssueGPController::class, 'printByRange']);
+                    Route::get('export', [ProductionIssueGPController::class, 'export']);
+                    Route::get('export_from_page', [ProductionIssueGPController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [ProductionIssueGPController::class, 'viewStructureTree']);
+                    Route::post('create', [ProductionIssueGPController::class, 'create'])->middleware('operation.access:issue_gp,update');
+                    Route::post('send_used_data', [ProductionIssueGPController::class, 'sendUsedData'])->middleware('operation.access:issue_gp,update');
+                    Route::get('view_journal/{id}', [ProductionIssueGPController::class, 'viewJournal'])->middleware('operation.access:issue_gp,journal');
+                    Route::get('approval/{id}', [ProductionIssueGPController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [ProductionIssueGPController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionIssueGPController::class, 'voidStatus'])->middleware('operation.access:issue_gp,void');
+                    Route::post('destroy', [ProductionIssueGPController::class, 'destroy'])->middleware('operation.access:issue_gp,delete');
                 });
 
                 Route::prefix('production_issue')->middleware(['operation.access:production_issue,view', 'lockacc'])->group(function () {

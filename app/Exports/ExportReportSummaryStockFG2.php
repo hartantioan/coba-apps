@@ -186,7 +186,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
                           GROUP BY c.`code`,c.name,k.code
-                               )h ON h.code=a.code and h.shading=a.shading");
+                               )h ON h.code=a.code and h.shading=a.shading order by a.name,a.shading" );
 
         foreach ($query as $row) {
 

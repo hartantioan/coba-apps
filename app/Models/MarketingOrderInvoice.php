@@ -378,6 +378,24 @@ class MarketingOrderInvoice extends Model
         return $code;
     }
 
+    public function soType(){
+        $type = '';
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            if ($row->lookable_type == 'marketing_order_delivery_process_details') {
+                if($type == ''){
+                    $type = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->soType();
+                }
+
+
+            } else if ($row->lookable_type == 'marketing_order_delivery_details') {
+                if($type == ''){
+                    $type = $row->lookable->marketingOrderDelivery->soType();
+                }
+            }
+        }
+        return $type;
+    }
+
     public function latestReceipt(){
         $code = '-';
         foreach($this->marketingOrderReceiptDetail as $row){

@@ -269,6 +269,8 @@ use App\Http\Controllers\Production\ProductionRepackController;
 use App\Http\Controllers\Production\ReportProductionResultController;
 use App\Http\Controllers\Sales\ReportSalesGoodScaleController;
 
+use App\Http\Controllers\Tax\ReportRecapTaxController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -3665,6 +3667,14 @@ Route::prefix('admin')->group(function () {
                     Route::post('store_w_barcode', [DocumentTaxHandoverController::class, 'store_w_barcode'])->middleware('operation.access:document_tax_handover,update');
                     Route::post('destroy', [DocumentTaxHandoverController::class, 'destroy'])->middleware('operation.access:document_tax_handover,delete');
                 });
+                Route::prefix('tax_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('report_recap_tax')->middleware('operation.access:report_recap_tax,view')->group(function () {
+                        Route::get('/', [ReportRecapTaxController::class, 'index']);
+                        Route::post('filter', [ReportRecapTaxController::class, 'filter']);
+                        Route::get('export', [ReportRecapTaxController::class, 'export']);
+                    });
+                });
+
             });
         });
     });

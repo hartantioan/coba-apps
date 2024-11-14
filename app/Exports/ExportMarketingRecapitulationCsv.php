@@ -140,7 +140,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             }
             foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key => $rowdetail) {
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->description . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $row->tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $row->tax . ';0;0;;;;;;;;;;',
                 ];
             }
         }

@@ -51,6 +51,7 @@ class Item extends Model
         'grade_id',
         'brand_id',
         'bom_calculator_id',
+        'print_name'
     ];
 
     public function itemGroup(){

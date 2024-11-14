@@ -179,14 +179,14 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <h4 class="card-title">{{ __('translations.list_data') }}</h4>
-                                            
+
                                         </div>
                                         <div class="col s12">
                                             @if ($itemsh == 1)
                                                 <input type="hidden" id="adaSh" name="adaSh">
                                                 <a class="btn btn-floating waves-effect waves-light red darken-4 breadcrumbs-btn right" href="javascript:void(0);" onclick="filterShade()">
                                                     <i class="material-icons hide-on-med-and-up">no shade</i>
-                                            
+
                                                     <i class="material-icons right">sim_card_alert</i>
                                                 </a>
                                             @endif
@@ -194,7 +194,7 @@
                                                 <input type="hidden" id="adaUnit" name="adaUnit">
                                                 <a class="btn btn-floating waves-effect waves-light red darken-4 breadcrumbs-btn right" href="javascript:void(0);" onclick="filterUnit()">
                                                     <i class="material-icons hide-on-med-and-up">no unit</i>
-                                            
+
                                                     <i class="material-icons right">perm_scan_wifi</i>
                                                 </a>
                                             @endif
@@ -235,6 +235,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>Nama Asing</th>
+                                                        <th>Nama Print</th>
                                                         <th>Grup</th>
                                                         <th>UOM</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -388,6 +389,9 @@
                             <div class="input-field col s12 m4">
                                 <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
                                 <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
+                            </div><div class="input-field col s12 m4">
+                                <input id="print_name" name="print_name" type="text" placeholder="Nama Item saat Print">
+                                <label class="active" for="print_name">Printing {{ __('translations.name') }}</label>
                             </div>
                             <div class="input-field col s12 m4">
                                 <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
@@ -611,11 +615,11 @@
                                         </label>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -668,13 +672,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -688,9 +692,9 @@
         }
     });
     var selected = [], arrCode = [], arrName = [], mainUnit = '';
-    
+
     $(function() {
-        
+
         M.Modal.prototype._handleFocus = function (e) {
             if (!this.el.contains(e.target) && this._nthModalOpened === M.Modal._modalsOpen) {
                 var s2 = 'select2-search__field';
@@ -699,7 +703,7 @@
                 }
             }
         };
-        
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
@@ -737,7 +741,7 @@
                         $('.modal-content').scrollTop(0);
 
                         $.each(response.error, function(i, val) {
-                            
+
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -751,10 +755,10 @@
                                 `);
                         });
                     }else if(response.status == 500) {
-                        
+
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         $.each(response.error, function(i, val) {
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
@@ -775,7 +779,7 @@
                     loadingClose('.modal-content');
                 },
                 error: function(response) {
-                    
+
                     loadingClose('.modal-content');
                     console.log(response);
                     var errors = response.responseJSON.errors;
@@ -783,7 +787,7 @@
                     if(response.status == 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
@@ -814,14 +818,14 @@
                 }
             });
         });
-        
+
         loadDataTable();
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -831,7 +835,7 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
@@ -841,7 +845,7 @@
         $('#modal3').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#text-shading').text('');
@@ -851,13 +855,13 @@
                 loadDataTable();
             }
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -892,9 +896,9 @@
 
         $('#modal7d').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_relation_table').empty();
@@ -925,7 +929,7 @@
         $('.buttons-select-all[aria-controls="datatable_serverside"]').on('click', function (e) {
             selectDeselectRow();
         });
-        
+
         $('.buttons-select-none[aria-controls="datatable_serverside"]').on('click', function (e) {
             selectDeselectRow();
         });
@@ -969,7 +973,7 @@
                 dropdownParent: $(this).parent(),
             });
         }); */
-        
+
         $(document).on('select2:close', '.select2', function (e) {
             var evt = "scroll.select2";
             $(e.target).parents().off(evt);
@@ -1120,7 +1124,7 @@
                 loadingClose('.modal-content');
 
                 $('#list-shading').html('');
-                
+
                 if(response.shadings.length > 0){
                     $.each(response.shadings, function(i, val) {
                         $('#list-shading').append(`
@@ -1131,7 +1135,7 @@
                         `);
                     });
                     $('.chip > .close').click(function() {
-                        return false; 
+                        return false;
                     });
                 }else{
                     $('#list-shading').html(`
@@ -1203,7 +1207,7 @@
             if($('#brand_id').val()){
                 arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
                 arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
-            }            
+            }
             let newCode = arrCode.join('.');
             let newName = arrName.join(' ');
             $('#code').val(newCode);
@@ -1323,6 +1327,7 @@
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
                 { name: 'other_name', className: '' },
+                { name: 'other_name', className: '' },
                 { name: 'group', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1331,8 +1336,8 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectAll', 
-                'selectNone' 
+                'selectAll',
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -1379,7 +1384,7 @@
     }
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]), passed = true, passedSameUnit = true;
 
         formData.delete("arr_sell_unit[]");
@@ -1415,7 +1420,7 @@
         $('input[name^="arr_is_affect_qty[]"]').each(function(index){
             formData.append('arr_is_affect_qty[]',($(this).is(':checked') ? $(this).val() : ''));
         });
-        
+
         if(passedSameUnit){
             if(passed){
                 $.ajax({
@@ -1450,7 +1455,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -1504,9 +1509,9 @@
     }
 
     function saveShading(){
-			
+
         var formData = new FormData($('#form_data_shading')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create_shading',
             type: 'POST',
@@ -1534,7 +1539,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert_shading').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -1589,9 +1594,9 @@
         }else{
             $('#adaUnit').val('{{$itemex}}');
         }
-       
+
         $('#adaSh').val('');
-        
+
         loadDataTable();
     }
 
@@ -1601,9 +1606,9 @@
         }else{
             $('#adaSh').val('{{$itemsh}}');
         }
-        
+
         $('#adaUnit').val('');
-        
+
         loadDataTable();
     }
 
@@ -1627,7 +1632,7 @@
 
                 arrCode = [];
                 arrName = [];
-                
+
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
@@ -1899,7 +1904,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1907,7 +1912,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -1915,11 +1920,11 @@
 
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
-        
+
         $.map(selected, function (item) {
             arr_id_temp.push(item);
         });
-        
+
         if(arr_id_temp.length > 0){
             $.ajax({
                 url: '{{ Request::url() }}/print',
@@ -1960,7 +1965,7 @@
     }
 
     function printBarcode(){
-        
+
         var arr_id_temp = [];
 
         $.map(selected, function (item) {

@@ -54,10 +54,10 @@ class ItemController extends Controller
         ->first();
 
         if ($itemWithoutRelations) {
-        
+
             $result = 1;
         } else {
-        
+
             $result = 0;
         }
 
@@ -65,10 +65,10 @@ class ItemController extends Controller
         ->whereDoesntHave('itemShading')
         ->first();
         if ($itemWithoutShading) {
-        
+
             $result1 = 1;
         } else {
-        
+
             $result1 = 0;
         }
 
@@ -108,9 +108,9 @@ class ItemController extends Controller
         $order  = $column[$request->input('order.0.column')];
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
-      
+
         $total_data = Item::count();
-        
+
         $query_data = Item::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -171,7 +171,7 @@ class ItemController extends Controller
                             ->orWhere('other_name', 'like', "%$search%");
                     });
                 }
-                
+
                 if($request->status){
                     $query->where('status', $request->status);
                 }
@@ -212,6 +212,7 @@ class ItemController extends Controller
                     $val->code,
                     $val->name??'',
                     $val->other_name??'',
+                    $val->print_name??'',
                     $val->itemGroup->name??'',
                     $val->uomUnit->code??'',
                     $val->status(),
@@ -241,14 +242,14 @@ class ItemController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'			    => $request->temp ? ['required', Rule::unique('items', 'code')->ignore($request->temp), 'uppercase'] : 'required|unique:items,code|uppercase',
             'name'              => 'required|uppercase',
             'item_group_id'     => 'required',
             'uom_unit'          => 'required',
             'arr_unit'          => 'required',
-            'arr_conversion'    => 'required',  
+            'arr_conversion'    => 'required',
             'tolerance_gr'      => 'required',
             'arr_place_buffer'  => 'required',
             'arr_min_buffer'    => 'required|array',
@@ -278,7 +279,7 @@ class ItemController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            
+
             $passedDefaultUnit = false;
             $passedBufferStock = true;
 
@@ -346,6 +347,7 @@ class ItemController extends Controller
                     $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->bom_calculator_id   = $request->bom_calculator_id ?? NULL;
+                    $query->print_name          = $request->print_name ?? NULL;
                     $query->save();
 
                     if($request->arr_unit){
@@ -405,17 +407,18 @@ class ItemController extends Controller
                         'grade_id'          => $request->grade_id ?? NULL,
                         'brand_id'          => $request->brand_id ?? NULL,
                         'bom_calculator_id' => $request->bom_calculator_id ?? NULL,
+                        'print_name'        => $request->print_name ?? NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 $place = Place::where('status','1')->get();
-                
+
                 if(!$request->temp){
                     foreach($place as $row_place){
                         foreach($query->itemGroup->itemGroupWarehouse as $rowwarehouse){
@@ -518,7 +521,7 @@ class ItemController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -539,7 +542,7 @@ class ItemController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                
+
                 $item = Item::find(intval($request->tempShading));
 
                 if($item){
@@ -569,7 +572,7 @@ class ItemController extends Controller
             }
 
             DB::commit();
-            
+
             return response()->json($response);
 
         }catch(\Exception $e){
@@ -729,7 +732,7 @@ class ItemController extends Controller
                             </tr>
                         </thead>
                     </table>';
-		
+
         return response()->json($string);
     }
 
@@ -761,7 +764,7 @@ class ItemController extends Controller
         $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
         $item['used'] = $item->hasChildDocument() ? '1' : '';
         $item['bom_calculator_data'] = $item->bomCalculator()->exists() ? $item->bomCalculator->name.' | '.$item->bomCalculator->note : '';
-        
+
         $units = [];
         $buffer = [];
         $parameter = [];
@@ -771,7 +774,7 @@ class ItemController extends Controller
                 'conversion'    => number_format($row->conversion,2,',','.'),
                 'is_sell_unit'  => $row->is_sell_unit ? $row->is_sell_unit : '',
                 'is_buy_unit'   => $row->is_buy_unit ? $row->is_buy_unit : '',
-                'is_default'    => $row->is_default ? $row->is_default : '', 
+                'is_default'    => $row->is_default ? $row->is_default : '',
             ];
         }
 
@@ -791,7 +794,7 @@ class ItemController extends Controller
 
     public function showShading(Request $request){
         $item = Item::find($request->id);
-        
+
         $shadings = [];
 
         foreach($item->itemShading as $row){
@@ -803,7 +806,7 @@ class ItemController extends Controller
         }
 
         $item['shadings'] = $shadings;
-        				
+
 		return response()->json($item);
     }
 
@@ -818,7 +821,7 @@ class ItemController extends Controller
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Delete the item data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data deleted successfully.'
@@ -840,7 +843,7 @@ class ItemController extends Controller
 
     public function destroyShading(Request $request){
         $query = ItemShading::find($request->id);
-		
+
         $passedDelete = true;
 
         foreach($query->itemStock as $row){
@@ -884,7 +887,7 @@ class ItemController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -901,7 +904,7 @@ class ItemController extends Controller
             $data = [
                 'title'     => 'Master Item',
                 'data'      => $pr
-            ];  
+            ];
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
@@ -923,8 +926,8 @@ class ItemController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -936,7 +939,7 @@ class ItemController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -952,7 +955,7 @@ class ItemController extends Controller
             $data = [
                 'title'     => 'Master Item',
                 'data'      => $pr
-            ];  
+            ];
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
@@ -973,7 +976,7 @@ class ItemController extends Controller
                 'message'  =>$document_po
             ];
         }
-		
+
 		return response()->json($response);
     }
 
@@ -982,7 +985,7 @@ class ItemController extends Controller
         $status = $request->status ? $request->status : '';
         $type = $request->type ? $request->type : '';
         $group = $request->group ? $request->group : '';
-		
+
 		return Excel::download(new ExportItem($search,$status,$type,$group), 'item_'.uniqid().'.xlsx');
     }
 
@@ -1029,9 +1032,9 @@ class ItemController extends Controller
                                 <th class="center-align">Status Dokumen</th>
                             </tr>
                         </thead><tbody>';
-        $no = 1; 
+        $no = 1;
         if($data->materialRequestDetail()->exists()){
-         
+
             foreach($data->materialRequestDetail as $row_mr_d){
                 if($row_mr_d->deleted_at == null){
                     $string .= '<tr>
@@ -1045,8 +1048,8 @@ class ItemController extends Controller
                     </tr>';
                     $no++;
                 }
-                
-               
+
+
             }
         }
         if($data->purchaseRequestDetail()->exists()){
@@ -1133,8 +1136,8 @@ class ItemController extends Controller
         }
 
         $string .= '</tbody></table></div>';
-		
+
         return response()->json($string);
     }
-    
+
 }

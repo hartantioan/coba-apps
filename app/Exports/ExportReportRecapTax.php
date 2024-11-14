@@ -70,7 +70,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
             $price_satuan = 0;
             $total_all = 0;
             foreach($row->marketingOrderInvoiceDetail as $keyd =>$row_detail){
-                info($keyd);
+
                 $dpp_discount_detail = 0;
                 $dpp_total_detail = 0;
                 $dpp_fp_detail = 0 ;

@@ -664,8 +664,8 @@ class JournalController extends Controller
                                 'project_id'        => $project ? $project->id : NULL,
                                 'department_id'     => $department ? $department->id : NULL,
                                 'type'              => '2',
-                                'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_debit[$key])),
-                                'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_debit_fc[$key])),
+                                'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])),
+                                'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_kredit_fc[$key])),
                                 'note'              => $request->arr_multi_note_detail[$key],
                                 'note2'             => $request->arr_multi_note_detail2[$key],
                             ]);

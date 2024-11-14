@@ -1469,8 +1469,8 @@
                         formData.append('arr_multi_kredit_fc[]',($('input[name^="arr_multi_kredit_fc[]"]').eq(index).val() ? $('input[name^="arr_multi_kredit_fc[]"]').eq(index).val() : '0'));
                         formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit[]"]').eq(index).val() ? $('input[name^="arr_multi_debit[]"]').eq(index).val() : '0'));
                         formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit[]"]').eq(index).val() ? $('input[name^="arr_multi_kredit[]"]').eq(index).val() : '0'));
-                        formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail"]').eq(index).val() : '-'));
-                        formData.append('arr_multi_note_detail2[]',($('input[name^="arr_multi_note_detail2[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail2"]').eq(index).val() : '-'));
+                        formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail[]"]').eq(index).val() : '-'));
+                        formData.append('arr_multi_note_detail2[]',($('input[name^="arr_multi_note_detail2[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail2[]"]').eq(index).val() : '-'));
                     }
                 });
 

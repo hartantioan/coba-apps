@@ -601,7 +601,7 @@ class JournalController extends Controller
                         $company = Company::where('code',explode('|',$request->arr_multi_company[$key])[0])->first();
                         $menu = Menu::where('url', 'journal')->first();
                         $newCode = Journal::generateCode(
-                            $menu->document_code . date('y', strtotime(\DateTime::createFromFormat('d-m-Y', $request->arr_multi_post_date[$key])->format('Y-m-d'))) . '00'
+                            $menu->document_code . date('y', strtotime(\DateTime::createFromFormat('d/m/Y', $request->arr_multi_post_date[$key])->format('Y-m-d'))) . '00'
                         );
 
                         $query = Journal::create([
@@ -611,7 +611,7 @@ class JournalController extends Controller
                             'company_id'                => $company->id,
                             'currency_rate'             => $request->arr_multi_conversion[$key] ? $request->arr_multi_conversion[$key] : NULL,
                             'post_date' => $request->arr_multi_post_date[$key]
-                            ? \DateTime::createFromFormat('d-m-Y', $request->arr_multi_post_date[$key])->format('Y-m-d')
+                            ? \DateTime::createFromFormat('d/m/Y', $request->arr_multi_post_date[$key])->format('Y-m-d')
                             : NULL,
                             'note'                      => $request->arr_multi_note[$key] ? $request->arr_multi_note[$key] : NULL,
                             'status'                    => '1'

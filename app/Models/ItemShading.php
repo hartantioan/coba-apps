@@ -53,4 +53,19 @@ class ItemShading extends Model
         $total = $this->marketingOrderDeliveryDetailStockSpecial()->sum('qty');
         return $total;
     }
+
+    public function totalUnsentSj(){
+        $total = 0;
+        $data = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
+            $query->where('status','2');
+        })->whereHas('itemStock',function($query){
+            $query->where('item_shading_id',$this->id);
+        })->get();
+        foreach($data as $row){
+            if(!$row->marketingOrderDeliveryProcess->isItemSent()){
+                $total += $row->qty;
+            }
+        }
+        return $total;
+    }
 }

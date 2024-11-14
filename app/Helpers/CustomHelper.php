@@ -2402,7 +2402,7 @@ class CustomHelper {
 			$sj = MarketingOrderDeliveryProcess::find($table_id);
 
 			if($sj){
-				if($sj->driver_hp){
+				if($sj->driver_hp && $sj->marketingOrderDelivery->type_delivery == '2'){
 					WaBlas::kirim_wa($sj->driver_hp,'Dokumen Surat Jalan '.$sj->code.' sudah bisa diupdate oleh driver. Silahkan klik link : '.env('APP_URL').'/admin/sales/delivery_order/driver/'.CustomHelper::encrypt($sj->code).'?d='.CustomHelper::encrypt($sj->driver_name).'&p='.CustomHelper::encrypt($sj->driver_hp));
 					WaBlas::kirim_wa('081330074432','Dokumen Surat Jalan '.$sj->code.' sudah bisa diupdate oleh driver. Silahkan klik link : '.env('APP_URL').'/admin/sales/delivery_order/driver/'.CustomHelper::encrypt($sj->code).'?d='.CustomHelper::encrypt($sj->driver_name).'&p='.CustomHelper::encrypt($sj->driver_hp));
 				}

@@ -71,7 +71,7 @@ class JournalController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = Journal::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -91,7 +91,7 @@ class JournalController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Journal::count();
-        
+
         $query_data = Journal::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -121,7 +121,7 @@ class JournalController extends Controller
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
-                
+
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
@@ -172,7 +172,7 @@ class JournalController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -209,7 +209,7 @@ class JournalController extends Controller
 
     public function rowDetail(Request $request){
         $data   = Journal::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -234,7 +234,7 @@ class JournalController extends Controller
                                 <th class="center-align">Kredit</th>
                             </tr>
                         </thead><tbody>';
-        
+
         foreach($data->journalDetail()
         ->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
@@ -255,7 +255,7 @@ class JournalController extends Controller
                 <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
             </tr>';
         }
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -271,7 +271,7 @@ class JournalController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -279,7 +279,7 @@ class JournalController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -291,7 +291,7 @@ class JournalController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -314,7 +314,7 @@ class JournalController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -352,8 +352,8 @@ class JournalController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                
-                $totalDebit = 0; 
+
+                $totalDebit = 0;
                 $totalCredit = 0;
                 foreach($request->arr_nominal_debit as $key => $row){
                     $totalDebit += str_replace(',','.',str_replace('.','',$row));
@@ -436,9 +436,9 @@ class JournalController extends Controller
                         'status'                    => '1'
                     ]);
                 }
-                
+
                 if($query) {
-                    
+
                     if($request->arr_coa){
                         foreach($request->arr_coa as $key => $row){
                             if(str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) < 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])) < 0){
@@ -501,7 +501,7 @@ class JournalController extends Controller
                     ];
                 }
             }
-            
+
             DB::commit();
         }catch(\Exception $e){
             DB::rollback();
@@ -524,10 +524,10 @@ class JournalController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            
-            $totalDebit = 0; 
+
+            $totalDebit = 0;
             $totalCredit = 0;
-            $totalDebitFC = 0; 
+            $totalDebitFC = 0;
             $totalCreditFC = 0;
             foreach($request->arr_multi_debit as $key => $row){
                 $totalDebit += floatval($row);
@@ -565,7 +565,7 @@ class JournalController extends Controller
                     'status'  => 500,
                     'message' => 'Coa tidak ditemukan '.implode(',',$coaNotAvailable).'.'
                 ]);
-            }            
+            }
 
             if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
                 return response()->json([
@@ -589,9 +589,9 @@ class JournalController extends Controller
                     'message' => 'Kode jurnal telah terpakai, silahkan gunakan yang lainnya.'
                 ]);
             }
-        
+
             DB::beginTransaction();
-            try {
+
 
                 $temp = '';
                 foreach($request->arr_multi_code as $key => $row){
@@ -599,14 +599,20 @@ class JournalController extends Controller
                     if($temp !== $row){
                         $currency = Currency::where('code',explode('|',$request->arr_multi_currency[$key])[0])->first();
                         $company = Company::where('code',explode('|',$request->arr_multi_company[$key])[0])->first();
+                        $menu = Menu::where('url', 'journal')->first();
+                        $newCode = Journal::generateCode(
+                            $menu->document_code . date('y', strtotime(\DateTime::createFromFormat('d-m-Y', $request->arr_multi_post_date[$key])->format('Y-m-d'))) . '00'
+                        );
 
                         $query = Journal::create([
-                            'code'			            => $row,
+                            'code'			            => $newCode,
                             'user_id'		            => session('bo_id'),
                             'currency_id'               => $currency->id,
                             'company_id'                => $company->id,
                             'currency_rate'             => $request->arr_multi_conversion[$key] ? $request->arr_multi_conversion[$key] : NULL,
-                            'post_date'                 => $request->arr_multi_post_date[$key] ? date('Y-m-d',strtotime($request->arr_multi_post_date[$key])) : NULL,
+                            'post_date' => $request->arr_multi_post_date[$key]
+                            ? \DateTime::createFromFormat('d-m-Y', $request->arr_multi_post_date[$key])->format('Y-m-d')
+                            : NULL,
                             'note'                      => $request->arr_multi_note[$key] ? $request->arr_multi_note[$key] : NULL,
                             'status'                    => '1'
                         ]);
@@ -665,7 +671,7 @@ class JournalController extends Controller
                             ]);
                         }
                     }
-                    
+
                     $temp = $row;
                 }
 
@@ -675,9 +681,7 @@ class JournalController extends Controller
 				];
 
                 DB::commit();
-            }catch(\Exception $e){
-                DB::rollback();
-            }
+
         }
 
         return response()->json($response);
@@ -692,11 +696,11 @@ class JournalController extends Controller
         $jou['has_relation'] = $jou->lookable_id ? '1' : '';
 
         $arr = [];
-        
+
         foreach($jou->journalDetail()->orderBy('id')->get() as $row){
             $arr[] = [
                 'type'                          => $row->type,
-                'cost_distribution_detail_id'   => $row->cost_distribution_detail_id ? $row->cost_distribution_detail_id : '', 
+                'cost_distribution_detail_id'   => $row->cost_distribution_detail_id ? $row->cost_distribution_detail_id : '',
                 'coa_id'                        => $row->coa_id,
                 'coa_name'                      => $row->coa->code.' - '.$row->coa->name,
                 'place_id'                      => $row->place_id ? $row->place_id : '',
@@ -715,16 +719,16 @@ class JournalController extends Controller
                 'note2'                         => $row->note2 ? $row->note2 : '',
             ];
         }
-        
+
         $jou['details'] = $arr;
-        	
+
 		return response()->json($jou);
     }
 
     public function destroy(Request $request){
-        
+
         $query = Journal::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $approved = false;
         $revised = false;
 
@@ -755,7 +759,7 @@ class JournalController extends Controller
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -789,7 +793,7 @@ class JournalController extends Controller
 
     public function voidStatus(Request $request){
         $query = Journal::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
             if(in_array($query->status,['4','5'])){
                 $response = [
@@ -808,13 +812,13 @@ class JournalController extends Controller
                 foreach($query->journalDetail as $row){
                     $row->delete();
                 }
-    
+
                 activity()
                     ->performedOn(new Journal())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the journal data');
-    
+
                 CustomHelper::sendNotification('journals',$query->id,'Jurnal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
 
                 $response = [
@@ -838,7 +842,7 @@ class JournalController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -850,9 +854,9 @@ class JournalController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = Journal::where('code',$row)->first();
-                
+
                 if($pr){
-                    
+
                     $pdf = PrintHelper::print($pr,'Journal','a4','landscape','admin.print.accounting.journal_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(650, 550, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -860,7 +864,7 @@ class JournalController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -878,8 +882,8 @@ class JournalController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -907,7 +911,7 @@ class JournalController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -915,19 +919,19 @@ class JournalController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = Journal::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Journal','a4','landscape','admin.print.accounting.journal_individual');
@@ -936,7 +940,7 @@ class JournalController extends Controller
                             $pdf->getCanvas()->page_text(650, 560, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -949,21 +953,21 @@ class JournalController extends Controller
 
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -972,7 +976,7 @@ class JournalController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -992,20 +996,20 @@ class JournalController extends Controller
                             $pdf->getCanvas()->page_text(650, 560, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1025,32 +1029,32 @@ class JournalController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = Journal::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
             $pdf = PrintHelper::print($pr,'Journal','a4','landscape','admin.print.accounting.journal_individual',$menuUser->mode);
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(650, 550, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(650, 560, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
-            $content = $pdf->download()->getOriginalContent();
-            
-            $randomString = Str::random(10); 
 
-         
+            $content = $pdf->download()->getOriginalContent();
+
+            $randomString = Str::random(10);
+
+
             $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
+
 
             Storage::put($filePath,$content);
-            
+
             $document_po = asset(Storage::url($filePath));
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -1058,9 +1062,9 @@ class JournalController extends Controller
     }
 
     public function approval(Request $request,$id){
-        
+
         $cap = Journal::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($cap){
             $data = [
                 'title'     => 'Approval Journal',

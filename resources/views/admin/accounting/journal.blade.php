@@ -24,7 +24,7 @@
     .browser-default {
         height: 2rem !important;
     }
-    
+
     .detail-table-fixed{
         margin: 0 auto;width: 100%;height:50vh;overflow-x:scroll;overflow-y:scroll;
     }
@@ -48,13 +48,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        
+
                                         <input id="note" name="note" type="text" placeholder="Keterangan">
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
@@ -260,7 +260,7 @@
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
                                                         <td colspan="14">
-                                                            
+
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -328,7 +328,7 @@
                                                 <tbody id="body-coa-multi">
                                                     <tr id="last-row-coa-multi">
                                                         <td colspan="20" class="center">
-                                                            
+
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -365,7 +365,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -412,7 +412,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -435,7 +435,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -452,7 +452,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -463,10 +463,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -509,9 +509,9 @@
         loadDataTable();
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -520,9 +520,9 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -556,7 +556,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -569,7 +569,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -579,10 +579,10 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
-        
+
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');
@@ -676,7 +676,7 @@
                         <input type="hidden" name="arr_type[]" value="` + type + `">
                         <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.id + `">
                         <td>
-                            <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                            <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>
                         </td>
                         <td>
                             <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
@@ -695,14 +695,14 @@
                                 @foreach ($line as $rowline)
                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                 @endforeach
-                            </select>    
+                            </select>
                         </td>
                         <td>
                             <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]"  onchange="changeLine(this);">
                                 <option value="">--{{ __('translations.empty') }}--</option>
                                 @foreach ($machine as $row)
                                     <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                @endforeach    
+                                @endforeach
                             </select>
                         </td>
                         <td>
@@ -767,7 +767,7 @@
                     </a>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
@@ -786,14 +786,14 @@
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]"  onchange="changeLine(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                        @endforeach    
+                        @endforeach
                     </select>
                 </td>
                 <td>
@@ -827,7 +827,7 @@
                 </td>
             </tr>
         `);
-        
+
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
@@ -877,7 +877,7 @@
                 (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
             );
         });
-        
+
         countAll();
     }
 
@@ -921,7 +921,7 @@
                     <input type="text" name="arr_multi_conversion[]" placeholder="Konversi" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">    
+                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_coa[]" placeholder="ID Coa" style="width:175px;">
@@ -987,7 +987,7 @@
                             if($start.closest('td').next('td').find('input')[0] != undefined) {
                                 $start = $start.closest('td').next('td').find('input');
                             }else{
-                                return false;  
+                                return false;
                             }
                         });
                         $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
@@ -1006,13 +1006,13 @@
         var count = 0;
         swal({
             title: "Input Jumlah Baris Yang Diinginkan!",
-            text: "Maksimal tambah multi adalah 50 baris.",
+            text: "Maksimal tambah multi adalah 100 baris.",
             buttons: true,
             content: {
                 element: "input",
                 attributes: {
                     min: 1,
-                    max: 50,
+                    max: 100,
                     type: "number",
                     value: 1,
                 }
@@ -1022,9 +1022,9 @@
         .then(() => {
             if ($('.swal-content__input').val() != "" && $('.swal-content__input').val() != null) {
                 count = parseInt($('.swal-content__input').val());
-                if(parseInt(count) > 50){
+                if(parseInt(count) > 100){
                     swal({
-                        title: 'Baris tidak boleh lebih dari 50.',
+                        title: 'Baris tidak boleh lebih dari 100.',
                         icon: 'error'
                     });
                 }else{
@@ -1050,7 +1050,7 @@
                                     <input type="text" name="arr_multi_conversion[]" placeholder="Konversi" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">    
+                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_coa[]" placeholder="ID Coa" style="width:175px;">
@@ -1118,7 +1118,7 @@
                                         if($start.closest('td').next('td').find('input')[0] != undefined) {
                                             $start = $start.closest('td').next('td').find('input');
                                         }else{
-                                            return false;  
+                                            return false;
                                         }
                                     });
                                     $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
@@ -1276,7 +1276,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             select: {
                 style: 'multi'
@@ -1327,12 +1327,12 @@
 
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1364,7 +1364,7 @@
                                 $.each(response.error, function(field, errorMessage) {
                                     $('#' + field).addClass('error-input');
                                     $('#' + field).css('border', '1px solid red');
-                                    
+
                                 });
                                 swal({
                                     title: 'Ups! Validation',
@@ -1501,7 +1501,7 @@
                             } else if(response.status == 422) {
                                 $('#validation_alert_multi').show();
                                 $('.modal-content').scrollTop(0);
-                                
+
                                 swal({
                                     title: 'Ups! Validation',
                                     text: 'Check your form.',
@@ -1586,7 +1586,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
@@ -1597,7 +1597,7 @@
                 $('#currency_rate').val(response.currency_rate);
 
                 $('.row_coa').remove();
-                
+
                 let attributeDisable = '';
                 if(response.has_relation){
                     attributeDisable = 'tabindex="-1"';
@@ -1614,7 +1614,7 @@
                                 </a>
                             </td>
                             <td class="disable-class">
-                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]" ` + attributeDisable + `></select>    
+                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]" ` + attributeDisable + `></select>
                             </td>
                             <td class="disable-class">
                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" ` + attributeDisable + `></select>
@@ -1633,14 +1633,14 @@
                                     @foreach ($line as $rowline)
                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                     @endforeach
-                                </select>    
+                                </select>
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" ` + attributeDisable + `>
                                     <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($machine as $row)
                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                    @endforeach    
+                                    @endforeach
                                 </select>
                             </td>
                             <td>
@@ -1674,7 +1674,7 @@
                             </td>
                         </tr>
                     `);
-                    
+
                     $('#arr_coa' + count).select2({
                         placeholder: '-- Pilih ya --',
                         minimumInputLength: 1,
@@ -1826,7 +1826,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1834,7 +1834,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -1880,7 +1880,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1925,13 +1925,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1961,13 +1961,13 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
-    
+
     function printPreview(code,aslicode){
         swal({
             title: "Apakah Anda ingin mengeprint dokumen ini?",
@@ -1987,7 +1987,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1996,10 +1996,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function whatPrinting(code){
@@ -2010,7 +2010,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2027,6 +2027,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

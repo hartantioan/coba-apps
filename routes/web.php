@@ -3066,6 +3066,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportSalesSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportSalesSummaryStockFgController::class, 'filter']);
                         Route::post('export', [ReportSalesSummaryStockFgController::class, 'export']);
+                        Route::get('export2', [ReportSalesSummaryStockFgController::class, 'export2']);
                     });
 
 

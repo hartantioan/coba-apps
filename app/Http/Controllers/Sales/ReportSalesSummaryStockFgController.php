@@ -12,7 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportReportSalesSummaryStockFg;
+use App\Exports\ExportReportSummaryStockFG2;
 use App\Jobs\StockSummaryPenjualanJob;
 
 class ReportSalesSummaryStockFgController extends Controller
@@ -135,5 +135,15 @@ class ReportSalesSummaryStockFgController extends Controller
         StockSummaryPenjualanJob::dispatch($start_date, $finish_date,$user_id);
 
         return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+    }
+
+
+    public function export2(Request $request){
+        $start_date = $request->start_date? $request->start_date : '';
+        $finish_date = $request->finish_date ? $request->finish_date : '';
+       
+       
+		return Excel::download(new ExportReportSummaryStockFG2($start_date,$finish_date), 'summary_sales_'.uniqid().'.xlsx');
+       
     }
 }

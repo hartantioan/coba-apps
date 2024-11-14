@@ -62,14 +62,30 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
             COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
             COALESCE(h.qtysj,0) AS qtysj, 
             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysj,0) AS endstock FROM (
-            SELECT  distinct d.code,d.name,k.code AS shading
-                                FROM production_handovers a
-                                LEFT JOIN production_handover_details b ON a.id=b.production_handover_id
-                                LEFT JOIN production_fg_receive_details c ON c.id=b.production_fg_receive_detail_id and c.deleted_at IS null
-                                LEFT JOIN items d ON d.id=b.item_id
-                                LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                           WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7
-                          
+          SELECT  distinct a.code,a.name,a.shading FROM (
+ 				SELECT d.code,d.name,k.code AS shading
+					 FROM production_handovers a
+					 LEFT JOIN production_handover_details b ON a.id=b.production_handover_id
+					 LEFT JOIN production_fg_receive_details c ON c.id=b.production_fg_receive_detail_id and c.deleted_at IS null
+					 LEFT JOIN items d ON d.id=b.item_id
+					 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7
+                 UNION ALL
+                SELECT d.code,d.name,k.code AS shading
+					 FROM production_repacks a
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN item_units c ON c.id=item_unit_source_id
+                LEFT JOIN items d ON d.id=b.item_source_id
+                	 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7
+					 UNION ALL
+					 SELECT d.code,d.name,k.code AS shading
+					 FROM production_repacks a
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN item_units c ON c.id=item_unit_target_id
+                LEFT JOIN items d ON d.id=b.item_target_id
+                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  )a
                            )a
             LEFT JOIN (
             SELECT code,name,shading, SUM(qty) AS initialstock FROM (

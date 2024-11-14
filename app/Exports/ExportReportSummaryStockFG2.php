@@ -85,6 +85,13 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                 LEFT JOIN item_units c ON c.id=item_unit_target_id
                 LEFT JOIN items d ON d.id=b.item_target_id
                  LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 
+                      UNION ALL
+					 SELECT d.code,d.name,k.code
+                FROM good_receives a
+                LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
+                LEFT JOIN items d ON d.id=b.item_id
+                LEFT JOIN item_shadings k ON k.id=b.item_shading_id
 					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  )a
                            )a
             LEFT JOIN (

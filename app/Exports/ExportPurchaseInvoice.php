@@ -98,6 +98,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         $arr = [];
 
         foreach($data as $key => $row){
+            info($row->id);
             $arr[] = [
                 'no'                => ($key + 1),
                 'invoice_code'              => $row->purchaseInvoice->code,

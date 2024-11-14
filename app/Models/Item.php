@@ -364,22 +364,25 @@ class Item extends Model
     public function currentStockMoreThanZero($dataplaces,$datawarehouses){
         $arrData = [];
 
-        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->where('qty','>',0)->get();
+        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get(); 
         foreach($data as $detail){
-            $arrData[] = [
-                'id'                => $detail->id,
-                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '').' - '.($detail->itemShading()->exists() ? $detail->itemShading->code : '').' - '.CustomHelper::formatConditionalQty($detail->qty),
-                'name'              => $detail->place->code.' Gudang: '.$detail->warehouse->name.($detail->area()->exists() ? ' Area: '.$detail->area->name : ''),
-                'warehouse_id'      => $detail->warehouse_id,
-                'place_id'          => $detail->place_id,
-                'area_id'           => $detail->area()->exists() ? $detail->area_id : '',
-                'area'              => $detail->area()->exists() ? $detail->area->name : '',
-                'item_shading_id'   => $detail->itemShading()->exists() ? $detail->item_shading_id : '',
-                'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
-                'qty'               => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
-                'qty_raw'           => CustomHelper::formatConditionalQty($detail->qty),
-                'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
-            ];
+            $balance = $detail->balanceWithUnsent();
+            if($balance > 0){
+                $arrData[] = [
+                    'id'                => $detail->id,
+                    'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '').' - '.($detail->itemShading()->exists() ? $detail->itemShading->code : '').' - '.CustomHelper::formatConditionalQty($balance),
+                    'name'              => $detail->place->code.' Gudang: '.$detail->warehouse->name.($detail->area()->exists() ? ' Area: '.$detail->area->name : ''),
+                    'warehouse_id'      => $detail->warehouse_id,
+                    'place_id'          => $detail->place_id,
+                    'area_id'           => $detail->area()->exists() ? $detail->area_id : '',
+                    'area'              => $detail->area()->exists() ? $detail->area->name : '',
+                    'item_shading_id'   => $detail->itemShading()->exists() ? $detail->item_shading_id : '',
+                    'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
+                    'qty'               => CustomHelper::formatConditionalQty($balance).' '.$this->uomUnit->code,
+                    'qty_raw'           => CustomHelper::formatConditionalQty($balance),
+                    'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
+                ];
+            }
         }
 
         return $arrData;

@@ -146,7 +146,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Uang Muka (DP)' => '',
                         'Total' =>  $total_detail,
                         'DPP FP' => $total_detail,
-                        'PPN FP' => floor($ppn_fp_detail),
+                        'PPN FP' => $ppn_fp_detail,
                         'Status Cancel' => '',
                         'Tipe Pembayaran' => '',
                         'Pembuat' => '',

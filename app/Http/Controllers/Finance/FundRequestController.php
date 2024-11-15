@@ -1071,6 +1071,18 @@ class FundRequestController extends Controller
             'arr_place.array'                   => 'Dist. Biaya Plant total harus dalam bentuk array.',
 		]);
 
+        // if($request->arr_item){
+        //     foreach($request->arr_item as $key => $row){
+        //         if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+        //             $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant 1';
+        //             $response = [
+        //                 'status' => 422,
+        //                 'error'  => $kambing
+        //             ];
+        //             return response()->json($response);
+        //         }
+        //     }
+        // }
         /* if($request->arr_item){
             foreach($request->arr_item as $key => $row){
                 if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {

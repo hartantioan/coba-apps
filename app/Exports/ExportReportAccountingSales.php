@@ -122,7 +122,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
                 }
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
-                $total = $row->getQtyM2() ?? 1 * $price;
+                $total = ($row->getQtyM2() ?? 1) * $price;
             }
 
 

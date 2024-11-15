@@ -534,16 +534,16 @@ class GoodIssueRequestController extends Controller
             'arr_warehouse.required'            => 'Penempatan gudang tidak boleh kosong.',
             'arr_warehouse.array'               => 'Penempatan gudang harus dalam bentuk array.',
 		]);
-        foreach($request->arr_item as $key => $row){
-            if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
-                $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant 1';
-                $response = [
-                    'status' => 422,
-                    'error'  => $kambing
-                ];
-                return response()->json($response);
-            }
-        }
+        // foreach($request->arr_item as $key => $row){
+        //     if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+        //         $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant 1';
+        //         $response = [
+        //             'status' => 422,
+        //             'error'  => $kambing
+        //         ];
+        //         return response()->json($response);
+        //     }
+        // }
 
         if($validation->fails()) {
             $response = [

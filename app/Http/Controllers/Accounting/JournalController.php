@@ -635,7 +635,7 @@ class JournalController extends Controller
                         $project = Project::where('code',explode('|',$request->arr_multi_project[$key])[0])->first();
                         $department = Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first();
 
-                        if(floatval($request->arr_multi_debit[$key]) > 0 || floatval($request->arr_multi_debit[$key]) < 0){
+                        if(floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) < 0){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $coaAvailable[$key],
@@ -653,7 +653,7 @@ class JournalController extends Controller
                             ]);
                         }
 
-                        if(floatval($request->arr_multi_kredit[$key]) > 0 || floatval($request->arr_multi_kredit[$key]) < 0){
+                        if(floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) < 0){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $coaAvailable[$key],

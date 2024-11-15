@@ -69,6 +69,17 @@ class MarketingOrderInvoiceDetail extends Model
         }
     }
 
+    public function getPrintName()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->print_name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->print_name;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
     public function getItemCode()
     {
         if ($this->lookable_type == 'marketing_order_delivery_process_details') {

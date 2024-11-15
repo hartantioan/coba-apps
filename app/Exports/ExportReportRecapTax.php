@@ -135,7 +135,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Nama NPWP' => $row->userData->user->name,
                         'No NPWP' => $row->getNpwp(),
                         'Alamat NPWP' => $row->userData->address,
-                        'Nama Barang' => $row_detail->getItem() . $boxQty . $hscode,
+                        'Nama Barang' => $row_detail->getPrintName() . $boxQty . $hscode,
                         'DPP Harga Satuan' => $price_satuan,
                         'Jumlah Barang (Qty)' => $jumlah_barang,
                         '% Diskon' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->percent_discount_1 : '',

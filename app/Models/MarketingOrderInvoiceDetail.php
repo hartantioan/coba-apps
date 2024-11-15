@@ -207,6 +207,17 @@ class MarketingOrderInvoiceDetail extends Model
         }
     }
 
+    public function getBoxConversion()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->pallet->box_conversion;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->pallet->box_conversion;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return 1;
+        }
+    }
+
     public function getMoDetail()
     {
         if ($this->lookable_type == 'marketing_order_delivery_process_details') {

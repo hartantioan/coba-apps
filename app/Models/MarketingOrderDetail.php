@@ -83,6 +83,16 @@ class MarketingOrderDetail extends Model
         return $codesString;
     }
 
+    public function priceWTax(){
+        $price = 0;
+        if($this->is_include_tax == '1'){
+            $price = $this->price_after_discount / (($this->percent_tax  + 100) / 100);
+        }else{
+            $price = $this->price_after_discount;
+        }
+        return round($price,2);
+    }
+
     public function marketingOrderPlanDetail(){
         return $this->hasMany('App\Models\MarketingOrderPlanDetail','marketing_order_detail_id','id')->whereHas('marketingOrderPlan',function($query){
             $query->whereIn('status',['1','2','3']);

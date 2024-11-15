@@ -26,7 +26,7 @@ use App\Models\ProductionFgReceiveMaterial;
 use App\Models\ProductionHandover;
 use App\Models\ProductionHandoverDetail;
 use App\Models\ProductionReceive;
-use App\Models\ProductionReceiveDetail;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\Shift;
@@ -803,6 +803,12 @@ class ProductionHandoverController extends Controller
                 $cekStock = ItemStock::where('production_batch_id',$row->productionBatch->id)->first();
                 if($cekStock){
                     if(round($cekStock->qty,3) !== round($row->qty * $row->productionFgReceiveDetail->conversion,3)){
+                        $stockUsed = true;
+                    }
+                    $countSj = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
+                        $query->whereIn('status',['2','3']);
+                    })->where('item_stock_id',$cekStock->id)->count();
+                    if($countSj > 0){
                         $stockUsed = true;
                     }
                 }

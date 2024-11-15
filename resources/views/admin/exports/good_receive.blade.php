@@ -29,6 +29,7 @@
             <th>{{ __('translations.warehouse') }}</th>
             <th>{{ __('translations.area') }}</th>
             <th>{{ __('translations.shading') }}</th>
+            <th>Batch</th>
             <th>Proyek</th>
             <th>{{ __('translations.price') }}</th>
             <th>{{ __('translations.total') }}</th>
@@ -69,7 +70,8 @@
                 <td>{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
                 <td>{{ $rowdetail->place->code.' - '.$rowdetail->warehouse->name }}</td>
                 <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '-' }}</td>
-                <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>
+                <td>{{ $rowdetail->itemShading->code ?? '-' }}</td>
+                <td>{{ $rowdetail->productionBatch->code ?? '-' }}</td>
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
                 <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
                 <td align="right">{{ number_format($rowdetail->total,2,',','.') }}</td>

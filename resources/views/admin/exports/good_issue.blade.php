@@ -17,6 +17,8 @@
             <th>Dokumen</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
+            <th>Shading</th>
+            <th>Batch</th>
             <th>{{ __('translations.plant') }}</th>
             <th>Ket. Detail 1</th>
             <th>Ket. Detail 2</th>
@@ -60,6 +62,8 @@
                 <td>{!! $row->document ? '<a href="'.$row->attachment().'">File</a>' : 'NO FILE' !!}</td>
                 <td>{{ $rowdetail->itemStock->item->code }}</td>
                 <td>{{ $rowdetail->itemStock->item->name }}</td>
+                <td>{{ $rowdetail->itemStock->itemShading->code ?? '-' }}</td>
+                <td>{{ $rowdetail->itemStock->productionBatch->code ?? '-' }}</td>
                 <td>{{ $rowdetail->place()->exists() ? $rowdetail->place->code : '-' }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>

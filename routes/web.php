@@ -222,6 +222,7 @@ use App\Http\Controllers\Accounting\ClosingJournalController;
 use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
 use App\Http\Controllers\Accounting\ReportAccountingSummaryStockController;
+use App\Http\Controllers\Accounting\ReportMarketingDeliveryOrderProcessRecapController;
 use App\Http\Controllers\Accounting\ReportAccountingSales;
 use App\Http\Controllers\Accounting\StockInRupiahShadingController;
 use App\Http\Controllers\Accounting\ReportTransaction_CogsController;
@@ -3587,6 +3588,11 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportAccountingSummaryStockController::class, 'index']);
                         Route::post('filter', [ReportAccountingSummaryStockController::class, 'filter']);
                         Route::get('export', [ReportAccountingSummaryStockController::class, 'export']);
+                    });
+
+                    Route::prefix('report_delivery_process_accounting')->middleware('operation.access:report_delivery_process_accounting,view')->group(function () {
+                        Route::get('/', [ReportMarketingDeliveryOrderProcessRecapController::class, 'index']);
+                        Route::get('export', [ReportMarketingDeliveryOrderProcessRecapController::class, 'export']);
                     });
 
                     Route::prefix('report_accounting_sales')->middleware('operation.access:report_accounting_sales,view')->group(function () {

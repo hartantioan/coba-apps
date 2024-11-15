@@ -86,9 +86,6 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
     {
         return 'A1';
     }
-	/**
-	 * @return array
-	 */
 	public function headings() : array
 	{
 		return $this->headings;

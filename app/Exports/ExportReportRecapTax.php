@@ -110,10 +110,11 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                     $dpp_discount_total += $dpp_discount_detail;
 
                     $dpp_total_detail = round($row_detail->getMarketingOrder->price_after_discount *  $row_detail->getMarketingOrder->qty_uom / $percentTax, 2);
+                  
                     $dpp_total += $dpp_total_detail;
 
                     // $total_detail = round($row_detail->getMarketingOrder->total / $percentTax, 2);
-                    $total_detail = round($row_detail->total / $percentTax, 2);
+                    $total_detail = round($row_detail->total, 2);
                     $total_all += $total_detail;
 
 

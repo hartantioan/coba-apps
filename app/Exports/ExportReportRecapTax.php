@@ -102,7 +102,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         $percentTax = ($row_detail->getMarketingOrder->percent_tax + 100) / 100;
                     }
 
-                    $price_satuan = $row_detail->getMarketingOrder->priceWTax();
+                    //  $price_satuan = $row_detail->getMarketingOrder->priceWTax();
+                    $price_satuan = round($row_detail->price / $percentTax, 2);
                     $jumlah_barang = $row_detail->getMarketingOrder->qty_uom;
 
                     $dpp_discount_detail = round($row_detail->getMarketingOrder->price / $percentTax - $row_detail->getMarketingOrder->price_after_discount / $percentTax, 2);
@@ -111,15 +112,16 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                     $dpp_total_detail = round($row_detail->getMarketingOrder->price_after_discount *  $row_detail->getMarketingOrder->qty_uom / $percentTax, 2);
                     $dpp_total += $dpp_total_detail;
 
-                    $total_detail = round($row_detail->getMarketingOrder->total / $percentTax, 2);
+                    // $total_detail = round($row_detail->getMarketingOrder->total / $percentTax, 2);
+                    $total_detail = round($row_detail->total / $percentTax, 2);
                     $total_all += $total_detail;
 
 
-                    $ppn_fp_detail = $row_detail->getMarketingOrder->tax;
+                    $ppn_fp_detail = $row_detail->tax;
                     $ppn_fp_total += $ppn_fp_detail;
 
                     // $price_dpp_detail = round((($row_detail->getMarketingOrder->price_after_discount * $row_detail->getMarketingOrder->qty_uom) - $dpp_discount_detail) / $percentTax, 2);
-                    $price_dpp_detail = round((($price_satuan * $row_detail->getMarketingOrder->qty_uom)), 2);
+                    $price_dpp_detail = round((($price_satuan - $dpp_discount_detail)), 2);
                     $price_dpp_total += $price_dpp_detail;
                 }
                 $detail[] = [

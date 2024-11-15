@@ -442,6 +442,16 @@ class GoodScale extends Model
         return $this->hasOne('App\Models\PurchaseOrder','document_no','code')->whereIn('status',['1','2','3']);
     }
 
+    public function hasRitase(){
+        $has = false;
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable->cost_delivery_type == '2'){
+                $has = true;
+            }
+        }
+        return $has;
+    }
+
     public function createPurchaseOrder(){
         #CREATE PO
         if($this->purchaseOrder()->exists()){
@@ -496,6 +506,7 @@ class GoodScale extends Model
             if($coahutangusahaekspedisi && $unit){
                 $total = 0;
                 $tempQty = -1;
+
                 foreach($this->goodScaleDetail()->orderByDesc('qty')->get() as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         $total += $row->total;

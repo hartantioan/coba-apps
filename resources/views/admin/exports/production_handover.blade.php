@@ -65,7 +65,7 @@
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
                     <td>{{ round($row_detail->productionFgReceiveDetail->conversion * $row_detail->qty,3) }}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
-                    <td>{{ $nominal ? CustomHelper::formatConditionalQty($row_detail->total) : ''}}</td>
+                    <td>{{ $nominal ? $row_detail->total : ''}}</td>
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->productionFgReceive->code }}</td>

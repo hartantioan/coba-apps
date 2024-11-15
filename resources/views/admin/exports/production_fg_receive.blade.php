@@ -70,7 +70,7 @@
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row->productionIssueList()}}</td>
-                    <td>{{ $nominal ? CustomHelper::formatConditionalQty($row_detail->total) : ''}}</td>
+                    <td>{{ $nominal ? $row_detail->total : ''}}</td>
                     <td>{{ $row_detail->pallet->code}}</td>
                     <td>{{ $row_detail->grade->code}}</td>
                     <td>{{ $row->productionOrderDetail->productionOrder->code }}</td>

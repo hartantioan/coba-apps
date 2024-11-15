@@ -71,7 +71,7 @@ class MarketingOrderDownPayment extends Model
         if ($this->account->type_body==3)
         {
             $npwp=substr(str_replace('.','',str_replace('-','',$this->account->userDataDefault()->npwp)),1);
-          
+
         }
         else
         {
@@ -188,7 +188,7 @@ class MarketingOrderDownPayment extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -254,12 +254,26 @@ class MarketingOrderDownPayment extends Model
         });
     }
 
+    public function invoiceType(){
+        $arr = [];
+        foreach ($this->marketingOrderInvoiceDetail as $row)
+        {
+            if (!in_array($row->marketingOrderInvoice->invoiceType(),$arr))
+            {
+                $arr[]=$row->marketingOrderInvoice->invoiceType();
+            }
+        }
+
+        $no = implode(',',$arr);
+        return array($no);
+    }
+
     public function incomingPaymentDetail(){
         return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
             $query->whereIn('status',['2','3']);
         });
     }
-    
+
     public function getCodeIncomingPayments()
     {
         $arr = [];
@@ -272,7 +286,7 @@ class MarketingOrderDownPayment extends Model
                 $tanggal[]=$row->incomingPayment->post_date;
             }
         }
-        
+
         $no = implode(',',$arr);
         $tanggal = implode(',',$tanggal);
         return array($no,$tanggal);
@@ -435,7 +449,7 @@ class MarketingOrderDownPayment extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Helpers\CustomHelper;
+use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -127,12 +128,12 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                     }
                     $detail[] = [
                         'No Urut' => '',
-                        'Jenis Dokumen' => $row->invoiceType(),
+                        'Jenis Dokumen' => 'INVOICE',
                         'Tipe Penjualan' => $row->soType(),
                         'No Seri Pajak' => $row->tax_no,
                         'No Dokumen' => $row->code,
                         'Tgl Dokumen' => date('d/m/Y', strtotime($row->post_date)),
-                        'Nama NPWP' => $row->userData->user->name,
+                        'Nama NPWP' => $row->userData->title,
                         'No NPWP' => $row->getNpwp(),
                         'Alamat NPWP' => $row->userData->address,
                         'Nama Barang' => $row_detail->getPrintName() . $boxQty . $hscode,
@@ -184,6 +185,114 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
 
             $arr[] = $header;
             $arr[] = $detail;
+
+
+
+
+
+
+        }
+        $arr[]= [
+            'No' => '',
+            'Kode'=> '',
+            'Post Date'=> '',
+            'User'=> '',
+            'BP'=> '',
+            'Nama NPWP'=> '',
+            'No. NPWP'=> '',
+            'Alamat. NPWP'=> '',
+            'Perusahaan'=> '',
+            'Tipe'=> '',
+            'Tipe Invoice'=> '',
+            'Currency'=> '',
+            'Note'=> '',
+            'Pajak'=> '',
+            'Subtotal'=> '',
+            'Total'=> '',
+            'Tax'=> '',
+            'Grandtotal'=> '',
+            'Status'=> '',
+        ];
+        $arr[]= [
+            'No' => '',
+            'Kode'=> '',
+            'Post Date'=> '',
+            'User'=> '',
+            'BP'=> '',
+            'Nama NPWP'=> '',
+            'No. NPWP'=> '',
+            'Alamat. NPWP'=> '',
+            'Perusahaan'=> '',
+            'Tipe'=> '',
+            'Tipe Invoice'=> '',
+            'Currency'=> '',
+            'Note'=> '',
+            'Pajak'=> '',
+            'Subtotal'=> '',
+            'Total'=> '',
+            'Tax'=> '',
+            'Grandtotal'=> '',
+            'Status'=> '',
+        ];
+
+        $arr[]= [
+            'No' => 'No',
+            'Kode'=> 'Kode',
+            'Post Date'=> 'Post Date',
+            'User'=> 'User',
+            'BP'=> 'BP',
+            'Nama NPWP'=> 'Nama NPWP',
+            'No. NPWP'=> 'No. NPWP',
+            'Alamat. NPWP'=> 'Alamat. NPWP',
+            'Perusahaan'=> 'Perusahaan',
+            'Tipe'=> 'Tipe',
+            'Tipe Invoice'=> 'Tipe Invoice',
+            'Currency'=> 'Currency',
+            'Note'=> 'Note',
+            'Pajak'=> 'Pajak',
+            'Subtotal'=> 'Subtotal',
+            'Total'=> 'Total',
+            'Tax'=> 'Tax',
+            'Grandtotal'=> 'Grandtotal',
+            'Status'=> 'Status',
+        ];
+        $query_dp =MarketingOrderDownPayment::where(function($query) {
+            if($this->start_date && $this->finish_date) {
+                $query->whereDate('post_date', '>=', $this->start_date)
+                    ->whereDate('post_date', '<=', $this->finish_date);
+            } else if($this->start_date) {
+                $query->whereDate('post_date','>=', $this->start_date);
+            } else if($this->finish_date) {
+                $query->whereDate('post_date','<=', $this->finish_date);
+            }
+        })
+        ->get();
+
+        foreach($query_dp as $index=>$row_arr){
+            $user = $row_arr->user->name;
+            $account = $row_arr->account->name;
+            $arr[]=[
+                'no' => $index+1,
+                'kode' =>$row_arr->code,
+                'post_date' =>date('d/m/Y',strtotime($row_arr->post_date)),
+                'user' =>$user,
+                'bp' =>$account,
+                'npwp_name' => $row_arr->account->userDataDefault()->title,
+                'npwp_no' => $row_arr->account->userDataDefault()->npwp,
+                'npwp_address' => $row_arr->account->userDataDefault()->address,
+                'perusahaan' =>$row_arr->plant,
+                'tipe' =>$row_arr->type(),
+                'invoice_type' =>$row_arr->invoiceType(),
+                'currency' =>$row_arr->currency->code,
+                'note' =>$row_arr->note,
+                'pajak' =>$row_arr->tax_no,
+                'subtotal' =>$row_arr->subtotal,
+                'total' =>$row_arr->total,
+                'tax' =>$row_arr->tax,
+                'grandtotal' =>$row_arr->grandtotal,
+                'status' =>$row_arr->statusRaw(),
+
+            ];
         }
 
 

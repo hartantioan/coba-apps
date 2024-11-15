@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Exports\ExportDeliveryOrderProcessAccountingRecap;
 use App\Http\Controllers\Controller;
+use App\Jobs\DeliveryOrderProcessAccountingJob;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
@@ -35,7 +36,14 @@ class ReportMarketingDeliveryOrderProcessRecapController extends Controller
     public function export(Request $request){
         ob_end_clean();
         ob_start();
-        $response = Excel::download(new ExportDeliveryOrderProcessAccountingRecap($request->start_date,$request->end_date), 'surat_jalan_recap_accounting_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-        return $response;
+        $start_date = $request->start_date;
+        $finish_date = $request->finish_date;
+
+        $user_id = session('bo_id');
+
+
+        DeliveryOrderProcessAccountingJob::dispatch($start_date, $finish_date,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
 }

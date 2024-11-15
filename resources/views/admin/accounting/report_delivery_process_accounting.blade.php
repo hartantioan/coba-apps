@@ -45,12 +45,12 @@
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m3 s6 ">
-                                                        <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
+                                                        <label for="finish_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
+                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m6 s6 pt-2">
 
-                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                        <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
@@ -86,11 +86,61 @@
 
 <script>
     function exportExcel(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
+        var finish_date = $('#finish_date').val();
+        var start_date = $('#start_date').val();
+        var $search = '';
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                finish_date: finish_date,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+        // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
+
     }
 
 
 
 
 </script>
+
+

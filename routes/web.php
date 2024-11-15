@@ -3592,7 +3592,7 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('report_delivery_process_accounting')->middleware('operation.access:report_delivery_process_accounting,view')->group(function () {
                         Route::get('/', [ReportMarketingDeliveryOrderProcessRecapController::class, 'index']);
-                        Route::get('export', [ReportMarketingDeliveryOrderProcessRecapController::class, 'export']);
+                        Route::post('export', [ReportMarketingDeliveryOrderProcessRecapController::class, 'export']);
                     });
 
                     Route::prefix('report_accounting_sales')->middleware('operation.access:report_accounting_sales,view')->group(function () {

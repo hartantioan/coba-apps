@@ -103,7 +103,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         }
 
                         //  $price_satuan = $row_detail->getMarketingOrder->priceWTax();
-                        $price_satuan = round($row_detail->price / $percentTax, 2);
+                        $price_satuan = round($row_detail->getMarketingOrder->price / $percentTax, 2);
                         $jumlah_barang = $row_detail->getMarketingOrder->qty_uom;
 
                         $dpp_discount_detail = round($row_detail->getMarketingOrder->price / $percentTax - $row_detail->getMarketingOrder->price_after_discount / $percentTax, 2);

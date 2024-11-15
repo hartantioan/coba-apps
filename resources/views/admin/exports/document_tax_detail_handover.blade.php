@@ -8,6 +8,7 @@
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Rp</th>
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.name') }}</th>
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.date') }}</th>
+            <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Status</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
                     <td style="border: 1px solid black;">{{ $row->documentTax->total }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->post_date }}</td>
+                    <td style="border: 1px solid black;">{{ $row->documentTax->status() }}</td>
                 </tr>
             @endforeach
         @endif

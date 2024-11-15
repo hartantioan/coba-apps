@@ -14,6 +14,7 @@
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.tax') }}</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
+            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Status</th>
         </tr>
     </thead>
     <tbody>
@@ -33,6 +34,7 @@
                     <td style="border: 1px solid black;">{{ number_format(round($row->total - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.')}}</td>
                     <td style="border: 1px solid black;">{{ number_format(round($row->tax - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.') }}</td>
                     <td style="border: 1px solid black;">{{ $row->item}}</td>
+                    <td style="border: 1px solid black;">{{ $row->documentTax->status() }}</td>
                 </tr>
             @endforeach
         @endif

@@ -95,7 +95,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                     }
                     $hscode = '';
                     if($freeAreaTax){
-                        $hscode = ' '.$row_detail->lookable->itemStock->item->type->hs_code;
+                        $hscode = ' '.$row_detail->getHSCode();
                     }
 
                     if($row_detail->is_include_tax == 1){

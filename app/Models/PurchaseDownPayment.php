@@ -679,10 +679,12 @@ class PurchaseDownPayment extends Model
 
     public function latestCurrencyRateByDate($date){
         $currency_rate = $this->currency_rate;
-        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
-            $query->where('post_date','<=',$date)/* ->where('post_date','<','2024-06-01') */->orderBy('post_date');
-        })->get() as $row){
-            $currency_rate = $row->adjustRate->currency_rate;
+        if($this->post_date < '2024-11-12'){
+            foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
+                $query->where('post_date','<=',$date)/* ->where('post_date','<','2024-06-01') */->orderBy('post_date');
+            })->get() as $row){
+                $currency_rate = $row->adjustRate->currency_rate;
+            }
         }
         return $currency_rate;
     }

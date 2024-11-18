@@ -195,7 +195,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Uang Muka (DP)' => $row->downpayment,
                 'Total' =>  $total_before_disc,
 
-                'DPP FP' => $row->total,
+                'DPP FP' => floor($row->total),
                 'PPN FP' => $row->tax,
                 'Status Cancel' => $row->statusRaw(),
                 'Tipe Pembayaran' => $row->type(),

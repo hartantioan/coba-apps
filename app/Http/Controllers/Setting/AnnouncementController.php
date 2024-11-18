@@ -17,7 +17,7 @@ class AnnouncementController extends Controller
     public function index()
     {
 
-        $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
+        /* $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2','3'])->where('post_date','>=','2024-10-01')->where('post_date','<=','2024-10-31');
         })->get();
 
@@ -25,7 +25,7 @@ class AnnouncementController extends Controller
             if($row->balanceInvoice() > 0){
                 echo $row->balanceInvoice().' - '.$row->goodReceipt->code.'<br>';
             }
-        }
+        } */
 
         $data = [
             'title'     => 'Announcement',

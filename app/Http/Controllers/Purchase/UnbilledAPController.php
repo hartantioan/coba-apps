@@ -95,7 +95,7 @@ class UnbilledAPController extends Controller
                                             AND grd.deleted_at IS NULL
                                         )
                                 AND pid.deleted_at IS NULL
-                                AND pi.status IN ('2','3','7')
+                                AND pi.status IN ('2','3','7','8')
                                 AND pi.post_date <= :date2
                         ),'') AS data_reconcile,
                         IFNULL((SELECT
@@ -147,7 +147,7 @@ class UnbilledAPController extends Controller
                         IFNULL((SELECT
                             ROUND(jd.nominal,2)
                             FROM journal_details jd
-                            JOIN journals j
+                            LEFT JOIN journals j
                                 ON jd.journal_id = j.id
                             WHERE
                                 j.post_date <= :date5

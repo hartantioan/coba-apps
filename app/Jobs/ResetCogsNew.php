@@ -145,6 +145,14 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+            if($row->journalDetail()->exists()){
+                foreach($row->journalDetail as $rowjournal){
+                    $rowjournal->update([
+                        'nominal_fc'  => $row->total,
+                        'nominal'     => $total,
+                    ]);
+                }
+            }
         }
     
         $goodreceive = GoodReceiveDetail::whereHas('goodReceive',function($query)use($dateloop){

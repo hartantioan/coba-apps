@@ -127,7 +127,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
 
         foreach ($data as $row) {
 
-            if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->include_tax == "0") {
+            if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == "0") {
                 $pricefinal = $row->marketingOrderDeliveryDetail->marketingOrderDetail->price;
             } else {
                 $pricefinal = Round($row->marketingOrderDeliveryDetail->marketingOrderDetail->price / (($row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) / 100), 2);

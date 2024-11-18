@@ -67,7 +67,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Transport Name',
         'Plat No',
         'Sales Employee Name',
-        'Tgl. Cetak',
+        // 'Tgl. Cetak',
     ];
 
     public function collection()
@@ -199,7 +199,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'ppn'               => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
                         'item'              => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->code.'-'.$row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->name,
 
-                        'delivery_date'     => date('d/m/Y',strtotime($row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->delivery_date)),
+                        'delivery_date'     => date('d/m/Y',strtotime($row->post_date)),
                         'qty'               => $row_shading['total_palet'] > 0 ? $row_shading['total_palet'] : $row_shading['total_box'],
                         'unit'              => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                         'qty_m2'            => $row_shading['total_conversion'],
@@ -215,7 +215,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'plat_no'                      => $row->vehicle_no ?? '-',
                         // 'nama_supir'                   => $row->driver_name ?? '-',
                         'sales_employee_name'          => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->sales->name,
-                        'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
+                        // 'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
                         /* 'project_name'               => $row->project->name??'-',
                         'other_fee'             => $row_detail->other_fee,
                         'ongkir'        => $row_detail->price_delivery, */

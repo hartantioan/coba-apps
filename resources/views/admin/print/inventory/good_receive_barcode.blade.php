@@ -68,7 +68,12 @@
                                         <td>{{ 'SHADE : '.($row->itemShading->code ?? '-') }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ 'PALET : '.$row->item->pallet->prefix_code }}</td>
+                                        <td>
+                                            {{ 'PALET : '.$row->item->pallet->prefix_code }}
+                                            @if ($row->item->pallet->box_conversion <= 1)
+                                                | QTY : {{ CustomHelper::formatConditionalQty($row->qty_sell) }}
+                                            @endif
+                                        </td>
                                     </tr>
                                 </table>
                             </td>

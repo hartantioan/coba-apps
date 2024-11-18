@@ -72,7 +72,12 @@
                                         <td>{{ 'SHADE : '.$row->shading }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ 'PALET : '.$row->pallet->prefix_code }}</td>
+                                        <td>
+                                            {{ 'PALET : '.$row->pallet->prefix_code }}
+                                            @if ($row->item->pallet->box_conversion <= 1)
+                                                | QTY : {{ CustomHelper::formatConditionalQty($row->qty_sell) }}
+                                            @endif
+                                        </td>
                                     </tr>
                                 </table>
                             </td>

@@ -102,6 +102,15 @@ class MarketingBarcodeScanController extends Controller
 
         $detail = [];
         if($mop){
+
+            if($mop->status !== '2'){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'SJ sudah diluar status perubahan. Hanya status PROSES yang bisa discan.'
+                ];
+                return response()->json($response);
+            }
+
             $mop['expedition_name'] = $mop->account->name;
             foreach ($mop->marketingOrderDeliveryProcessDetail as $key => $value) {
 

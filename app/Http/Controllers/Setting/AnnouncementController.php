@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\GoodReceipt;
+use App\Models\GoodReceiptDetail;
 use App\Models\LandedCostFeeDetail;
 use App\Models\Menu;
 use Carbon\Carbon;
@@ -15,17 +17,15 @@ class AnnouncementController extends Controller
     public function index()
     {
 
-        /* $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
-            $query->whereIn('status',['2','3'])
-                ->where('post_date','<=','2024-10-31')->where('post_date','>=','2024-10-01');
+        $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['2','3'])->where('post_date','>=','2024-10-01')->where('post_date','<=','2024-10-31');
         })->get();
 
         foreach($data as $row){
-            $balance = $row->balanceInvoiceByDate('2024-10-31');
-            if($balance > 0){
-                echo $row->landedCost->code.' - '.date('d/m/Y',strtotime($row->landedCost->post_date)).' - '.number_format($balance * $row->landedCost->currency_rate,2,',','.').' - '.number_format($row->journalDetail()->first()->nominal,2,',','.').' - '.$row->journalDetail()->count().'<br>';
+            if($row->balanceInvoice() > 0){
+                echo $row->balanceInvoice().' - '.$row->goodReceipt->code.'<br>';
             }
-        } */
+        }
 
         $data = [
             'title'     => 'Announcement',

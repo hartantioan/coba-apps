@@ -215,6 +215,15 @@ class MarketingBarcodeScanController extends Controller
     public function create(Request $request){
         $query = MarketingOrderDeliveryProcess::find($request->temp);
         if($query){
+            
+            if($query->status !== '2'){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'SJ sudah diluar status perubahan. Hanya status PROSES yang bisa discan.'
+                ];
+                return response()->json($response);
+            }
+
             $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$request->temp)
             ->whereIn('status',values: ['5'])->get();
             if(count($query_track) > 0){

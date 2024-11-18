@@ -654,7 +654,7 @@ class InventoryTransferOutController extends Controller
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
         $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.$x.'</div>
-                    <div class="col s12" style="font-weight:bold;"> Dari: '.$data->warehouseFrom->name.' Ke: '.$data->warehouseTo->name.'</div>
+                    <div class="col s12" style="font-weight:bold;"> Dari: '.$data->placeFrom->code.' - '.$data->warehouseFrom->name.' &nbsp; &nbsp; Ke: '.$data->placeTo->code.' - '.$data->warehouseTo->name.'</div>
                     <div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>

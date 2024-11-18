@@ -111,6 +111,7 @@
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
                                                         <option value="6">Direvisi</option>
+                                                        <option value="8">Ditutup Balik</option>
                                                     </select>
                                                 </div>
                                             </div>

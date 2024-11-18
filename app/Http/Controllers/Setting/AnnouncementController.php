@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\LandedCostFeeDetail;
 use App\Models\Menu;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,12 +14,25 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $data = [
+
+        $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
+            $query->whereIn('status',['2','3'])
+                ->where('post_date','<=','2024-10-31');
+        })->get();
+
+        foreach($data as $row){
+            $balance = $row->balanceInvoiceByDate('2024-10-31');
+            if($balance > 0){
+                echo $row->landedCost->code.' - '.date('d/m/Y',strtotime($row->landedCost->post_date)).' - '.number_format($balance * $row->landedCost->currency_rate,2,',','.').' - '.number_format($row->journalDetail()->first()->nominal,2,',','.').'<br>';
+            }
+        }
+
+        /* $data = [
             'title'     => 'Announcement',
             'content'   => 'admin.setting.announcement',
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
     }
 
     public function datatable(Request $request){

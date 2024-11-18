@@ -34,7 +34,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
         'Nama Barang',
         'DPP Harga Satuan',
         'Jumlah Barang (Qty)',
-        'Total Harga Barang',
+
         '% Diskon',
         '% Diskon 2',
         'Diskon 3',
@@ -149,16 +149,16 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Nama Barang' => $row_detail->getPrintName() . $boxQty . $hscode,
                         'DPP Harga Satuan' => $price_satuan,
                         'Jumlah Barang (Qty)' => $jumlah_barang,
-                        'Total Harga Barang' => $price_satuan * $jumlah_barang,
+
                         '% Diskon' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->percent_discount_1 : '',
                         '% Diskon 2' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->percent_discount_2 : '',
                         'Diskon 3' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->discount_3 : '',
                         'DPP Diskon / Qty' => $dpp_discount_detail,
-
+                        'Total Diskon' => $dpp_discount_detail * $jumlah_barang,
                         'Total Harga Barang (DPP)' => $price_dpp_detail,
                         'Uang Muka (DP)' => '',
                         'Total' =>  $price_satuan * $jumlah_barang,
-                        'Total Diskon' => $dpp_discount_detail * $jumlah_barang,
+                      
                         'DPP FP' => $total_detail,
                         'PPN FP' => $ppn_fp_detail,
                         'Status Cancel' => '',
@@ -185,16 +185,16 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Nama Barang' => '',
                 'DPP Harga Satuan' => '',
                 'Jumlah Barang (Qty)' => '',
-                'Total Harga Barang' => '',
+
                 '% Diskon' => '',
                 '% Diskon 2' => '',
                 'Diskon 3' => '',
                 'DPP Diskon' => '',
-
+                'Total Diskon' => $total_discount,
                 'Total Harga Barang (DPP)' => '',
                 'Uang Muka (DP)' => $row->downpayment,
                 'Total' =>  $total_before_disc,
-                'Total Diskon' => $total_discount,
+
                 'DPP FP' => $row->total,
                 'PPN FP' => $row->tax,
                 'Status Cancel' => $row->statusRaw(),
@@ -216,16 +216,16 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Nama Barang' => '',
                 'DPP Harga Satuan' => '',
                 'Jumlah Barang (Qty)' => '',
-                'Total Harga Barang' => '',
+
                 '% Diskon' => '',
                 '% Diskon 2' => '',
                 'Diskon 3' => '',
                 'DPP Diskon' => '',
-
+                'Total Diskon' => '',
                 'Total Harga Barang (DPP)' => '',
                 'Uang Muka (DP)' => '',
                 'Total' =>  '',
-                'Total Diskon' => '',
+
                 'DPP FP' => '',
                 'PPN FP' => '',
                 'Status Cancel' => '',
@@ -271,16 +271,16 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Nama Barang' => $row_arr->note,
                 'DPP Harga Satuan' => $row_arr->total,
                 'Jumlah Barang (Qty)' => '1',
-                'Total Harga Barang' => '0',
+
                 '% Diskon' => '0',
                 '% Diskon 2' => '0',
                 'Diskon 3' => '0',
                 'DPP Diskon' => '0',
-
+                'Total Diskon' => '',
                 'Total Harga Barang (DPP)' => $row_arr->total,
                 'Uang Muka (DP)' => '0',
                 'Total' => $row_arr->total,
-                'Total Diskon' => '',
+
                 'DPP FP' => $row_arr->total,
                 'PPN FP' => $row_arr->tax,
                 'Status Cancel' => $row_arr->statusRaw(),

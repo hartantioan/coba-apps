@@ -32,6 +32,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
 
         $array=[];
         foreach($data as $row){
+            $balance = $row->balanceInvoiceByDate($this->date);
             $entry = [];
             $entry["code"]=$row->landedCost->code;
             $entry["post_date"] = date('d/m/Y',strtotime($row->landedCost->post_date));
@@ -61,9 +62,9 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             $entry["total_rupiah"] = number_format($row->landedCost->total*$row->landedCost->currency_rate,2,',','.');
             $entry["tagihan"] = number_format($row->total * $row->landedCost->currency_rate,2,',','.');
             $entry["dibayar"] = number_format($row->totalInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');
-            $entry["sisa"] = number_format($row->balanceInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');
+            $entry["sisa"] = number_format($balance * $row->landedCost->currency_rate,2,',','.');
             $entry["grpo_no"] = $row->landedCost->getGoodReceiptNo();
-            if($row->balanceInvoiceByDate($this->date) > 0){
+            if($balance > 0){
                 $array[] = $entry;
             }
 

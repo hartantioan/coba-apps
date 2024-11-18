@@ -144,7 +144,19 @@ class UnbilledAPController extends Controller
                                     END
                                 )
                         ),0) AS adjust_nominal,
-                        0 AS total_journal
+                        IFNULL((SELECT
+                            0
+                            FROM journal_details jd
+                            JOIN journals j
+                                ON jd.journal_id = j.id
+                            WHERE
+                                j.post_date <= :date5
+                                AND j.status IN ('2','3')
+                                AND j.deleted_at IS NULL
+                                AND jd.deleted_at IS NULL
+                                AND jd.note = CONCAT('ADJUST*',gr.code)
+                                AND jd.type = '1'
+                        ),0) AS total_journal
                         FROM good_receipts gr
                         LEFT JOIN users u
                             ON u.id = gr.account_id

@@ -49,6 +49,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                 rs.total,
                 rs.total_invoice,
                 rs.total_return,
+                rs.total_journal,
                 rs.currency_rate,
                 rs.total_detail,
                 rs.adjust_nominal,
@@ -149,22 +150,36 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                                         WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                                     END
                                 )
-                        ),0) AS adjust_nominal
+                        ),0) AS adjust_nominal,
+                        IFNULL((SELECT
+                            SUM(ROUND(jd.nominal,2))
+                            FROM journal_details jd
+                            JOIN journals j
+                                ON jd.journal_id = j.id
+                            WHERE
+                                j.post_date <= :date5
+                                AND j.status IN ('2','3')
+                                AND j.deleted_at IS NULL
+                                AND jd.deleted_at IS NULL
+                                AND jd.note = CONCAT('ADJUST*',gr.code)
+                                AND jd.type = '1'
+                        ),0) AS total_journal
                         FROM good_receipts gr
                         LEFT JOIN users u
                             ON u.id = gr.account_id
                         WHERE 
-                            gr.post_date <= :date5
+                            gr.post_date <= :date6
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
                     ) AS rs
-                WHERE (rs.total - rs.total_invoice - rs.total_return) > 0
+                WHERE (rs.total - rs.total_invoice - rs.total_return - rs.total_journal) > 0
         ", array(
             'date1'     => $date,
             'date2'     => $date,
             'date3'     => $date,
             'date4'     => $date,
             'date5'     => $date,
+            'date6'     => $date,
         ));
 
         $totalUnbilled = 0;
@@ -188,7 +203,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
             $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate;
+            $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return + $row->total_journal) * $currency_rate;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
             if(round($balance,2) > 0){
                 $arr[] = [

@@ -35,7 +35,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Variant Item',
         'Status',
         'No DO',
-        'Tgl. Cetak',
+
         'No. SO',
         'No. MOD',
         'No Invoice',
@@ -67,6 +67,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Transport Name',
         'Plat No',
         'Sales Employee Name',
+        'Tgl. Cetak',
     ];
 
     public function collection()
@@ -181,7 +182,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'variant_item'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->type->name,
                         'status'            => $row->statusSAP(),
                         'no_do'             => $row->code ?? '-',
-                        'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
+
                         'no_so'             => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
                         'no_mod'            => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->listCodeMOD(),
                         'no_invoice'        => $row->marketingOrderInvoice->code??'-',
@@ -214,6 +215,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'plat_no'                      => $row->vehicle_no ?? '-',
                         // 'nama_supir'                   => $row->driver_name ?? '-',
                         'sales_employee_name'          => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->sales->name,
+                        'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
                         /* 'project_name'               => $row->project->name??'-',
                         'other_fee'             => $row_detail->other_fee,
                         'ongkir'        => $row_detail->price_delivery, */

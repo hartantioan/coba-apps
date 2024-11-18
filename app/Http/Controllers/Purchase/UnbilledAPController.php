@@ -165,6 +165,7 @@ class UnbilledAPController extends Controller
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
                     ) AS rs
+                WHERE (rs.total - rs.total_invoice - rs.total_return - rs.total_journal) > 0
         ", array(
             'date1'     => $date,
             'date2'     => $date,

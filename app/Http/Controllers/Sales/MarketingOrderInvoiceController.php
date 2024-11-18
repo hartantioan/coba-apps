@@ -950,7 +950,7 @@ class MarketingOrderInvoiceController extends Controller
 
         if($pr){
 
-            if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-10-18'){
+            if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                 $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual_after_18',$menuUser->mode);
             }else{
                 $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual',$menuUser->mode);
@@ -1013,7 +1013,7 @@ class MarketingOrderInvoiceController extends Controller
                 $pr = MarketingOrderInvoice::where('code',$row)->first();
 
                 if($pr){
-                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-10-18'){
+                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                         $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                     }else{
                         $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');
@@ -1094,7 +1094,7 @@ class MarketingOrderInvoiceController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            if(date('Y-m-d',strtotime($query->created_at)) >= '2024-10-18'){
+                            if(date('Y-m-d',strtotime($query->created_at)) >= '2024-11-18'){
                                 $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                             }else{
                                 $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');
@@ -1152,7 +1152,7 @@ class MarketingOrderInvoiceController extends Controller
                     foreach($merged as $code){
                         $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
-                            if(date('Y-m-d',strtotime($query->created_at)) >= '2024-10-18'){
+                            if(date('Y-m-d',strtotime($query->created_at)) >= '2024-11-18'){
                                 $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                             }else{
                                 $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');

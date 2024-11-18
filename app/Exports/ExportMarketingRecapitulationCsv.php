@@ -114,7 +114,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
                 }
 
-                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-10-18'){
+                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-11-18'){
                     $price = $rowdetail->priceBeforeTax();
                     $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                     $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
@@ -147,7 +147,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
                 }
 
-                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-10-18'){
+                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-11-18'){
                     $price = $rowdetail->priceBeforeTax();
                     $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                     $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);

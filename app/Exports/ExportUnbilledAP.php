@@ -152,7 +152,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                                 )
                         ),0) AS adjust_nominal,
                         IFNULL((SELECT
-                            SUM(ROUND(jd.nominal,2))
+                            ROUND(jd.nominal,2)
                             FROM journal_details jd
                             JOIN journals j
                                 ON jd.journal_id = j.id

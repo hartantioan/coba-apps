@@ -2847,7 +2847,7 @@
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                rowtotal = rowprice * rowqty;
+                rowtotal = Math.round((rowprice * rowqty) * 10000) / 10000;
                 if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));
                 }

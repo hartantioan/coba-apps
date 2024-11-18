@@ -113,8 +113,19 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 if ($rowdetail->lookable->isPallet()) {
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
                 }
+
+                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-10-18'){
+                    $price = $rowdetail->priceBeforeTax();
+                    $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                    $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
+                }else{
+                    $price = $rowdetail->price;
+                    $totalBeforeTax = round($rowdetail->total, 2);
+                    $totalDiscountBeforeTax = 0;
+                }
+
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . $boxQty . $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }
@@ -135,8 +146,19 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 if ($rowdetail->lookable->isPallet()) {
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
                 }
+
+                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-10-18'){
+                    $price = $rowdetail->priceBeforeTax();
+                    $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                    $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
+                }else{
+                    $price = $rowdetail->price;
+                    $totalBeforeTax = round($rowdetail->total, 2);
+                    $totalDiscountBeforeTax = 0;
+                }
+
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name . $boxQty . $hscode . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }

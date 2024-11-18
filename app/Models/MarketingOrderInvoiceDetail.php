@@ -31,6 +31,56 @@ class MarketingOrderInvoiceDetail extends Model
         'note',
     ];
 
+    public function priceBeforeDiscount(){
+        $price = 0;
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            $price = $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            $price = $this->lookable->marketingOrderDetail->price;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            $price = $this->price;
+        }
+        return $price;
+    }
+
+    public function discount(){
+        $discount = 0;
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            $discount = $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price - $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price_after_discount;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            $discount = $this->lookable->marketingOrderDetail->price - $this->lookable->marketingOrderDetail->price_after_discount;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            $discount = 0;
+        }
+        return $discount;
+    }
+
+    public function priceBeforeTax(){
+        $price = $this->priceBeforeDiscount();
+        if($this->is_include_tax == '1'){
+            $price = $price / ((100 + $this->percent_tax) / 100);
+        }
+        return $price;
+    }
+
+    public function discountBeforeTax(){
+        $discount = $this->discount();
+        if($discount > 0){
+            $discount = $discount / ((100 + $this->percent_tax) / 100);
+        }
+        return $discount;
+    }
+
+    public function totalDiscountBeforeTax(){
+        $total = $this->getQtyM2()  * $this->discountBeforeTax();
+        return $total;
+    }
+
+    public function totalBeforeTax(){
+        $total = $this->getQtyM2() * $this->priceBeforeTax();
+        return $total;
+    }
+
     public function lookable()
     {
         return $this->morphTo();
@@ -215,6 +265,8 @@ class MarketingOrderInvoiceDetail extends Model
             return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $this->qty;
         } else if ($this->lookable_type == 'marketing_order_delivery_details') {
             return $this->lookable->marketingOrderDetail->qty_conversion * $this->qty;
+        } else {
+            return $this->qty;
         }
     }
 

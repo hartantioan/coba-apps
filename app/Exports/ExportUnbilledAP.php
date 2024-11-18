@@ -203,7 +203,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
             $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return + $row->total_journal) * $currency_rate;
+            $total_invoice_after_adjust = (($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
             if(round($balance,2) > 0){
                 $arr[] = [

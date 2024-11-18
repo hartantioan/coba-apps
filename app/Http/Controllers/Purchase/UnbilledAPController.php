@@ -144,19 +144,7 @@ class UnbilledAPController extends Controller
                                     END
                                 )
                         ),0) AS adjust_nominal,
-                        IFNULL((SELECT
-                            ROUND(jd.nominal,2)
-                            FROM journal_details jd
-                            JOIN journals j
-                                ON jd.journal_id = j.id
-                            WHERE
-                                j.post_date <= :date5
-                                AND j.status IN ('2','3')
-                                AND j.deleted_at IS NULL
-                                AND jd.deleted_at IS NULL
-                                AND jd.note = CONCAT('ADJUST*',gr.code)
-                                AND jd.type = '1'
-                        ),0) AS total_journal
+                        0 AS total_journal
                         FROM good_receipts gr
                         LEFT JOIN users u
                             ON u.id = gr.account_id
@@ -190,12 +178,12 @@ class UnbilledAPController extends Controller
                     })->sum('nominal_fc');
                 }
             }
-            $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return,2);
+            $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return - $row->total_journal,2);
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
-            if(round($balance_after_adjust,2) > 0){
+            if(round($balance,2) > 0){
                 $array_filter[] = [
                     'no'            => ($key + 1),
                     'code'          => $row->code,

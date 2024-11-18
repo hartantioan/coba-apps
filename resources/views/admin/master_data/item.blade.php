@@ -1637,6 +1637,7 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#other_name').val(response.other_name);
+                $('#print_name').val(response.print_name);
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit_id).trigger('change');

@@ -88,6 +88,7 @@ class MarketingOrderDeliveryProcess extends Model
                     'unit_code'=> $row->itemStock->item->uomUnit->code,
                     'total_palet'=> 0,
                     'satuan_terakir'=> $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                    'detail'=> $row,
                 ];
 
             }

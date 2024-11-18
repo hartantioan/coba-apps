@@ -169,45 +169,47 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
 
         $x=1;
+        $arr=[];
         foreach($data as $key => $row){
-            foreach($row->marketingOrderDeliveryProcessDetail as  $key_detail =>$row_process_detail){
-                $row_detail = $row_process_detail->marketingOrderDeliveryDetail->marketingOrderDetail;
-                if($row_detail->deleted_at == null){
+            $shadingData = $row->qtyPerShading()['data'];
+            foreach($shadingData as $key => $row_shading){
+
+                if($row_shading['detail']->deleted_at == null){
                     $arr[] = [
-                        'variant_item'      => $row_detail->item->type->name,
+                        'variant_item'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->type->name,
                         'status'            => $row->statusSAP(),
                         'no_do'             => $row->code ?? '-',
-                        'no_so'             => $row_detail->marketingOrder->code,
-                        'no_mod'            => $row_detail->listCodeMOD(),
+                        'no_so'             => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                        'no_mod'            => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->listCodeMOD(),
                         'no_invoice'        => $row->marketingOrderInvoice->code??'-',
-                        'customer_code'     => $row_detail->marketingOrder->account->employee_no,
-                        'customer'          => $row_detail->marketingOrder->account->name,
-                        'customer_detail'   => isset($row_detail->marketingOrder->outlet->name) ? $row_detail->marketingOrder->outlet->name : '-',
-                        'alamat_kirim'      => $row_detail->marketingOrder->destination_address,
-                        'tipe_penjualan'   => $row_detail->marketingOrder->type(),
-                        'tipe_pengiriman'   => $row_detail->marketingOrder->deliveryType(),
-                        'kabupaten_tujuan'  => $row_detail->marketingOrder->city->name,
-                        'kecamatan_tujuan'  => $row_detail->marketingOrder->district->name,
+                        'customer_code'     => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->account->employee_no,
+                        'customer'          => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->account->name,
+                        'customer_detail'   => isset($row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name) ? $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name : '-',
+                        'alamat_kirim'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->destination_address,
+                        'tipe_penjualan'   => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->type(),
+                        'tipe_pengiriman'   => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->deliveryType(),
+                        'kabupaten_tujuan'  => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->city->name,
+                        'kecamatan_tujuan'  => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->district->name,
 
 
-                        'ppn'               => $row_detail->percent_tax,
-                        'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
+                        'ppn'               => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                        'item'              => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->code.'-'.$row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->name,
 
-                        'delivery_date'     => date('d/m/Y',strtotime($row_detail->marketingOrder->delivery_date)),
-                        'qty'               => $row_process_detail->qty,
-                        'unit'              => $row_detail->itemUnit->unit->code,
-                        'harga_satuan'      => $row_detail->price,
-                        'discount_1'        => $row_detail->percent_discount_1,
-                        'discount_2'        => $row_detail->percent_discount_2,
-                        'discount_3'        => $row_detail->discount_3,
-                        'disc_global'       => $row_detail->marketingOrder->discount,
-                        'dp_percentage'     => $row_detail->marketingOrder->percent_dp,
-                        'tipe_pembayaran'    => $row_detail->marketingOrder->paymentType(),
+                        'delivery_date'     => date('d/m/Y',strtotime($row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->delivery_date)),
+                        'qty'               => $row_shading['total_palet'] > 0 ? $row_shading['total_palet'] : $row_shading['total_box'],
+                        'unit'              => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                        'harga_satuan'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price,
+                        'discount_1'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,
+                        'discount_2'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,
+                        'discount_3'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,
+                        'disc_global'       => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->discount,
+                        'dp_percentage'     => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->percent_dp,
+                        'tipe_pembayaran'    => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->paymentType(),
                         'ekspedisi_name'               => $row->account->name ?? '-',
-                        'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
+                        'transport_name'               => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
                         'plat_no'                      => $row->vehicle_no ?? '-',
                         // 'nama_supir'                   => $row->driver_name ?? '-',
-                        'sales_employee_name'          => $row_detail->marketingOrder->sales->name,
+                        'sales_employee_name'          => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->sales->name,
                         /* 'project_name'               => $row->project->name??'-',
                         'other_fee'             => $row_detail->other_fee,
                         'ongkir'        => $row_detail->price_delivery, */
@@ -215,8 +217,54 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     ];
                     $x++;
                 }
-
             }
+            // foreach($row->marketingOrderDeliveryProcessDetail as  $key_detail =>$row_process_detail){
+            //     $row_detail = $row_process_detail->marketingOrderDeliveryDetail->marketingOrderDetail;
+            //     if($row_detail->deleted_at == null){
+            //         $arr[] = [
+            //             'variant_item'      => $row_detail->item->type->name,
+            //             'status'            => $row->statusSAP(),
+            //             'no_do'             => $row->code ?? '-',
+            //             'no_so'             => $row_detail->marketingOrder->code,
+            //             'no_mod'            => $row_detail->listCodeMOD(),
+            //             'no_invoice'        => $row->marketingOrderInvoice->code??'-',
+            //             'customer_code'     => $row_detail->marketingOrder->account->employee_no,
+            //             'customer'          => $row_detail->marketingOrder->account->name,
+            //             'customer_detail'   => isset($row_detail->marketingOrder->outlet->name) ? $row_detail->marketingOrder->outlet->name : '-',
+            //             'alamat_kirim'      => $row_detail->marketingOrder->destination_address,
+            //             'tipe_penjualan'   => $row_detail->marketingOrder->type(),
+            //             'tipe_pengiriman'   => $row_detail->marketingOrder->deliveryType(),
+            //             'kabupaten_tujuan'  => $row_detail->marketingOrder->city->name,
+            //             'kecamatan_tujuan'  => $row_detail->marketingOrder->district->name,
+
+
+            //             'ppn'               => $row_detail->percent_tax,
+            //             'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
+
+            //             'delivery_date'     => date('d/m/Y',strtotime($row_detail->marketingOrder->delivery_date)),
+            //             'qty'               => $row_process_detail->qty,
+            //             'unit'              => $row_detail->itemUnit->unit->code,
+            //             'harga_satuan'      => $row_detail->price,
+            //             'discount_1'        => $row_detail->percent_discount_1,
+            //             'discount_2'        => $row_detail->percent_discount_2,
+            //             'discount_3'        => $row_detail->discount_3,
+            //             'disc_global'       => $row_detail->marketingOrder->discount,
+            //             'dp_percentage'     => $row_detail->marketingOrder->percent_dp,
+            //             'tipe_pembayaran'    => $row_detail->marketingOrder->paymentType(),
+            //             'ekspedisi_name'               => $row->account->name ?? '-',
+            //             'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
+            //             'plat_no'                      => $row->vehicle_no ?? '-',
+            //             // 'nama_supir'                   => $row->driver_name ?? '-',
+            //             'sales_employee_name'          => $row_detail->marketingOrder->sales->name,
+            //             /* 'project_name'               => $row->project->name??'-',
+            //             'other_fee'             => $row_detail->other_fee,
+            //             'ongkir'        => $row_detail->price_delivery, */
+
+            //         ];
+            //         $x++;
+            //     }
+
+            // }
 
 
 

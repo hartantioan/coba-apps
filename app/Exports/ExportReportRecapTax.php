@@ -30,16 +30,20 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
         'Nama NPWP',
         'No NPWP',
         'Alamat NPWP',
+        'Kode Barang',
         'Nama Barang',
         'DPP Harga Satuan',
         'Jumlah Barang (Qty)',
+        'Total Harga Barang',
         '% Diskon',
         '% Diskon 2',
         'Diskon 3',
-        'DPP Diskon',
+        'DPP Diskon / Qty',
+
         'Total Harga Barang (DPP)',
         'Uang Muka (DP)',
         'Total',
+        'Total Diskon',
         'DPP FP',
         'PPN FP',
         'Status Cancel',
@@ -71,13 +75,15 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
             $price_dpp_total = 0;
             $price_satuan = 0;
             $total_all = 0;
+            $total_discount = 0;
+            $total_before_disc = 0;
 
             $freeAreaTax = $row->marketingOrderDeliveryProcess()->exists() ? ($row->marketingOrderDeliveryProcess->marketingOrderDelivery->getMaxTaxType() == '2' ? '18' : '') : '';
             foreach ($row->marketingOrderInvoiceDetail as $keyd => $row_detail) {
                 if ($row_detail->lookable_type == 'marketing_order_delivery_details' || $row_detail->lookable_type == 'marketing_order_delivery_process_details') {
                     $dpp_discount_detail = 0;
                     $dpp_total_detail = 0;
-                    $dpp_fp_detail = 0;
+
                     $ppn_fp_detail = 0;
                     $price_dpp_detail = 0;
                     $total_detail = 0;
@@ -107,8 +113,10 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         $price_satuan = round($row_detail->getMarketingOrder->price / $percentTax, 7);
                         $jumlah_barang = $row_detail->getMarketingOrder->qty_uom;
 
-                        $dpp_discount_detail = round($row_detail->getMarketingOrder->price / $percentTax - $row_detail->getMarketingOrder->price_after_discount / $percentTax, 2);
+                        $dpp_discount_detail = $row_detail->getMarketingOrder->price / $percentTax - $row_detail->getMarketingOrder->price_after_discount / $percentTax;
                         $dpp_discount_total += $dpp_discount_detail;
+
+                        $total_discount += $dpp_discount_detail * $jumlah_barang;
 
                         $dpp_total_detail = round($row_detail->getMarketingOrder->price_after_discount *  $row_detail->getMarketingOrder->qty_uom / $percentTax, 2);
 
@@ -118,6 +126,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         $total_detail = round($row_detail->total, 2);
                         $total_all += $total_detail;
 
+                        $total_before_disc += $price_satuan * $jumlah_barang;
 
                         $ppn_fp_detail = $row_detail->tax;
                         $ppn_fp_total += $ppn_fp_detail;
@@ -128,7 +137,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                     }
                     $detail[] = [
                         'No Urut' => '',
-                        'Jenis Dokumen' => 'INVOICE',
+                        'Jenis Dokumen' => 'AR INVOICE',
                         'Tipe Penjualan' => $row->soType(),
                         'No Seri Pajak' => $row->tax_no,
                         'No Dokumen' => $row->code,
@@ -136,16 +145,20 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Nama NPWP' => $row->userData->title,
                         'No NPWP' => $row->getNpwp(),
                         'Alamat NPWP' => $row->userData->address,
+                        'Kode Barang' => $row_detail->getItemCode(),
                         'Nama Barang' => $row_detail->getPrintName() . $boxQty . $hscode,
                         'DPP Harga Satuan' => $price_satuan,
                         'Jumlah Barang (Qty)' => $jumlah_barang,
+                        'Total Harga Barang' => $price_satuan * $jumlah_barang,
                         '% Diskon' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->percent_discount_1 : '',
                         '% Diskon 2' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->percent_discount_2 : '',
                         'Diskon 3' => $row_detail->getMarketingOrder() ? $row_detail->getMarketingOrder->discount_3 : '',
-                        'DPP Diskon' => $dpp_discount_detail,
+                        'DPP Diskon / Qty' => $dpp_discount_detail,
+
                         'Total Harga Barang (DPP)' => $price_dpp_detail,
                         'Uang Muka (DP)' => '',
-                        'Total' =>  $total_detail,
+                        'Total' =>  $price_satuan * $jumlah_barang,
+                        'Total Diskon' => $dpp_discount_detail * $jumlah_barang,
                         'DPP FP' => $total_detail,
                         'PPN FP' => $ppn_fp_detail,
                         'Status Cancel' => '',
@@ -156,26 +169,32 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
             }
 
 
+
+
             $header = [
                 'No Urut' => ($key + 1),
-                'Jenis Dokumen' => $row->invoiceType(),
+                'Jenis Dokumen' => 'AR INVOICE',
                 'Tipe Penjualan' => $row->soType(),
                 'No Seri Pajak' => $row->tax_no,
                 'No Dokumen' => $row->code,
                 'Tgl Dokumen' => date('d/m/Y', strtotime($row->post_date)),
-                'Nama NPWP' => $row->userData->user->name,
+                'Nama NPWP' => $row->userData->title,
                 'No NPWP' => $row->getNpwp(),
                 'Alamat NPWP' => $row->userData->address,
+                'Kode Barang' => '',
                 'Nama Barang' => '',
                 'DPP Harga Satuan' => '',
                 'Jumlah Barang (Qty)' => '',
+                'Total Harga Barang' => '',
                 '% Diskon' => '',
                 '% Diskon 2' => '',
                 'Diskon 3' => '',
                 'DPP Diskon' => '',
+
                 'Total Harga Barang (DPP)' => '',
                 'Uang Muka (DP)' => $row->downpayment,
-                'Total' =>  $row->total,
+                'Total' =>  $total_before_disc,
+                'Total Diskon' => $total_discount,
                 'DPP FP' => $row->total,
                 'PPN FP' => $row->tax,
                 'Status Cancel' => $row->statusRaw(),
@@ -183,115 +202,90 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Pembuat' => $row->user->name,
             ];
 
+            $header2 = [
+                'No Urut' => '',
+                'Jenis Dokumen' => '',
+                'Tipe Penjualan' => '',
+                'No Seri Pajak' => '',
+                'No Dokumen' => '',
+                'Tgl Dokumen' => '',
+                'Nama NPWP' => '',
+                'No NPWP' => '',
+                'Alamat NPWP' => '',
+                'Kode Barang' => '',
+                'Nama Barang' => '',
+                'DPP Harga Satuan' => '',
+                'Jumlah Barang (Qty)' => '',
+                'Total Harga Barang' => '',
+                '% Diskon' => '',
+                '% Diskon 2' => '',
+                'Diskon 3' => '',
+                'DPP Diskon' => '',
+
+                'Total Harga Barang (DPP)' => '',
+                'Uang Muka (DP)' => '',
+                'Total' =>  '',
+                'Total Diskon' => '',
+                'DPP FP' => '',
+                'PPN FP' => '',
+                'Status Cancel' => '',
+                'Tipe Pembayaran' => '',
+                'Pembuat' => '',
+            ];
+
             $arr[] = $header;
             $arr[] = $detail;
-
-
-
-
-
-
+            $arr[] = $header2;
         }
-        $arr[]= [
-            'No' => '',
-            'Kode'=> '',
-            'Post Date'=> '',
-            'User'=> '',
-            'BP'=> '',
-            'Nama NPWP'=> '',
-            'No. NPWP'=> '',
-            'Alamat. NPWP'=> '',
-            'Perusahaan'=> '',
-            'Tipe'=> '',
-            'Tipe Invoice'=> '',
-            'Currency'=> '',
-            'Note'=> '',
-            'Pajak'=> '',
-            'Subtotal'=> '',
-            'Total'=> '',
-            'Tax'=> '',
-            'Grandtotal'=> '',
-            'Status'=> '',
-        ];
-        $arr[]= [
-            'No' => '',
-            'Kode'=> '',
-            'Post Date'=> '',
-            'User'=> '',
-            'BP'=> '',
-            'Nama NPWP'=> '',
-            'No. NPWP'=> '',
-            'Alamat. NPWP'=> '',
-            'Perusahaan'=> '',
-            'Tipe'=> '',
-            'Tipe Invoice'=> '',
-            'Currency'=> '',
-            'Note'=> '',
-            'Pajak'=> '',
-            'Subtotal'=> '',
-            'Total'=> '',
-            'Tax'=> '',
-            'Grandtotal'=> '',
-            'Status'=> '',
-        ];
 
-        $arr[]= [
-            'No' => 'No',
-            'Kode'=> 'Kode',
-            'Post Date'=> 'Post Date',
-            'User'=> 'User',
-            'BP'=> 'BP',
-            'Nama NPWP'=> 'Nama NPWP',
-            'No. NPWP'=> 'No. NPWP',
-            'Alamat. NPWP'=> 'Alamat. NPWP',
-            'Perusahaan'=> 'Perusahaan',
-            'Tipe'=> 'Tipe',
-            'Tipe Invoice'=> 'Tipe Invoice',
-            'Currency'=> 'Currency',
-            'Note'=> 'Note',
-            'Pajak'=> 'Pajak',
-            'Subtotal'=> 'Subtotal',
-            'Total'=> 'Total',
-            'Tax'=> 'Tax',
-            'Grandtotal'=> 'Grandtotal',
-            'Status'=> 'Status',
-        ];
-        $query_dp =MarketingOrderDownPayment::where(function($query) {
-            if($this->start_date && $this->finish_date) {
+
+
+
+        $query_dp = MarketingOrderDownPayment::where(function ($query) {
+            if ($this->start_date && $this->finish_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
                     ->whereDate('post_date', '<=', $this->finish_date);
-            } else if($this->start_date) {
-                $query->whereDate('post_date','>=', $this->start_date);
-            } else if($this->finish_date) {
-                $query->whereDate('post_date','<=', $this->finish_date);
+            } else if ($this->start_date) {
+                $query->whereDate('post_date', '>=', $this->start_date);
+            } else if ($this->finish_date) {
+                $query->whereDate('post_date', '<=', $this->finish_date);
             }
         })
-        ->get();
+            ->get();
 
-        foreach($query_dp as $index=>$row_arr){
+        foreach ($query_dp as $index => $row_arr) {
             $user = $row_arr->user->name;
             $account = $row_arr->account->name;
-            $arr[]=[
-                'no' => $index+1,
-                'kode' =>$row_arr->code,
-                'post_date' =>date('d/m/Y',strtotime($row_arr->post_date)),
-                'user' =>$user,
-                'bp' =>$account,
-                'npwp_name' => $row_arr->account->userDataDefault()->title,
-                'npwp_no' => $row_arr->account->userDataDefault()->npwp,
-                'npwp_address' => $row_arr->account->userDataDefault()->address,
-                'perusahaan' =>$row_arr->plant,
-                'tipe' =>$row_arr->type(),
-                'invoice_type' =>$row_arr->invoiceType(),
-                'currency' =>$row_arr->currency->code,
-                'note' =>$row_arr->note,
-                'pajak' =>$row_arr->tax_no,
-                'subtotal' =>$row_arr->subtotal,
-                'total' =>$row_arr->total,
-                'tax' =>$row_arr->tax,
-                'grandtotal' =>$row_arr->grandtotal,
-                'status' =>$row_arr->statusRaw(),
+            $arr[] = [
+                'No Urut' => $index + 1,
+                'Jenis Dokumen' => 'AR DP',
+                'Tipe Penjualan' => '',
+                'No Seri Pajak' => $row_arr->tax_no,
+                'No Dokumen' => $row_arr->code,
+                'Tgl Dokumen' => date('d/m/Y', strtotime($row_arr->post_date)),
+                'No Npwp' => $row_arr->account->userDataDefault()->title,
+                'Nama Npwp' => $row_arr->getNpwp(),
 
+                'Alamat Npwp' => $row_arr->account->userDataDefault()->address,
+                'Kode Barang' => '',
+                'Nama Barang' => $row_arr->note,
+                'DPP Harga Satuan' => $row_arr->total,
+                'Jumlah Barang (Qty)' => '1',
+                'Total Harga Barang' => '0',
+                '% Diskon' => '0',
+                '% Diskon 2' => '0',
+                'Diskon 3' => '0',
+                'DPP Diskon' => '0',
+
+                'Total Harga Barang (DPP)' => $row_arr->total,
+                'Uang Muka (DP)' => '0',
+                'Total' => $row_arr->total,
+                'Total Diskon' => '',
+                'DPP FP' => $row_arr->total,
+                'PPN FP' => $row_arr->tax,
+                'Status Cancel' => $row_arr->statusRaw(),
+                'Tipe Pembayaran' => '',
+                'Pembuat' => $row_arr->user->name,
             ];
         }
 
@@ -301,7 +295,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
 
     public function title(): string
     {
-        return 'Invoice REKAP Penjualan';
+        return 'Invoice REKAP Pajak';
     }
 
     public function headings(): array

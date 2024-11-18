@@ -23,6 +23,7 @@ class AnnouncementController extends Controller
         foreach($data as $row){
             $balance = $row->balanceInvoiceByDate('2024-10-31');
             if($balance > 0){
+                info($row->landedCost->code);
                 echo $row->landedCost->code.' - '.date('d/m/Y',strtotime($row->landedCost->post_date)).' - '.number_format($balance * $row->landedCost->currency_rate,2,',','.').' - '.number_format($row->journalDetail()->first()->nominal,2,',','.').'<br>';
             }
         }

@@ -1049,6 +1049,9 @@ document.addEventListener('focusin', function (event) {
                                             <input type="hidden" name="arr_item_shading_stock[]" value="` + value.qty + `">
                                             <td class="center-align">` + (j+1) + `</td>
                                             <td>` + value.item_shading_code + `</td>
+                                            <td>` + value.stock + `</td>
+                                            <td>` + value.qty_outstanding_mod + `</td>
+                                            <td>` + value.qty_unsent_sj + `</td>
                                             <td><input name="arr_item_shading_qty[]" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty + `" data-mod="` + val.id + `"></td>
                                             <td class="center">
                                                 <span>` + val.unit + `</span>
@@ -1109,15 +1112,18 @@ document.addEventListener('focusin', function (event) {
                                     </tr>
                                     <tr>
                                         <td colspan="9">
-                                            <table class="bordered" style="width:600px !important;">
+                                            <table class="bordered" style="width:100% !important;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" colspan="5">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i></th>
+                                                        <th class="center" colspan="8">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i></th>
                                                     </tr>
                                                     <tr>
                                                         <th class="center">No</th>
                                                         <th class="center">Shading</th>
-                                                        <th class="center">Qty</th>
+                                                        <th class="center">Qty Stock</th>
+                                                        <th class="center">Qty Outstanding MOD</th>
+                                                        <th class="center">Qty Unsent SJ</th>
+                                                        <th class="center">Qty Available</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>

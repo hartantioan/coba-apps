@@ -364,7 +364,7 @@ class Item extends Model
     public function currentStockMoreThanZero($dataplaces,$datawarehouses){
         $arrData = [];
 
-        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get(); 
+        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get();
         foreach($data as $detail){
             $balance = $detail->balanceWithUnsent();
             if($balance > 0){
@@ -984,11 +984,17 @@ class Item extends Model
     public function arrayStockByShading($conversion){
         $arr = [];
         foreach($this->itemShading as $row){
-            $balance = round($row->itemStock()->sum('qty') / $conversion,3) - $row->totalUnsentMOd() - $row->totalUnsentSj();
+            $outstanding = $row->totalUnsentMOd();
+            $unsent =  $row->totalUnsentSj();
+            $stock = round($row->itemStock()->sum('qty') / $conversion,3);
+            $balance = $stock - $outstanding - $unsent;
             $arr[] = [
                 'item_shading_id'   => $row->id,
                 'item_shading_code' => $row->code,
                 'qty'               => CustomHelper::formatConditionalQty($balance),
+                'qty_outstanding_mod'               => CustomHelper::formatConditionalQty($outstanding),
+                'qty_unsent_sj'               => CustomHelper::formatConditionalQty($unsent),
+                'stock'       => CustomHelper::formatConditionalQty($stock),
             ];
         }
         return $arr;

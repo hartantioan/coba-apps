@@ -978,8 +978,11 @@ class MarketingOrderInvoiceController extends Controller
         $pr = MarketingOrderInvoice::where('code',CustomHelper::decrypt($id))->first();
 
         if($pr){
-
-            $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full',$menuUser->mode);
+            if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
+                $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18',$menuUser->mode);
+            }else{
+                $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full',$menuUser->mode);
+            }
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
 

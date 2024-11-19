@@ -139,7 +139,7 @@
             }
 
             @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            header { position: fixed; top: -30px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
         
            
@@ -149,23 +149,23 @@
         <header>
             <table border="0" width="100%">
                 <tr>
-                    <td width="60%" class="left-align">
+                    <td width="60%" class="left-align" style="font-size:15px;">
                         <tr>
                             <td align="center">
-                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
+                                <span class="invoice-number mr-1" style="font-weight:800;margin-bottom:0px">
                                     KWITANSI {{ $data->code }}
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Tgl.Berlaku:</small>
-                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
+                                <small style="font-size:15px">Tgl.Berlaku:</small>
+                                <span style="font-size:15px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">AR Down Payment</h5>
+                                <h5 style="margin-top: -2px;font-size:15px;">AR Down Payment</h5>
                             </td>
                         </tr>
                     </td>
@@ -177,11 +177,11 @@
                 
             </table>
         </header>
-        <main>
+        <main style="margin-top:50px;">
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
-                    <table border="0" width="80%" style="margin-left: auto;margin-right: auto;font-size:12px;font-weight:800;">
+                    <table border="0" width="80%" style="margin-left: auto;margin-right: auto;font-size:17px;font-weight:800;">
                         <tr>
                             <td width="25%">Telah terima dari</td>
                             <td width="1%">:</td>
@@ -216,7 +216,7 @@
                         </tr>
                     </table> --}}
 
-                    <table border="0" width="100%" style="font-size:12px;margin-top:15px;">
+                    <table border="0" width="100%" style="font-size:17px;margin-top:15px;">
                         <tr>
                             <td width="40%"{{--  style="border:1px solid black;padding:5px;" --}}>
                                 {{-- Mohon ditransfer ke :

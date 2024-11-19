@@ -204,7 +204,7 @@
                         </tr>
                     </table>
 
-                    <table border="0" width="80%" style="font-size:12px;margin-top:15px;">
+                    {{-- <table border="0" width="80%" style="font-size:12px;margin-top:15px;">
                         <tr>
                             <td>
                                 NB : Bukan merupakan bukti penerimaan, pembayaran dianggap sah jika : 
@@ -214,14 +214,14 @@
                                 </ol>
                             </td>
                         </tr>
-                    </table>
+                    </table> --}}
 
                     <table border="0" width="100%" style="font-size:12px;margin-top:15px;">
                         <tr>
-                            <td width="40%" style="border:1px solid black;padding:5px;">
-                                Mohon ditransfer ke :
+                            <td width="40%"{{--  style="border:1px solid black;padding:5px;" --}}>
+                                {{-- Mohon ditransfer ke :
                                 <h5>BANK MANDIRI KCP DARMO PERMAI 14100 798 77999</h5>
-                                atas nama {{ $data->company->name }}
+                                atas nama {{ $data->company->name }} --}}
                             </td>
                             <td width="10%" style="padding-left:10px;">
 

@@ -145,6 +145,7 @@ class LandedCostController extends Controller
                     $landed_cost[] = [
                         'id'            => $row->id,
                         'code'          => $row->code,
+                        'delivery_no'   => '-',
                         'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),

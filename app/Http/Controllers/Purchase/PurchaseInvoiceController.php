@@ -433,7 +433,7 @@ class PurchaseInvoiceController extends Controller
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
                     'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
-                    'info'          => $row->note,
+                    'info'          => $row->note .' '.$row->getGRPO() ,
                     'list_item'     => $row->getListItem(),
                 ];
             }

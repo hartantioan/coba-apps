@@ -105,7 +105,7 @@ class LandedCost extends Model
 
     public function getPurchaseCode(){
         $arr = [];
-        
+
         foreach($this->landedCostDetail as $row){
             if($row->goodReceiptDetail()){
                 $index = CustomHelper::checkArrayRaw($arr,$row->lookable->purchaseOrderDetail->purchaseOrder->code);
@@ -124,7 +124,7 @@ class LandedCost extends Model
 
     public function getGoodReceiptNo(){
         $arr = [];
-        
+
         foreach($this->landedCostDetail as $row){
             if($row->goodReceiptDetail()){
                 $index = CustomHelper::checkArrayRaw($arr,$row->lookable->goodReceipt->code);
@@ -192,7 +192,7 @@ class LandedCost extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -252,7 +252,7 @@ class LandedCost extends Model
         return $ada;
     }
 
-    
+
 
     public function getListItem(){
         $html = '<ol>';
@@ -276,7 +276,7 @@ class LandedCost extends Model
                 $hasRelation = true;
             }
         }
-        
+
 
         return $hasRelation;
     }
@@ -303,7 +303,7 @@ class LandedCost extends Model
 
     public function getArrayDetail(){
         $arrInfo = [];
-        
+
         foreach($this->landedCostDetail as $row){
             $arrInfo = [
                 'place_id'          => $row->place_id,
@@ -344,6 +344,20 @@ class LandedCost extends Model
         foreach($this->landedCostDetail as $row){
             foreach($row->landedCostDetailSelf as $rowdetail){
                 $arr[] = $rowdetail->landedCost->code;
+            }
+        }
+
+        $result = array_unique($arr);
+
+        return implode(', ',$result);
+    }
+
+    public function getGRPO(){
+        $arr = [];
+
+        foreach($this->landedCostDetail as $row){
+            if($row->lookable_type == 'good_receipt_details'){
+                $arr[] = $row->lookable->goodReceipt->code.'-'.$row->lookable->goodReceipt->delivery_no;
             }
         }
 
@@ -401,7 +415,7 @@ class LandedCost extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

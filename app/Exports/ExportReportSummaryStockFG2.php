@@ -38,7 +38,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         'Repack In (M2)',
         'GR (M2)',
         'GI (M2)',
-        'Delivery (M2)',
+        'Delivery Belum Barcode(M2)',
+        'Delivery Sudah Barcode(M2)',
         'End Stock (M2)',
 
         // 'Qty SJ Blm Terkirim(M2)',
@@ -58,10 +59,10 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         $arr = [];
 
         $query = DB::select("
-            SELECT a.code,a.name,a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
+          SELECT a.code,a.name,a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
             COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
-            COALESCE(h.qtysj,0) AS qtysj, 
-            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysj,0) AS endstock FROM (
+            COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,   COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode, 
+            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
           SELECT  distinct a.code,a.name,a.shading FROM (
  				SELECT d.code,d.name,k.code AS shading
 					 FROM production_handovers a
@@ -199,17 +200,33 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            GROUP BY d.code,d.name,k.code
                                )g ON g.code=a.code AND g.shading=a.shading
                                LEFT JOIN (
-                                SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
+                                SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJbelumbarcode
                                FROM marketing_order_delivery_processes a
                                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
                                LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
                                LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
+                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.markering_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                          GROUP BY c.`code`,c.name,k.code
-                               )h ON h.code=a.code and h.shading=a.shading order by a.name,a.shading" );
+                         AND mo.tracks=1
+								  GROUP BY c.`code`,c.name,k.code
+                               )h ON h.code=a.code and h.shading=a.shading order by a.name,a.shading
+                               LEFT JOIN (
+                                SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJsudahbarcode
+                               FROM marketing_order_delivery_processes a
+                               LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
+                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
+                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+                               LEFT JOIN item_stocks l ON l.id=b.item_stock_id
+                               LEFT JOIN items c ON c.id=e.item_id
+                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.markering_order_delivery_process_id=a.id
+                           LEFT JOIN item_shadings k ON k.id=l.item_shading_id
+                               WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                         AND mo.tracks<>1
+								  GROUP BY c.`code`,c.name,k.code
+                               )i ON i.code=a.code and i.shading=a.shading order by a.name,a.shading" );
 
         foreach ($query as $row) {
 
@@ -223,7 +240,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                 'repackin' => $row->repackin,
                 'gr' => $row->gr,
                 'gi' => $row->gi,
-                'qtysj' => $row->qtysj,
+                'qtysjbelumbarcode' => $row->qtysjbelumbarcode,
+                'qtysjsudahbarcode' => $row->qtysjsudahbarcode,
                 'endstock' => $row->endstock
             ];
         }

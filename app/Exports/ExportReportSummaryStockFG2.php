@@ -210,7 +210,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                         AND mo.status=1
+                         AND mo.status = '1'
 								  GROUP BY c.`code`,c.name,k.code
                                )h ON h.code=a.code and h.shading=a.shading 
                                LEFT JOIN (
@@ -224,7 +224,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                         AND mo.status>=2
+                         AND mo.status <> '1'
 								  GROUP BY c.`code`,c.name,k.code
                                )i ON i.code=a.code and i.shading=a.shading order by a.name,a.shading" );
 

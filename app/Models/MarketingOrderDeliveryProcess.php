@@ -856,7 +856,7 @@ class MarketingOrderDeliveryProcess extends Model
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
             'post_date'		=> $modp->receive_date,
-            'note'			=> $modp->marketingOrderDelivery->code,
+            'note'			=> 'PENGIRIMAN '.$modp->marketingOrderDelivery->code,
             'status'		=> '3'
         ]);
 

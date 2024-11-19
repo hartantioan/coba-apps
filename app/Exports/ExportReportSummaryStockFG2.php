@@ -210,7 +210,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                          a.id not in (select marketing_order_delivery_process_id from marketing_order_delivery_process_tracks where status='2')
+                          and a.id not in (select marketing_order_delivery_process_id from marketing_order_delivery_process_tracks where status='2')
 								  GROUP BY c.`code`,c.name,k.code
                                )h ON h.code=a.code and h.shading=a.shading 
                                LEFT JOIN (

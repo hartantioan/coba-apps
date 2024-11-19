@@ -207,7 +207,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
-                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.markering_order_delivery_process_id=a.id
+                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
                          AND mo.status=1
@@ -221,7 +221,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
-                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.markering_order_delivery_process_id=a.id
+                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
                          AND mo.status<>1

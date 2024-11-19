@@ -141,4 +141,8 @@ class MarketingOrderDeliveryProcessDetail extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function itemCogs(){
+        return $this->hasOne('App\Models\ItemCogs','detailable_id','id')->where('detailable_type',$this->table);
+    }
 }

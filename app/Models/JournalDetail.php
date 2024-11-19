@@ -89,6 +89,10 @@ class JournalDetail extends Model
         return $this->belongsTo('App\Models\Division', 'department_id', 'id')->withTrashed();
     }
 
+    public function itemCogs(){
+        return $this->hasOne('App\Models\ItemCogs', 'detailable_id', $this->detailable_id)->where('detailable_type',$this->detailable_type);
+    }
+
     public function type(){
         $type = match ($this->type) {
           '1' => '<span class="green medium-small white-text padding-3">Debit</span>',

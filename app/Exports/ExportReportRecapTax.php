@@ -41,9 +41,10 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
         'DPP Diskon / Qty',
 
         'Total Diskon',
+        'Total Harga Barang',
         'Uang Muka (DP)',
        
-        'Total',
+      
         'DPP FP',
         'PPN FP',
         'Status Cancel',

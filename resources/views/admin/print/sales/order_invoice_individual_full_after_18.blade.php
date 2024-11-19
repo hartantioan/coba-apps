@@ -276,7 +276,7 @@
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td align="center">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,2,',','.') }}</td>
@@ -300,7 +300,7 @@
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td align="center">{{ $row->lookable->item->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDetail->price,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->marketingOrderDetail->discount_3,2,',','.') }}</td>

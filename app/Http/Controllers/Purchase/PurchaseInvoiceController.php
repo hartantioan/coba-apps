@@ -403,7 +403,8 @@ class PurchaseInvoiceController extends Controller
 
         foreach($datagr as $row){
             $invoice = $row->totalInvoice();
-            if(round($row->total - $invoice,2) > 0){
+            $adjust = $row->totalAdjust();
+            if(round($row->total - $invoice - $adjust,2) > 0){
                 $details[] = [
                     'type'          => 'good_receipts',
                     'id'            => $row->id,
@@ -412,7 +413,7 @@ class PurchaseInvoiceController extends Controller
                     'purchase_order'=> $row->getPurchaseCode(),
                     'grandtotal'    => number_format($row->total,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => $row->currencyReference()->symbol.' '.number_format($row->total - $invoice,2,',','.'),
+                    'balance'       => $row->currencyReference()->symbol.' '.number_format($row->total - $invoice - $adjust,2,',','.'),
                     'info'          => $row->note,
                     'list_item'     => $row->getListItem(),
                 ];

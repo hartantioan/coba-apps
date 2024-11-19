@@ -285,6 +285,13 @@ class GoodReceipt extends Model
         return $total;
     }
 
+    public function totalAdjust(){
+        $total = JournalDetail::where('note','ADJUST*'.$this->code)->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        })->sum('nominal');
+        return $total;
+    }
+
     public function hasBalanceInvoice(){
         $total = $this->total;
 

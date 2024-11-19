@@ -42,7 +42,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
 
         'Total Diskon',
         'Uang Muka (DP)',
-        'Total',
+       
         'Total',
         'DPP FP',
         'PPN FP',

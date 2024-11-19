@@ -32,7 +32,11 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 $query->where('post_date', '>=', $this->start_date)
                     ->where('post_date', '<=', $this->end_date);
             });
-        })->get();
+        })->with(['marketingOrderDelivery.marketingOrderDeliveryProcess']) // Include the related process for sorting
+        ->get()
+        ->sortBy(function ($item) {
+            return $item->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '';
+        })->values();
 
         // $array_sudah = [];
         // $array_shading = [];

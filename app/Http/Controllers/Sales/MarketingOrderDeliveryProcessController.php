@@ -738,30 +738,42 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    $query = MarketingOrderDeliveryProcess::create([
-                        'code'			                => $newCode,
-                        'user_id'		                => session('bo_id'),
-                        'account_id'                    => $mod->account_id,
-                        'company_id'                    => $request->company_id,
-                        'marketing_order_delivery_id'   => $request->marketing_order_delivery_id,
-                        'post_date'                     => $request->post_date,
-                        'user_driver_id'                => $user_driver,
-                        'driver_name'                   => $request->driver_name,
-                        'driver_hp'                     => $request->driver_hp,
-                        'vehicle_name'                  => $request->vehicle_name,
-                        'vehicle_no'                    => $request->vehicle_no,
-                        'no_container'                  => $request->no_container,
-                        'seal_no'                       => $request->seal_no,
-                        'weight_netto'                  => 0,
-                        'note_internal'                 => $request->note_internal,
-                        'note_external'                 => $request->note_external,
-                        'status'                        => '1',
-                        'total'                         => $mod->getTotal(),
-                        'tax'                           => $mod->getTax(),
-                        'rounding'                      => $mod->getRounding(),
-                        'grandtotal'                    => $mod->getGrandtotal(),
-                        'revision_counter'              => 0,
-                    ]);
+                    $sama = MarketingOrderDeliveryProcess::where('marketing_order_delivery_id', $request->marketing_order_delivery_id)
+                    ->whereIn('status', ['1', '2', '3', '6'])
+                    ->whereNull('deleted_at')
+                    ->get();
+
+                    if ($sama->isNotEmpty()) {
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'MOD Sudah digunakan Di SJ Lain. Mohon periksa lagi'
+                        ]);
+                    }else{
+                        $query = MarketingOrderDeliveryProcess::create([
+                            'code'			                => $newCode,
+                            'user_id'		                => session('bo_id'),
+                            'account_id'                    => $mod->account_id,
+                            'company_id'                    => $request->company_id,
+                            'marketing_order_delivery_id'   => $request->marketing_order_delivery_id,
+                            'post_date'                     => $request->post_date,
+                            'user_driver_id'                => $user_driver,
+                            'driver_name'                   => $request->driver_name,
+                            'driver_hp'                     => $request->driver_hp,
+                            'vehicle_name'                  => $request->vehicle_name,
+                            'vehicle_no'                    => $request->vehicle_no,
+                            'no_container'                  => $request->no_container,
+                            'seal_no'                       => $request->seal_no,
+                            'weight_netto'                  => 0,
+                            'note_internal'                 => $request->note_internal,
+                            'note_external'                 => $request->note_external,
+                            'status'                        => '1',
+                            'total'                         => $mod->getTotal(),
+                            'tax'                           => $mod->getTax(),
+                            'rounding'                      => $mod->getRounding(),
+                            'grandtotal'                    => $mod->getGrandtotal(),
+                            'revision_counter'              => 0,
+                        ]);
+                    }
                 }
 
                 if($query) {

@@ -145,7 +145,7 @@ class UnbilledAPController extends Controller
                                 )
                         ),0) AS adjust_nominal,
                         IFNULL((SELECT
-                            ROUND(jd.nominal,2)
+                            SUM(ROUND(jd.nominal,2))
                             FROM journal_details jd
                             LEFT JOIN journals j
                                 ON jd.journal_id = j.id

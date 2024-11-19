@@ -90,7 +90,7 @@ class JournalDetail extends Model
     }
 
     public function itemCogs(){
-        return $this->hasOne('App\Models\ItemCogs', 'detailable_id', $this->detailable_id)->where('detailable_type',$this->detailable_type);
+        return $this->hasOne('App\Models\ItemCogs', 'detailable_id', 'detailable_id')->where('detailable_type',$this->detailable_type)->where('lookable_type',$this->lookable_type)->where('lookable_id',$this->lookable_id);
     }
 
     public function type(){

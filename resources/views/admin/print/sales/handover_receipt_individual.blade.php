@@ -188,7 +188,11 @@
                                     <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->balancePaymentIncoming(),2,',','.') }}</td>
-                                    <td>{{ $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) }}</td>
+                                    <td>
+                                    {{ 
+                                        $row->lookable->marketingOrderDeliveryProcess()->exists() ? $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) : '-' 
+                                    }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

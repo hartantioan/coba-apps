@@ -134,7 +134,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            UNION ALL
                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI
                            FROM good_issues a
-                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and g.deleted_at is null
+                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                            LEFT JOIN items d ON d.id=c.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id

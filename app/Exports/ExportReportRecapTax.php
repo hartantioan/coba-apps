@@ -43,8 +43,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
         'Total Diskon',
         'Total Harga Barang',
         'Uang Muka (DP)',
-       
-      
+
+        'Total',
         'DPP FP',
         'PPN FP',
         'Status Cancel',
@@ -159,7 +159,7 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Total Harga Barang (DPP)' => $price_dpp_detail,
                         'Uang Muka (DP)' => '',
                         'Total' =>  $price_satuan * $jumlah_barang,
-                      
+
                         'DPP FP' => $total_detail,
                         'PPN FP' => $ppn_fp_detail,
                         'Status Cancel' => '',

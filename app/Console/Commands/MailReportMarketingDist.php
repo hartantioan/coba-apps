@@ -37,17 +37,17 @@ class MailReportMarketingDist extends Command
         foreach ($brand as $merk) {
 
             if ($merk == 1) {
-               // $recipient = ['hunawan@superiorporcelain.co.id','eunike@superior.co.id'];
+                $recipient = ['hunawan@superiorporcelain.co.id','eunike@superior.co.id'];
             }
 
             if ($merk == 4) {
-               // $recipient = ['adrianto@superiorporcelain.co.id','eunike@superior.co.id'];
+                $recipient = ['adrianto@superiorporcelain.co.id','eunike@superior.co.id'];
             }
 
             if ($merk == 13) {
-               // $recipient = ['jimmy@superiorporcelain.co.id','eunike@superior.co.id'];
+                $recipient = ['jimmy@superiorporcelain.co.id','eunike@superior.co.id'];
             }
-            $recipient = ['edp@superior.co.id'];
+          //  $recipient = ['edp@superior.co.id'];
 
             //  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 
@@ -423,7 +423,7 @@ class MailReportMarketingDist extends Command
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
 					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
-						LEFT JOIN marketing_orders mo ON mo.id=f.marketing_order_id and deleted_at is null
+						LEFT JOIN marketing_orders mo ON mo.id=f.marketing_order_id and mo.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 						LEFT JOIN users g ON g.id=mo.account_id

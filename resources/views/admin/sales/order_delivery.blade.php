@@ -1903,11 +1903,10 @@ document.addEventListener('focusin', function (event) {
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                     let newGrandTotal = 0;
-                    $.each(total_grandtotal, function(index, value) {
-                        d = parseFloat(value);
-                        newGrandTotal += d;
-                    });
+                    let grandTotalText = document.getElementById('grand-total').textContent.trim();
 
+                    let grandTotalValue = parseFloat(grandTotalText.replace(/\./g, '').replace(',', '.'));
+                    newGrandTotal += grandTotalValue;
                     x = parseFloat(newGrandTotal);
                     formData.append('lastsegment',lastSegment);
                     formData.append('grandtotal',x);

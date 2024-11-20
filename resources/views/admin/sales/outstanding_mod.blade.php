@@ -38,37 +38,43 @@
                                                 <div id="validation_alert_multi" style="display:none;"></div>
                                             </div>
                                             <div class="col s12">
-                                                <div class="row">                               
-                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                                                            <span class="hide-on-small-onl">Excel</span>
-                                                            <i class="material-icons right">view_list</i>
-                                                        </a>
-                                         
+                                                <div class="row">
+                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                        <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                        <span class="hide-on-small-onl">Excel</span>
+                                                        <i class="material-icons right">view_list</i>
+                                                    </a>
+                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel2();">
+                                                        <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                        <span class="hide-on-small-onl">Excel (Compare With Stock)</span>
+                                                        <i class="material-icons right">view_list</i>
+                                                    </a>
                                                 </div>
                                             </div>
-
+                                            
                                     </div>
-                                    </form>
+
                         </div>
-                        </li>
-                        </ul>
+                        </form>
                     </div>
-
+                    </li>
+                    </ul>
                 </div>
-            </div>
 
-            <div id="intro">
-                <div class="row">
-                    <div class="col s12">
-
-                    </div>
-                </div>
             </div>
-            <!-- / Intro -->
         </div>
-        <div class="content-overlay"></div>
+
+        <div id="intro">
+            <div class="row">
+                <div class="col s12">
+
+                </div>
+            </div>
+        </div>
+        <!-- / Intro -->
     </div>
+    <div class="content-overlay"></div>
+</div>
 </div>
 </div>
 
@@ -76,5 +82,10 @@
     function exportExcel() {
         var date = $('#date').val();
         window.location = "{{ Request::url() }}/export?date=" + date;
+    }
+
+    function exportExcel2() {
+        var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export2?date=" + date;
     }
 </script>

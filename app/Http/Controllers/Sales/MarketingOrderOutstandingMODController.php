@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExportOutstandingAP;
 use App\Exports\ExportOutstandingMOD;
+use App\Exports\ExportOutstandingMODCompareWithStock;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -31,5 +32,9 @@ class MarketingOrderOutstandingMODController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportOutstandingMOD(), 'outstanding_mod_'.uniqid().'.xlsx');
+    }
+
+    public function export2(Request $request){
+		return Excel::download(new ExportOutstandingMODCompareWithStock(), 'outstanding_mod_compare_stock'.uniqid().'.xlsx');
     }
 }

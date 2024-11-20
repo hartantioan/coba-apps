@@ -139,11 +139,11 @@ class ReportSalesSummaryStockFgController extends Controller
 
 
     public function export2(Request $request){
-        $start_date = $request->start_date? $request->start_date : '';
+        $start_date = $request->start_date ? $request->start_date : '';
         $finish_date = $request->finish_date ? $request->finish_date : '';
        
        
-		return Excel::download(new ExportReportSummaryStockFG2($start_date,$finish_date), 'summary_sales_'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportSummaryStockFG2($start_date,$finish_date), 'summary_stock_'.uniqid().'.xlsx');
        
     }
 }

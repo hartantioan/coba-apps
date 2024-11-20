@@ -37,7 +37,7 @@ class AnnouncementController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'user_id',
+            'id',
             'description',
             'menu_id',
             'status',

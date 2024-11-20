@@ -61,7 +61,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_atis null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')

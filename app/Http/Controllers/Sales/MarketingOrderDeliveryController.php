@@ -343,6 +343,8 @@ class MarketingOrderDeliveryController extends Controller
                         'unit'              => $row->itemUnit->unit->code,
                         'note'              => $row->note,
                         'qty_conversion'    => CustomHelper::formatConditionalQty($row->qty_conversion),
+                        'price'             => $row->grandtotal / $row->qty,
+                        'grandtotal_detail' => $row->grandtotal,
                         'code'              => $data->code,
                         'uom_unit'          => $row->item->uomUnit->code,
                         'stock_by_shading'  => $row->item->arrayStockByShading($row->qty_conversion),
@@ -559,7 +561,7 @@ class MarketingOrderDeliveryController extends Controller
                         ]);
                     }
                 }
-                
+
                 $queryrevision = NULL;
                 if($request->tempRevision){
                     $queryrevision = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->tempRevision))->where('status','2')->whereNull('marketing_order_delivery_id')->first();
@@ -617,7 +619,7 @@ class MarketingOrderDeliveryController extends Controller
                         ]);
                     }
                 }else{
-            
+
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDelivery::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);

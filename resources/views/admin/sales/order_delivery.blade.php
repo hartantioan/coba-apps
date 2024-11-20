@@ -777,23 +777,25 @@ document.addEventListener('focusin', function (event) {
 
         $('#body-item').on('click', '.delete-data-item', function() {
             const $row = $(this).closest('tr');
-            const iteration = $row.data('iteration');
-            if (Array.isArray(total_grandtotal) && total_grandtotal.length > iteration) {
-                total_grandtotal.splice(iteration, 1);
-            }
-            let newGrandTotal=0;
+            // const iteration = $row.data('iteration');
+            // if (Array.isArray(total_grandtotal) && total_grandtotal.length > iteration) {
+            //     total_grandtotal.splice(iteration, 1);
+            // }
+            // let newGrandTotal=0;
             $row.next().remove();
-            $.each(total_grandtotal, function(index, value) {
-                d = parseFloat(value);
-                newGrandTotal += d;
-            });
+            // $.each(total_grandtotal, function(index, value) {
+            //     d = parseFloat(value);
+            //     newGrandTotal += d;
+            // });
 
-            x = parseFloat(newGrandTotal);
-            if(x > 0){
-                x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
-            }
-            $('#grand-total').text(x);
+            // x = parseFloat(newGrandTotal);
+            // if(x > 0){
+            //     x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
+            // }
+            // $('#grand-total').text(x);
             $row.closest('tr').remove();
+
+            calculateTotal();
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
@@ -951,6 +953,23 @@ document.addEventListener('focusin', function (event) {
         }
     }
 
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('input[name="arr_qty[]"]').forEach(function(input) {
+
+            const qty = parseFloat(input.value) || 0;
+            const price = parseFloat(input.getAttribute('data-price')) || 0;
+
+
+            total += qty * price;
+        });
+        x = parseFloat(total);
+        if(x > 0){
+            x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
+        }
+        $('#grand-total').text(x);
+    }
+
     function getMarketingOrder(){
         if($('#marketing_order_id').val()){
             $.ajax({
@@ -1047,12 +1066,13 @@ document.addEventListener('focusin', function (event) {
                                             <input type="hidden" name="arr_stock_detail_id[]" value="` + val.id + `">
                                             <input type="hidden" name="arr_item_shading_id[]" value="` + value.item_shading_id + `">
                                             <input type="hidden" name="arr_item_shading_stock[]" value="` + value.qty + `">
+                                            <input type="hidden" name="arr_price[]" value="` + val.price + `">
                                             <td class="center-align">` + (j+1) + `</td>
                                             <td>` + value.item_shading_code + `</td>
                                             <td>` + value.stock + `</td>
                                             <td>` + value.qty_outstanding_mod + `</td>
                                             <td>` + value.qty_unsent_sj + `</td>
-                                            <td><input name="arr_item_shading_qty[]" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty + `" data-mod="` + val.id + `"></td>
+                                            <td><input name="arr_item_shading_qty[]" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty + `" data-mod="` + val.id + `" ></td>
                                             <td class="center">
                                                 <span>` + val.unit + `</span>
                                             </td>
@@ -1087,7 +1107,7 @@ document.addEventListener('focusin', function (event) {
                                             ` + val.qty_stock + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');calculateTotal();" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-price="` + val.price + `" data-grandtotal_detail="` + val.grandtotal_detail + `">
                                         </td>
                                         <td class="center">
                                             <span id="arr_unit` + count + `">` + val.unit + `</span>
@@ -1115,7 +1135,7 @@ document.addEventListener('focusin', function (event) {
                                             <table class="bordered" style="width:100% !important;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" colspan="8">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i></th>
+                                                        <th class="center" colspan="8">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i> Harga total SO bisa berbeda dengan aslinya karena ada selisih pembulatan PPN.</th>
                                                     </tr>
                                                     <tr>
                                                         <th class="center">No</th>
@@ -1142,6 +1162,8 @@ document.addEventListener('focusin', function (event) {
                         $('#marketing_order_id').empty();
                     }
                     M.updateTextFields();
+
+                    calculateTotal();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
@@ -1160,6 +1182,7 @@ document.addEventListener('focusin', function (event) {
                 icon: 'warning'
             });
         }
+
     }
 
     function getStock(id){

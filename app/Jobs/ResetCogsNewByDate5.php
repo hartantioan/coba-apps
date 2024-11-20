@@ -1159,7 +1159,7 @@ class ResetCogsNewByDate5 implements ShouldQueue/* , ShouldBeUnique */
             $row->productionBatch->update([
                 'total' => $total
             ]);
-            self::dispatch($dateloop,$row->productionRepack->company_id,$row->place_id,$row->item_target_id,$row->area_id,$row->item_shading_id,$row->production_batch_id);
+            self::dispatch($dateloop,$row->productionRepack->company_id,$row->place_id,$row->item_target_id,$row->area_id,$row->item_shading_id,$row->production_batch_id,$end_date);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
         }

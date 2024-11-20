@@ -53,7 +53,7 @@ class ExportReportDeliveryOnTheWay implements FromCollection, WithTitle, WithHea
         $arr = [];
 
         foreach ($delivery_process as $key => $row) {
-            if($row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->status != '2' || $row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->status != '3') {
+            if($row->marketingOrderDeliveryProcess->receive_date != null) {
                 $tgl_smpai =date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->receive_date));
             }else{
                 $tgl_smpai = '';

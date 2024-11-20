@@ -52,7 +52,7 @@ class AnnouncementController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Announcement::count();
-        
+
         $query_data = Announcement::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -99,7 +99,7 @@ class AnnouncementController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->user->name,
@@ -132,7 +132,7 @@ class AnnouncementController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'description'          => 'required',
             'start_date'          => 'required',
@@ -158,7 +158,7 @@ class AnnouncementController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Announcement::find($request->temp);
-                   
+
                     $query->user_id                = session('bo_id');
                     $query->description            = $request->description;
                     $query->menu_id                = $menu_id;
@@ -189,8 +189,8 @@ class AnnouncementController extends Controller
                     DB::rollback();
                 }
 			}
-			
-			if($query) {               
+
+			if($query) {
 
                 activity()
                     ->performedOn(new Announcement())
@@ -209,7 +209,7 @@ class AnnouncementController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -221,16 +221,16 @@ class AnnouncementController extends Controller
         foreach($query_menu as $row_menu){
             $menu [] = $row_menu;
         }
-        $announcement['menu']=$menu;	
+        $announcement['menu']=$menu;
 		return response()->json($announcement);
     }
 
     public function refresh(Request $request){
         $today = Carbon::today();
-        
+
         $menu = Menu::where('url', $request->lastSegment)->first();
         $arrnotif=[];
-        
+
         if ($menu) {
             $menuId = $menu->id;
             $announcements = Announcement::where('status', 1)
@@ -245,15 +245,42 @@ class AnnouncementController extends Controller
                 $arrnotif[] = $row;
             }
         }
-        
-        
+
+
 
         $response = [
             'status'            => 200,
             'message'           => 'Test success.',
             'announcement_list'        => $arrnotif,
         ];
-        
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = Announcement::find($request->id);
+
+
+        if($query->delete()) {
+
+
+            activity()
+                ->performedOn(new Announcement())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the Announcement data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
         return response()->json($response);
     }
 }

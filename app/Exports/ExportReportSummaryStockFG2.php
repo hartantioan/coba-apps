@@ -108,7 +108,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            UNION ALL
                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS RepackOut
                                 FROM production_repacks a
-                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                            LEFT JOIN item_units c ON c.id=item_unit_source_id
                            LEFT JOIN items d ON d.id=b.item_source_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -117,7 +117,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            UNION ALL
                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RepackIn
                                 FROM production_repacks a
-                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                            LEFT JOIN item_units c ON c.id=item_unit_target_id
                            LEFT JOIN items d ON d.id=b.item_target_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -126,7 +126,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            UNION ALL
                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS GR
                            FROM good_receives a
-                           LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
+                           LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                            LEFT JOIN items d ON d.id=b.item_id
                            LEFT JOIN item_shadings k ON k.id=b.item_shading_id
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'".$this->start_date."'
@@ -134,7 +134,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                            UNION ALL
                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI
                            FROM good_issues a
-                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
+                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and g.deleted_at is null
                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                            LEFT JOIN items d ON d.id=c.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -144,8 +144,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                           SELECT c.code,c.name,k.code, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
                                FROM marketing_order_delivery_processes a
                                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
                            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
@@ -163,7 +163,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                           LEFT JOIN (
                           SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS RepackOut
                                 FROM production_repacks a
-                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                            LEFT JOIN item_units c ON c.id=item_unit_source_id
                            LEFT JOIN items d ON d.id=b.item_source_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -173,7 +173,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN (
                                 SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0) AS RepackIn
                                 FROM production_repacks a
-                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                           LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                            LEFT JOIN item_units c ON c.id=item_unit_target_id
                            LEFT JOIN items d ON d.id=b.item_target_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -183,7 +183,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN (
                                  SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0) AS GR
                            FROM good_receives a
-                           LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
+                           LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                            LEFT JOIN items d ON d.id=b.item_id
                            LEFT JOIN item_shadings k ON k.id=b.item_shading_id
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
@@ -192,7 +192,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                LEFT JOIN (
                                SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS GI
                            FROM good_issues a
-                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
+                           LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                            LEFT JOIN items d ON d.id=c.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
@@ -203,8 +203,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJbelumbarcode
                                FROM marketing_order_delivery_processes a
                                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
                                                               LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id AND mo.deleted_at IS NULL AND mo.status=1
@@ -217,8 +217,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJsudahbarcode
                                FROM marketing_order_delivery_processes a
                                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+                               LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+                               LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
                                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                LEFT JOIN items c ON c.id=e.item_id
                                LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id and mo.deleted_at is null and mo.status=2

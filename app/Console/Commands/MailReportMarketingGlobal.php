@@ -61,7 +61,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_atis null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -79,7 +79,7 @@ class MailReportMarketingGlobal extends Command
 					FROM types a LEFT JOIN (
 
 					SELECT d.name AS tipe, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -88,8 +88,8 @@ class MailReportMarketingGlobal extends Command
 
                SELECT d.name AS tipe, coalesce(SUM(b.qty*e.qty_conversion),0) AS qtyMOD
 					FROM marketing_order_deliveries a
-					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id
-					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id and b.deleted_at is null
+					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id and e.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -98,9 +98,9 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN (
 					SELECT d.name AS tipe, coalesce(SUM(b.qty*f.qty_conversion),0) AS qtySJ
 					FROM marketing_order_delivery_processes a
-					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id and b.deleted_at is null
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -109,10 +109,10 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN (
 					SELECT e.name AS tipe,  sum((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso
 					FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN (SELECT c.id, SUM(b.qty * c.qty_conversion) AS sokepakai FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL GROUP BY c.id
 					)c ON c.id=b.id
 					LEFT JOIN items d ON d.id=b.item_id
@@ -125,8 +125,8 @@ class MailReportMarketingGlobal extends Command
 					(
 					SELECT f.name AS tipe, SUM(b.qty*c.qty_conversion) AS 'osmod' FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
-					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
+					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id and d.deleted_at is null
 					LEFT JOIN items e ON e.id=b.item_id
 					LEFT JOIN types f ON f.id=e.type_id
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -138,7 +138,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -150,7 +150,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
@@ -220,7 +220,7 @@ class MailReportMarketingGlobal extends Command
 					WHERE is_sales_item=1 AND a.type_id IS NOT null )a LEFT JOIN (
 
 					SELECT concat(concat(d.name,' '),e.name) AS tipe, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN varieties e ON e.id=c.variety_id
@@ -231,7 +231,7 @@ class MailReportMarketingGlobal extends Command
                SELECT concat(concat(d.name,' '),f.name) AS tipe, coalesce(SUM(b.qty*e.qty_conversion),0) AS qtyMOD
 					FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id
-					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id and e.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN varieties f ON f.id=c.variety_id
@@ -243,8 +243,8 @@ class MailReportMarketingGlobal extends Command
 					SELECT concat(concat(d.name,' '),g.name) AS tipe, coalesce(SUM(b.qty*f.qty_conversion),0) AS qtySJ
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN varieties g ON g.id=c.variety_id
@@ -254,10 +254,10 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN (
 					SELECT concat(concat(e.name,' '),f.name) AS tipe,  SUM((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso
 					FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN (SELECT c.id, SUM(b.qty * c.qty_conversion) AS sokepakai FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL GROUP BY c.id
 					)c ON c.id=b.id
 					LEFT JOIN items d ON d.id=b.item_id
@@ -271,8 +271,8 @@ class MailReportMarketingGlobal extends Command
 					(
 					SELECT concat(concat(f.name,' '),g.name) AS tipe, SUM(b.qty*c.qty_conversion) AS 'osmod' FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
-					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
+					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id and d.deleted_at is null
 					LEFT JOIN items e ON e.id=b.item_id
 					LEFT JOIN types f ON f.id=e.type_id
 					LEFT JOIN varieties g ON g.id=e.variety_id
@@ -285,7 +285,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 						LEFT JOIN varieties h ON h.id=c.variety_id
@@ -298,7 +298,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 							LEFT JOIN varieties g ON g.id=c.variety_id
@@ -360,7 +360,7 @@ class MailReportMarketingGlobal extends Command
 
 					FROM types a CROSS JOIN (select name from `groups` WHERE type='2') z left JOIN (
 					SELECT d.name AS tipe, f.name AS grup, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users e ON e.id=a.account_id
@@ -371,8 +371,8 @@ class MailReportMarketingGlobal extends Command
 
                SELECT d.name AS tipe, g.name AS grup, coalesce(SUM(b.qty*e.qty_conversion),0) AS qtyMOD
 					FROM marketing_order_deliveries a
-					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id
-					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id and b.deleted_at is null
+					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id and e.deleted_at is null
 					LEFT JOIN items c ON c.id=b.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN users f ON f.id=a.customer_id
@@ -384,9 +384,9 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN (
 					SELECT d.name AS tipe,h.name AS grup, coalesce(SUM(b.qty*f.qty_conversion),0) AS qtySJ
 					FROM marketing_order_delivery_processes a
-					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id and b.deleted_at is null
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at si null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 						LEFT JOIN marketing_orders gg ON gg.id=f.marketing_order_id
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
@@ -398,10 +398,10 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN (
 					SELECT e.name AS tipe, g.name AS grup, sum((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso
 					FROM marketing_orders a
-					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id
+					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
 					LEFT JOIN (SELECT c.id, SUM(b.qty * c.qty_conversion) AS sokepakai FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL GROUP BY c.id
 					)c ON c.id=b.id
 					LEFT JOIN items d ON d.id=b.item_id
@@ -416,8 +416,8 @@ class MailReportMarketingGlobal extends Command
 					(
 					SELECT f.name AS tipe, h.name AS grup, SUM(b.qty*c.qty_conversion) AS 'osmod' FROM marketing_order_deliveries a
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id AND b.deleted_at IS null
-					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id
-					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id
+					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
+					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id and d.deleted_at is null
 					LEFT JOIN items e ON e.id=b.item_id
 					LEFT JOIN types f ON f.id=e.type_id
 					LEFT JOIN users g ON g.id=a.customer_id
@@ -431,7 +431,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 						LEFT JOIN marketing_orders gg ON gg.id=f.marketing_order_id
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
@@ -446,7 +446,7 @@ class MailReportMarketingGlobal extends Command
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN marketing_orders gg ON gg.id=f.marketing_order_id
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
@@ -571,8 +571,8 @@ class MailReportMarketingGlobal extends Command
                   SELECT concat(concat(d.name,' '),g.name) AS tipe, coalesce(SUM(b.qty*f.qty_conversion),0) AS qtySJ
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN varieties g ON g.id=c.variety_id
@@ -593,7 +593,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(b.qty),0)*-1 AS RepackOut
 					 FROM production_repacks a
-                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                 LEFT JOIN item_units c ON c.id=item_unit_source_id
                 LEFT JOIN items d ON d.id=b.item_source_id
                 LEFT JOIN types e ON e.id=d.type_id
@@ -603,7 +603,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(b.qty),0) AS RepackIn
 					 FROM production_repacks a
-                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                 LEFT JOIN item_units c ON c.id=item_unit_target_id
                 LEFT JOIN items d ON d.id=b.item_target_id
                 LEFT JOIN types e ON e.id=d.type_id
@@ -613,7 +613,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(b.qty),0) AS GR
                 FROM good_receives a
-                LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
+                LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                 LEFT JOIN items d ON d.id=b.item_id
                 INNER JOIN types e ON e.id=d.type_id
                 INNER JOIN varieties f ON f.id=d.variety_id
@@ -622,7 +622,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT concat(concat(e.name,' '),f.name) AS tipe, coalesce(SUM(b.qty),0)*-1 AS GI
                 FROM good_issues a
-                LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
+                LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
                 LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                 LEFT JOIN items d ON d.id=c.item_id
                 INNER JOIN types e ON e.id=d.type_id
@@ -633,8 +633,8 @@ class MailReportMarketingGlobal extends Command
                SELECT concat(concat(d.name,' '),g.name) AS tipe, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN varieties g ON g.id=c.variety_id
@@ -696,7 +696,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(b.qty),0)*-1 AS RepackOut
 					 FROM production_repacks a
-                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                 LEFT JOIN item_units c ON c.id=item_unit_source_id
                 LEFT JOIN items d ON d.id=b.item_source_id
                 INNER JOIN types e ON e.id=d.type_id
@@ -707,7 +707,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(b.qty),0) AS RepackIn
 					 FROM production_repacks a
-                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id
+                LEFT JOIN production_repack_details b ON a.id=b.production_repack_id and b.deleted_at is null
                 LEFT JOIN item_units c ON c.id=item_unit_target_id
                 LEFT JOIN items d ON d.id=b.item_target_id
                 INNER JOIN types e ON e.id=d.type_id
@@ -718,7 +718,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(b.qty),0) AS GR
                 FROM good_receives a
-                LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
+                LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                 LEFT JOIN items d ON d.id=b.item_id
                 INNER JOIN types e ON e.id=d.type_id
                 INNER JOIN brands f ON f.id=d.brand_id
@@ -728,7 +728,7 @@ class MailReportMarketingGlobal extends Command
                 UNION ALL
                 SELECT e.`name` AS tipe, f.name AS brand, g.name AS grade, coalesce(SUM(b.qty),0)*-1 AS GI
                 FROM good_issues a
-                LEFT JOIN good_issue_details b ON a.id=b.good_issue_id
+                LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
                 LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                 LEFT JOIN items d ON d.id=c.item_id
                 INNER JOIN types e ON e.id=d.type_id
@@ -740,8 +740,8 @@ class MailReportMarketingGlobal extends Command
                SELECT d.`name` AS tipe,g.name AS brand,h.name AS grade, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
-					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id
-					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id
+					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and b.deleted_at is null
+					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN items c ON c.id=e.item_id
 					LEFT JOIN types d ON d.id=c.type_id
 					LEFT JOIN brands g ON g.id=c.brand_id

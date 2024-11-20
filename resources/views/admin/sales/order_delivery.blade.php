@@ -777,22 +777,9 @@ document.addEventListener('focusin', function (event) {
 
         $('#body-item').on('click', '.delete-data-item', function() {
             const $row = $(this).closest('tr');
-            // const iteration = $row.data('iteration');
-            // if (Array.isArray(total_grandtotal) && total_grandtotal.length > iteration) {
-            //     total_grandtotal.splice(iteration, 1);
-            // }
-            // let newGrandTotal=0;
-            $row.next().remove();
-            // $.each(total_grandtotal, function(index, value) {
-            //     d = parseFloat(value);
-            //     newGrandTotal += d;
-            // });
 
-            // x = parseFloat(newGrandTotal);
-            // if(x > 0){
-            //     x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
-            // }
-            // $('#grand-total').text(x);
+            $row.next().remove();
+
             $row.closest('tr').remove();
 
             calculateTotal();

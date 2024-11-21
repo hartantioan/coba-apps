@@ -25,6 +25,7 @@ class BrandController extends Controller
             'id',
             'code',
             'name',
+            'type',
         ];
 
         $start  = $request->start;
@@ -34,7 +35,7 @@ class BrandController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Brand::count();
-        
+
         $query_data = Brand::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -70,12 +71,13 @@ class BrandController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->code,
                     $val->name,
                     $val->status(),
+                    $val->type(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -121,6 +123,7 @@ class BrandController extends Controller
                     $query = Brand::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->type			= $request->type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -133,6 +136,7 @@ class BrandController extends Controller
                     $query = Brand::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'type'			=> $request->type,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -140,7 +144,7 @@ class BrandController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -160,19 +164,19 @@ class BrandController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $brand = Brand::find($request->id);
-        				
+
 		return response()->json($brand);
     }
 
     public function destroy(Request $request){
         $query = Brand::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Brand())

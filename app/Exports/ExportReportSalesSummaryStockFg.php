@@ -34,6 +34,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         'Qty On Hand (M2)',
         'Qty On Hand (Palet)',
         'Qty On Hand (Box)',
+        'Brand',
+        'Brand Kategori',
+        'Warna',
+        'Kategori KW',
         // 'Qty SJ Blm Terkirim(M2)',
         // 'Qty SJ Blm Terkirim(Palet)',
         // 'Qty SJ Blm Terkirim(Box)',
@@ -227,7 +231,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             $total_sj_awal = 0;
             $total_sj_awal_blm_terkirim = 0;
             $total_sj_awal_blm_terkirim_pallet = 0 ;
-            $total_sj_awal_blm_terkirim_box = 0;
+            $total_sj_awal_blm_terkirim_box = 0;$pallet_conversion_total_sum = 0;
             if($delivery_process_awal){
                 foreach ($delivery_process_awal as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
@@ -350,6 +354,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out));
             $pallet_conversion=0;
             $box_conversion=0;
+            $total_sum_sj_blm_terkirim=0;
             if($total != 0 ){
                 $pallet_conversion= round($total/$row->item->sellConversion(),3);
                 $box_conversion=round(($total/$row->item->sellConversion())*$row->item->pallet->box_conversion,3);
@@ -384,7 +389,6 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             if($pallet_conversion_total_sum == $total_sum_sj_blm_terkirim || $pallet_conversion_total_sum == $box_conversion_total_sum){
                 $pallet_conversion_total_sum = 0;
             }
-
             $arr[] = [
                 'item_code'=> $row->item->code,
                 'item_name'=>$row->item->name,
@@ -392,6 +396,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 'total'=>$total,
                 'pallet_conversion'=>$pallet_conversion,
                 'box_conversion'=>$box_conversion,
+                'Brand'=>$row->item->brand->name ?? '-',
+                'Brand Kategori'=>$row->item->brand?->type() ?? '-',
+                'Warna'=>$row->item->pattern->name ?? '-',
+                'Kategori KW'=>$row->item->grade->name ?? '-',
                 // 'sj_belum_terkirim'=> $total_sj_awal_blm_terkirim,
                 // 'sj_belum_terkirim_pallet'=> $total_sj_awal_blm_terkirim_pallet,
                 // 'sj_belum_terkirim_box'=> $total_sj_awal_blm_terkirim_box,
@@ -424,6 +432,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             'aviable'=>'Aviable(m2)',
             'aviable2'=>'Aviable(Palet)',
             'aviable3'=>'Aviable(Box)',
+            'Brand'=>'Brand',
+            'Kategori'=>'Brand Kategori',
+            'Warna'=>'Warna',
+            'Kategori KW'=>'Kategori KW',
         ];
 
         $uniqueItems = $item->unique('item_id');
@@ -532,6 +544,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 'aviable'=>$aviable,
                 'aviable2'=>$aviable2,
                 'aviable3'=>$aviable3,
+                'Brand'=>$v->item->brand->name ?? '-',
+                'Brand Kategori'=>$row->item->brand?->type() ?? '-',
+                'Warna'=>$v->item->pattern->name ?? '-',
+                'Kategori KW'=>$v->item->grade->name ?? '-',
             ];
         }
 

@@ -3,7 +3,7 @@
         <tr align="center">
             <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
-           
+
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
@@ -30,6 +30,10 @@
             <th>Gudang</th>
             <th>Area</th>
             <th>Based On</th>
+            <th>Brand</th>
+            <th>Brand Kategori</th>
+            <th>Warna</th>
+            <th>Kategori KW</th>
         </tr>
     </thead>
     <tbody>
@@ -58,8 +62,8 @@
                     <td>{{ $row_detail->item->code }}</td>
                     <td>{{ $row_detail->item->name }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->pallet_no}}</td>
-                    <td>{{ $row_detail->shading}}</td> 
-                    <td>{{ $row_detail->qty}}</td>                
+                    <td>{{ $row_detail->shading}}</td>
+                    <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->itemUnit->unit->code}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
                     <td>{{ round($row_detail->productionFgReceiveDetail->conversion * $row_detail->qty,3) }}</td>
@@ -67,12 +71,16 @@
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->productionFgReceive->code }}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->brand->name ?? '-'}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->brand->type() ?? '-'}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->pattern->name ?? '-'}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->grade->name ?? '-'}}</td>
                 </tr>
                 @php
                     $no++;
                 @endphp
             @endforeach
-            
+
         @endforeach
     </tbody>
 </table>

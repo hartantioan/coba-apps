@@ -67,6 +67,11 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Transport Name',
         'Plat No',
         'Sales Employee Name',
+        'Brand',
+        'Brand Kategori',
+        'Warna',
+        'Kategori KW',
+        'Timbangan/Berat Kg per SJ'
         // 'Tgl. Cetak',
     ];
 
@@ -215,6 +220,11 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'plat_no'                      => $row->vehicle_no ?? '-',
                         // 'nama_supir'                   => $row->driver_name ?? '-',
                         'sales_employee_name'          => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->sales->name,
+                        'Brand'                        => $row_shading['detail']->itemstock->item->brand->name,
+                        'Brand Kategori'               => $row_shading['detail']->itemstock->item->brand->type(),
+                        'Warna'                        => $row_shading['detail']->itemstock->item->pattern->name,
+                        'Kategori KW'                   => $row_shading['detail']->itemstock->item->grade->name,
+                        'Timbangan/Berat Kg per SJ'     => $row->weight_netto,
                         // 'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
                         /* 'project_name'               => $row->project->name??'-',
                         'other_fee'             => $row_detail->other_fee,

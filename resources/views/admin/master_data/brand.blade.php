@@ -72,6 +72,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>Kategori</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -82,7 +83,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -108,6 +109,15 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class=" col s12 m6">
+                            <label for="type" style="font-size:1rem;">Kategori :</label>
+                            <div class="input-field">
+                                <select class="form-control" id="type" name="type">
+                                    <option value="1">HB</option>
+                                    <option value="2">OEM</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -147,13 +157,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -168,13 +178,13 @@
     });
     $(function() {
         loadDataTable();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -226,11 +236,12 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'kategori', className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -238,9 +249,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -267,7 +278,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',

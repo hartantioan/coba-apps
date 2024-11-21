@@ -17,7 +17,8 @@ class Brand extends Model
     protected $fillable = [
         'code',
         'name',
-        'status'
+        'status',
+        'type',
     ];
 
     public function status(){
@@ -35,4 +36,21 @@ class Brand extends Model
 
         return $status;
     }
+
+    public function type(){
+        $type = match ($this->type) {
+            '1' => 'HB',
+            '2' => 'OEM',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Direvisi',
+            null =>'',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+
 }

@@ -61,7 +61,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         $query = DB::select("
           SELECT a.code,a.name,a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
             COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
-            COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,   COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode, 
+            COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,   COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode,
             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
           SELECT  distinct a.code,a.name,a.shading FROM (
  				SELECT d.code,d.name,k.code AS shading
@@ -86,7 +86,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                 LEFT JOIN item_units c ON c.id=item_unit_target_id
                 LEFT JOIN items d ON d.id=b.item_target_id
                  LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 
+					 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7
                       UNION ALL
 					 SELECT d.code,d.name,k.code
                 FROM good_receives a
@@ -212,7 +212,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
                           and a.id not in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status ='2' and created_at <= '".$this->finish_date." 23:59:59' and deleted_at is null)
 								  GROUP BY c.`code`,c.name,k.code
-                               )h ON h.code=a.code and h.shading=a.shading 
+                               )h ON h.code=a.code and h.shading=a.shading
                                LEFT JOIN (
                                 SELECT c.code,c.name,k.code AS shading, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJsudahbarcode
                                FROM marketing_order_delivery_processes a

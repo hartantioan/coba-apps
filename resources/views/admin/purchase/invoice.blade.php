@@ -2273,7 +2273,6 @@
                                                 }
                                                 $('#due_date').val(val.due_date);
                                             }else{
-                                                alert(val.raw_price);
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">
                                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">

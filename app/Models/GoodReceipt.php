@@ -292,6 +292,13 @@ class GoodReceipt extends Model
         return $total;
     }
 
+    public function totalAdjustByDate($date){
+        $total = JournalDetail::where('note','ADJUST*'.$this->code)->whereHas('journal',function($query)use($date){
+            $query->whereIn('status',['2','3'])->where('post_date','<=',$date);
+        })->sum('nominal');
+        return $total;
+    }
+
     public function hasBalanceInvoice(){
         $total = $this->total;
 
@@ -300,6 +307,8 @@ class GoodReceipt extends Model
                 $total -= $rowinvoice->total;
             }
         }
+
+        $total -= $this->totalAdjust();
 
         if($total > 0){
             return true;
@@ -321,6 +330,8 @@ class GoodReceipt extends Model
             }
         }
 
+        $total -= $this->totalAdjust($date);
+
         return $total;
     }
 
@@ -332,6 +343,8 @@ class GoodReceipt extends Model
                 $total -= $rowinvoice->total;
             }
         }
+
+        $total -= $this->totalAdjust();
 
         return $total;
     }
@@ -488,7 +501,7 @@ class GoodReceipt extends Model
     }
 
     public function statusLC(){
-        $status = match ($this->status) {
+        $status = match ($this->status_lc) {
             '1' => 'Buka',
             '2' => 'Tutup',
             default => 'Invalid',

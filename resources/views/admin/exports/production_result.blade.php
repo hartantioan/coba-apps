@@ -30,6 +30,7 @@
             <th>Gudang</th>
             <th>Area</th>
             <th>Based On</th>
+            <th>Variant</th>
             <th>Brand</th>
             <th>Brand Kategori</th>
             <th>Warna</th>
@@ -71,6 +72,7 @@
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->productionFgReceive->code }}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->type->name ?? '-'}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->item->brand->name ?? '-'}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->item->brand->type() ?? '-'}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->item->pattern->name ?? '-'}}</td>

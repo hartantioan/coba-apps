@@ -1688,8 +1688,7 @@ class PurchaseInvoiceController extends Controller
             </tr>';
         }
 
-        $string .= '</tbody></table></div>
-            ';
+        $string .= '</tbody></table></div>';
         $string.= '<div class="col s12 mt-2" style="font-weight:bold;">List Pengguna Dokumen :</div><ol class="col s12">';
         if($data->used()->exists()){
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';

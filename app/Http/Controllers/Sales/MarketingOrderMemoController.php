@@ -523,55 +523,19 @@ class MarketingOrderMemoController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="col s12 mt-3"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item & Surat Jalan</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Dokumen</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Total</th>
+                                <th class="center-align">Nominal</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">Grandtotal</th>
                             </tr>
-                        </thead><tbody>';
-        $totalqty=0;
-        $totals=0;
-        $totalppn=0;
-        $totalgrandtotal=0;
-        foreach($data->marketingOrderMemoDetail as $key => $row){
-            $totalqty+=$row->qty;
-            $totals+=$row->total;
-            $totalppn+=$row->tax;
-            $totalgrandtotal+=$row->grandtotal;
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->getCode().'</td>
-                <td class="">'.$row->lookable->lookable->item->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->lookable->lookable->item->sellUnit->code.'</td>
-                <td class="">'.$row->note.'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
-            </tr>';
-        }
-        $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
-            </tr>
-        ';
-
-        $string .= '</tbody></table></div>';
+                            <tr>
+                                <th class="center-align gradient-45deg-brown-brown"><h6 class="white-text">'.number_format($data->total,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-indigo-blue"><h6 class="white-text">'.number_format($data->tax,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-purple-deep-orange"><h6 class="white-text">'.number_format($data->grandtotal,2,',','.').'</h6></th>
+                            </tr>
+                        </thead></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>

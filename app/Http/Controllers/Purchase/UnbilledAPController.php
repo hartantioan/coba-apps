@@ -78,7 +78,7 @@ class UnbilledAPController extends Controller
                             AND pid.deleted_at IS NULL
                             AND pi.status IN ('2','3','7','8')
                             AND pi.post_date <= :date1
-                            AND pi.id NOT IN (
+                            AND pi.id IN (
                                 SELECT 
                                     cd.lookable_id 
                                     FROM cancel_documents cd 

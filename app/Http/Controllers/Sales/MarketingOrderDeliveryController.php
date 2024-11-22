@@ -504,9 +504,8 @@ class MarketingOrderDeliveryController extends Controller
                             'message' => implode(', ',$arrItemError),
                         ]);
                     }
+                    info('kambing');
                 }
-
-                info('kambing');
 
                 /* if(!$request->temp){
                     $passedZero = true;

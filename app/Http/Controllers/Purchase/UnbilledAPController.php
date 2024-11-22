@@ -83,9 +83,9 @@ class UnbilledAPController extends Controller
                                     cd.lookable_id 
                                     FROM cancel_documents cd 
                                     WHERE 
-                                    cd.lookable_type = 'purchase_invoices' 
-                                    AND cd.deleted_at IS NULL
-                                    AND pi.post_date >= cd.post_date 
+                                        cd.lookable_type = 'purchase_invoices' 
+                                        AND cd.deleted_at IS NULL
+                                        AND cd.post_date >= :date2
                                 )
                         ),0) AS total_invoice,
                         IFNULL((
@@ -105,7 +105,7 @@ class UnbilledAPController extends Controller
                                         )
                                 AND pid.deleted_at IS NULL
                                 AND pi.status IN ('2','3','7')
-                                AND pi.post_date <= :date2
+                                AND pi.post_date <= :date3
                         ),'') AS data_reconcile,
                         IFNULL((SELECT
                             SUM(grtd.total)
@@ -125,7 +125,7 @@ class UnbilledAPController extends Controller
                                         grt.id
                                         FROM good_returns grt
                                         WHERE grt.status IN ('2','3')
-                                        AND grt.post_date <= :date3
+                                        AND grt.post_date <= :date4
                                     )
                         ),0) AS total_return,
                         (SELECT
@@ -142,7 +142,7 @@ class UnbilledAPController extends Controller
                             JOIN adjust_rates ar
                                 ON ar.id = ard.adjust_rate_id
                             WHERE
-                                ar.post_date <= :date4
+                                ar.post_date <= :date5
                                 AND ar.status IN ('2','3')
                                 AND ard.lookable_type = 'good_receipts'
                                 AND ard.lookable_id = gr.id
@@ -159,7 +159,7 @@ class UnbilledAPController extends Controller
                             LEFT JOIN journals j
                                 ON jd.journal_id = j.id
                             WHERE
-                                j.post_date <= :date5
+                                j.post_date <= :date6
                                 AND j.status IN ('2','3')
                                 AND j.deleted_at IS NULL
                                 AND jd.deleted_at IS NULL
@@ -170,7 +170,7 @@ class UnbilledAPController extends Controller
                         LEFT JOIN users u
                             ON u.id = gr.account_id
                         WHERE
-                            gr.post_date <= :date6
+                            gr.post_date <= :date7
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
                     ) AS rs
@@ -182,6 +182,7 @@ class UnbilledAPController extends Controller
             'date4'     => $date,
             'date5'     => $date,
             'date6'     => $date,
+            'date7'     => $date,
         ));
 
         $totalUnbilled = 0;

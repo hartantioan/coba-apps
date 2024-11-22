@@ -506,6 +506,8 @@ class MarketingOrderDeliveryController extends Controller
                     }
                 }
 
+                info('kambing');
+
                 /* if(!$request->temp){
                     $passedZero = true;
                     $passedQty = true;

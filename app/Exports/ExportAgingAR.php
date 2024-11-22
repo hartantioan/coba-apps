@@ -99,7 +99,7 @@ class ExportAgingAR implements FromView, WithEvents
                 $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
                 if ($balance > 0) {
                     $totalAll += $balance;
-                    $daysDiff = $this->dateDiffInDays($row->due_date, $this->date);
+                    $daysDiff = $this->dateDiffInDays($row->due_date_internal, $this->date);
                     $index = $this->findDuplicate($row->account_code, $newData);
                     if ($index >= 0) {
                         foreach ($newData[$index]['data'] as $key => $rowdata) {
@@ -157,7 +157,7 @@ class ExportAgingAR implements FromView, WithEvents
             foreach ($query_data as $row) {
                 $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
                 if ($balance > 0) {
-                    $daysDiff = $this->dateDiffInDays($row->due_date, $this->date);
+                    $daysDiff = $this->dateDiffInDays($row->due_date_internal, $this->date);
                     $arrDetail = [];
                     $totalAll += $balance;
                     foreach ($arrColumn as $key => $rowcolumn) {

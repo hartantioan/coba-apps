@@ -63,7 +63,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                         gr.*,
                         u.name AS account_name,
                         IFNULL((SELECT 
-                            SUM(ROUND(grd.total * (SELECT j.currency_rate FROM journals j WHERE j.lookable_type = 'good_receipts' AND j.lookable_id = gr.id),2))
+                            SUM(ROUND(grd.total * (SELECT po.currency_rate FROM purchase_order_details pod, purchase_orders po WHERE po.id = pod.purchase_order_id AND pod.id = grd.purchase_order_detail_id),2))
                             FROM good_receipt_details grd
                             WHERE grd.good_receipt_id = gr.id 
                             AND grd.deleted_at IS NULL
@@ -85,6 +85,15 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                             AND pid.deleted_at IS NULL 
                             AND pi.status IN ('2','3','7') 
                             AND pi.post_date <= :date1
+                            AND pi.id NOT IN (
+                                SELECT 
+                                    cd.lookable_id 
+                                    FROM cancel_documents cd 
+                                    WHERE 
+                                        cd.lookable_type = 'purchase_invoices' 
+                                        AND cd.deleted_at IS NULL
+                                        AND :date2 >= cd.post_date
+                                )
                         ),0) AS total_invoice,
                         IFNULL((
                             SELECT 
@@ -103,7 +112,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                                         )
                                 AND pid.deleted_at IS NULL 
                                 AND pi.status IN ('2','3','7') 
-                                AND pi.post_date <= :date2
+                                AND pi.post_date <= :date3
                         ),'') AS data_reconcile,
                         IFNULL((SELECT 
                             SUM(grtd.total) 
@@ -123,7 +132,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                                         grt.id 
                                         FROM good_returns grt 
                                         WHERE grt.status IN ('2','3') 
-                                        AND grt.post_date <= :date3
+                                        AND grt.post_date <= :date4
                                     )
                         ),0) AS total_return,
                         (SELECT 
@@ -140,7 +149,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                             JOIN adjust_rates ar
                                 ON ar.id = ard.adjust_rate_id
                             WHERE 
-                                ar.post_date <= :date4
+                                ar.post_date <= :date5
                                 AND ar.status IN ('2','3')
                                 AND ard.lookable_type = 'good_receipts'
                                 AND ard.lookable_id = gr.id
@@ -157,7 +166,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                             JOIN journals j
                                 ON jd.journal_id = j.id
                             WHERE
-                                j.post_date <= :date5
+                                j.post_date <= :date6
                                 AND j.status IN ('2','3')
                                 AND j.deleted_at IS NULL
                                 AND jd.deleted_at IS NULL
@@ -168,7 +177,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                         LEFT JOIN users u
                             ON u.id = gr.account_id
                         WHERE 
-                            gr.post_date <= :date6
+                            gr.post_date <= :date7
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
                     ) AS rs
@@ -180,6 +189,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
             'date4'     => $date,
             'date5'     => $date,
             'date6'     => $date,
+            'date7'     => $date,
         ));
 
         $totalUnbilled = 0;
@@ -203,7 +213,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
             $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return - $row->total_journal;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return + $row->total_journal) * $currency_rate),2);
+            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal,2);
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
             if(round($balance,2) > 0){
                 $arr[] = [

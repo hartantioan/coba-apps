@@ -499,12 +499,12 @@ class MarketingOrderDeliveryController extends Controller
                         }
                     }
                     if(!$passedQtyShading){
+                        info('kambing');
                         return response()->json([
                             'status'  => 500,
                             'message' => implode(', ',$arrItemError),
                         ]);
                     }
-                    info('kambing');
                 }
 
                 /* if(!$request->temp){

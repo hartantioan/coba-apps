@@ -490,6 +490,7 @@ class MarketingOrderDeliveryController extends Controller
                         $itemShading = ItemShading::find($row);
                         if($itemShading){
                             $stock = round($itemShading->stockAvailable(),3);
+                            info($stock);
                             if($stock < round($arrShadingQty[$key],3)){
                                 $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty(round($arrShadingQty[$key],3)).' Stok : '.CustomHelper::formatConditionalQty($stock);
                                 $passedQtyShading = false;
@@ -499,7 +500,6 @@ class MarketingOrderDeliveryController extends Controller
                         }
                     }
                     if(!$passedQtyShading){
-                        info('kambing');
                         return response()->json([
                             'status'  => 500,
                             'message' => implode(', ',$arrItemError),

@@ -68,7 +68,7 @@ class AttendancePeriodController extends Controller
         $search = $request->input('search.value');
 
         $total_data = AttendancePeriod::count();
-        
+
         $query_data = AttendancePeriod::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -81,7 +81,7 @@ class AttendancePeriodController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                
+
             })
             ->offset($start)
             ->limit($length)
@@ -100,7 +100,7 @@ class AttendancePeriodController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                
+
             })
             ->count();
 
@@ -109,7 +109,7 @@ class AttendancePeriodController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 if($val->status == '2'){
-                    $btn = 
+                    $btn =
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Harian" onclick="reportDaily(' . $val->id . ')"><i class="material-icons dp48" style="color:black">assignment</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2 btn-small" data-popup="tooltip" title="Laporan Presensi" onclick="reportPresence(' . $val->id . ')"><i class="material-icons dp48" style="color:black">directions_walk</i></button>
@@ -120,17 +120,17 @@ class AttendancePeriodController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Buka Kembali " onclick="reOpen(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">lock_open</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Excel" onclick="exportExcel(`'.$val->id.'`)"><i class="material-icons dp48" style="color:black">view_list</i></button>
                     ';
-                      
+
                 }else{
-                    $btn = 
+                    $btn =
                 '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-text btn-small" data-popup="tooltip" title="Close Period" onclick="closed(' . $val->id . ')"><i class="material-icons dp48">close</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
-                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>   
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
                 ';
                 }
-                
-				
+
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -159,27 +159,27 @@ class AttendancePeriodController extends Controller
     }
 
     public function close(Request $request){
-        
+
         $attendance_period = AttendancePeriod::find($request->id);
         $start_time = microtime(true);
         $start_date = Carbon::parse($attendance_period->start_date);
         $end_date = Carbon::parse($attendance_period->end_date);
-        
+
         $user_data = User::where(function($query) use ( $request) {
             $query->where('employee_type','3');
             // $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
             // ,'312403008','312403012']);
-            // $query->whereIn('employee_no',['312401001']);
-            // // $query->whereIn('employee_no',['312402038']);        
+            $query->whereIn('employee_no',['323019']);
+            // // $query->whereIn('employee_no',['312402038']);
             })->get();
-        
+
         $query_salary_report = SalaryReport::create([
             'code'                                  => SalaryReport::generateCode('SrPo'),
             'period_id'                             => $request->id,
             'post_date'                             => Carbon::now(),
         ]);
-       
-        
+
+
         $query_salary_component= SalaryComponent::where('status',1)->get();
         $punishment_get = Punishment::where('status',1)->get();
         foreach($query_salary_component as $row_component){
@@ -203,7 +203,7 @@ class AttendancePeriodController extends Controller
                 'lookable_id'                               => -1,
             ]);
         }
-        
+
 
         $attendance_detail = [];
         $user_counter_effective_day = [];
@@ -239,11 +239,11 @@ class AttendancePeriodController extends Controller
                 $date_out_forget=[];
                 $date_arrived_forget=[];
 
-                
+
 
 
                 $all_exact_in=[];
-                $all_exact_out=[];  
+                $all_exact_out=[];
                 $query_late_punishment = Punishment::where('place_id',$row_user->place_id)
                                             ->where('type','1')
                                             ->where('status','1')
@@ -254,39 +254,39 @@ class AttendancePeriodController extends Controller
                 $query_late_tambahan1 = Punishment::where('place_id',$row_user->place_id)
                     ->where('type','1')
                     ->where('status','1')
-                    ->whereNotNull('shift_id') 
+                    ->whereNotNull('shift_id')
                     ->orderByDesc(DB::raw('CAST(minutes AS DECIMAL)'))
                     ->get();
-               
+
                 $tipe_punish_counter=[];
-               
+
                 $query_tidak_check_masuk = Punishment::where('place_id',$row_user->place_id)
                                         ->where('type','2')
                                         ->where('status','1')
                                         ->first();
-               
+
                 $query_tidak_check_pulang = Punishment::where('place_id',$row_user->place_id)
                                         ->where('type','3')
                                         ->where('status','1')
                                         ->first();
 
-                
+
                 foreach($query_late_tambahan1 as $row_type){
                     $tipe_punish_counter[$row_type->code]['counter']=0;
-                    $tipe_punish_counter[$row_type->code]['date']=[]; 
+                    $tipe_punish_counter[$row_type->code]['date']=[];
                     $tipe_punish_counter[$row_type->code]['uid']=$row_user->id;
                     $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
-                    $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
+                    $tipe_punish_counter[$row_type->code]['price']=$row_type->price;
                 }
-                
+
                 foreach($query_late_punishment as $row_type){
                     $tipe_punish_counter[$row_type->code]['counter']=0;
-                    $tipe_punish_counter[$row_type->code]['date']=[]; 
+                    $tipe_punish_counter[$row_type->code]['date']=[];
                     $tipe_punish_counter[$row_type->code]['uid']=$row_user->id;
                     $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
-                    $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
-                } 
-                
+                    $tipe_punish_counter[$row_type->code]['price']=$row_type->price;
+                }
+
                 $query_special_1_forLimit = UserSpecial::where('user_id',$row_user->id)
                         ->where('start_date','<=', $date)
                         ->where('status',1)->first();
@@ -300,9 +300,9 @@ class AttendancePeriodController extends Controller
                             $key_id_punish=$key_mod;
                         }
                     }
-                } 
+                }
                 while ($date->lte($end_date)) {
-                    
+
                     $query_data = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
                         ->whereDate('employee_schedules.date', $date->toDateString())
                         ->where('employee_schedules.user_id', $row_user->employee_no)
@@ -310,18 +310,18 @@ class AttendancePeriodController extends Controller
                         ->orderBy('shifts.time_in') // Order by next_day (1 comes last)
                         ->select('employee_schedules.*') // Select the columns you need
                         ->get();
-                    
-                             
+
+
                     $cleanedNik = str_replace(' ', '', $row_user->employee_no);
-                    
-                    
-             
-                    
+
+
+
+
                     //diloop per user untuk mendapatkan schedule yang dibuat untuk peruser masing masing
                     $array_masuk=[];
                     $array_keluar=[];
                     $muleh=null;
-                    
+
                     $exact_in  = [];
                     $exact_out = [];
                     $masuk_awal = null;
@@ -336,7 +336,7 @@ class AttendancePeriodController extends Controller
                     $different_keluar=[];
                     $tipe=[];
 
-            
+
                     $query_special = UserSpecial::where('user_id',$row_user->id)
                                 ->where('start_date','<=', $date)
                                 ->where('end_date','>=',$date)
@@ -354,49 +354,49 @@ class AttendancePeriodController extends Controller
                         $lembur_awal_shift = 0;
                         $time_in = $row_schedule_filter->shift->time_in;
                         $time_out = $row_schedule_filter->shift->time_out;
-                       
-                        
-                        
+
+
+
                         if($row_schedule_filter->status == 5){
-                            
+
                             $query_lembur = OvertimeRequest::where('schedule_id',$row_schedule_filter->id)
                             ->where('account_id',$row_user->id)->first();
                             if($query_lembur){
-                               
+
                                 if($time_in <= $query_lembur->time_in){//smpe dimana pas kurang dari awl shift
                                     $lembur=1;
-                                    
-                                   
+
+
                                     $time_out = $query_lembur->time_out;
-                                   
+
                                 }
                                 if($query_lembur->time_out <= $time_in){
                                     $lembur_awal_shift = 1;
                                     $time_in =$query_lembur->time_in;
                                 }
                             }
-                          
+
                             //dihitung dari time in lembur dan kapan terakhir orang tsb logout berapa jam yang didapat
                         }
                         $min_time_in = Carbon::parse($time_in)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
                         $real_time_in =$date->format('Y-m-d') . ' ' . $time_in;
                         $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
                         $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($row_schedule_filter->shift->tolerant);
-                   
-                        
+
+
                         $max_time_out = Carbon::parse($time_out)->addHours($row_schedule_filter->shift->tolerant)->toTimeString();
                         if($time_in>$time_out){
                             $tambah1hari=$date->copy()->addDay();
-                         
+
                             $real_time_out =$tambah1hari->format('Y-m-d'). ' ' . $time_out;
-                            //info('masuk');
+
                         }else{
                             $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
                         }
                         $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
-                        
+
                         $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
-                        
+
                         if($row_schedule_filter->status == 4){
                             $counter_effective_day++;
                             $exact_in[$key]=3;
@@ -405,7 +405,7 @@ class AttendancePeriodController extends Controller
                             $different_keluar[$key]='';
                             $login[$key]=null;
                             $logout=null;
-                                
+
                             $array_masuk[$key]='Cuti Melahirkan';
                             $array_keluar[$key]='Cuti Melahirkan';
                         }
@@ -415,117 +415,118 @@ class AttendancePeriodController extends Controller
                             $counter_effective_day++;
                             $login[$key]=null;
                             $logout=null;
-                        
-                            
+
+
 
                             $different_masuk[$key]='';
                             $different_keluar[$key]='';
-                            
+
 
                             $array_masuk[$key]='';
                             $array_keluar[$key]='';
                             if($key != 0){// mengetahui apabila shift merupakan yang pertama atau bukan melalui iterasi
                                 $currentSchedule = $query_data[$key];
                                 $previousSchedule = $query_data[$key - 1];
-                                
+
                                 $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
                                 $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                                
+
                                 $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
-                            
+
                                 if($timeDifference>2 && $key <= 2){
-                                    
+
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0;
                                     if(count(($query_data))==3){
                                         $exact_out[$key-1]=1;
                                     }
                                 }elseif($key===2){
-                                    
+
                                     if($login[0] !=null){
-                                        
+
                                         $exact_in[$key]=1;
                                         $exact_out[$key]=0;
                                         $array_masuk[$key]='Lanjutan';
                                     }else{
-                                        
+
                                         $exact_in[$key]=0;
                                         $exact_out[$key]=0;
                                     }
-                                
-                                    
+
+
                                 }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
-                                    
+
                                     if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
-                                        
+
                                         $exact_in[$key]=1;
-                                        
+
                                         $array_masuk[$key]='Lanjutan';
                                         if($key>0){
                                             $array_keluar[$key-1]='Lanjutan';
                                             $exact_out[$key-1]=1;
                                         }
-                                        
+
                                     }else{
                                         $exact_in[$key]=1;
-                                        $exact_out[$key]=0; 
+                                        $exact_out[$key]=0;
                                     }
-                                    
+
                                 }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
-                                    
+
                                     if($login[0]!=null){
-                            
+
                                         $exact_in[$key]=1;
                                         $exact_out[$key]=1;
                                         $array_masuk[$key]='Lanjutan';
                                         $array_keluar[$key]='Lanjutan';
                                     }else{
-                                    
+
                                         $exact_in[$key]=0;
-                                        $exact_out[$key]=0; 
+                                        $exact_out[$key]=0;
                                     }
                                 }
-                                
+
                                 //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
                             }
-                         
+
                             $query_attendance = Attendances::where(function ($query) use ($date,$cleanedNik) {
                                 $mulaiDate = Carbon::parse($date)->subDays(1)->startOfDay()->toDateTimeString();
                                 $akhirDate = Carbon::parse($date)->addDays(2)->endOfDay()->toDateTimeString();
-                             
+
                                 $query->where('date', '>=', $mulaiDate)
                                     ->where('date', '<', $akhirDate)
                                     ->where('employee_no',$cleanedNik);
                             })->orderBy('date')->get();
-                            //info($query_attendance);
-                            //
+
                             foreach($query_attendance as $row_attendance_filter){
                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                
+
                                 $timePart = $dateAttd->format('H:i:s');
-                                //ini tempat kalau tidak ada masuk awal dan pulang 
+                                //ini tempat kalau tidak ada masuk awal dan pulang
                                 if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
-                                   
-                                    
+
+
                                     $masuk_awal=$timePart;
-                                  
+
                                     $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
                                     $minutes = floor($diffInSeconds / 60);
                                     $seconds = $diffInSeconds % 60;
-                                    
-                                    
+
+
                                     $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                    
+
                                 }
                                 if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
-                                    if ($timePart >= $time_out && $timePart > $masuk_awal) 
+                                    if ($timePart >= $time_out && $timePart > $masuk_awal)
                                     {
-                                        $muleh=$timePart;
-                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
-                                        $minutes = floor($diffInSeconds / 60);
-                                        $seconds = $diffInSeconds % 60;
-                                        
-                                        $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
+                                        if ($date->isSameDay($dateAttd)) {
+                                            $muleh=$timePart;
+                                            $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
+                                            $minutes = floor($diffInSeconds / 60);
+                                            $seconds = $diffInSeconds % 60;
+
+                                            $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
+                                        }
                                     }
                                 }
                                 //end
@@ -533,9 +534,8 @@ class AttendancePeriodController extends Controller
                                 //perhitungan masuk tepat atau tidak dan pulang tepat atau tidak
                                 if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
                                     $exact_in[$key]= 1 ;
-                                  
                                     if(!$login[$key]){
-                                        
+
                                         if($masuk_awal==null){
                                             $masuk_awal=$timePart;
                                         }elseif($masuk_awal > $timePart){
@@ -544,29 +544,29 @@ class AttendancePeriodController extends Controller
                                         $login[$key] = $timePart;
                                         $array_masuk[$key]=$timePart;
                                         $different_masuk[$key]='';
-                                        
+
                                     }
-                                    
+
                                 }if($dateAttd > $real_time_in && $dateAttd < $real_time_out){// tataru sini bisa haruse utk yang tidak ada ituuu
                                     $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
-                                   
+
                                     if($row_schedule_filter->status == 5 && $query_lembur && $lembur_awal_shift == 0){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
                                         $lembur = 0;
-                                       
-                                    
+
+
                                         if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
                                             $exact_in[$key]= 2 ;
-                                            
+
                                             $login[$key]= $timePart;
                                             if (count($query_data) == 3 && $key > 0 ) {
                                                 $exact_in[$key]= 1 ;
                                                 $login[$key]= $timePart;
                                             }
                                             $array_masuk[$key]=$timePart;
-                                        } 
+                                        }
                                     }
                                     if($row_schedule_filter->status == 5 && $query_lembur && $lembur_awal_shift == 1){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
-                                      
+
                                         $time_in_temp = $row_schedule_filter->shift->time_in;
                                         $time_out_temp = $row_schedule_filter->shift->time_out;
                                         $real_time_in_temp =$date->format('Y-m-d') . ' ' . $time_in_temp;
@@ -576,7 +576,7 @@ class AttendancePeriodController extends Controller
                                             $diffHoursTimePartMinInTemp = Carbon::parse($timePart)->diffInHours($time_in_temp);
                                             if($diffHoursTimePartMinInTemp<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
                                                 $exact_in[$key]= 2 ;
-                                                
+
                                                 $login[$key]= $timePart;
                                                 if (count($query_data) == 3 && $key > 0 ) {
                                                     $exact_in[$key]= 1 ;
@@ -589,7 +589,7 @@ class AttendancePeriodController extends Controller
                                             if(!$login[$key]){
                                                 $lembur = 1;
                                                 $exact_in[$key]= 1 ;
-                                               
+
                                                 $login[$key]= $timePart;
                                                 if (count($query_data) == 3 && $key > 0 ) {
                                                     $exact_in[$key]= 1 ;
@@ -597,124 +597,123 @@ class AttendancePeriodController extends Controller
                                                 }
                                                 $array_masuk[$key]=$timePart;
                                             }
-                                           
+
                                         }
-                                        
-                                       
+
+
                                     }
                                     //mengetahui apabila jam yang ada melebihi toleransi pada shift.
                                     if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1 &&$row_schedule_filter->status != 5){
                                         $exact_in[$key]= 2 ;
-                                        
-                                        
+
+
                                         $login[$key]= $timePart;
                                         if (count($query_data) == 3 && $key > 0 ) {
                                             $exact_in[$key]= 1 ;
                                             $login[$key]= $timePart;
                                         }
                                         $array_masuk[$key]=$timePart;
-                                    }                                      
+                                    }
                                 }elseif($dateAttd > $real_max_time_out){
                                     $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
-                                   
+
                                     if($diffHoursTimePartMaxOut<=$row_schedule_filter->shift->tolerant){
-                                        $array_keluar[$key]=$timePart;
+                                        if ($date->isSameDay($dateAttd)) {
+                                            $array_keluar[$key]=$timePart;
+                                        }
                                     }
                                 }
-                                
-                                //perhitungan pulang
-                               
-                                // if($date == '2024-05-07 00:00:00'){
-                                //     info('tanggal '.$date);
-                                //     info($dateAttd);
-                                //     info('real time out '.$real_time_out.'&&'.'Max Time Out'.$real_max_time_out);
-                                // }
-                                
+
                                 if($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out){
                                     $date1 = date('d', strtotime($date));
                                     $date2 = date('d', strtotime($dateAttd));
                                     $timeObject = DateTime::createFromFormat('H:i:s', $timePart);
-                                   
+
                                     $newTimePart = $timeObject->format('H:i:s');
                                     if ($date2 > $date1) {
                                         $timeObject->modify('+12 hours');
                                         $newTimePart = $timeObject->format('H:i:s');
                                     }
-                                    //info('masuk nak');
-                                    //info($date);
-                                    //info($dateAttd);
+
                                     $exact_out [$key]= 1 ;
-                                    
-                                   
+
+
                                     if(!$logout){
-                                        $logout = $timePart;
-                                        $muleh=$timePart;
-                                        $array_keluar[$key]=$timePart;
-                                        $different_keluar[$key]='';
+                                        if ($date->isSameDay($dateAttd)) {
+
+                                            $logout = $timePart;
+                                            $muleh=$timePart;
+                                            $array_keluar[$key]=$timePart;
+                                            $different_keluar[$key]='';
+                                        }
                                     }
                                     if($logout<$newTimePart){
-                                       
-                                        
-                                        $logout = $timePart;
-                                        $muleh=$timePart;
-                                        $array_keluar[$key]=$timePart;
-                                        $different_keluar[$key]='';
+
+                                        if ($date->isSameDay($dateAttd)) {
+                                            $logout = $timePart;
+                                            $muleh=$timePart;
+                                            $array_keluar[$key]=$timePart;
+                                            $different_keluar[$key]='';
+                                        }
                                     }
-                                    
+
+
                                 }
-                                
-                               
+
+
                                 if ($dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()&&count($query_data)==1) {
-                                    
+
                                     if($muleh==null && $date->toDateString() == $dateAttd->toDateString()){
                                         if($masuk_awal == null){
                                             $masuk_awal = $timePart;
                                         }else{
-                                            
+
                                             if($masuk_awal != $timePart){
                                                 $muleh=$timePart;
                                             }
                                         }
-                                        
+
                                     }elseif($muleh < $timePart){
-                                        $muleh=$timePart;
-                                        $array_keluar[$key]=$timePart;
-                                        
-                                    }
-                                    if(!$logout&& $date->toDateString() == $dateAttd->toDateString()){
-                                        
-                                        if($timePart != $masuk_awal || $dateAttd > $real_max_time_out || $dateAttd > $real_time_in){
-                                           
-                                            $logout = $timePart;
-                                        }
-                                       
-                                        if($login && $timePart != $masuk_awal){
-                                        
+                                        if ($date->isSameDay($dateAttd)) {
+                                            $muleh=$timePart;
                                             $array_keluar[$key]=$timePart;
                                         }
+
+                                    }
+                                    if(!$logout&& $date->toDateString() == $dateAttd->toDateString()){
+
+                                        if($timePart != $masuk_awal || $dateAttd > $real_max_time_out || $dateAttd > $real_time_in){
+
+                                            $logout = $timePart;
+                                        }
+
+                                        if($login && $timePart != $masuk_awal){
+                                            if ($date->isSameDay($dateAttd)) {
+                                                $array_keluar[$key]=$timePart;
+                                            }
+                                        }
                                         $different_keluar[$key]='';
-                                        
-                                    }  
+
+                                    }
+
                                 }
-                              
-                                
+
                             }
-                            //info('logouts '.$logout);
-                            //info($exact_out);
+
                             $latestRecord = $query_attendance->last();
                             if($query_lembur){
                                 $query_libur = Holiday::where('date',$query_lembur->date)->first();
-                                    
+
                                 if($query_libur){
-                                    
+
                                     $query_cost = OvertimeCost::whereRaw("'$query_lembur->date' BETWEEN start_date AND end_date ")
                                         ->where('place_id',$row_user->place_id)
                                         ->where('level_id',$row_user->position->level_id)
                                         ->where('type','1')
                                         ->first();
-                                    
+
                                 }else{
-                                    
+
                                     $query_cost = OvertimeCost::whereRaw("'$query_lembur->date' BETWEEN start_date AND end_date ")
                                         ->where('place_id',$row_user->place_id)
                                         ->where('level_id',$row_user->position->level_id)
@@ -722,79 +721,79 @@ class AttendancePeriodController extends Controller
                                         ->first();
                                 }
                             }
-                            
+
                             if($row_schedule_filter->status == 5 && $query_lembur &&  $lembur_awal_shift != 1){//perhitungan lemboer
-                                
+
                                 $time_in_lembur = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' . $query_lembur->time_in;
                                 $time_out_lembur = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' . $query_lembur->time_out;
-                        
+
                                 if(Carbon::parse($latestRecord->date) < Carbon::parse($real_time_out)){
-                                   
-                                   
-                                  
+
+
+
                                     $timeDifference = Carbon::parse($time_in_lembur)->diff($latestRecord->date);
                                     $hoursDifference = $timeDifference->h;
-                                    
+
                                     $query_lembur->total            = $hoursDifference;
-                                    
-                                    
-                                    
+
+
+
                                     if($query_cost){
-                                        
+
                                         $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
-                                       
+
                                         $query_lembur->save();
                                     }
                                 }else{
                                     $timeDifference = Carbon::parse($time_in_lembur)->diff(Carbon::parse($time_out_lembur));
                                     $hoursDifference = $timeDifference->h;
-                                    
+
                                     $query_lembur->total            = $hoursDifference;
-                    
+
                                     if($query_cost){
                                         $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $query_lembur->save();
-                                    } 
+                                    }
                                 }
                             }
-                            
+
                             if($row_schedule_filter->status == 5 && $query_lembur &&  $lembur_awal_shift == 1 && $exact_out[$key] == 1 && $masuk_awal){
                                 $masuk_awal_combine = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' .$masuk_awal;
                                 $time_in_lembur = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' . $query_lembur->time_in;
                                 $time_out_lembur = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' . $query_lembur->time_out;
                                 if(Carbon::parse($masuk_awal_combine) < Carbon::parse($real_time_in)){
-                                    
-                                  
+
+
                                     $timeDifference = Carbon::parse($time_in_lembur)->diff(Carbon::parse($time_out_lembur));
                                     $hoursDifference = $timeDifference->h;
-                                   
+
                                     $query_lembur->total            = $hoursDifference;
- 
+
                                     if($query_cost){
-                                        
+
                                         $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $query_lembur->save();
                                     }
                                 }else{
                                     $timeDifference = Carbon::parse($masuk_awal_combine)->diff(Carbon::parse($time_out_lembur));
                                     $hoursDifference = $timeDifference->h;
-                                  
+
                                     $query_lembur->total            = $hoursDifference;
-                                   
+
                                     if($query_cost){
                                         $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $query_lembur->save();
-                                    } 
+                                    }
                                 }
                             }
                             //perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
-                           
+
 
                             if(!$exact_in){// untuk memberi apabila dia tidak masuk memberi tanda kalau tidak ada checkclock
                                 $exact_in[$key]=0;
-                                
+
                             }
-                           
+
 
                             if(count($exact_in) == 3){
                                 if($exact_in[0] == 0 && $exact_out[2] == 0){
@@ -803,55 +802,47 @@ class AttendancePeriodController extends Controller
                                         $exact_out[$key]= 0;
                                     }
                                 }
-                                
+
                             }
                             if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
-                                
-                            
+
+
                                 if (count($query_data) === 3) {
                                     if($login[$key]==null){
                                         $exact_in[$key]=0;
                                         $exact_out[$key]= 0 ;
                                     }
-                                    
+
                                     if($login[$key]!=null){
-                                        
+
                                         $exact_out[$key]= 1 ;
                                     }
                                 }else{
-                                    //info('sebelums');
-                                    //info($login[$key].'login');
-                                    //info($exact_out);
+
                                     if($login[$key] == null && $masuk_awal == null){
-                                        
+
                                         $exact_in[$key]= 0 ;
                                         $exact_out[$key]= 0 ;
                                         if($logout!=null){
                                             $exact_out[$key]=1;
                                         }
                                     }
-                                    //info($exact_out);
-                                    //info('cok');
                                     if($logout != null ){
-                                        
+
                                         $exact_out[$key]=1;
                                         $logout_real =$date->format('Y-m-d') . ' ' . $logout;
-                                         
+
                                         if($logout_real>$real_max_time_out){
-                                            
+
                                             $exact_out[$key]=0;
                                         }
-                                        //info($exact_out);
-                                        //info('mbeng');
                                     }else{
-                                       
+
                                         $exact_out[$key]= 0 ;
                                     }
-                                    
+
                                 }
-                              
-                                //info("HALOS");
-                                //info($exact_out);
+;
                             }
                             if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
                                 if($exact_out[$key]==1){
@@ -873,47 +864,42 @@ class AttendancePeriodController extends Controller
                                 $array_keluar[1]="Lanjutan";
                                 $array_keluar[0]="Lanjutan";
                             }
-                        
+
                         }
-                        // if($row_user->id == '530'){
-                        //     //info('masuk');
-                        //     //info($exact_in);
-                        //     //info('Keluar');
-                        //     //info($exact_out);
-                        // }  
-                        
-                        
+
+
+
                         $time_ins[]=$time_in;
                         $time_outs[]=$time_out;
                         $min_time_ins[]=$min_time_in;
-                        $max_time_outs[]=$max_time_out;        
+                        $max_time_outs[]=$max_time_out;
                         $nama_shifts[]=$row_schedule_filter->shift->name;
                         $shift_id[]=$row_schedule_filter->shift->id;
-                       
+
                         $query_late_tambahan = Punishment::where('place_id',$row_user->place_id)
                                                 ->where('type','1')
                                                 ->where('status','1')
                                                 ->where('shift_id',$row_schedule_filter->shift_id)
                                                 ->orderBy(DB::raw('CAST(minutes AS DECIMAL)'))
                                                 ->get();
-     
-                        
+
+
 
                         if($query_special){
-                           
+
                             if($query_special->type == 1){
                                 foreach($exact_in as  $key_in=>$row_exact_in){
                                     $exact_in[$key_in]=1;
                                     $exact_out[$key_in]=1;
                                 }
-                                
+
                             } if($query_special->type == 2){
                                 if($exact_in[0] == 1 || $exact_out[count($exact_out)-1]== 1){
                                     foreach($exact_in as  $key_in=>$row_exact_in){
                                         $exact_in[$key_in]=1;
                                         $exact_out[$key_in]=1;
                                     }
-                                     
+
                                 }
                             }else{
                                 if($masuk_awal ){//perhitungan toleransi punya specialll?
@@ -922,27 +908,27 @@ class AttendancePeriodController extends Controller
                                     if(count($query_data)==2 && $key == 1){
                                         $currentSchedule = $query_data[1];
                                         $previousSchedule = $query_data[0];
-                                        
+
                                         $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
                                         $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                                        
+
                                         $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
                                         if($timeDifference >= 2){
                                             $pembandingdate = Carbon::parse($login[1]);
                                         }
                                     }
-                                    
+
                                     $pembanding= $pembandingdate->format('H:i:s');
                                     $carbonTimeIn = Carbon::parse($time_in);
-                                    
+
                                     $tambahan_time = 0;
                                     if (count($query_late_tambahan)>0) {
 
                                         $tambahan_time = $query_late_tambahan[count($query_late_tambahan)-1]->minutes;
                                         foreach($query_late_tambahan as $key_tambahan=>$row_late_tambahan){
-                                           
+
                                             if ($key_tambahan === 0) {
-                                               
+
                                                 // Use a different condition for the first key
                                                 if ($pembanding > $time_in && $pembanding < Carbon::parse($time_in)->addMinutes($row_late_tambahan->minutes)->format('H:i:s')) {
                                                     $tipe_punish_counter[$row_late_tambahan->code]['counter']++;
@@ -951,7 +937,7 @@ class AttendancePeriodController extends Controller
                                                 }
                                             }
                                             if($key_tambahan != count($query_late_tambahan)-1){
-                                                if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){    
+                                                if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){
                                                     $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['counter']++;
                                                     $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['date'][]=$date->format('d/M/y');
                                                     break;
@@ -960,40 +946,40 @@ class AttendancePeriodController extends Controller
                                         }
 
                                     }
-                                    
+
                                     if($pembanding > $time_in ){
                                         if(count($query_late_punishment)> 0){
-                                      
+
                                             if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
-                                                
+
                                                 if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[0]->code]['punish_id'] && ($key_id_punish!=null && $key <= $key_id_punish) ) ) {
                                                     $limit--;
-                                                    
+
                                                     foreach ($exact_in as $key_in => $row_ins) {
                                                         $exact_in[$key_in] = 1;
                                                     }
-                                                    break;  
+                                                    break;
                                                 }
                                                 else{
                                                     $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');
                                                 }
                                             }else{
                                                 foreach($query_late_punishment as $key=>$row_punish_type){
                                                     $newCarbonTime = Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                                     if($key !=0 ){
-                                                        
+
                                                         if($pembanding < Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                                             if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                                                 $limit--;
-                                                                
+
                                                                 foreach ($exact_in as $key_in => $row_ins) {
                                                                     $exact_in[$key_in] = 1;
                                                                 }
-                                                                break;  
+                                                                break;
                                                             }
                                                             else{
-                                                                
+
                                                                 $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
                                                                 $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
                                                                 break;
@@ -1004,30 +990,30 @@ class AttendancePeriodController extends Controller
                                                         if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
                                                             if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                                                 $limit--;
-                                                                
+
                                                                 foreach ($exact_in as $key_in => $row_ins) {
                                                                     $exact_in[$key_in] = 1;
                                                                 }
-                                                                break;  
+                                                                break;
                                                             }
                                                             else{
                                                                 $tipe_punish_counter[$row_punish_type->code]['counter']++;
                                                                 $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
-                                                                break;  
+                                                                break;
                                                             }
                                                         }else{
                                                             $tipe_punish_counter['over_t']['counter']++;
                                                             $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
                                                         }
                                                     }
-                                                    
+
                                                 }
                                             }
-                                            
+
                                         }
-                                        
+
                                     }
-                                    
+
                                 }
                             }
                         }else{
@@ -1036,65 +1022,65 @@ class AttendancePeriodController extends Controller
                             }
                             $limit =0;
                             if($masuk_awal && $lembur == 0){//perhitungan toleransi okeeeeey?
-                              
+
                                 $pembandingdate = Carbon::parse($masuk_awal);
                                 if(count($query_data)==2 && $key == 1){
                                     $currentSchedule = $query_data[1];
                                     $previousSchedule = $query_data[0];
-                                    
+
                                     $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
                                     $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                                    
+
                                     $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
                                     if($timeDifference >= 2){
                                         $pembandingdate = Carbon::parse($login[1]);
                                     }
                                 }
-                                
+
                                 $pembanding= $pembandingdate->format('H:i:s');
                                 $carbonTimeIn = Carbon::parse($time_in);
-                                
+
                                 $tambahan_time = 0;
                                 if (count($query_late_tambahan)>0) {
-                                    
+
                                     $tambahan_time = $query_late_tambahan[count($query_late_tambahan)-1]->minutes;
                                     foreach($query_late_tambahan as $key_tambahan=>$row_late_tambahan){
-                                        
+
                                         if ($key_tambahan === 0) {
                                             // Use a different condition for the first key
                                             if ($pembanding > $time_in && $pembanding < Carbon::parse($time_in)->addMinutes($row_late_tambahan->minutes)->format('H:i:s')) {
-                                               
+
                                                 $tipe_punish_counter[$row_late_tambahan->code]['counter']++;
-                                               
+
                                                 $tipe_punish_counter[$row_late_tambahan->code]['date'][] = $date->format('d/M/y');
                                                 break;
                                             }
                                         }
                                         if($key_tambahan != count($query_late_tambahan)-1){
-                                            if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){    
+                                            if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){
                                                 $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['counter']++;
                                                 $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['date'][]=$date->format('d/M/y');
                                                 break;
                                             }
                                         }
                                     }
-                                  
+
                                 }
-                               
+
                                 if($pembanding > $time_in ){
                                     if(count($query_late_punishment)> 0){
-                                        
+
                                         if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->format('H:i:s') && $pembanding <= Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
-                                           
+
                                             $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-                                            $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                            $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');
                                         }else{
                                             foreach($query_late_punishment as $key=>$row_punish_type){
                                                 $newCarbonTime = Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                                 if($key !=0 ){
-                                                    
+
                                                     if($pembanding < Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
-                                                       
+
                                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
                                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
                                                         break;
@@ -1109,21 +1095,19 @@ class AttendancePeriodController extends Controller
                                                         $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
                                                     }
                                                 }
-                                                
+
                                             }
                                         }
-                                        
+
                                     }
-                                    
+
                                 }
-                                
+
                             }
                         }
 
                     }
-                    
-                    
-                    
+
                     $attendance_detail[$row_user->id][]=[
                         'date' => Carbon::parse($date)->format('d/m/Y'),
                         'user_no'=>$row_user->id,
@@ -1146,55 +1130,54 @@ class AttendancePeriodController extends Controller
                         'shift_id'=>$shift_id,
                     ];
                     //perhitungan cuti atau ijin
-                    
+
                     foreach($exact_in as $key=>$row_exact){
-                        
+
                         $all_exact_in[]=$row_exact;
                         $all_exact_out[]=$exact_out[$key];
                     }
-                    
+
                     $lanjoet=1;
-                   
                     foreach($exact_in as $key=>$row_arrive){
-                       
-                        
+
+
                         if($row_arrive == 0 && $exact_out[$key] == 1){
-                            
+
                             $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
-                            
+
                         }
                     }
-                    
-                   
+
+
                     if($lanjoet==1){
-                          
+
                         foreach($exact_out as $key3=>$row_out){
                             if($row_user->id == '21'){
 
-                            }  
+                            }
                             if($row_out==0 && $exact_in[$key3] == 1){
-                                
+
                                 $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
                                 break;
                             }
                         }
                     }
-                    
-                    
-                    
+
+
+
                     $date->addDay();
-                    
+
                 }
                 if($limit_temp == 0){
                     $limit_temp = $limit_temp+$limit;
                 }
                 $counter_ps= 0;
-                
+
                 while($date_leave_req->lte($end_date)){
                     $exact_in=[];
                     $exact_out=[];
                     $parse_date = Carbon::parse($date_leave_req->format('Y-m-d'))->toDateString();
-                   
+
                     $query_data_leaveRequest = LeaveRequest::whereRaw("'$parse_date' BETWEEN start_date AND end_date ")
                                     ->where('account_id',$row_user->id)
                                     ->where('status', 2)
@@ -1209,17 +1192,17 @@ class AttendancePeriodController extends Controller
                                 ->where('end_date','>=',$date_leave_req)
                                 ->where('status',1)
                                 ->first();
-                    
+
                     foreach($query_data_leaveRequest as $key=>$row_leave_request){
                         foreach($row_leave_request->leaveRequestShift as $key2=>$schedule_leave_request){
-                           
+
                             if($schedule_leave_request->employeeSchedule->date == $parse_date){
-                                
+
                                 if($row_leave_request->leaveType->furlough_type == 1){
-                                   
+
                                     $counter_cuti++;
                                     $counter_effective_day++;
-    
+
                                     $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
                                     $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
@@ -1240,12 +1223,12 @@ class AttendancePeriodController extends Controller
                                     $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
                                     $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
                                     $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
-                                    
+
                                 }
                                 if($row_leave_request->leaveType->furlough_type == 2){
                                     $counter_sakit++;
                                     $counter_effective_day++;
-                                    
+
                                     $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
                                     $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
@@ -1270,7 +1253,7 @@ class AttendancePeriodController extends Controller
                                 if($row_leave_request->leaveType->furlough_type == 3){
                                     $counter_cuti_kusus++;
                                     $counter_effective_day++;
-                                    
+
                                     $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
                                     $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
@@ -1303,7 +1286,7 @@ class AttendancePeriodController extends Controller
                                 if($row_leave_request->leaveType->furlough_type == 6){
                                     $counter_dispen++;
                                     $counter_effective_day++;
-                                  
+
                                     $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
                                     $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
@@ -1334,7 +1317,7 @@ class AttendancePeriodController extends Controller
                                     $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
                                     $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
-    
+
                                     $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
                                     $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
                                     $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
@@ -1355,11 +1338,11 @@ class AttendancePeriodController extends Controller
                                     $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
                                     $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
                                     $startTime = Carbon::createFromFormat('H:i', $row_leave_request->start_time);
-                                    
+
                                     $temp_is_late = $startTime->format('H:i:s');
-                                   
+
                                     $diffWithTimeIn = $startTime->diffInHours($time_in);
-                                    
+
                                     $diffWithTimeOut = $startTime->diffInHours($time_out);
                                     if($diffWithTimeIn>$diffWithTimeOut){
                                         $time_out = $temp_is_late;
@@ -1373,14 +1356,14 @@ class AttendancePeriodController extends Controller
                                     $real_time_in =$date_leave_req->format('Y-m-d') . ' ' . $time_in;
                                     $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
                                     $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($schedule_leave_request->employeeSchedule->shift->tolerant);
-                                    
-                                  
+
+
                                     $max_time_out = Carbon::parse($time_out)->addHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
                                     $real_time_out =$date_leave_req->format('Y-m-d') . ' ' . $time_out;
                                     $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
                                     $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($schedule_leave_request->employeeSchedule->shift->tolerant);
                                     //perhitungan baru utk jam masuk yng berubah
-                                   
+
 
                                     $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
                                     $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
@@ -1392,33 +1375,33 @@ class AttendancePeriodController extends Controller
                                     $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
                                     $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
                                     $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
-                                    
+
 
 
                                     $query_attendance = Attendances::where(function ($query) use ($date_leave_req,$cleanedNik) {
                                         $mulaiDate = Carbon::parse($date_leave_req)->subDays(1)->startOfDay()->toDateTimeString();
                                         $akhirDate = Carbon::parse($date_leave_req)->addDays(1)->endOfDay()->toDateTimeString();
-                                        
+
                                         $query->where('date', '>=', $mulaiDate)
                                             ->where('date', '<=', $akhirDate)
                                             ->where('employee_no',$cleanedNik);
                                     })->orderBy('date')->get();
-                                   
+
                                     $masuk_awal = null;
                                     $muleh = null;
                                     $perlu_nambah = true;
                                     $ada_pulang = false;
-                                    
+
                                     foreach($query_attendance as $row_attendance_filter){
                                         $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                       
+
                                         $timePart = $dateAttd->format('H:i:s');
                                         if($masuk_awal==null){
                                             if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
                                                 $exact_in[]='1';
-                                                
+
                                                 $attendance_detail[$row_user->id][$counter_ps]['in'][]='1';
-                                             
+
                                                 if($masuk_awal==null){
                                                     $masuk_awal =$timePart;
                                                     $attendance_detail[$row_user->id][$counter_ps]['login']=$timePart;
@@ -1426,11 +1409,11 @@ class AttendancePeriodController extends Controller
                                                     $attendance_detail[$row_user->id][$counter_ps]['login']=$timePart;
                                                     $masuk_awal =$timePart;
                                                 }
-                                               
+
                                                 $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$min_time_in.' | '.$timePart .' | '.$time_in;
                                                 $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
-                                                
-                                                
+
+
                                             }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
                                                 $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
                                                 if($masuk_awal==null){
@@ -1439,42 +1422,42 @@ class AttendancePeriodController extends Controller
                                                 $perlu_nambah = false;
                                                 if($diffHoursTimePartMinIn<=$schedule_leave_request->employeeSchedule->shift->tolerant){
                                                     $exact_in[]='2';
-                                                    
+
                                                     $attendance_detail[$row_user->id][$counter_ps]['in'][]='2';
                                                     $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$min_time_in.' | '.$timePart .' | '.$time_in;
                                                 }elseif($perlu_nambah != false && $diffHoursTimePartMinIn>=$schedule_leave_request->employeeSchedule->shift->tolerant){
                                                     $exact_in[]='0';
                                                     $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
                                                     $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
-                                                }                                      
+                                                }
                                             }elseif($dateAttd > $real_max_time_out){
                                                 $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
-    
+
                                                 if($diffHoursTimePartMaxOut<=$schedule_leave_request->employeeSchedule->shift->tolerant){
                                                     $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$time_out.' | '.$timePart .' | '.$max_time_out;
                                                     $ada_pulang=true;
                                                 }
                                             }
                                         }
-                                        
+
 
 
                                         //perhitungan pulang
                                         if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
                                             $attendance_detail[$row_user->id][$counter_ps]['out'][]=1;
                                             $exact_out[]='1';
-                                         
+
                                             $ada_pulang=true;
                                             if($muleh==null){
                                                 $muleh=$timePart;
                                                 $attendance_detail[$row_user->id][$counter_ps]['logout']=$timePart;
                                                 $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$time_out.' | '.$timePart .' | '.$max_time_out;
-                                                $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]=''; 
+                                                $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
                                             }elseif($muleh < $timePart){
                                                 $muleh=$timePart;
                                                 $attendance_detail[$row_user->id][$counter_ps]['logout']=$timePart;
                                             }
-                                             
+
                                         }
                                     }
                                     // if($query_special){
@@ -1483,64 +1466,64 @@ class AttendancePeriodController extends Controller
                                     //             $exact_in[$key_in]=1;
                                     //             $exact_out[$key_in]=1;
                                     //         }
-                                            
+
                                     //     } if($query_special->type == 2){
                                     //         if($exact_in[0] == 1 || $exact_out[count($exact_out)-1]== 1){
                                     //             foreach($exact_in as  $key_in=>$row_exact_in){
                                     //                 $exact_in[$key_in]=1;
                                     //                 $exact_out[$key_in]=1;
                                     //             }
-                                                 
+
                                     //         }
                                     //     }else{
                                     //         if($masuk_awal){//perhitungan toleransi punya specialll?
-            
+
                                     //             $pembandingdate = Carbon::parse($masuk_awal);
                                     //             if(count($query_data)==2 && $key == 1){
                                     //                 $currentSchedule = $query_data[1];
                                     //                 $previousSchedule = $query_data[0];
-                                                    
+
                                     //                 $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
                                     //                 $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                                                    
+
                                     //                 $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
                                     //                 if($timeDifference >= 2){
                                     //                     $pembandingdate = Carbon::parse($login[1]);
                                     //                 }
                                     //             }
-                                                
+
                                     //             $pembanding= $pembandingdate->format('H:i:s');
                                     //             $carbonTimeIn = Carbon::parse($time_in);
-                                                
+
                                     //             if($pembanding > $time_in ){
                                     //                 if(count($query_late_punishment)> 0){
-                                                        
+
                                     //                     if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                                     //                         if (($max_punish_id != null && $limit_temp > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                     //                             $limit_temp--;
-                                    
+
                                     //                             foreach ($exact_in as $key_in => $row_ins) {
                                     //                                 $exact_in[$key_in] = 1;
                                     //                             }
-                                    //                             break;  
+                                    //                             break;
                                     //                         }
                                     //                         else{
                                     //                             $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-                                    //                             $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date_leave_req)->format('d/M/y');  
+                                    //                             $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date_leave_req)->format('d/M/y');
                                     //                         }
                                     //                     }else{
                                     //                         foreach($query_late_punishment as $key=>$row_punish_type){
                                     //                             $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                     //                             if($key !=0 ){
-                                                                    
+
                                     //                                 if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                     //                                     if (($max_punish_id != null && $limit_temp > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id'] &&($key_id_punish!=null && $key <= $key_id_punish))) {
                                     //                                         $limit_temp--;
-                                    //                                        
+                                    //
                                     //                                         foreach ($exact_in as $key_in => $row_ins) {
                                     //                                             $exact_in[$key_in] = 1;
                                     //                                         }
-                                    //                                         break;  
+                                    //                                         break;
                                     //                                     }else{
                                     //                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
                                     //                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date_leave_req->format('d/M/y');
@@ -1551,36 +1534,36 @@ class AttendancePeriodController extends Controller
                                     //                             if($key == count($query_late_punishment)){
                                     //                                 if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
                                     //                                     if (($max_punish_id != null && $limit_temp > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
-                                    //                                       
+                                    //
                                     //                                         $limit_temp--;
                                     //                                         foreach ($exact_in as $key_in => $row_ins) {
                                     //                                             $exact_in[$key_in] = 1;
                                     //                                         }
-                                    //                                         break;  
+                                    //                                         break;
                                     //                                     }else{
                                     //                                         $tipe_punish_counter[$row_punish_type->code]['counter']++;
                                     //                                         $tipe_punish_counter[$row_punish_type->code]['date'][]=$date_leave_req->format('d/M/y');
-                                    //                                         break;  
+                                    //                                         break;
                                     //                                     }
                                     //                                 }else{
                                     //                                     $tipe_punish_counter['over_t']['counter']++;
                                     //                                     $tipe_punish_counter['over_t']['date'][]=$date_leave_req->format('d/M/y');
                                     //                                 }
                                     //                             }
-                                                                
+
                                     //                         }
                                     //                     }
-                                                        
+
                                     //                 }
-                                                    
+
                                     //             }
-                                                
+
                                     //         }else{//hanya utk telat di ijin
                                     //             if($perlu_nambah == true){
                                     //                 $exact_in[]=0;
                                     //                 $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
                                     //                 $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
-                                            
+
                                     //             }
                                     //         }
                                     //     }
@@ -1590,18 +1573,18 @@ class AttendancePeriodController extends Controller
                                     //         $pembandingdate = Carbon::parse($masuk_awal);
                                     //         $pembanding= $pembandingdate->format('H:i:s');
                                     //         $carbonTimeIn = Carbon::parse($time_in);
-                                            
+
                                     //         if($pembanding > $time_in ){
                                     //             if(count($query_late_punishment)> 0){
-                                                
+
                                     //                 if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                                     //                     $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-                                    //                     $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                    //                     $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');
                                     //                 }else{
                                     //                     foreach($query_late_punishment as $key=>$row_punish_type){
                                     //                         $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                     //                         if($key !=0 ){
-                                                                
+
                                     //                             if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                     //                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['counter']++;
                                     //                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['date'][]=$date->format('d/M/y');
@@ -1617,20 +1600,20 @@ class AttendancePeriodController extends Controller
                                     //                                 $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
                                     //                             }
                                     //                         }
-                                                            
+
                                     //                     }
                                     //                 }
-                                                    
+
                                     //             }
-                                                
+
                                     //         }
-                                            
+
                                     //     }else{//hanya utk telat di ijin
                                     //         if($perlu_nambah == true){
                                     //             $exact_in[]=0;
                                     //             $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
                                     //             $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
-                                        
+
                                     //         }
                                     //     }
                                     // }
@@ -1638,18 +1621,18 @@ class AttendancePeriodController extends Controller
                                         $pembandingdate = Carbon::parse($masuk_awal);
                                         $pembanding= $pembandingdate->format('H:i:s');
                                         $carbonTimeIn = Carbon::parse($time_in);
-                                        
+
                                         if($pembanding > $time_in ){
                                             if(count($query_late_punishment)> 0){
-                                            
+
                                                 if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->format('H:i:s') && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                                                     $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date_leave_req)->format('d/M/y');  
+                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date_leave_req)->format('d/M/y');
                                                 }else{
                                                     foreach($query_late_punishment as $key=>$row_punish_type){
                                                         $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                                         if($key !=0 ){
-                                                            
+
                                                             if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['counter']++;
                                                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['date'][]=$date_leave_req->format('d/M/y');
@@ -1665,20 +1648,20 @@ class AttendancePeriodController extends Controller
                                                                 $tipe_punish_counter['over_t']['date'][]=$date_leave_req->format('d/M/y');
                                                             }
                                                         }
-                                                        
+
                                                     }
                                                 }
-                                                
+
                                             }
-                                            
+
                                         }
-                                        
+
                                     }else{//hanya utk telat di ijin
                                         if($perlu_nambah == true){
                                             $exact_in[]=0;
                                             $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
                                             $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
-                                    
+
                                         }
                                     }
                                     if($ada_pulang == false){
@@ -1686,27 +1669,27 @@ class AttendancePeriodController extends Controller
                                         $attendance_detail[$row_user->id][$counter_ps]['out'][]='0';
                                         $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]='';
                                     }
-                               
-                                   
+
+
                                 }
-                            }  
+                            }
                         }
                     }
                     $lanjoet=1;
-                   
+
                     foreach($exact_in as $key=>$row_exact){
-                      
+
                         $all_exact_in[]=$row_exact;
                         $all_exact_out[]=$exact_out[$key];
                     }
                     foreach($exact_in as $key=>$row_arrive){
                         if($row_arrive == 0 && $exact_out[$key] == 1){
                             $date_arrived_forget[]=Carbon::parse($date_leave_req)->format('d/m/Y');
-                            
+
                         }
                     }
                     if($lanjoet==1){
-                        
+
                         foreach($exact_out as $row_out){
                             if($row_out==0 && $exact_in[$key] == 1){
                                 $date_out_forget[]=Carbon::parse($date_leave_req)->format('d/m/Y');
@@ -1717,13 +1700,13 @@ class AttendancePeriodController extends Controller
                     $counter_ps++;
                     $date_leave_req->addDay();
                 }
-               
+
                 $counter_overtime_date= 0;
                 while($date_overtime_no_schedule->lte($end_date)){//perlusd
                     $array_masuk=[];
                     $array_keluar=[];
                     $muleh=null;
-                    
+
                     $exact_in  = [];
                     $exact_out = [];
                     $masuk_awal = null;
@@ -1746,7 +1729,7 @@ class AttendancePeriodController extends Controller
                     $query_attendance = Attendances::where(function ($query) use ($date_overtime_no_schedule,$cleanedNik) {
                         $mulaiDate = Carbon::parse($date_overtime_no_schedule)->subDays(1)->startOfDay()->toDateTimeString();
                         $akhirDate = Carbon::parse($date_overtime_no_schedule)->addDays(1)->endOfDay()->toDateTimeString();
-                
+
                         $query->where('date', '>=', $mulaiDate)
                             ->where('date', '<=', $akhirDate)
                             ->where('employee_no',$cleanedNik);
@@ -1758,7 +1741,7 @@ class AttendancePeriodController extends Controller
                         $time_out = $row_overtime->time_out;
                         $login[$key] = null;
                         $logout = null;
-                        
+
                         $real_time_in =$date_overtime_no_schedule->format('Y-m-d') . ' ' . $time_in;
                         $combinedDateTimeInCarbonz = Carbon::parse($real_time_in);
 
@@ -1768,15 +1751,15 @@ class AttendancePeriodController extends Controller
                         $addx=$combinedDateTimeInCarbonz->copy()->addHours(2);
                         foreach($query_attendance as $row_attendance_filter){
                             $dateAttd = Carbon::parse($row_attendance_filter->date);
-                           
+
                             $timePart = $dateAttd->format('H:i:s');
-                                      
+
                             //perhitungan masuk tepat atau tidak dan pulang tepat atau tidak
                             if ( $dateAttd > $subx && $dateAttd <= $addx) {
                                 $exact_in[$key]= 1 ;
-                            
+
                                 if(!$login[$key]){
-                                    
+
                                     if($masuk_awal==null){
                                         $masuk_awal=$timePart;
                                     }elseif($masuk_awal > $timePart){
@@ -1787,25 +1770,25 @@ class AttendancePeriodController extends Controller
                                     $different_masuk[$key]='';
                                     $attendance_detail[$row_user->id][$counter_overtime_date]['jam_masuk'][]=  $timePart;
                                 }
-                                
+
                             }
                         }
-                        
+
                         $last_attendance = $query_attendance->last();
-                    
-                       
+
+
                         if($last_attendance&&$exact_in[$key]==1){
                             $exact_out[$key]= 1 ;
                             $dateAttdLast = Carbon::parse($last_attendance->date);
-                           
+
                             $timePartlast = $dateAttd->format('H:i:s');
-                         
+
                             if($login[$key]!=$timePartlast){
                                 $attendance_detail[$row_user->id][$counter_overtime_date]['jam_keluar'][]=  $timePartlast;
                                 if($dateAttdLast >= $combinedDateTimeOutCarbon){
-                                     
+
                                     $timeDifference = Carbon::parse($row_overtime->time_in)->diff(Carbon::parse($row_overtime->time_out));
-                                
+
                                     $hoursDifference = $timeDifference->h;
                                     $row_overtime->total            = $hoursDifference;
                                     $query_libur = Holiday::where('date',$row_overtime->date)->get();
@@ -1815,9 +1798,9 @@ class AttendancePeriodController extends Controller
                                             ->where('level_id',$row_user->position->level_id)
                                             ->where('type','1')
                                             ->first();
-                                        
+
                                     }else{
-                                       
+
                                         $query_cost = OvertimeCost::whereRaw("'$row_overtime->date' BETWEEN start_date AND end_date ")
                                             ->where('place_id',$row_user->place_id)
                                             ->where('level_id',$row_user->position->level_id)
@@ -1831,24 +1814,24 @@ class AttendancePeriodController extends Controller
                                 }if($dateAttdLast <= $combinedDateTimeOutCarbon && $dateAttdLast >= $combinedDateTimeInCarbonz){
                                     $attendance_detail[$row_user->id][$counter_overtime_date]['jam_keluar'][]=  $timePartlast;
                                     $timeDifference = $combinedDateTimeInCarbonz->diff($dateAttdLast);
-                                    
+
                                     $hoursDifference = $timeDifference->h;
-                                
+
                                     $row_overtime->total            = $hoursDifference;
-                                    
+
                                     $query_cost = OvertimeCost::whereRaw("'$row_overtime->date' BETWEEN start_date AND end_date ")
                                     ->where('place_id',$row_user->place_id)
                                     ->where('level_id',$row_user->position->level_id)
                                     ->where('type','2')
                                     ->first();
-                                
+
                                     if($query_cost){
                                         $row_overtime->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $row_overtime->save();
                                     }
                                 }
                             }
-                            
+
                         }
                         if($last_attendance&&$exact_in[$key]!=1){
                             $attendance_detail[$row_user->id][$counter_overtime_date]['jam_masuk'][]='';
@@ -1867,36 +1850,36 @@ class AttendancePeriodController extends Controller
                         $attendance_detail[$row_user->id][$counter_overtime_date]['shift_id'][]=null;
 
                     }
-                    
 
-                    
-            
+
+
+
 
                     $counter_overtime_date++;
                     $date_overtime_no_schedule->addDay();
                 }
-                
-                
-                
+
+
+
                 //mencari apakah dia datang tidak checkclock atau pulang tidak checkclock salah tol
-                
-                
+
+
                 //melakukan perhitungan datang pulang
-                
+
                 foreach($all_exact_in as $key=>$row_exact){
-             
+
                     if($row_exact==1){
 
                         $counter_arrived_on_time++;
                     }if($row_exact == 0 && $all_exact_out[$key] == 1){
-                        
+
                         $counter_arrived_forget++;
                     }
                     if($all_exact_out[$key]==1){
                         $counter_out_on_time++;
                     }if($all_exact_out[$key] == 0 && $row_exact == 1){
-                       
-                        
+
+
                         $counter_out_forget++;
                     }
                     if($row_exact==1 && $all_exact_out[$key] == 1){
@@ -1906,7 +1889,7 @@ class AttendancePeriodController extends Controller
                     }
                 }
 
-                
+
                 DB::beginTransaction();
                 $query_monthly_report = AttendanceMonthlyReport::create([
                     'user_id'                   => $row_user->id,
@@ -1928,7 +1911,7 @@ class AttendancePeriodController extends Controller
                     'out_log_forget'            => $counter_out_forget,
                     'arrived_forget'            => $counter_arrived_forget,
                 ]);
-                
+
                 try {
                     $query_close = AttendancePeriod::find($request->id);
                     $query_close->status            = "2";
@@ -1938,7 +1921,7 @@ class AttendancePeriodController extends Controller
                     DB::rollback();
                 }
                 $counter_user_monthly[$row_user->employee_no]=$tipe_punish_counter;
-                
+
                 $temp_for_punishment_forget = [];
                 if($query_tidak_check_masuk){
                     $temp_for_punishment_forget[]=[
@@ -1959,9 +1942,9 @@ class AttendancePeriodController extends Controller
                 }
                //memasukkan data saat user memiliki kelupaan cecklclok masuk
                 if(count($date_arrived_forget) != 0){
-                    
+
                     if($query_tidak_check_masuk){
-                        
+
                         $query_presence_report = AttendancePunishment::create([
                             'user_id'                  => session('bo_id'),
                             'period_id'                => $request->id,
@@ -1976,9 +1959,9 @@ class AttendancePeriodController extends Controller
                 }
                  //memasukkan data saat user memiliki kelupaan cecklclok keluar
                 if(count($date_out_forget) != 0){
-                    
+
                     if($query_tidak_check_pulang){
-                      
+
                         $query_presence_report = AttendancePunishment::create([
                             'user_id'                  => session('bo_id'),
                             'period_id'                => $request->id,
@@ -1994,10 +1977,10 @@ class AttendancePeriodController extends Controller
                 //pembuatan tidak cek masuk // keluar untuk ditaruh ke report
 
             }
-           
+
             $end_time = microtime(true);
-            
-            
+
+
             foreach($attendance_detail as $row_attd){
                 foreach($row_attd as $row_attd_detail){
                    if (is_array($row_attd_detail['nama_shift']) && empty(($row_attd_detail['nama_shift']))) {
@@ -2020,7 +2003,7 @@ class AttendancePeriodController extends Controller
                     ]);
                 } else {
                    foreach($row_attd_detail['in'] as $key_masuk=>$row_masuk){
-                    
+
                     $status='';
                         if($row_masuk == '1' && $row_attd_detail['out'][$key_masuk] == '1'){
                             $status = '1';
@@ -2055,7 +2038,7 @@ class AttendancePeriodController extends Controller
                             'late_status'              => $status,
                             'status'                   => '1',
                         ]);
-                       
+
                         $query_daily_report= AttendanceDailyReports::create([
                             'user_id'                  => $row_attd_detail['user_no'],
                             'masuk'                    => $row_attd_detail['jam_masuk'][$key_masuk],
@@ -2068,16 +2051,16 @@ class AttendancePeriodController extends Controller
                    }
                 }
                 }
-                
+
             }
-           
+
             //untuk menghitung denda terlambat
             foreach($counter_user_monthly as $row_user){
                 $uid_new = null;
                 $counter = 0;
                 $minus = 0;
                 foreach($row_user as $key=>$row_counter){
-               
+
                     if(!$uid_new){
                         $uid_new=$row_counter['uid'];
                         $query_report_peruser= SalaryReportUser::create([
@@ -2093,7 +2076,7 @@ class AttendancePeriodController extends Controller
                                 ->where('salary_component_id',2)
                                 ->first();
                             $kali = $query_monthly_report->effective_day * $query_employee_salary_day->nominal;
-                        
+
                             $query_report_peruser->total_plus = $query_report_peruser->total_plus+$kali;
                             $query_salary_reports_detail = SalaryReportDetail::create([
                                 'salary_report_user_id' =>$query_report_peruser->id,
@@ -2116,13 +2099,13 @@ class AttendancePeriodController extends Controller
                             ]);
                             $query_report_peruser->total_plus = $query_report_peruser->total_plus+$query_employee_salary_month->nominal;
                         }
-                       
+
 
                         //pakai 1 dan 2 tidak sama dengan karena ingin mengambil komponen yang bukan gaji harian atau gaji bulanan.
                         $query_employee_salary_component = EmployeeSalaryComponent::where('user_id', $row_counter['uid'])
                         ->whereNotIn('salary_component_id', [1, 2])
                         ->get();
-                        
+
 
                         foreach($query_employee_salary_component as $row_salary_component){
                             $type = ($row_salary_component->nominal > 0) ? 1 : 2;
@@ -2134,23 +2117,23 @@ class AttendancePeriodController extends Controller
                                 'nominal'               =>$row_salary_component->nominal,
                             ]);
                             if($type==1){
-                                
+
                                 $query_report_peruser->total_plus = $query_report_peruser->total_plus+$row_salary_component->nominal;
                             }else{
-                               
-                                $query_report_peruser->total_minus = $query_report_peruser->total_minus+$row_salary_component->nominal; 
+
+                                $query_report_peruser->total_minus = $query_report_peruser->total_minus+$row_salary_component->nominal;
                             }
-                            
+
                         }
-                        
+
                         //lembur itung
                         $lembur_get = OvertimeRequest::whereBetween('date', [$start_date, $end_date])
                         ->where('status', 2)
                         ->get();
-                      
+
                         $total_biasa = 0;
                         $total_kusus = 0;
-                        
+
                         $nominal_biasa = 0 ;
                         $nominal_kusus = 0 ;
 
@@ -2164,7 +2147,7 @@ class AttendancePeriodController extends Controller
                                 $nominal_biasa += $row_lembur->grandtotal;
                             }
                         }
-                        
+
                         $query_salary_reports_detail = SalaryReportDetail::create([
                             'salary_report_user_id' =>$query_report_peruser->id,
                             'lookable_type'         =>'overtime_requests',
@@ -2172,8 +2155,8 @@ class AttendancePeriodController extends Controller
                             'type'                  =>1,
                             'nominal'               =>$nominal_biasa,
                         ]);
-                    
-                    
+
+
                         $query_salary_reports_detail = SalaryReportDetail::create([
                             'salary_report_user_id' =>$query_report_peruser->id,
                             'lookable_type'         =>'overtime_requests',
@@ -2182,15 +2165,15 @@ class AttendancePeriodController extends Controller
                             'nominal'               => $nominal_kusus,
                         ]);
                         $query_report_peruser->total_plus = $query_report_peruser->total_plus+$nominal_kusus+$nominal_biasa;
-                    
-                        
+
+
                     }
-                    
-                    
+
+
 
                     $string_date = implode(',',$row_counter['date']);
                     if($row_counter['counter']!='0'){
-                       
+
                         $query_presence_report = AttendancePunishment::create([
                             'user_id'                  => session('bo_id'),
                             'period_id'                => $request->id,
@@ -2208,9 +2191,9 @@ class AttendancePeriodController extends Controller
                             'type'                  =>2,
                             'nominal'               =>$row_counter['counter']*$row_counter['price'],
                         ]);
-                        $minus += $row_counter['counter']*$row_counter['price']; 
+                        $minus += $row_counter['counter']*$row_counter['price'];
                         $query_report_peruser->total_minus = $query_report_peruser->total_minus+$query_salary_reports_detail->nominal;
-                    
+
                         $query_report_peruser->save();
                     }else{
                         $query_salary_reports_detail = SalaryReportDetail::create([
@@ -2221,12 +2204,12 @@ class AttendancePeriodController extends Controller
                             'nominal'               =>0,
                         ]);
                     }
-                   
-                  
+
+
                     if($counter == count($row_counter)-1){
                         $minus_forget = 0;
                         foreach($temp_for_punishment_forget as $row_forget){
-                            
+
                             $query_salary_reports_detail = SalaryReportDetail::create([
                                 'salary_report_user_id' =>$query_report_peruser->id,
                                 'lookable_type'         =>'punishments',
@@ -2236,31 +2219,31 @@ class AttendancePeriodController extends Controller
                             ]);
                             $minus_forget+=$row_forget['nominal'];
                         }
-                        $query_report_peruser->total_minus = $query_report_peruser->total_minus+$minus_forget; 
-                        $query_report_peruser->total_received = $query_report_peruser->total_plus-$minus-$minus_forget; 
+                        $query_report_peruser->total_minus = $query_report_peruser->total_minus+$minus_forget;
+                        $query_report_peruser->total_received = $query_report_peruser->total_plus-$minus-$minus_forget;
 
                         $query_report_peruser->save();
                     }
                     $counter++;
                 }
             }
-           
+
 
             $query_employee_reward_or_punishment = EmployeeRewardPunishmentDetail::where('nominal_total','>',0)->get();
-            
-            
+
+
             foreach($query_employee_reward_or_punishment as $row_detail_punr){
                 $total_pembayaran = 0;
-             
+
                 if($row_detail_punr->nominal_total >= $row_detail_punr->nominal_payment){
-                    
+
                     $query_employee_re_or_pu_payment = EmployeeRewardPunishmentPayment::where('employee_reward_punishment_detail_id',$row_detail_punr->id)
                     ->get();
                     foreach($query_employee_re_or_pu_payment as $row_payment){
                         $total_pembayaran+=$row_payment->nominal;
                     }
                     $sisa = $row_detail_punr->nominal_total-$total_pembayaran;
-                  
+
                     if($sisa > 0 ){
                         if($sisa > $row_detail_punr->nominal_payment){
                             $query_mbeng1=EmployeeRewardPunishmentPayment::create([
@@ -2270,7 +2253,7 @@ class AttendancePeriodController extends Controller
                                 'nominal'                    => $row_detail_punr->nominal_payment,
                                 'employee_reward_punishment_detail_id'                     =>$row_detail_punr->id ,
                             ]);
-                            
+
                         }else{
                             $query_mbeng1=EmployeeRewardPunishmentPayment::create([
                                 'user_id'                               => $row_detail_punr->user_id,
@@ -2280,9 +2263,9 @@ class AttendancePeriodController extends Controller
                                 'employee_reward_punishment_detail_id'  =>$row_detail_punr->id ,
                             ]);
                         }
-                        
+
                         if($query_mbeng1){
-                            
+
                             if($row_detail_punr->employeeRewardPunishment->type == 1 ){
                                 $query_salary_report_user = SalaryReportUser::where('user_id', $row_detail_punr->user_id)
                                 ->whereHas('salaryReport', function($query) use ($request) {
@@ -2291,16 +2274,16 @@ class AttendancePeriodController extends Controller
                                 })
                                 ->orderBy('created_at', 'desc')
                                 ->first();
-                                
-                               
+
+
                                 if( $query_salary_report_user){
-                             
+
                                     $query_salary_report_user->total_plus = $query_salary_report_user->total_plus+$query_mbeng1->nominal;
-                        
+
                                     $query_salary_report_user->total_received = $query_salary_report_user->total_received+$query_mbeng1->nominal;
                                     $query_salary_report_user->save();
                                 }
-                                
+
                             }
                             if($row_detail_punr->employeeRewardPunishment->type == 2 ){
                                 $query_salary_report_user = SalaryReportUser::where('user_id', $row_detail_punr->user_id)
@@ -2310,24 +2293,24 @@ class AttendancePeriodController extends Controller
                                 })
                                 ->orderBy('created_at', 'desc')
                                 ->first();
-                              
-                                
+
+
                                 if( $query_salary_report_user){
                                     $query_salary_report_user->total_minus = $query_salary_report_user->total_minus+$query_mbeng1->nominal;
                                     $query_salary_report_user->total_received = $query_salary_report_user->total_received-$query_mbeng1->nominal;
                                     $query_salary_report_user->save();
                                 }
-                              
+
                             }
                         }
                     }
                 }
             }
 
-            
+
 
             $execution_time = ($end_time - $start_time);
-           
+
             $response =[
                 'status'   =>200,
                 'message'  =>$attendance_detail,
@@ -2344,7 +2327,7 @@ class AttendancePeriodController extends Controller
 
     public function reopen(Request $request){
         $query_salary_report = SalaryReport::where('period_id',CustomHelper::decrypt($request->id))->first();
-        
+
         $query_salary_report->salaryReportUser->each(function ($salaryReportUser) {
             $salaryReportUser->salaryReportDetail()->delete();
         });
@@ -2362,7 +2345,7 @@ class AttendancePeriodController extends Controller
                 'message'  =>'sep',
             ];
             $query_close = AttendancePeriod::find(CustomHelper::decrypt($request->id));
-           
+
             $date = Carbon::parse($query_close->start_date)->copy();
             while($date->lte($query_close->end_date)){
                 $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())->get();
@@ -2370,7 +2353,7 @@ class AttendancePeriodController extends Controller
                     $query_data[$key]->is_closed = '1';
                     $query_data[$key]->save();
                 }
-                
+
                 $date->addDay();
             }
             $query_close->status            = "1";
@@ -2385,7 +2368,7 @@ class AttendancePeriodController extends Controller
     }
     public function presenceReport(Request $request){
         $distinctUserIds = PresenceReport::where('period_id',$request->id)->groupBy('user_id')->pluck('user_id')->toArray();
-        
+
         $distinctDates = PresenceReport::where('period_id', $request->id)
                 ->groupBy('date')
                 ->pluck('date')
@@ -2399,9 +2382,9 @@ class AttendancePeriodController extends Controller
                     return $date->format('d/m/Y'); // Format the date as 'd/m/Y'
                 })
                 ->toArray();
-        
+
         $userDetail=[];
-      
+
         foreach($distinctUserIds as $key_user=>$user_id){
             foreach($distinctDates as $key_dates=>$row_dates){
                 $userDetail[$key_user][$key_dates]=[
@@ -2418,11 +2401,11 @@ class AttendancePeriodController extends Controller
                 }
             }
         }
-        
+
         $string_table="";
 
         foreach($userDetail as $key_presenced => $row_user_presence){
-        
+
             $string_table.="
                 <tr>
                     <td rowspan='3'>".$row_user_presence[0]['user_name']."
@@ -2434,8 +2417,8 @@ class AttendancePeriodController extends Controller
             }
             $string_table .="
                 </tr>
-                
-                <tr> 
+
+                <tr>
             ";
             foreach($row_user_presence as $key_detailed=>$row_detailed){
                 foreach($row_detailed['nama_shift'] as $key_d=>$row_nama_shift){
@@ -2446,7 +2429,7 @@ class AttendancePeriodController extends Controller
             }
             $string_table .="
                 </tr>
-                <tr> 
+                <tr>
             ";
             foreach($row_user_presence as $row_detailed){
                 foreach($row_detailed['late_status'] as $key_status=>$row_status){
@@ -2510,7 +2493,7 @@ class AttendancePeriodController extends Controller
                         $time_out = $row_daily->shift->time_out;
                         $max_time_out = Carbon::parse($time_out)->addHours($row_daily->shift->tolerant)->toTimeString();
                     }else{
-                       
+
                         $overtime_request_perday = OvertimeRequest::where('date',Carbon::createFromFormat('d/m/Y', $row_daily['date'])->format('Y-m-d'))
                             ->where('account_id',$row_daily->user_id)
                             ->where('schedule_id',null)
@@ -2522,10 +2505,10 @@ class AttendancePeriodController extends Controller
                                 $max_time_out='lembur';
                                 $time_out=$row_overtime->time_out;
                                 $nama_shift = 'lembur';
-                           } 
+                           }
                         }
                         $min_time_in = "";
-                        
+
                         $max_time_out ="";
                     }
                     $attendanceDetail[$key_date][]=[
@@ -2543,9 +2526,9 @@ class AttendancePeriodController extends Controller
                     ];
                     $x++;
                 }
-                
+
             }
-            
+
         }
         $string_table="";
         $iterasi=0;
@@ -2553,7 +2536,7 @@ class AttendancePeriodController extends Controller
             foreach($row_detail as $key_daily=>$row_daily){
                 $iterasi++;
                 $string_table.="
-                <tr>      
+                <tr>
                     <td class='center-align'>".$iterasi."</td>
                     <td class='center-align'>".$row_daily['user_id']."</td>
                     <td class='center-align'>".$row_daily['user_name']."</td>
@@ -2579,15 +2562,15 @@ class AttendancePeriodController extends Controller
 
     public function punishmentReport(Request $request){
         $dailyReports  = AttendancePunishment::where('period_id',CustomHelper::decrypt($request->id))
-                      
+
         ->get();
-        
+
         $distinctUserIds = $dailyReports->pluck('employee_id')->unique()->toArray();
 
         $attendanceDetail=[];
-      
+
             foreach($dailyReports as $key_daily=>$row_punishment){
-                
+
                 $attendanceDetail[$key_daily][]=[
                     'user_id'=>$row_punishment->employee->employee_no??'',
                     'user_name'=>$row_punishment->employee->name??'',
@@ -2597,9 +2580,9 @@ class AttendancePeriodController extends Controller
                     'date'=>$row_punishment->dates,
                     'total'=> $row_punishment->total,
                 ];
-        
+
             }
-         
+
 
         $string_table="";
         $iterasi=0;
@@ -2607,7 +2590,7 @@ class AttendancePeriodController extends Controller
             foreach($row_detail as $key_daily=>$row_punish){
                 $iterasi++;
                 $string_table.="
-                <tr>      
+                <tr>
                     <td class='center-align'>".$iterasi."</td>
                     <td class='center-align'>".$row_punish['user_id']."</td>
                     <td class='center-align'>".$row_punish['user_name']."</td>
@@ -2630,22 +2613,22 @@ class AttendancePeriodController extends Controller
     public function salaryReport(Request $request){
         $salary_report  = SalaryReport::where('period_id',CustomHelper::decrypt($request->id))
         ->first();
-        
+
 
         $salary_report_template = SalaryReportTemplate::where('salary_report_id',$salary_report->id)->get();
-      
+
         $salary_report_user = SalaryReportUser::where('salary_report_id', $salary_report->id)
         ->whereHas('user', function ($query) {
             $query->where('type_payment', 1);
         })
         ->get();
-        
+
         $salary_report_user_harian = SalaryReportUser::where('salary_report_id', $salary_report->id)
         ->whereHas('user', function ($query) {
             $query->where('type_payment', 2);
         })
         ->get();
-      
+
         $plant = Place::where('status',1)->get();
         $plant_for_user = [];
         $salary_for_perday_user = [];
@@ -2654,7 +2637,7 @@ class AttendancePeriodController extends Controller
             if (!isset($title[$row->id])) {
                 $title[$row->id] = '';
             }
-            $title[$row->id]=$row->name; 
+            $title[$row->id]=$row->name;
         }
         //dinamis plant
         foreach($plant as $row_plant){
@@ -2688,7 +2671,7 @@ class AttendancePeriodController extends Controller
                 $plant_for_user[$row_template->punishment->place_id].='<th>'.$row_template->punishment->name.'</th>';
                 $salary_for_perday_user[$row_template->punishment->place_id].='<th>'.$row_template->punishment->name.'</th>';
             }
-            
+
         }
 
         foreach($plant_for_user as $key=>$rowws){
@@ -2723,28 +2706,28 @@ class AttendancePeriodController extends Controller
             $nominal_plus = 0 ;
             $nominal_minus = 0 ;
             foreach($salary_report_template as $row_template){
-                
+
                 foreach($query_detail as $row_detail){
-                    
+
                     if($row_detail->lookable_type == $row_template->lookable_type && $row_detail->lookable_id == $row_template->lookable_id){
                         if($row_detail->lookable_type == 'punishments'){
                             $nominal_minus+=$row_detail->nominal;
                         }
-                       
+
                         $plant_for_user[$row_user_report->user->place_id].='
                             <td>'.$row_detail->nominal.'</td>
                         ';
                     }
-                    
+
                 }
             }
             $query_payment = EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->
             where('user_id',$row_user_report->user->id)->get();
-            
+
             foreach($query_payment as $row_payment){
-               
+
                 if($row_payment->employeeRewardPunishmentDetail->employeeRewardPunishment->type == 1){
-                    $nominal_plus+=$row_payment->nominal; 
+                    $nominal_plus+=$row_payment->nominal;
                 }
             }
             foreach($query_detail_overtime as $row_overtime_detail){
@@ -2752,9 +2735,9 @@ class AttendancePeriodController extends Controller
                 $plant_for_user[$row_user_report->user->place_id].='
                     <td>'.$row_overtime_detail->nominal.'</td>
                 ';
-                
-            }  
-           
+
+            }
+
             $plant_for_user[$row_user_report->user->place_id].='
                 <td>'.$nominal_minus.'</td>
                 <td>'.$row_user_report->total_minus.'</td>
@@ -2762,7 +2745,7 @@ class AttendancePeriodController extends Controller
                 <td>'.$row_user_report->total_received.'</td>
                 </tr>
             ';
-            
+
         }
 
         foreach($salary_report_user_harian as $row_user_report){
@@ -2776,11 +2759,11 @@ class AttendancePeriodController extends Controller
                     <td>'.$row_user_report->user->employee_no.'</td>';
             $nominal_plus = 0 ;
             $nominal_minus = 0 ;
-            
+
             foreach($salary_report_template as $row_template){
-                
+
                 foreach($query_detail as $row_detail){
-                    
+
                     if($row_detail->lookable_type == $row_template->lookable_type && $row_detail->lookable_id == $row_template->lookable_id){
                         if($row_detail->lookable_type == 'punishments'){
                             $nominal_minus+=$row_detail->nominal;
@@ -2788,27 +2771,27 @@ class AttendancePeriodController extends Controller
                         $salary_for_perday_user[$row_user_report->user->place_id].='
                             <td>'.$row_detail->nominal.'</td>
                         ';
-                       
+
                     }
-                    
+
                 }
             }
             $query_payment = EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->
             where('user_id',$row_user_report->user->id)->get();
-            
+
             foreach($query_payment as $row_payment){
-              
+
                 if($row_payment->employeeRewardPunishmentDetail->employeeRewardPunishment->type == 1){
-                    $nominal_plus+=$row_payment->nominal; 
+                    $nominal_plus+=$row_payment->nominal;
                 }
             }
             foreach($query_detail_overtime as $row_overtime_detail){
                 $nominal_plus += $row_overtime_detail->nominal ;
-               
+
                 $salary_for_perday_user[$row_user_report->user->place_id].='
                     <td>'.$row_overtime_detail->nominal.'</td>
                 ';
-            }  
+            }
             $salary_for_perday_user[$row_user_report->user->place_id].='
                 <td>'.$nominal_minus.'</td>
                 <td>'.$row_user_report->total_minus.'</td>
@@ -2816,11 +2799,11 @@ class AttendancePeriodController extends Controller
                 <td>'.$row_user_report->total_received.'</td>
                 </tr>
             ';
-           
-            
+
+
         }
 
-       
+
         $response = [
             'status'    => 200,
             'message'   => $plant_for_user,
@@ -2829,9 +2812,9 @@ class AttendancePeriodController extends Controller
         ];
         return response()->json($response);
     }
-    
+
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'			          => $request->temp ? ['required', Rule::unique('attendance_periods', 'code')->ignore($request->temp)] : 'required|unique:attendance_periods,code',
             'name'                    => 'required',
@@ -2877,14 +2860,14 @@ class AttendancePeriodController extends Controller
                         'start_date'             => $request->start_date,
                         'end_date'                => $request->end_date,
                         'plant_id'           => $request->plant_id,
-                       
+
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
 				$response = [
@@ -2898,10 +2881,10 @@ class AttendancePeriodController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
-    public function export(Request $request){        
+    public function export(Request $request){
         $period_id = $request->period_id ? $request->period_id:'';
 		return Excel::download(new ExportPeriod($period_id), 'period_report'.uniqid().'.xlsx');
     }

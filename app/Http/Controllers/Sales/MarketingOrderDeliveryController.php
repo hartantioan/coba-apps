@@ -754,6 +754,12 @@ class MarketingOrderDeliveryController extends Controller
                 }
             }
 
+            activity()
+                ->performedOn(new MarketingOrderDelivery())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('update note the Marketing Order Delivery data');
+
             $response = [
                 'status'  => 200,
                 'message' => 'Data berhasil diupdate.'
@@ -1449,7 +1455,11 @@ class MarketingOrderDeliveryController extends Controller
                     ]);
 
                     CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status pengiriman dokumen anda telah dinyatakan '.$data->sendStatus().'.',session('bo_id'));
-
+                    activity()
+                        ->performedOn(new MarketingOrderDelivery())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($data)
+                        ->log('update status send the Marketing Order Delivery data');
                     $response = [
                         'status'  => 200,
                         'message' => 'Status berhasil dirubah.',

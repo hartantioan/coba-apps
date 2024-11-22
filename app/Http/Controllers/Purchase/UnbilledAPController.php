@@ -203,7 +203,7 @@ class UnbilledAPController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
-                    'real'          => number_format($row->total,2,',','.'),
+                    'real'          => number_format($row->total_detail,2,',','.'),
                     'adjust_kurs'   => number_format($row->adjust_nominal,2,',','.'),
                     'total_received'=> number_format($total_received_after_adjust,2,',','.'),
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),

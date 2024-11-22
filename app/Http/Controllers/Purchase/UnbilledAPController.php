@@ -76,7 +76,7 @@ class UnbilledAPController extends Controller
                                         AND grd.deleted_at IS NULL
                                     )
                             AND pid.deleted_at IS NULL
-                            AND pi.status IN ('2','3','7')
+                            AND pi.status IN ('2','3','7','8')
                             AND pi.post_date <= :date1
                         ),0) AS total_invoice,
                         IFNULL((

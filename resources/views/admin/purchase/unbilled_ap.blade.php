@@ -87,13 +87,14 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Surat Jalan</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Diterima</th>
+                                                        <th class="center-align">Adjust Kurs</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Invoice</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="10">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -157,6 +158,7 @@
                                     <td class="">`+ val.delivery_no +`</td>
                                     <td class="">`+ val.note +`</td>
                                     <td class="right-align">`+ val.total_received +`</td>
+                                    <td class="right-align">`+ val.adjust_kurs +`</td>
                                     <td class="right-align">`+ val.total_invoice +`</td>
                                     <td class="right-align">`+ val.total_balance +`</td>
                                 </tr>

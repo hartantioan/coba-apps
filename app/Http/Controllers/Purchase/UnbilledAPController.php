@@ -137,7 +137,12 @@ class UnbilledAPController extends Controller
                                 AND ar.status IN ('2','3')
                                 AND ard.lookable_type = 'good_receipts'
                                 AND ard.lookable_id = gr.id
-                                AND ard.type = '2'
+                                AND (
+                                    CASE
+                                        WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
+                                        WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
+                                    END
+                                )
                         ),0) AS adjust_nominal,
                         IFNULL((SELECT
                             SUM(ROUND(jd.nominal,2))
@@ -199,6 +204,7 @@ class UnbilledAPController extends Controller
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
                     'total_received'=> number_format($total_received_after_adjust,2,',','.'),
+                    'adjust_kurs'   => number_format($row->adjust_nominal,2,',','.'),
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
                     'total_balance' => number_format($balance_after_adjust,2,',','.'),
                 ];

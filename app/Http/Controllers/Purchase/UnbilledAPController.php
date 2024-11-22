@@ -85,7 +85,7 @@ class UnbilledAPController extends Controller
                                     WHERE 
                                         cd.lookable_type = 'purchase_invoices' 
                                         AND cd.deleted_at IS NULL
-                                        AND cd.post_date >= :date2
+                                        AND :date2 >= cd.post_date
                                 )
                         ),0) AS total_invoice,
                         IFNULL((

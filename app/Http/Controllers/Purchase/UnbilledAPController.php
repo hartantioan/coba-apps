@@ -56,7 +56,7 @@ class UnbilledAPController extends Controller
                         gr.*,
                         u.name AS account_name,
                         IFNULL((SELECT
-                            SUM(ROUND(grd.total * (SELECT j.currency_rate FROM journals j WHERE j.lookable_type = 'good_receipts' AND j.lookable_id = gr.id),2))
+                            SUM(ROUND(grd.total * (SELECT po.currency_rate FROM purchase_order_details pod, purchase_orders po WHERE po.id = pod.purchase_order_id AND pod.id = grd.purchase_order_detail_id),2))
                             FROM good_receipt_details grd
                             WHERE grd.good_receipt_id = gr.id
                             AND grd.deleted_at IS NULL

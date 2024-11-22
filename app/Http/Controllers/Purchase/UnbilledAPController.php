@@ -145,7 +145,7 @@ class UnbilledAPController extends Controller
                                 )
                         ),0) AS adjust_nominal,
                         IFNULL((SELECT
-                            SUM(ROUND(jd.nominal,2))
+                            0
                             FROM journal_details jd
                             LEFT JOIN journals j
                                 ON jd.journal_id = j.id
@@ -190,10 +190,10 @@ class UnbilledAPController extends Controller
                     })->sum('nominal_fc');
                 }
             }
-            $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return,2);
+            $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return - $row->total_journal,2);
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return)),2);
+            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if(round($balance,2) > 0){
                 $array_filter[] = [

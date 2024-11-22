@@ -243,8 +243,7 @@
     </a>
 </div> --}}
 
-<!-- END: Page Main-->
-<script type="text/javascript" src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+<script src="{{ url('app-assets/js/custom/camera_scan.js') }}"></script>
 <script>
 
     window.addEventListener('load', function () {

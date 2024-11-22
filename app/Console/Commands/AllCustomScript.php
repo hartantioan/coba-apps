@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ActivityLog;
 use App\Models\ApprovalMatrix;
 use App\Models\GoodIssueRequest;
 use App\Models\LockPeriod;
@@ -126,6 +127,10 @@ class AllCustomScript extends Command
 
         #reset approvalmatrix
         DB::delete('DELETE FROM approval_matrixs WHERE approval_source_id NOT IN (SELECT id FROM approval_sources)');
+
+        $threeMonthsAgo = now()->subMonths(3);
+
+        ActivityLog::where('created_at', '<', $threeMonthsAgo)->delete();
 
         #delete weight history 7 day
         $dateThreshold = Carbon::now()->subDays(7);

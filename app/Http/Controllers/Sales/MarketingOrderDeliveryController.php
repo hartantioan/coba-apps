@@ -394,7 +394,7 @@ class MarketingOrderDeliveryController extends Controller
     }
 
     public function create(Request $request){
-        /* DB::beginTransaction();
+        DB::beginTransaction();
         try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
@@ -463,7 +463,7 @@ class MarketingOrderDeliveryController extends Controller
                         'status'  => 500,
                         'message' => 'Ada Item yang stocknya kurang pada SO yang dipilih dengan nama Item :'. $list_item,
                     ]);
-                } */
+                }
 
                 if($request->arr_item_shading_id){
                     $arrShadingItem = [];
@@ -509,7 +509,7 @@ class MarketingOrderDeliveryController extends Controller
                     }
                 }
 
-                /* if(!$request->temp){
+                if(!$request->temp){
                     $passedZero = true;
                     $passedQty = true;
                     $passedSentMore = true;
@@ -731,7 +731,7 @@ class MarketingOrderDeliveryController extends Controller
             info($e->getMessage());
         }
 
-		return response()->json($response); */
+		return response()->json($response);
     }
 
     public function saveUpdate(Request $request){

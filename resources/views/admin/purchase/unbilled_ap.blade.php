@@ -86,15 +86,16 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Surat Jalan</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Diterima</th>
+                                                        <th class="center-align">Nominal awal</th>
                                                         <th class="center-align">Adjust Kurs</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Diterima</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Invoice</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="10">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="11">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -157,8 +158,9 @@
                                     <td class="center-align">`+ val.post_date +`</td>
                                     <td class="">`+ val.delivery_no +`</td>
                                     <td class="">`+ val.note +`</td>
-                                    <td class="right-align">`+ val.total_received +`</td>
+                                    <td class="right-align">`+ val.real +`</td>
                                     <td class="right-align">`+ val.adjust_kurs +`</td>
+                                    <td class="right-align">`+ val.total_received +`</td>
                                     <td class="right-align">`+ val.total_invoice +`</td>
                                     <td class="right-align">`+ val.total_balance +`</td>
                                 </tr>
@@ -166,16 +168,16 @@
                         });
                         $('#detail_invoice').append(`
                             <tr>
-                                <td colspan="9" class="right-align"><h6><b>Total : ` + response.total + `</b></h6></td>
+                                <td colspan="11" class="right-align"><h6><b>Total : ` + response.total + `</b></h6></td>
                             </tr>
                             <tr>
-                                <td colspan="9" class="center-align"><h6><b>Waktu proses : ` + response.time + `</b></h6></td>
+                                <td colspan="11" class="center-align"><h6><b>Waktu proses : ` + response.time + `</b></h6></td>
                             </tr>
                         `);
                     }else{
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="center-align" colspan="9">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="11">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }

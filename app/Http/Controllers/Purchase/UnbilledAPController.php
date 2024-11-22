@@ -78,14 +78,14 @@ class UnbilledAPController extends Controller
                             AND pid.deleted_at IS NULL
                             AND pi.status IN ('2','3','7','8')
                             AND pi.post_date <= :date1
-                            AND pi.id IN (
+                            AND pi.id NOT IN (
                                 SELECT 
                                     cd.lookable_id 
                                     FROM cancel_documents cd 
                                     WHERE 
                                     cd.lookable_type = 'purchase_invoices' 
                                     AND cd.deleted_at IS NULL
-                                    AND pi.post_date < cd.post_date 
+                                    AND pi.post_date >= cd.post_date 
                                 )
                         ),0) AS total_invoice,
                         IFNULL((

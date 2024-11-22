@@ -394,12 +394,11 @@ class MarketingOrderDeliveryController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
+        /* DB::beginTransaction();
         try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
-                /* 'code'			        => $request->temp ? ['required', Rule::unique('marketing_order_deliveries', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_deliveries,code',
-                */'code_place_id'          => 'required',
+                'code_place_id'             => 'required',
                 'account_id' 				=> $request->temp ? 'required' : '',
                 'company_id'			    => 'required',
                 'customer_id'		        => 'required',
@@ -412,9 +411,6 @@ class MarketingOrderDeliveryController extends Controller
                 'arr_qty'                   => 'required|array',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
-            /*  'code.string'                       => 'Kode harus dalam bentuk string.',
-                'code.min'                          => 'Kode harus minimal 18 karakter.',
-                'code.unique'                       => 'Kode telah dipakai', */
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'account_id.required' 				=> 'Vendor/Ekspedisi/Broker tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
@@ -467,7 +463,7 @@ class MarketingOrderDeliveryController extends Controller
                         'status'  => 500,
                         'message' => 'Ada Item yang stocknya kurang pada SO yang dipilih dengan nama Item :'. $list_item,
                     ]);
-                }
+                } */
 
                 if($request->arr_item_shading_id){
                     $arrShadingItem = [];
@@ -510,7 +506,7 @@ class MarketingOrderDeliveryController extends Controller
                     }
                 }
 
-                if(!$request->temp){
+                /* if(!$request->temp){
                     $passedZero = true;
                     $passedQty = true;
                     $passedSentMore = true;
@@ -732,7 +728,7 @@ class MarketingOrderDeliveryController extends Controller
             info($e->getMessage());
         }
 
-		return response()->json($response);
+		return response()->json($response); */
     }
 
     public function saveUpdate(Request $request){

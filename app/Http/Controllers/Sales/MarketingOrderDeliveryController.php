@@ -477,7 +477,7 @@ class MarketingOrderDeliveryController extends Controller
                             $arrShadingItem[] = $row;
                             $arrShadingQty[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));
                             $arrShadingStock[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_stock[$key]));
-                            $arrConversion[] = str_replace(',', '.', str_replace('.', '', $request->arr_conversion[$key]));
+                            $arrConversion[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_conversion[$key]));
                         }else{
                             $index = array_search($row,$arrShadingItem);
                             $arrShadingQty[$index] += str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));

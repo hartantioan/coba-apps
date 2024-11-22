@@ -1054,6 +1054,7 @@ document.addEventListener('focusin', function (event) {
                                             <input type="hidden" name="arr_item_shading_id[]" value="` + value.item_shading_id + `">
                                             <input type="hidden" name="arr_item_shading_stock[]" value="` + value.qty + `">
                                             <input type="hidden" name="arr_price[]" value="` + val.price + `">
+                                            <input type="hidden" name="arr_item_shading_conversion[]" value="` + val.qty_conversion + `">
                                             <td class="center-align">` + (j+1) + `</td>
                                             <td>` + value.item_shading_code + `</td>
                                             <td>` + value.stock + `</td>

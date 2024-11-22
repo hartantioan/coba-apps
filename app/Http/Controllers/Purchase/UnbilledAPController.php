@@ -95,7 +95,7 @@ class UnbilledAPController extends Controller
                                             AND grd.deleted_at IS NULL
                                         )
                                 AND pid.deleted_at IS NULL
-                                AND pi.status IN ('2','3','7','8')
+                                AND pi.status IN ('2','3','7')
                                 AND pi.post_date <= :date2
                         ),'') AS data_reconcile,
                         IFNULL((SELECT

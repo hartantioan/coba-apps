@@ -31,6 +31,11 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
     private $headings = [
         'Kode',
         'Item',
+        'Jenis',
+        'Brand',
+        'Motif',
+        'Grade',
+        'Kategori',
         'Shading',
         'Initial (M2)',
         'Receive FG (M2)',
@@ -39,8 +44,9 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         'GR (M2)',
         'GI (M2)',
         'Delivery Belum Barcode(M2)',
+        'End Stock Delivery Belum Barcode (M2)',
         'Delivery Sudah Barcode(M2)',
-        'End Stock (M2)',
+        'End Stock All(M2)',
 
         // 'Qty SJ Blm Terkirim(M2)',
         // 'Qty SJ Blm Terkirim(Palet)',
@@ -56,12 +62,15 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
     public function collection()
     {
 
-            $arr = [];
+        $arr = [];
 
-            $query = DB::select("
-            SELECT a.code,a.name,a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
+        $query = DB::select("
+              SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade,
+	case when br.type='1' then 'HB' ELSE 'OEM' end AS 'kategori',a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
             COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
-            COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,   COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode,
+            COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,  
+             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
+            COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode,
             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
             SELECT  distinct a.code,a.name,a.shading FROM (
                     SELECT d.code,d.name,k.code AS shading
@@ -103,7 +112,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN production_fg_receive_details c ON c.id=b.production_fg_receive_detail_id and c.deleted_at IS null
                                 LEFT JOIN items d ON d.id=b.item_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 AND a.post_date<'".$this->start_date."'
+                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS RepackOut
@@ -112,7 +121,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_units c ON c.id=item_unit_source_id
                             LEFT JOIN items d ON d.id=b.item_source_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id AND d.item_group_id=7  AND a.post_date<'".$this->start_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RepackIn
@@ -121,7 +130,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_units c ON c.id=item_unit_target_id
                             LEFT JOIN items d ON d.id=b.item_target_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'".$this->start_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS GR
@@ -129,7 +138,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                             LEFT JOIN items d ON d.id=b.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'".$this->start_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI
@@ -138,7 +147,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                             LEFT JOIN items d ON d.id=c.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'".$this->start_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
                             SELECT c.code,c.name,k.code, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
@@ -149,7 +158,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN item_stocks l ON l.id=b.item_stock_id
                                 LEFT JOIN items c ON c.id=e.item_id
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
-                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date<'".$this->start_date."'
+                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY c.`code`,c.name,k.code)a GROUP BY code,NAME,shading)b ON a.code=b.code AND a.shading=b.shading
                             LEFT JOIN (
                             SELECT  d.code,d.name,k.code AS shading, coalesce(SUM(b.qty*c.conversion),0) AS receivefg
@@ -158,7 +167,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN production_fg_receive_details c ON c.id=b.production_fg_receive_detail_id and c.deleted_at IS null
                                 LEFT JOIN items d ON d.id=b.item_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7 AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code)c ON c.code=a.code AND c.shading=a.shading
                             LEFT JOIN (
                             SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS RepackOut
@@ -167,7 +176,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_units c ON c.id=item_unit_source_id
                             LEFT JOIN items d ON d.id=b.item_source_id
                                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id AND d.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )d ON d.code=a.code AND d.shading=a.shading
                                 LEFT JOIN (
@@ -177,7 +186,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_units c ON c.id=item_unit_target_id
                             LEFT JOIN items d ON d.id=b.item_target_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )e ON e.code=a.code AND e.shading=a.shading
                                 LEFT JOIN (
@@ -186,7 +195,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                             LEFT JOIN items d ON d.id=b.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )f ON f.code=a.code AND f.shading=a.shading
                                 LEFT JOIN (
@@ -196,7 +205,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                             LEFT JOIN item_stocks c ON c.id=b.item_stock_id
                             LEFT JOIN items d ON d.id=c.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
-                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )g ON g.code=a.code AND g.shading=a.shading
                                 LEFT JOIN (
@@ -209,8 +218,8 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN items c ON c.id=e.item_id
                                                                 LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id AND mo.deleted_at IS NULL AND mo.status=1
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
-                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                            and a.id not in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status ='2' and created_at <= '".$this->finish_date." 23:59:59' and deleted_at is null)
+                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
+                            and a.id not in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status ='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
                                 )h ON h.code=a.code and h.shading=a.shading
                                 LEFT JOIN (
@@ -223,28 +232,40 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN items c ON c.id=e.item_id
                                 LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id and mo.deleted_at is null and mo.status=2
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
-                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='".$this->start_date."' AND a.post_date<='".$this->finish_date."'
-                        and a.id in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '".$this->finish_date." 23:59:59' and deleted_at is null)
+                                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
+                        and a.id in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
-                                )i ON i.code=a.code and i.shading=a.shading order by a.name,a.shading" );
+                                )i ON i.code=a.code and i.shading=a.shading 
+                                LEFT JOIN items it ON it.code=a.code
+                                LEFT JOIN `types` v ON v.code=it.type_id
+                                LEFT JOIN brands br ON br.id=it.brand_id
+                                LEFT JOIN patterns pa ON pa.id=it.pattern_id
+                                LEFT JOIN grades gr ON gr.id=it.grade_id
+                                order by a.name,a.shading");
 
-                foreach ($query as $row) {
+        foreach ($query as $row) {
 
-                        $arr[] = [
-                        'kode' => $row->code,
-                        'name' => $row->name,
-                        'shading' => $row->shading,
-                        'initial' => $row->initial,
-                        'receivefg' => $row->receivefg,
-                        'repackout' => $row->repackout,
-                        'repackin' => $row->repackin,
-                        'gr' => $row->gr,
-                        'gi' => $row->gi,
-                        'qtysjbelumbarcode' => $row->qtysjbelumbarcode,
-                        'qtysjsudahbarcode' => $row->qtysjsudahbarcode,
-                        'endstock' => $row->endstock
-                    ];
-                }
+            $arr[] = [
+                'kode' => $row->code,
+                'name' => $row->name,
+                'Jenis' =>$row->jenis,
+                'Brand' =>$row->brand,
+                'Motif' =>$row->motif,
+                'Grade' =>$row->grade,
+                'Kategori' =>$row->kategori,
+                'shading' => $row->shading,
+                'initial' => $row->initial,
+                'receivefg' => $row->receivefg,
+                'repackout' => $row->repackout,
+                'repackin' => $row->repackin,
+                'gr' => $row->gr,
+                'gi' => $row->gi,
+                'qtysjbelumbarcode' => $row->qtysjbelumbarcode,
+                'endstockblmbarcode' => $row->endstockblmbarcode,
+                'qtysjsudahbarcode' => $row->qtysjsudahbarcode,
+                'endstock' => $row->endstock
+            ];
+        }
 
 
 

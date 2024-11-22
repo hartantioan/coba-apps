@@ -469,6 +469,7 @@ class MarketingOrderDeliveryController extends Controller
                     $arrShadingItem = [];
                     $arrShadingQty = [];
                     $arrShadingStock = [];
+                    $arrConversion = [];
                     $passedQtyShading = true;
                     $arrItemError = [];
                     foreach($request->arr_item_shading_id as $key => $row){
@@ -476,6 +477,7 @@ class MarketingOrderDeliveryController extends Controller
                             $arrShadingItem[] = $row;
                             $arrShadingQty[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));
                             $arrShadingStock[] = str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_stock[$key]));
+                            $arrConversion[] = str_replace(',', '.', str_replace('.', '', $request->arr_conversion[$key]));
                         }else{
                             $index = array_search($row,$arrShadingItem);
                             $arrShadingQty[$index] += str_replace(',', '.', str_replace('.', '', $request->arr_item_shading_qty[$key]));
@@ -490,8 +492,8 @@ class MarketingOrderDeliveryController extends Controller
                         $itemShading = ItemShading::find($row);
                         if($itemShading){
                             $stock = round($itemShading->stockAvailable(),3);
-                            info(round($arrShadingQty[$key],3));
-                            if($stock < round($arrShadingQty[$key],3)){
+                            $needed = round($arrShadingQty[$key] * $arrConversion[$key],3);
+                            if($stock < $needed){
                                 $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty(round($arrShadingQty[$key],3)).' Stok : '.CustomHelper::formatConditionalQty($stock);
                                 $passedQtyShading = false;
                             }

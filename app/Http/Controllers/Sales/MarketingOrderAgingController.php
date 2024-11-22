@@ -112,7 +112,7 @@ class MarketingOrderAgingController extends Controller
         foreach ($results as $row) {
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
             if ($balance > 0) {
-                $daysDiff = $this->dateDiffInDays($row->due_date, $date);
+                $daysDiff = $this->dateDiffInDays($row->due_date_internal, $date);
                 $index = $this->findDuplicate($row->account_code, $newData);
                 if ($index >= 0) {
                     foreach ($newData[$index]['data'] as $key => $rowdata) {
@@ -310,7 +310,7 @@ class MarketingOrderAgingController extends Controller
         foreach ($results as $row) {
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
             if ($balance > 0) {
-                $daysDiff = $this->dateDiffInDays($row->due_date, $date);
+                $daysDiff = $this->dateDiffInDays($row->due_date_internal, $date);
                 $arrDetail = [];
                 foreach ($arrColumn as $key => $rowcolumn) {
                     if ($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']) {
@@ -435,8 +435,8 @@ class MarketingOrderAgingController extends Controller
                     'code'          => $pi->code,
                     'vendor'        => $pi->account->name,
                     'post_date'     => date('d/m/Y', strtotime($pi->post_date)),
-                    'due_date'      => date('d/m/Y', strtotime($pi->due_date)),
-                    'due_days'      => $this->dateDiffInDays($pi->due_date, $date),
+                    'due_date'      => date('d/m/Y', strtotime($pi->due_date_internal)),
+                    'due_days'      => $this->dateDiffInDays($pi->due_date_internal, $date),
                     'grandtotal'    => number_format($pi->grandtotal, 2, ',', '.'),
                     'memo'          => number_format($memo, 2, ',', '.'),
                     'paid'          => number_format($paid, 2, ',', '.'),

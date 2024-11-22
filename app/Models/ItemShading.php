@@ -68,4 +68,32 @@ class ItemShading extends Model
         }
         return $total;
     }
+
+    public function totalUnsentSjM2(){
+        $total = 0;
+        $data = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
+            $query->where('status','2');
+        })->whereHas('itemStock',function($query){
+            $query->where('item_shading_id',$this->id);
+        })->get();
+        foreach($data as $row){
+            if(!$row->marketingOrderDeliveryProcess->isItemSent()){
+                $total += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3);
+            }
+        }
+        return $total;
+    }
+
+    public function totalUnsentMOdM2(): mixed{
+        $total = 0;
+        foreach($this->marketingOrderDeliveryDetailStockSpecial as $row){
+            $total += round($row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $row->qty,3);
+        }
+        return $total;
+    }
+
+    public function stockAvailable(){
+        $total = round($this->itemStock()->sum('qty') - $this->totalUnsentMOdM2() - $this->totalUnsentSjM2(),3);
+        return $total;
+    }
 }

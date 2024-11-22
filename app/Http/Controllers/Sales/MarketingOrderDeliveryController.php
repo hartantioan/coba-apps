@@ -486,9 +486,19 @@ class MarketingOrderDeliveryController extends Controller
                         }
                     }
                     foreach($arrShadingItem as $key => $row){
-                        if($arrShadingQty[$key] > $arrShadingStock[$key]){
+                        /* if($arrShadingQty[$key] > $arrShadingStock[$key]){
                             $itemShading = ItemShading::find($row);
                             $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty($arrShadingQty[$key]).' Stok : '.CustomHelper::formatConditionalQty($arrShadingStock[$key]);
+                            $passedQtyShading = false;
+                        } */
+                        $itemShading = ItemShading::find($row);
+                        if($itemShading){
+                            $stock = round($itemShading->stockAvailable(),3);
+                            if($stock < round($arrShadingQty[$key],3)){
+                                $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty(round($arrShadingQty[$key],3)).' Stok : '.CustomHelper::formatConditionalQty($stock);
+                                $passedQtyShading = false;
+                            }
+                        }else{
                             $passedQtyShading = false;
                         }
                     }

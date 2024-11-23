@@ -115,6 +115,8 @@
                                                         <th>{{ __('translations.tonnage') }} (KG)</th>
                                                         <th> Harga/Kg(Rp.) </th>
                                                         <th> Harga/Ritase(Rp.) </th>
+                                                        <th>Tgl.Dibuat</th>
+                                                        <th>Tgl.Diedit</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -508,6 +510,8 @@
                 { name: 'qty_tonnage', className: 'center-align' },
                 { name: 'tonnage', className: 'center-align' },
                 { name: 'ritage', className: 'center-align' },
+                { name: 'created_at', className: '' },
+                { name: 'updated_at', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

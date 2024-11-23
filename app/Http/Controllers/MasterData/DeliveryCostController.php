@@ -183,8 +183,8 @@ class DeliveryCostController extends Controller
                     number_format($val->qty_tonnage,3,',','.'),
                     number_format($val->tonnage,2,',','.'),
                     number_format($val->ritage,2,',','.'),
-                    $val->created_at,
-                    $val->updated_at,
+                    date('d/m/Y H:i:s',strtotime($val->created_at)),
+                    date('d/m/Y H:i:s',strtotime($val->updated_at)),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>

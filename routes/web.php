@@ -2658,6 +2658,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportProductionSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportProductionSummaryStockFgController::class, 'filter']);
                         Route::post('export', [ReportProductionSummaryStockFgController::class, 'export']);
+                        Route::get('export2', [ReportProductionSummaryStockFgController::class, 'export2']);
                     });
 
                     Route::prefix('report_balance_wip')->middleware('operation.access:production_summary_stock_fg,view')->group(function () {
@@ -3682,7 +3683,6 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [ReportRecapTaxController::class, 'export']);
                     });
                 });
-
             });
         });
     });

@@ -11,6 +11,7 @@ use App\Models\ItemStock;
 use App\Models\Place;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Exports\ExportReportSummaryStockFG2;
 
 
 use Maatwebsite\Excel\Facades\Excel;
@@ -138,5 +139,19 @@ class ReportProductionSummaryStockFgController extends Controller
 
         return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
+
+    public function export2(Request $request){
+
+        $start_date = $request->start_date ? $request->start_date : '';
+        $finish_date = $request->finish_date ? $request->finish_date : '';
+
+        $user_id = session('bo_id');
+
+      
+
+   
+		return Excel::download(new ExportReportSummaryStockFG2($start_date,$finish_date), 'summary_stock_'.uniqid().'.xlsx');
+    }
+
 
 }

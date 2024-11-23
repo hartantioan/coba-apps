@@ -30,7 +30,7 @@ class MailReportMarketingOEM extends Command
 	public function handle()
 	{
 		//$recipient = ['henrianto@superior.co.id', 'hendra@superior.co.id', 'andrew@superior.co.id', 'haidong@superiorporcelain.co.id', 'billylaw@superior.co.id'];
-		$recipient = ['iwan@superiorporcelain.co.id','henrianto@superior.co.id','eunike@superior.co.id'];
+			$recipient = ['iwan@superiorporcelain.co.id','henrianto@superior.co.id','eunike@superior.co.id'];
 		//  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 		//$recipient = ['edp@superior.co.id'];
 		// foreach ($akun as $pangsit) {
@@ -291,7 +291,21 @@ class MailReportMarketingOEM extends Command
 
 
 		//global 1c
-		$query = DB::select("		SELECT a.`name` AS tipe, b.`name` AS brand, IFNULL(c.sisaso,0) AS osso, IFNULL(d.osmod,0) AS osmod
+		$query = DB::select("		  
+               SELECT a.`name` AS tipe, case when b.`name`='ARA' then 'ARA - ARA' 
+						when b.`name`='AURORA' then 'ARR - AURORA'
+						when b.`name`='REXTON' then 'REX - REXTON'
+						when b.`name`='ALTHEA' then 'ALT - ALTHEA'
+						when b.`name`='CORE' then 'COR - CORE'
+						when b.`name`='CARLO' then 'CRL - CARLO'
+						when b.`name`='EOS' then 'EOS - EOS'
+						when b.`name`='REMO' then 'RMO - REMO'
+						when b.`name`='VALDA' then 'VDA - VALDA'
+						when b.`name`='VALERIO' then 'VRO - VALERIO'
+						ELSE 'XXX - NO BRAND'
+						end AS brand
+						
+						, IFNULL(c.sisaso,0) AS osso, IFNULL(d.osmod,0) AS osmod
 							, IFNULL(e.qtysjm,0) AS sj from types a cross JOIN brands b LEFT JOIN  
 	(
 	SELECT e.name AS tipe, f.`name` AS brand,  SUM((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso
@@ -331,7 +345,22 @@ class MailReportMarketingOEM extends Command
 							LEFT JOIN brands g ON g.id=c.brand_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
                	 GROUP BY d.name,g.name
-						)e ON a.name=e.tipe AND b.name = e.brand 	ORDER BY b.name");
+						)e ON a.name=e.tipe AND b.name = e.brand  where b.name not in ('GISELLE','MAHESA','WINTER')
+						ORDER BY case b.name
+  WHEN 'ARA' THEN 1
+  WHEN 'AURORA' THEN 2
+  WHEN 'REXTON' THEN 3
+  WHEN 'ALTHEA' THEN 4
+  WHEN 'CORE' THEN 5
+  WHEN 'CARLO' THEN 6
+  WHEN 'EOS' THEN 7
+  WHEN 'REMO' THEN 8
+  WHEN 'VALDA' THEN 9
+  WHEN 'VALERIO' THEN 10
+  
+  ELSE 11
+END
+						");
 
 		foreach ($query as $row) {
 

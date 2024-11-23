@@ -198,20 +198,31 @@
     @php
 
     $jenis = [];
+    $ara=[];
+    $aurora=[];
+    $rexton=[];
+    $althea=[];
     $carlo = [];
     $core = [];
-    $eod = [];
-    $mahesa = [];
+    $eos = [];
+
     $remo = [];
     $valda = [];
     $valerio = [];
-    $totalcarlo=0;
+    $nobrand = [];
+    $totalara=0;
+    $totalaurora=0;
+    $totalrexton=0;
+    $totalalthea=0;
     $totalcore=0;
-    $totaleod=0;
-    $totalmahesa=0;
+    $totalcarlo=0;
+    $totaleos=0;
     $totalremo=0;
     $totalvalda=0;
     $totalvalerio=0;
+    $totalnobrand=0;
+
+
 
 
     foreach ($data4 as $row) {
@@ -220,18 +231,29 @@
     $jenis[] = $row->jenis;
     }
     if ($row->jenis == 'HT PLAIN') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -240,23 +262,37 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
 
     }
 
     if ($row->jenis == 'GLAZED SPECIAL MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -265,22 +301,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED LIGHT MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -289,22 +339,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED DARK MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -313,22 +377,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED SATIN LIGHT') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -337,22 +415,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED SATIN DARK') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -361,22 +453,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED MEDIUM MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -385,22 +491,36 @@
     }
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
     }
     }
 
     if ($row->jenis == 'GLAZED REGULAR MARBLE') {
-    if ($row->brand=='CARLO'){
-    $carlo[$row->jenis] = $row->endstock;
+    if ($row->brand=='ARA'){
+    $ara[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $aurora[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $rexton[$row->jenis] = $row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $althea[$row->jenis] = $row->endstock;
     }
     if ($row->brand=='CORE'){
     $core[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $eod[$row->jenis] = $row->endstock;
+    if ($row->brand=='CARLO'){
+    $carlo[$row->jenis] = $row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $mahesa[$row->jenis] = $row->endstock;
+
+    if ($row->brand=='EOS'){
+    $eos[$row->jenis] = $row->endstock;
     }
+
     if ($row->brand=='REMO'){
     $remo[$row->jenis] = $row->endstock;
     }
@@ -410,20 +530,34 @@
     if ($row->brand=='VALERIO'){
     $valerio[$row->jenis] = $row->endstock;
     }
+    if ($row->brand=='NO BRAND'){
+    $nobrand[$row->jenis] = $row->endstock;
+    }
     }
 
+
+    if ($row->brand=='ARA'){
+    $totalara+=$row->endstock;
+    }
+    if ($row->brand=='AURORA'){
+    $totalaurora+=$row->endstock;
+    }
+    if ($row->brand=='REXTON'){
+    $totalrexton+=$row->endstock;
+    }
+    if ($row->brand=='ALTHEA'){
+    $totalalthea+=$row->endstock;
+    }
     if ($row->brand=='CARLO'){
     $totalcarlo+=$row->endstock;
     }
     if ($row->brand=='CORE'){
     $totalcore+=$row->endstock;
     }
-    if ($row->brand=='EOD'){
-    $totaleod+=$row->endstock;
+    if ($row->brand=='EOS'){
+    $totaleos+=$row->endstock;
     }
-    if ($row->brand=='MAHESA'){
-    $totalmahesa+=$row->endstock;
-    }
+
     if ($row->brand=='REMO'){
     $totalremo+=$row->endstock;
     }
@@ -433,7 +567,11 @@
     if ($row->brand=='VALERIO'){
 
     $totalvalerio+=$row->endstock;
-    }}
+    }
+    if ($row->brand=='NO BRAND'){
+    $totalnobrand+=$row->endstock;
+    }
+    }
     @endphp
 
 
@@ -443,24 +581,36 @@
 
         <tr>
             <th style="font-size:12px;">BRAND</th>
-            <th style="font-size:12px;">CARLO</th>
-            <th style="font-size:12px;">CORE</th>
-            <th style="font-size:12px;">EOD</th>
-            <th style="font-size:12px;">MAHESA</th>
-            <th style="font-size:12px;">REMO</th>
-            <th style="font-size:12px;">VALDA</th>
-            <th style="font-size:12px;">VALERIO</th>
+            <th style="font-size:12px;">ARA - ARA</th>
+            <th style="font-size:12px;">ARR - AURORA</th>
+            <th style="font-size:12px;">REX - REXTON</th>
+            <th style="font-size:12px;">ALT - ALTHEA</th>
+            <th style="font-size:12px;">COR - CORE</th>
+            <th style="font-size:12px;">CRL - CARLO</th>
+            <th style="font-size:12px;">EOS - EOS</th>
+            <th style="font-size:12px;">RMO - REMO</th>
+            <th style="font-size:12px;">VDA - VALDA</th>
+            <th style="font-size:12px;">VRO - VALERIO</th>
+            <th style="font-size:12px;">XXX - NO BRAND</th>
+
+
 
         </tr>
         <tr>
             <td style="font-size:12px;" align="left">TOTAL</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalcarlo?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalara?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalaurora?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalrexton?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalalthea?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($totalcore?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totaleod?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalmahesa?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalcarlo?? 0,0,",",".")}}</td>
+          
+            <td style="font-size:12px;" align="right">{{number_format($totaleos?? 0,0,",",".")}}</td>
+            
             <td style="font-size:12px;" align="right">{{number_format($totalremo?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($totalvalda?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($totalvalerio?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($totalnobrand?? 0,0,",",".")}}</td>
 
 
 
@@ -473,13 +623,19 @@
 
         <tr>
             <td style="font-size:12px;" align="left">{{$row}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($carlo[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($ara[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($aurora[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($rexton[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($althea[$row]?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($core[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($eod[$row]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($mahesa[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($carlo[$row]?? 0,0,",",".")}}</td>
+            
+            <td style="font-size:12px;" align="right">{{number_format($eos[$row]?? 0,0,",",".")}}</td>
+       
             <td style="font-size:12px;" align="right">{{number_format($remo[$row]?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($valda[$row]?? 0,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($valerio[$row]?? 0,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($nobrand[$row]?? 0,0,",",".")}}</td>
 
 
 

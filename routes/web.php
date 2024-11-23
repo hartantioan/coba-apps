@@ -225,6 +225,7 @@ use App\Http\Controllers\Accounting\ReportAccountingSummaryStockController;
 use App\Http\Controllers\Accounting\ReportMarketingDeliveryOrderProcessRecapController;
 use App\Http\Controllers\Accounting\ReportAccountingSales;
 use App\Http\Controllers\Accounting\StockInRupiahShadingController;
+use App\Http\Controllers\Accounting\ReportStockMovementPerShadingController;
 use App\Http\Controllers\Accounting\ReportTransaction_CogsController;
 use App\Http\Controllers\Accounting\StockInRupiahShading_BatchController;
 use App\Http\Controllers\Finance\HistoryEmployeeReceivableController;
@@ -3607,6 +3608,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [StockInRupiahShadingController::class, 'index']);
                         Route::post('filter', [StockInRupiahShadingController::class, 'filter']);
                         Route::post('export', [StockInRupiahShadingController::class, 'export']);
+                    });
+
+                    Route::prefix('stock_movement_shading')->middleware('operation.access:stock_movement_shading,view')->group(function () {
+                        Route::get('/', [ReportStockMovementPerShadingController::class, 'index']);
+                        Route::post('filter', [ReportStockMovementPerShadingController::class, 'filter']);
+                        Route::post('export', [ReportStockMovementPerShadingController::class, 'export']);
                     });
 
                     Route::prefix('report_transaction_cogs')->middleware('operation.access:report_transaction_cogs,view')->group(function () {

@@ -245,9 +245,14 @@ class ProductionIssueGPController extends Controller
 
             $passedQty = true;
             $arrNotPassedQty = [];
+            $sameItem = false;
+            $arrItem = [];
 
             foreach($request->arr_qty as $key => $row){
                 if($request->arr_lookable_type[$key] == 'items'){
+                    if(in_array($request->arr_lookable_id[$key],$arrItem)){
+                        $sameItem = true;
+                    }
                     $item = Item::find($request->arr_lookable_id[$key]);
                     $itemstock = $item->itemCogs()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                     $qty = str_replace(',','.',str_replace('.','',$row));
@@ -261,7 +266,15 @@ class ProductionIssueGPController extends Controller
                         $passedQty = false;
                         $arrNotPassedQty[] = $item->code.' - '.$item->name;
                     }
+                    $arrItem[] = $request->arr_lookable_id[$key];
                 }
+            }
+
+            if($sameItem){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf terdapat item yang sama. Silahkan hapus item yang sama dan jadikan satu.'
+                ]);
             }
 
             if(!$passedQty){

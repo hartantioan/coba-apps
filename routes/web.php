@@ -3136,6 +3136,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [MarketingOrderOutstandingMODController::class, 'index']);
                         Route::get('export', [MarketingOrderOutstandingMODController::class, 'export']);
                         Route::get('export2', [MarketingOrderOutstandingMODController::class, 'export2']);
+                        Route::post('filter', [MarketingOrderOutstandingMODController::class, 'filter']);
+                        Route::post('filterWithStock', [MarketingOrderOutstandingMODController::class, 'filterWithStock']);
                     });
 
                     Route::prefix('outstanding_delivery_order')->middleware('operation.access:outstanding_delivery_order,view')->group(function () {

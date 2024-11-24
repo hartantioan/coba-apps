@@ -40,6 +40,10 @@ use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionRepackDetail;
+use App\Models\IssueGlaze;
+use App\Models\IssueGlazeDetail;
+use App\Models\ReceiveGlaze;
+use App\Models\ReceiveGlazeDetail;
 use App\Models\PurchaseMemo;
 use Carbon\CarbonPeriod;
 use Illuminate\Bus\Queueable;
@@ -49,7 +53,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ResetCogsNewByDate4 implements ShouldQueue/* , ShouldBeUnique */
+class ResetCogsNewByDate4 implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     
@@ -69,7 +73,12 @@ class ResetCogsNewByDate4 implements ShouldQueue/* , ShouldBeUnique */
         $this->item_shading_id = $item_shading_id;
         $this->production_batch_id = $production_batch_id;
         $this->end_date = $end_date;
-        $this->queue = 'cogsbydate4';
+        $this->queue = 'cogsbydate';
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->item_id.'-'.$this->place_id.'-'.$this->item_shading_id.'-'.$this->production_batch_id.'-'.$this->date;
     }
 
     /**
@@ -210,6 +219,88 @@ class ResetCogsNewByDate4 implements ShouldQueue/* , ShouldBeUnique */
                     }
                 }
             }
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        $issueglazeheader = IssueGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){
+            $query->where('item_id',$item_id);
+        })->get();
+
+        foreach($issueglazeheader as $row){
+            $total = $row->grandtotal;
+            $qty = $row->qty;
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->getTable(),
+                'lookable_id'		    => $row->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->company_id,
+                'place_id'			    => $row->itemStock->place_id,
+                'warehouse_id'		    => $row->itemStock->warehouse_id,
+                'item_id'			    => $row->itemStock->item_id,
+                'qty_in'			    => $qty,
+                'price_in'			    => $qty > 0 ? $total / $qty : 0,
+                'total_in'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'IN',
+                'area_id'               => $row->itemStock->area_id ?? NULL,
+                'item_shading_id'       => $row->itemStock->item_shading_id ?? NULL,
+                'production_batch_id'   => $row->itemStock->production_batch_id ?? NULL,
+            ]);
+
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal'     => $total,
+                ]);
+            }
+
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        $receiveglazeheader = ReceiveGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){
+            $query->where('item_id',$item_id);
+        })->get();
+
+        foreach($receiveglazeheader as $row){
+            $total = $row->grandtotal;
+            $qty = $row->qty;
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->getTable(),
+                'lookable_id'		    => $row->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->company_id,
+                'place_id'			    => $row->itemStock->place_id,
+                'warehouse_id'		    => $row->itemStock->warehouse_id,
+                'item_id'			    => $row->itemStock->item_id,
+                'qty_in'			    => $qty,
+                'price_in'			    => $qty > 0 ? $total / $qty : 0,
+                'total_in'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'IN',
+                'area_id'               => $row->itemStock->area_id ?? NULL,
+                'item_shading_id'       => $row->itemStock->item_shading_id ?? NULL,
+                'production_batch_id'   => $row->itemStock->production_batch_id ?? NULL,
+            ]);
+
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal'     => $total,
+                ]);
+            }
+
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
         }
@@ -741,6 +832,128 @@ class ResetCogsNewByDate4 implements ShouldQueue/* , ShouldBeUnique */
             if($gi){
                 $gi->updateGrandtotal();
             }
+        }
+
+        $issueglaze = IssueGlazeDetail::whereHas('issueGlaze',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('itemStock',function($query)use($item_id){
+            $query->where('item_id',$item_id);
+        })->where('lookable_type','items')->get();
+
+        $arrIssueGlaze = [];
+        foreach($issueglaze as $row){
+            if(!in_array($row->issue_glaze_id,$arrIssueGlaze)){
+                $arrIssueGlaze[] = $row->issue_glaze_id;
+            }
+            $price = $row->itemStock->priceDate($row->issueGlaze->post_date);
+            $total = round($row->qty * $price,2);
+            $qty = $row->qty;
+            $total_final = $totalBefore - $total;
+            $qty_final = $qtyBefore - $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->issueGlaze->getTable(),
+                'lookable_id'		    => $row->issueGlaze->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->issueGlaze->company_id,
+                'place_id'			    => $row->itemStock->place_id,
+                'warehouse_id'		    => $row->itemStock->warehouse_id,
+                'item_id'			    => $row->itemStock->item_id,
+                'qty_out'			    => $qty,
+                'price_out'			    => round($price,5),
+                'total_out'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'OUT',
+                'area_id'               => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+                'item_shading_id'       => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+                'production_batch_id'   => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+            ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => 0,
+                    'nominal'     => $total,
+                ]);
+            }
+            $row->update([
+                'total' => $total
+            ]);
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        if(count($arrIssueGlaze) > 0){
+            foreach($arrIssueGlaze as $id){
+                $ig = IssueGlaze::find(intval($id));
+                if($ig){
+                    $ig->updateGrandtotal();
+                    self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date);
+                }
+            }   
+        }
+
+        $receiveglaze = ReceiveGlazeDetail::whereHas('receiveGlaze',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('issueGlaze',function($query)use($item_id){
+            $query->whereHas('itemStock',function($query)use($item_id){
+                $query->where('item_id',$item_id);
+            });
+        })->get();
+
+        $arrReceiveGlaze = [];
+        foreach($receiveglaze as $row){
+            if(!in_array($row->receive_glaze_id,$arrReceiveGlaze)){
+                $arrReceiveGlaze[] = $row->receive_glaze_id;
+            }
+            $price = $row->issueGlaze->itemStock->priceDate($row->receiveGlaze->post_date);
+            $total = round($row->qty * $price,2);
+            $qty = $row->qty;
+            $total_final = $totalBefore - $total;
+            $qty_final = $qtyBefore - $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->receiveGlaze->getTable(),
+                'lookable_id'		    => $row->receiveGlaze->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->receiveGlaze->company_id,
+                'place_id'			    => $row->issueGlaze->itemStock->place_id,
+                'warehouse_id'		    => $row->issueGlaze->itemStock->warehouse_id,
+                'item_id'			    => $row->issueGlaze->itemStock->item_id,
+                'qty_out'			    => $qty,
+                'price_out'			    => round($price,5),
+                'total_out'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'OUT',
+                'area_id'               => $row->issueGlaze->itemStock->area()->exists() ? $row->issueGlaze->itemStock->area_id : NULL,
+                'item_shading_id'       => $row->issueGlaze->itemStock->itemShading()->exists() ? $row->issueGlaze->itemStock->item_shading_id : NULL,
+                'production_batch_id'   => $row->issueGlaze->itemStock->productionBatch()->exists() ? $row->issueGlaze->itemStock->production_batch_id : NULL,
+            ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => 0,
+                    'nominal'     => $total,
+                ]);
+            }
+            $row->update([
+                'total' => $total
+            ]);
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        if(count($arrReceiveGlaze) > 0){
+            foreach($arrReceiveGlaze as $id){
+                $ig = ReceiveGlaze::find(intval($id));
+                if($ig){
+                    $ig->updateGrandtotal();
+                    self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date);
+                }
+            }   
         }
 
         $goodreturnissue = GoodReturnIssueDetail::whereHas('goodReturnIssue',function($query)use($dateloop){

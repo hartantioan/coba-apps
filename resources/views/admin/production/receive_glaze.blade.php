@@ -147,9 +147,10 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                                        <th>Item Tujuan</th>
+                                                        <th>Qty Diterima</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
-                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.operation') }}</th>
                                                     </tr>
                                                 </thead>
@@ -184,7 +185,6 @@
                                     <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
-                                        <input type="hidden" id="tempGroup" name="tempGroup">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
@@ -224,6 +224,31 @@
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();">
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
+                                    <div class="input-field col m3 s12" >
+                                        <select class="browser-default" id="item_id" name="item_id">
+                                            @foreach ($items as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="item_id">Target Item</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="to_place_id" name="to_place_id">
+                                            @foreach ($place as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="to_place_id">Plant Tujuan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="to_warehouse_id" name="to_warehouse_id">
+                                            @foreach ($list_warehouse as $row)
+                                                <option value="{{ $row['id'] }}">{{ $row['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="to_warehouse_id">Gudang Tujuan</label>
+                                    </div>
+                                    <div class="col m12 s12"></div>
                                     <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
                                             <span>File</span>
@@ -237,17 +262,13 @@
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                    <div class="input-field col  m3 s12" >
-                                        <select class="browser-default" id="target_item_id" name="target_item_id"  >&nbsp;</select>
-                                        <label class="active" for="target_item_id">Pilih Item </label>
-                                    </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Detail Pemakaian Issue GC</legend>
+                                    <legend>2. Detail Pemakaian Issue Glaze Prep</legend>
                                     <div class="col m12 s12">
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
@@ -268,53 +289,14 @@
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
-                                                        <td colspan="4" class="center-align">
+                                                        <td colspan="2" class="center-align">
                                                             <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addIssue();"><i class="material-icons right">add_circle_outline</i> Tambah Issue</a>
                                                         </td>
+                                                        <td class="right-align"><h5 id="total-qty">0,000</h5></td>
+                                                        <td></td>
                                                     </tfoot>
                                                 </table>
                                             </p>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12 step9">
-                                <fieldset style="min-width: 100%;">
-                                    <legend>4. Detail Item Receive</legend>
-                                    <div class="col m12 s12">
-                                        <div class="col s12" style="overflow:auto;min-width:100%;">
-                                            <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">{{ __('translations.no') }}.</th>
-                                                            <th class="center">{{ __('translations.item') }}</th>
-                                                            <th class="center" width="150px">Qty Receive (OK)</th>
-                                                            <th class="center" width="300px">Satuan</th>
-                                                            <th class="center">Plant</th>
-                                                            <th class="center">Gudang</th>
-                                                            <th class="center">Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-item">
-                                                        <tr id="last-row-item">
-                                                            <td class="center-align" colspan="7">
-
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <td colspan="4" class="center-align">
-                                                            <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick=""><i class="material-icons right">add_circle_outline</i> Tambah Item</a>
-                                                        </td>
-                                                    </tfoot>
-                                                </table>
-                                            </p>
-                                        </div>
-                                        <div class="col s12" id="alert-method">
-                                            -
                                         </div>
                                     </div>
                                 </fieldset>
@@ -329,217 +311,6 @@
         <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
-    </div>
-</div>
-
-<div id="modal_edit" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content" style="overflow:auto !important;">
-        <div class="row">
-            <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                <form class="row" id="form_data_edit" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>1. {{ __('translations.main_info') }}</legend>
-                                    <div class="input-field col m2 s12 step1">
-                                        <input type="hidden" id="temp_id_edit" name="temp_id_edit">
-                                        <input type="hidden" id="tempGroup_id_edit" name="tempGroup_id_edit">
-                                        <input id="doc_code_edit" name="doc_code_edit" type="text" value="{{ $newcode }}" readonly>
-                                        <label class="active" for="doc_code_edit">No. Dokumen</label>
-                                    </div>
-                                    <div class="input-field col m1 s12 step2">
-                                        <select class="form-control" id="code_place_id_edit" name="code_place_id_edit" onchange="getCode(this.value);" readonly>
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="code_place_id_edit">Tempat Kode</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <select class="form-control" id="company_id_edit" name="company_id_edit" readonly>
-                                            @foreach ($company as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="company_id_edit">{{ __('translations.company') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="plant_id_edit" name="plant_id_edit" readonly>
-                                            @foreach ($place as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="plant_id_edit">{{ __('translations.plant') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="line_id_edit" name="line_id_edit" readonly>
-                                            @foreach ($line as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="line_id_edit">{{ __('translations.line') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="shift_id_edit" name="shift_id_edit" onchange="unlockProductionOrder();"></select>
-                                        <label class="active" for="shift_id_edit">Shift</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="group_edit" name="group_edit" type="text" placeholder="Grup" onkeyup="unlockProductionOrder();">
-                                        <label class="active" for="group_edit">Grup</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="post_date_edit" name="post_date_edit" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();" readonly>
-                                        <label class="active" for="post_date_edit">Tgl. Post</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="start_process_time_edit" name="start_process_time_edit" type="datetime-local" placeholder="Tgl. Mulai Produksi" readonly>
-                                        <label class="active" for="start_process_time_edit">Tgl. Mulai Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="end_process_time_edit" name="end_process_time_edit" type="datetime-local" placeholder="Tgl. Selesai Produksi" readonly>
-                                        <label class="active" for="end_process_time_edit">Tgl. Selesai Produksi</label>
-                                    </div>
-
-                                    <div class="input-field col m3 s12">
-                                        <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                        <label class="active" for="note_edit">{{ __('translations.note') }}</label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
-                        <div class="col s12">
-                            <fieldset>
-                                <legend>2. Order Produksi</legend>
-                                <div class="input-field col m4 s12 step6 disable-class">
-                                    <select class="browser-default" id="production_order_detail_id_edit" name="production_order_detail_id_edit" onchange="getProductionOrder();" tabindex="-1"></select>
-                                    <label class="active" for="production_order_detail_id_edit">Daftar Order Produksi (Pilih Shift & Grup)</label>
-                                </div>
-                                <div class="input-field col m1 s12 center-align">
-                                    <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text" onclick="getAccountData('1');" id="btn-show_edit"><i class="material-icons right">receipt</i></a>
-                                    <label class="active">&nbsp;</label>
-                                </div>
-                                <div class="col m12">
-                                    <div class="row">
-                                        <div class="col m4 s12">
-                                            Line : <b id="output-line_edit">-</b>
-                                        </div>
-                                        <div class="col m4 s12">
-                                            Target Item SFG/FG : <b id="output-fg_edit">-</b>
-                                        </div>
-                                        <div class="col m4 s12">
-                                            Qty : <b id="output-qty_edit">-</b>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col s12">
-                            <fieldset>
-                                <legend>3. Detail Issue Production Order</legend>
-                                <div class="col m12 s12">
-                                    <div class="col s12" style="overflow:auto;min-width:100%;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item_edit">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">{{ __('translations.no') }}.</th>
-                                                        <th class="center">No. Production Issue</th>
-                                                        <th class="center">Daftar Batch Terpakai</th>
-                                                        <th class="center">Hapus</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-issue_edit">
-                                                    <tr id="last-row-issue_edit">
-                                                        <td class="center-align" colspan="4">
-                                                            Silahkan tambah dengan tombol dibawah
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <td colspan="4" class="center-align">
-                                                        <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addIssue();"><i class="material-icons right">add_circle_outline</i> Tambah Issue</a>
-                                                    </td>
-                                                </tfoot>
-                                            </table>
-                                        </p>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col s12 step9">
-                            <fieldset style="min-width: 100%;">
-                                <legend>4. Detail Item Receive</legend>
-                                <div class="col m12 s12">
-                                    <div class="card-alert card gradient-45deg-purple-amber">
-                                        <div class="card-content white-text">
-                                            <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
-                                        </div>
-                                    </div>
-                                    <div class="card-alert card gradient-45deg-purple-amber">
-                                        <div class="card-content white-text">
-                                            <p>Info : Production Receive tipe item FG, tidak akan menjurnal dan membuat stok.</p>
-                                        </div>
-                                    </div>
-                                    <div class="col s12" style="overflow:auto;min-width:100%;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">{{ __('translations.no') }}.</th>
-                                                        <th class="center">{{ __('translations.item') }}</th>
-                                                        <th class="center" width="150px">Qty Planned</th>
-                                                        <th class="center" width="150px">Qty Receive (OK)</th>
-                                                        <th class="center" width="150px">Qty Reject (Jika ada)</th>
-                                                        <th class="center" width="300px">Satuan Produksi</th>
-                                                        <th class="center">Plant</th>
-                                                        <th class="center">Gudang</th>
-                                                        <th class="center" width="400px">Batch (*Nomor Sementara)</th>
-                                                        <th class="center">Hapus</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item_edit">
-                                                    <tr id="last-row-item">
-                                                        <td class="center-align" colspan="10">
-                                                            Silahkan tambahkan Order Produksi untuk memulai...
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                                {{-- <tfoot>
-                                                    <tr>
-                                                        <th colspan="10">
-                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah Reject
-                                                            </a>
-                                                        </th>
-                                                    </tr>
-                                                </tfoot> --}}
-                                            </table>
-                                        </p>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
-        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="saveEdit();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -841,31 +612,7 @@
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
-        $('#modal_edit').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ $minDate }}');
-                $('#post_date').attr('max','{{ $maxDate }}');
-                applyStartEndDate();
-            },
-            onOpenEnd: function(modal, trigger) {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                M.updateTextFields();
-                window.onbeforeunload = function() {
-                    return 'You will lose all changes made since your last save';
-                };
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_data_edit')[0].reset();
-                $('#shift_id_edit').empty();
-                $('#group_edit').val('');
-                $('#code_edit').empty();
-                $('#temp_id_edit').val('');
-                M.updateTextFields();
-
-            }
-        });
+    
         $('#modal_pdo').modal({
             onOpenStart: function(modal,trigger) {
                 $('.collapsible').collapsible({
@@ -1007,13 +754,12 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $('#temp,#tempGroup').val('');
+                $('#temp').val('');
+                $('#total-qty').text('0,000');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td class="center-align" colspan="10">
@@ -1021,8 +767,6 @@
                         </td>
                     </tr>
                 `);
-                $('.disable-class').css('pointer-events','none');
-                $('#production_order_detail_id').attr('tabindex','-1');
                 $('#body-issue').empty().append(`
                     <tr id="last-row-issue">
                         <td class="center-align" colspan="4">
@@ -1036,36 +780,6 @@
             }
         });
 
-        $('#production_order_detail_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/production_order_detail_receive") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        place_id: $('#place_id').val(),
-                        line_id: $('#line_id').val(),
-                        group: $('#group').val(),
-                        shift_id: $('#shift_id').val(),
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
-        });
-
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
-
         $('#body-item').on('click', '.delete-data-item', function() {
             let id = $(this).data('id');
             $('.row_item_batch[data-code="' + id + '"]').remove();
@@ -1075,6 +789,7 @@
         $('#body-issue').on('click', '.delete-data-issue', function() {
             $(this).closest('tr').remove();
             resetIssue();
+            countAll();
         });
     });
 
@@ -1125,469 +840,6 @@
                 $('#modal_pdo').modal('close');
             }
         });
-    }
-
-    function saveEdit(){
-        var formData = new FormData($('#form_data_edit')[0]);
-        $.ajax({
-            url: '{{ Request::url() }}/save_edit',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('#modal_edit');
-            },
-            success: function(response) {
-                loadingClose('#modal_edit');
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
-                if(response.status == 200) {
-                    loadDataTable();
-                    $('#modal_edit').modal('close');
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    $.each(response.error, function(field, errorMessage) {
-                        $('#' + field).addClass('error-input');
-                        $('#' + field).css('border', '1px solid red');
-
-                    });
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
-                        });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#modal1');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function showEdit(id){
-        $.ajax({
-            url: '{{ Request::url() }}/show',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                $('#modal_edit').modal('open');
-                $('#temp_id_edit').val(id);
-
-                $('#code_edit').append(response.code);
-                $('#shift_id_edit').empty().append(`
-                    <option value="` + response.shift_id + `">` + response.shift_name + `</option>
-                `);
-                $('#group_edit').val(response.group);
-                $('#note_edit').val(response.note);
-
-                $('#temp_id_edit').val(id);
-                $('#tempGroup_id_edit').val(response.group_bom);
-                $('#code_place_id_edit').val(response.code_place_id).formSelect();
-                $('#doc_code_edit').val(response.code);
-                $('#post_date_edit').val(response.post_date);
-                $('#plant_id_edit').val(response.place_id).formSelect();
-                $('#line_id_edit').val(response.line_id).formSelect();
-
-                $('#company_id_edit').val(response.company_id).formSelect();
-                $('#start_process_time_edit').val(response.start_process_time);
-                $('#end_process_time_edit').val(response.end_process_time);
-                $('#note_edit').val(response.note);
-                $('#production_order_detail_id_edit').empty().append(`
-                    <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
-                `);
-
-                let no = $('.row_item').length + 1;
-
-                $.each(response.details, function(i, val) {
-                    var count = makeid(10);
-
-                    let batchhtml = `-`;
-
-                    if(val.group_bom == '3'){
-                        batchhtml = `<div class="row">
-                            <div class="col m12 s12">
-                                <table class="bordered" style="width:500px !important;">
-                                    <thead>
-                                        <tr>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-batch_edit` + count + `"></tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="center-align">
-                                                <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>`;
-                    }
-
-                    $('#body-item_edit').append(`
-                        <tr class="row_item" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
-                            <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `" readonly>
-                            <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `" readonly>
-                            <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `" readonly>
-                            <input type="hidden" name="arr_is_powder[]" value="` + val.is_powder + `" readonly>
-                            <td class="center-align">
-                                ` + no + `
-                            </td>
-                            <td>
-                                ` + val.item_name + `
-                            </td>
-                            <td class="right-align">
-                                ` + val.qty_planned + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty[]" readonly type="text" value="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" data-max="` + val.qty_planned + `" readonly >
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty_reject[]" readonly type="text" value="` + val.qty_reject + `" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" readonly>
-                            </td>
-                            <td class="center" id="arr_unit` + count + `">
-                                ` + val.unit + `
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" readonly>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" readonly>
-                                    <option value="">--Silahkan pilih item--</option>
-                                </select>
-                            </td>
-                            <td class="center-align">
-                                ` + batchhtml + `
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `"  readonly>
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-
-                    if(val.group_bom == '3'){
-                        $.each(val.list_batch, function(i, detail) {
-                            let detailcode = makeid(10);
-                            $('#table-batch_edit' + count).append(`<tr>
-                                <td>
-                                    <input name="arr_batch_no[]" id="arr_batch_no` + detailcode + `" type="text" value="` + detail.batch_no + `" readonly class="no-batch-` + count + `" readonly>
-                                </td>
-                                <td>
-                                    <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + detail.qty + `" readonly style="text-align:right;" readonly>
-                                </td>
-                                <td>
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);" readonly>
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>`);
-                        });
-                    }
-
-                    if(val.list_warehouse.length > 0){
-                        $('#arr_warehouse' + count).empty();
-                        $.each(val.list_warehouse, function(i, val) {
-                            $('#arr_warehouse' + count).append(`
-                                <option value="` + val.id + `">` + val.name + `</option>
-                            `);
-                        });
-                    }
-
-                    $('#arr_warehouse' + count).val(val.warehouse_id);
-                    $('#arr_place' + count).val(val.place_id);
-                    no++;
-                });
-
-                $('#body-issue_edit').empty();
-
-                $.each(response.issues, function(i, val) {
-                    let count = makeid(10);
-                    $('#body-issue_edit').append(`
-                        <tr class="row_issue">
-                            <td class="center-align">
-                                ` + (i + 1) + `
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');" readonly>
-                                    <option value="` + val.production_issue_id + `">` + val.production_issue_name + `</option>
-                                </select>
-                            </td>
-                            <td id="batch-used` + count + `">
-                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
-                                    <thead>
-                                        <tr>
-                                            <th class="center">Batch</th>
-                                            <th class="center">Qty Terpakai</th>
-                                            <th class="center">Hapus</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-issue-batch` + count + `">
-                                        <tr id="last-row-issue-batch` + count + `">
-                                            <td class="center-align" colspan="3">
-                                                Hanya untuk issue yang memiliki batch dan WIP 2.
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-
-
-                    if(val.details.length > 0){
-                        $('#body-issue-batch_edit' + count).empty();
-                        $.each(val.details, function(i, value) {
-                            let countdata = makeid(10);
-                            $('#body-issue-batch_edit' + count).append(`
-                                <tr class="row_batch_usage` + count + `">
-                                    <input type="hidden" value="` + value.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
-                                    <input type="hidden" value="` + value.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
-                                    <td>
-                                        ` + value.batch_no + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" readonly style="text-align:right;" data-max="` + value.qty_max + `"  readonly>
-                                    </td>
-                                    <td>
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + count + `');">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-                });
-
-                resetIssue();
-
-                M.updateTextFields();
-                $('.modal-content').scrollTop(0);
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function unlockProductionOrder(){
-        if($('#shift_id').val() && $('#group').val()){
-            $('.disable-class').css('pointer-events','auto');
-            $('#production_order_detail_id').attr('tabindex','0');
-        }else{
-            $('.disable-class').css('pointer-events','none');
-            $('#production_order_detail_id').attr('tabindex','-1');
-        }
-    }
-
-    function getAccountData(kind){
-        $.ajax({
-            url: '{{ Request::url() }}/get_account_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: $('#account_id').val(),
-                shift_id: $('#shift_id').val(),
-                place_id: $('#place_id').val(),
-                line_id: $('#line_id').val(),
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-
-                if(kind == '1'){
-                    $('#modal_pdo').modal('open');
-
-                    if(response.details.length > 0){
-
-                        $.each(response.details, function(i, val) {
-
-                            $('#body-detail-pdo').append(`
-                                <tr data-id="` + val.id + `">
-                                    <td>
-                                        ` + val.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.user + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.item_receive_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.note1 + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.status + `
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-                }
-
-                $('.modal-content').scrollTop(0);
-                M.updateTextFields();
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function addLine(){
-        if($('#production_order_detail_id').val()){
-            let no = $('.row_item').length + 1;
-            var count = makeid(10);
-            $('#body-item').append(`
-                <tr class="row_item" data-id="">
-                    <input type="hidden" name="arr_production_order_detail_id[]" value="` + $('#production_order_detail_id').val() + `">
-                    <input type="hidden" name="arr_bom_id[]" value="0">
-                    <input type="hidden" name="arr_qty_bom[]" value="0,000">
-                    <td class="center-align">
-                        ` + no + `
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_item_id` + count + `" name="arr_item_id[]" onchange="getRowUnit('` + count + `')"></select>
-                    </td>
-                    <td class="right-align">
-                        0,000
-                    </td>
-                    <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
-                    </td>
-                    <td class="center" id="arr_unit` + count + `">
-                        -
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                            @foreach ($place as $rowplace)
-                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                            <option value="">--Silahkan pilih item--</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="" readonly>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-
-            select2ServerSide('#arr_item_id' + count, '{{ url("admin/select2/item") }}');
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih Production Order terlebih dahulu.',
-                icon: 'error'
-            });
-        }
-    }
-
-    function getRowUnit(val){
-        $("#arr_unit" + val).empty();
-        if($("#arr_lookable_id" + val).val()){
-            $("#arr_unit" + val).text($("#arr_lookable_id" + val).select2('data')[0].uom);
-            /* if($('select#arr_warehouse' + val).length > 0){
-                $('#arr_warehouse' + val).empty();
-                $.each($("#arr_lookable_id" + val).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + val).append(`
-                        <option value="` + value.id + `">` + value.name + `</option>
-                    `);
-                });
-            } */
-        }else{
-            $("#arr_unit" + val).text('-');
-        }
     }
 
     function makeTreeOrg(data,link){
@@ -1714,190 +966,11 @@
         });
     }
 
-    function checkQtyReject(code){
-        /* let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
-        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let balance = qtyMax - qty;
-        let qtyReject = parseFloat($('#rowQtyReject' + code).val().replaceAll(".", "").replaceAll(",","."));
-        if(qtyReject > 0){
-            if(qtyReject > balance){
-                $('#rowQtyReject' + code).val(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
-            }
-        } */
-    }
-
-    function applyReject(code){
-        /* let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
-        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let balance = qtyMax - qty;
-        if(balance >= 0){
-            $('#rowQtyReject' + code).val(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
-        }else{
-            $('#rowQtyReject' + code).val('0,000');
-        } */
-    }
-
-    function getProductionOrder(data){
-        data = data || '';
-        if($('.row_issue').length > 0){
-            $('.row_issue').remove();
-            $('#body-issue').append(`
-                <tr id="last-row-issue">
-                    <td class="center-align" colspan="4">
-                        Silahkan tambah dengan tombol dibawah
-                    </td>
-                </tr>
-            `);
-        }
-        $('#note').val('');
-        if($('#production_order_detail_id').val()){
-            $('#body-item').empty();
-            if($('#shift_id').val() && $('#group').val()){
-
-
-                $('#alert-method').html('-');
-                let datakuy = data !== '' ? data : $('#production_order_detail_id').select2('data')[0];
-                $('#note').val(datakuy.note);
-                $('#tempGroup').val(datakuy.group_bom);
-                $('#title-modal').text(datakuy.bom_group);
-
-                if(datakuy.has_backflush){
-                    $('#alert-method').empty().append(`
-                        <div class="red darken-4 white-text">Item yang akan diterima akan membuat Production Issue secara otomatis karena Material BOM terdapat item / resource dengan tipe BACKFLUSH.</div>
-                    `);
-                }
-
-                $('#last-row-item').remove();
-
-                var count = makeid(10);
-
-                let no = $('.row_item').length + 1;
-
-                $('#body-item').append(`
-                    <tr class="row_item" data-id="` + $('#production_order_detail_id').val() + `">
-                        <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
-                        <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
-                        <input type="hidden" name="arr_qty_bom[]" value="` + datakuy.item_receive_qty + `">
-                        <input type="hidden" name="arr_item_id[]" value="` + datakuy.item_receive_id + `">
-                        <input type="hidden" name="arr_is_powder[]" value="` + datakuy.is_powder + `">
-                        <td class="center-align">
-                            ` + no + `
-                        </td>
-                        <td>
-                            ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
-                        </td>
-                        <td class="right-align">
-                            ` + datakuy.item_receive_balance + `
-                        </td>
-                        <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);applyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" data-max="` + datakuy.item_receive_balance + `" required>
-                        </td>
-                        <td class="center">
-                            <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
-                        </td>
-                        <td class="center" id="arr_unit` + count + `">
-                            ` + datakuy.item_receive_unit_uom + `
-                        </td>
-                        <td>
-                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                <option value="">--Silahkan pilih item--</option>
-                            </select>
-                        </td>
-                        <td class="center-align">
-                            <div class="row">
-                                <div class="col m12 s12">
-                                    <table class="bordered" style="width:500px !important;">
-                                        <thead>
-                                            <tr>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-batch` + count + `"></tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="3" class="center-align">
-                                                    <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="center">
-                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        </td>
-                    </tr>
-                `);
-                if(datakuy.list_warehouse.length > 0){
-                    $('#arr_warehouse' + count).empty();
-                    $.each(datakuy.list_warehouse, function(i, val) {
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.id + `">` + val.name + `</option>
-                        `);
-                    });
-                }
-
-                $('#arr_warehouse' + count).val(datakuy.warehouse_id);
-
-                $('#output-line').empty().text(datakuy.line);
-                $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
-                $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
-                M.updateTextFields();
-            }else{
-                swal({
-                    title: 'Ups!',
-                    text: 'Mohon maaf. Shift & Grup tidak boleh kosong.',
-                    icon: 'error'
-                });
-                $('#production_order_detail_id').empty();
-            }
-        }else{
-            $('#title-modal').text('-');
-            $('#output-line,#output-fg,#output-qty').text('-');
-            $('#body-item').empty().append(`
-                <tr id="last-row-item">
-                    <td class="center-align" colspan="10">
-                        Silahkan tambahkan Order Produksi untuk memulai...
-                    </td>
-                </tr>
-            `);
-        }
-    }
-
-    function removeBatch(element){
-        $(element).parent().parent().remove();
-    }
-
-    function removeBatchIssue(element,id){
-        $(element).parent().parent().remove();
-        if($('.row_batch_usage' + id).length == 0){
-            $('#body-issue-batch' + id).empty().append(`
-                <tr id="last-row-issue-batch` + id + `">
-                    <td class="center-align" colspan="3">
-                        Hanya untuk issue yang memiliki batch dan WIP 2.
-                    </td>
-                </tr>
-            `);
-        }
-    }
-
     var arrIssue = [];
 
     function resetIssue(){
         arrIssue = [];
-        $('select[name^="arr_production_issue_id[]"]').each(function(index){
+        $('select[name^="arr_issue_glaze_id[]"]').each(function(index){
             if($(this).val()){
                 arrIssue.push($(this).val());
             }
@@ -1905,186 +978,83 @@
     }
 
     function checkMaxBatchQty(id){
-        let qtyMax = parseFloat($('#arr_issue_batch_usage_qty' + id).data('max').replaceAll(".", "").replaceAll(",","."));
-        let qty = parseFloat($('#arr_issue_batch_usage_qty' + id).val().replaceAll(".", "").replaceAll(",","."));
+        let qtyMax = parseFloat($('#rowQty' + id).data('max').toString().replaceAll(".", "").replaceAll(",","."));
+        let qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",","."));
         if(qty > qtyMax){
-            $('#arr_issue_batch_usage_qty' + id).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+            $('#rowQty' + id).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
         }
+        countAll();
     }
 
-    function getBatchIssue(id){
-        $('#body-issue-batch' + id).empty();
-        if($('#arr_production_issue_id' + id).val()){
-            let data = $('#arr_production_issue_id' + id).select2('data')[0];
-            if(data.list_batch_usage.length > 0){
-                $.each(data.list_batch_usage, function(i, val) {
-                    let count = makeid(10);
-                    $('#body-issue-batch' + id).append(`
-                        <tr class="row_batch_usage` + id + `">
-                            <input type="hidden" value="` + val.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
-                            <input type="hidden" value="` + val.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
-                            <td>
-                                ` + val.batch_no + `
-                            </td>
-                            <td>
-                                <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + count + `')" style="text-align:right;" data-max="` + val.qty + `">
-                            </td>
-                            <td>
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + id + `');">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-                });
-            }else{
-                $('#body-issue-batch' + id).append(`
-                    <tr id="last-row-issue-batch` + id + `">
-                        <td class="center-align" colspan="3">
-                            Issue ini bukan untuk WIP 3 atau tidak terdapat penggunaan batch disana.
-                        </td>
-                    </tr>
-                `);
-            }
-        }else{
-            $('#body-issue-batch' + id).append(`
-                <tr id="last-row-issue-batch` + id + `">
-                    <td class="center-align" colspan="3">
-                        Hanya untuk issue yang memiliki batch dan WIP 2.
-                    </td>
-                </tr>
-            `);
+    function countAll(){
+        let total = 0;
+        $('input[name^="arr_qty[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-qty').text(
+            formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
+    }
+
+    function getQtyIssue(id){
+        $('#rowQty' + id).val('0,000');
+        $('#rowQty' + id).data('max','0,000');
+        if($('#arr_issue_glaze_id' + id).val()){
+            let data = $('#arr_issue_glaze_id' + id).select2('data')[0];
+            $('#rowQty' + id).val(data.balance);
+            $('#rowQty' + id).data('max',data.balance);
         }
+        countAll();
     }
 
     function addIssue(){
-        if($('#production_order_detail_id').val()){
-            if($('#last-row-issue').length > 0){
-                $('#last-row-issue').remove();
-            }
-            let no = $('.row_issue').length + 1;
-            let count = makeid(10);
-            $('#body-issue').append(`
-                <tr class="row_issue">
-                    <td class="center-align">
-                        ` + no + `
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');"></select>
-                    </td>
-                    <td id="batch-used` + count + `">
-                        <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
-                            <thead>
-                                <tr>
-                                    <th class="center">Batch</th>
-                                    <th class="center">Qty Terpakai</th>
-                                    <th class="center">Hapus</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-issue-batch` + count + `">
-                                <tr id="last-row-issue-batch` + count + `">
-                                    <td class="center-align" colspan="3">
-                                        Hanya untuk issue yang memiliki batch dan WIP 2.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-            $('#arr_production_issue_id' + count).select2({
-                placeholder: '-- Kosong --',
-                minimumInputLength: 1,
-                allowClear: true,
-                cache: true,
-                width: 'resolve',
-                dropdownParent: $('body').parent(),
-                ajax: {
-                    url: '{{ url("admin/select2/production_issue") }}',
-                    type: 'GET',
-                    dataType: 'JSON',
-                    data: function(params) {
-                        return {
-                            search: params.term,
-                            pod_id: $('#production_order_detail_id').val(),
-                            arrissue: arrIssue,
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.items
-                        }
+        if($('#last-row-issue').length > 0){
+            $('#last-row-issue').remove();
+        }
+        let no = $('.row_issue').length + 1;
+        let count = makeid(10);
+        $('#body-issue').append(`
+            <tr class="row_issue">
+                <td class="center-align">
+                    ` + no + `
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_issue_glaze_id` + count + `" name="arr_issue_glaze_id[]" onchange="resetIssue();getQtyIssue('` + count + `');"></select>
+                </td>
+                <td id="batch-used` + count + `">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `" data-max="0,000">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $('#arr_issue_glaze_id' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: false,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/issue_glaze") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        arrissue: arrIssue,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
                     }
                 }
-            });
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih Production Order terlebih dahulu.',
-                icon: 'warning'
-            });
-        }
-    }
-
-    function checkQtyBatch(code,id){
-
-    }
-
-    function addBatch(code){
-        if($('#shift_id').val() && $('#group').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/get_batch_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    shift_id: $('#shift_id').val(),
-                    group: $('#group').val(),
-                    pod_id: $('#production_order_detail_id').val(),
-                    number: $('input[name^="arr_batch_no[]"]').length,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('#modal1');
-                },
-                success: function(response) {
-                    loadingClose('#modal1');
-                    let count = makeid(10);
-                    $('#table-batch' + code).append(`
-                        <tr>
-                            <td>
-                                <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="` + response + `" readonly class="no-batch-` + code + `">
-                            </td>
-                            <td>
-                                <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + code + `','` + count + `')" style="text-align:right;">
-                            </td>
-                            <td>
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('#modal1');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-
-        }
+            }
+        });
     }
 
     function printMultiSelect(){
@@ -2297,12 +1267,12 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
-
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'item_id', searchable: false, orderable: false, className: '' },
+                { name: 'qty', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -2380,92 +1350,30 @@
             if (willDelete) {
 
                 var formData = new FormData($('#form_data')[0]);
-                formData.delete("arr_batch_no[]");
-                formData.delete("arr_qty_batch[]");
-                formData.delete("arr_production_issue_id[]");
-                let totalBatchIssue = 0;
 
-                let passedInput = true, passedQty = true, passedProductionIssue = true, totalQtyReceive = 0;
+                let passedInput = true;
 
-                if($('#tempGroup').val() == '1' || $('#tempGroup').val() == '3'){
-                    if($('select[name^="arr_production_issue_id[]"]').length == 0){
-                        passedProductionIssue = false;
-                    }else{
-                        $('select[name^="arr_production_issue_id[]"]').each(function(index){
-                            if(!$(this).val()){
-                                passedProductionIssue = false;
-                            }
-                        });
-                    }
-                }
-
-                if(!passedProductionIssue){
-                    swal({
-                        title: 'Ups! Maaf.',
-                        text: 'Untuk Tipe Bom Powder dan FG, silahkan pilih Production Issue (Batch).',
-                        icon: 'error'
-                    });
-
-                    return false;
-                }
-
-                $('input[name^="arr_qty[]"]').each(function(index){
-                    let count = makeid(10), rowtotal = 0, element = this;
-                    totalQtyReceive += Math.round(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) * 1000) / 1000;
-                    totalQtyReceive += Math.round(parseFloat($('input[name^="arr_qty_reject[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) * 1000) / 1000;
-                    if($(element).val() == '' || $(element).val() == '0'){
-                        passedInput = false;
-                    }
-                    formData.append('arr_count_header[]',count);
-                    $('.no-batch-' + $(element).data('id')).each(function(d){
-                        formData.append('arr_count_detail[]',count);
-                        formData.append('arr_batch_no[]',$(this).val());
-                    });
-                    if($('.qty-batch-' + $(element).data('id')).length > 0){
-                        $('.qty-batch-' + $(element).data('id')).each(function(d){
-                            formData.append('arr_qty_batch[]',$(this).val());
-                            rowtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-                        });
-                        if(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) !== rowtotal && $('input[name^="arr_issue_batch_usage_qty[]"]').length == 0){
-                            passedQty = false;
+                if($('input[name^="arr_qty[]"]').length > 0){
+                    $('input[name^="arr_qty[]"]').each(function(index){
+                        if(!$(this).val() || parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) <= 0){
+                            passedInput = false
                         }
-                    }else{
-                        passedQty = false;
-                    }
-                    if(!$('select[name^="arr_warehouse[]"]').eq(index).val()){
-                        passedInput = false;
-                    }
-                });
-
-                $('select[name^="arr_production_issue_id[]"]').each(function(index){
-                    if($(this).val()){
-                        formData.append('arr_production_issue_id[]',$(this).val());
-                    }
-                });
-
-                if($('input[name^="arr_issue_batch_usage_qty[]"]').length > 0){
-                    $('input[name^="arr_issue_batch_usage_qty[]"]').each(function(index){
-                        totalBatchIssue += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                        if(!$('select[name^="arr_issue_glaze_id[]"]').eq(index).val()){
+                            passedInput = false;
+                        }
                     });
-                    if((Math.round(totalBatchIssue* 1000) / 1000) !== (Math.round(totalQtyReceive * 1000) / 1000)){
-                        passedQty = false;
-                    }
+                }else{
+                    passedInput = false;
                 }
 
-                if(!passedQty){
-                    swal({
-                        title: 'Ups! Maaf.',
-                        text: 'Qty diterima dan qty batch tidak sama. Selain itu batch tidak boleh kosong. Apalagi qty batch terpakai dengan qty diterima harus sama.',
-                        icon: 'error'
-                    });
-
-                    return false;
+                if($('select[name^="arr_issue_glaze_id[]"]').length == 0){
+                    passedInput = false;
                 }
 
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty hasil produksi tidak boleh kosong atau 0. Gudang tidak boleh kosong.',
+                        text: 'Issue glaze tidak boleh kosong, qty tidak boleh 0 atau kosong.',
                         icon: 'error'
                     });
                 }else{
@@ -2573,239 +1481,83 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#tempGroup').val(response.group_bom);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#post_date').val(response.post_date);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#line_id').val(response.line_id).formSelect();
-                $('#shift_id').empty().append(`
-                    <option value="` + response.shift_id + `">` + response.shift_name + `</option>
-                `);
-                $('#group').val(response.group);
-                $('#company_id').val(response.company_id).formSelect();
-                $('#start_process_time').val(response.start_process_time);
-                $('#end_process_time').val(response.end_process_time);
-                $('#note').val(response.note);
-                $('#production_order_detail_id').empty().append(`
-                    <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
-                `);
+                if(response.status == 200){
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#code_place_id').val(response.data.code_place_id).formSelect();
+                    $('#code').val(response.data.code);
+                    $('#post_date').val(response.data.post_date);
+                    $('#place_id').val(response.data.place_id).formSelect();
+                    $('#line_id').val(response.data.line_id).formSelect();
+                    $('#company_id').val(response.data.company_id).formSelect();
+                    $('#to_place_id').val(response.data.to_place_id);
+                    $('#to_warehouse_id').val(response.data.to_warehouse_id);
+                    $('#note').val(response.data.note);
+                    $('#item_id').val(response.data.item_id);
 
-                $('.row_item').remove();
+                    $('#body-issue').empty();
 
-                $('#last-row-item').remove();
-
-                $('#title-modal').text(response.bom_group);
-
-                let no = $('.row_item').length + 1;
-
-                $.each(response.details, function(i, val) {
-
-                    var count = makeid(10);
-
-                    let batchhtml = `-`;
-
-                    if(val.group_bom == '3'){
-                        batchhtml = `<div class="row">
-                            <div class="col m12 s12">
-                                <table class="bordered" style="width:500px !important;">
-                                    <thead>
-                                        <tr>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-batch` + count + `"></tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="center-align">
-                                                <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>`;
-                    }
-
-                    $('#body-item').append(`
-                        <tr class="row_item" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
-                            <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `">
-                            <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `">
-                            <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
-                            <input type="hidden" name="arr_is_powder[]" value="` + val.is_powder + `">
-                            <td class="center-align">
-                                ` + no + `
-                            </td>
-                            <td>
-                                ` + val.item_name + `
-                            </td>
-                            <td class="right-align">
-                                ` + val.qty_planned + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);applyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" data-max="` + val.qty_planned + `" required>
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty_reject[]" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
-                            </td>
-                            <td class="center" id="arr_unit` + count + `">
-                                ` + val.unit + `
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                    <option value="">--Silahkan pilih item--</option>
-                                </select>
-                            </td>
-                            <td class="center-align">
-                                ` + batchhtml + `
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-
-                    if(val.group_bom == '3'){
-                        $.each(val.list_batch, function(i, detail) {
-                            let detailcode = makeid(10);
-                            $('#table-batch' + count).append(`<tr>
-                                <td>
-                                    <input name="arr_batch_no[]" id="arr_batch_no` + detailcode + `" type="text" placeholder="Generate otomatis..." value="` + detail.batch_no + `" readonly class="no-batch-` + count + `">
+                    $.each(response.data.details, function(i, val) {
+                        let count = makeid(10);
+                        $('#body-issue').append(`
+                            <tr class="row_issue">
+                                <td class="center-align">
+                                    ` + (i+1) + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + detail.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `','` + detailcode + `')" style="text-align:right;">
+                                    <select class="browser-default" id="arr_issue_glaze_id` + count + `" name="arr_issue_glaze_id[]" onchange="resetIssue();getQtyIssue('` + count + `');"></select>
                                 </td>
-                                <td>
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);">
+                                <td id="batch-used` + count + `">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `" data-max="` + val.max + `">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
-                            </tr>`);
-                        });
-                    }
+                            </tr>
+                        `);
 
-                    if(val.list_warehouse.length > 0){
-                        $('#arr_warehouse' + count).empty();
-                        $.each(val.list_warehouse, function(i, val) {
-                            $('#arr_warehouse' + count).append(`
-                                <option value="` + val.id + `">` + val.name + `</option>
-                            `);
-                        });
-                    }
+                        $('#arr_issue_glaze_id' + count).append(`
+                            <option value="` + val.issue_glaze_id + `">` + val.issue_glaze_name + `</option>
+                        `);
 
-                    $('#arr_warehouse' + count).val(val.warehouse_id);
-                    $('#arr_place' + count).val(val.place_id);
-                    no++;
-                });
-
-                $('#body-issue').empty();
-
-                $.each(response.issues, function(i, val) {
-                    let count = makeid(10);
-                    $('#body-issue').append(`
-                        <tr class="row_issue">
-                            <td class="center-align">
-                                ` + (i + 1) + `
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');">
-                                    <option value="` + val.production_issue_id + `">` + val.production_issue_name + `</option>
-                                </select>
-                            </td>
-                            <td id="batch-used` + count + `">
-                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
-                                    <thead>
-                                        <tr>
-                                            <th class="center">Batch</th>
-                                            <th class="center">Qty Terpakai</th>
-                                            <th class="center">Hapus</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-issue-batch` + count + `">
-                                        <tr id="last-row-issue-batch` + count + `">
-                                            <td class="center-align" colspan="3">
-                                                Hanya untuk issue yang memiliki batch dan WIP 2.
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `);
-                    $('#arr_production_issue_id' + count).select2({
-                        placeholder: '-- Kosong --',
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        cache: true,
-                        width: 'resolve',
-                        dropdownParent: $('body').parent(),
-                        ajax: {
-                            url: '{{ url("admin/select2/production_issue") }}',
-                            type: 'GET',
-                            dataType: 'JSON',
-                            data: function(params) {
-                                return {
-                                    search: params.term,
-                                    pod_id: $('#production_order_detail_id').val(),
-                                    arrissue: arrIssue,
-                                };
-                            },
-                            processResults: function(data) {
-                                return {
-                                    results: data.items
+                        $('#arr_issue_glaze_id' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: false,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/issue_glaze") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        arrissue: arrIssue,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
                                 }
                             }
-                        }
+                        });
                     });
 
-                    if(val.details.length > 0){
-                        $('#body-issue-batch' + count).empty();
-                        $.each(val.details, function(i, value) {
-                            let countdata = makeid(10);
-                            $('#body-issue-batch' + count).append(`
-                                <tr class="row_batch_usage` + count + `">
-                                    <input type="hidden" value="` + value.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
-                                    <input type="hidden" value="` + value.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
-                                    <td>
-                                        ` + value.batch_no + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + countdata + `')" style="text-align:right;" data-max="` + value.qty_max + `">
-                                    </td>
-                                    <td>
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + count + `');">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-                });
+                    resetIssue();
+                    countAll();
 
-                resetIssue();
-
-                M.updateTextFields();
-                $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                    $('.modal-content').scrollTop(0);
+                }else{
+                    M.toast({
+                        html: response.message
+                    });
+                }
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

@@ -145,11 +145,12 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.company') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th>Target Item</th>
+                                                        <th>Qty Hasil</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
-                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.operation') }}</th>
                                                     </tr>
                                                 </thead>
@@ -219,7 +220,14 @@
                                         </select>
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
-
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="item_id" name="item_id">
+                                            @foreach ($items as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="item_id">Item Target</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();">
                                         <label class="active" for="post_date">Tgl. Post</label>
@@ -243,7 +251,7 @@
                         <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>2. </legend>
+                                    <legend>2. Detail Item Issue</legend>
                                     <div class="col m12 s12">
 
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
@@ -251,14 +259,14 @@
                                                 <table class="bordered" style="border: 1px solid;width:1500px !important;" id="table-detail-item-issue">
                                                     <thead>
                                                         <tr>
+                                                            <th class="center">{{ __('translations.delete') }}</th>
                                                             <th class="center">{{ __('translations.no') }}.</th>
-                                                            <th class="center">Item/Resource</th>
+                                                            <th class="center">Item/Manual</th>
                                                             <th class="center">Ket.</th>
                                                             <th class="center">Qty</th>
                                                             <th class="center">Unit</th>
                                                             <th class="center">Plant</th>
                                                             <th class="center">Gudang</th>
-                                                            <th class="center">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item-issue">
@@ -269,13 +277,19 @@
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="9">
+                                                            <th colspan="4">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
-                                                                {{-- <a class="waves-effect waves-light purple btn-small mb-1 mr-1" onclick="addLine('resources')" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah Resource
-                                                                </a> --}}
+                                                                <a class="waves-effect waves-light purple btn-small mb-1 mr-1" onclick="addLine('manual')" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah Manual
+                                                                </a>
+                                                            </th>
+                                                            <th class="right-align" id="total-qty-issue">
+                                                                0,000
+                                                            </th>
+                                                            <th colspan="3">
+
                                                             </th>
                                                         </tr>
                                                     </tfoot>
@@ -294,163 +308,6 @@
     <div class="modal-footer">
         <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
         <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
-    </div>
-</div>
-
-<div id="modal_edit" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content" style="overflow:auto !important;">
-        <div class="row">
-            <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                <form class="row" id="form_data_edit" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>1. {{ __('translations.main_info') }}</legend>
-                                    <div class="input-field col m2 s12 step1">
-                                        <input type="hidden" id="temp_edit" name="temp_edit">
-                                        <input id="code_edit" name="code" type="text" value="{{ $newcode }}" readonly>
-                                        <label class="active" for="code_edit">No. Dokumen </label>
-                                    </div>
-                                    <div class="input-field col m1 s12 step2">
-                                        <select class="form-control" id="code_place_id_edit" name="code_place_id" onchange="getCode(this.value);" readonly>
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="code_place_id_edit">Tempat Kode </label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <select class="form-control" id="company_id_edit" name="company_id" readonly>
-                                            @foreach ($company as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="company_id_edit">{{ __('translations.company') }} </label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="place_id_edit" name="place_id" readonly>
-                                            @foreach ($place as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="place_id_edit">{{ __('translations.plant') }} </label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="line_id_edit" name="line_id">
-                                            @foreach ($line as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="line_id_edit">{{ __('translations.line') }} </label>
-                                    </div>
-
-
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="post_date_edit" name="post_date" min="{{ $minDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();" readonly>
-                                        <label class="active" for="post_date_edit">Tgl. Post </label>
-                                    </div>
-                                    <div class="col m12 s12 "></div>
-                                    {{-- <div class="input-field col m3 s12 step4">
-                                        <input id="start_process_time_edit" name="start_process_time" type="datetime-local" placeholder="Tgl. Mulai Produksi">
-                                        <label class="active" for="start_process_time_edit">Tgl. Mulai Produksi </label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="end_process_time_edit" name="end_process_time" type="datetime-local" placeholder="Tgl. Selesai Produksi">
-                                        <label class="active" for="end_process_time_edit">Tgl. Selesai Produksi </label>
-                                    </div> --}}
-
-                                    <div class="input-field col m3 s12">
-                                        <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                        <label class="active" for="note_edit">{{ __('translations.note') }}</label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>2. Target Produksi</legend>
-                                    <div class="col m12">
-                                        <div class="row">
-                                            <div class="col m4 s12">
-                                                Line : <b id="output-line_edit">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Target Item SFG/FG : <b id="output-fg_edit">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Qty : <b id="output-qty_edit">-</b>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col s12 step9">
-                            <fieldset style="min-width: 100%;">
-                                <legend>3. Detail Item Issue</legend>
-                                <div class="col m12 s12">
-                                    <div class="card-alert card gradient-45deg-purple-amber">
-                                        <div class="card-content white-text">
-                                            <p>Info : Item/Resource akan diambil otomatis dari BOM item Production Order. Anda tetap bisa menambahkan manual item/resource malalui tombol yang disediakan.</p>
-                                        </div>
-                                    </div>
-                                    <div class="card-alert card gradient-45deg-deep-orange-orange">
-                                        <div class="card-content white-text">
-                                            <p>Info : Nominal item adalah 0. Karena harga didapatkan dari rata-rata cogs item terbaru ketika disimpan.</p>
-                                        </div>
-                                    </div>
-                                    <div class="col s12" style="overflow:auto;min-width:100%;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" style="border: 1px solid;width:1500px !important;" id="table-detail-item-issue_edit">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">{{ __('translations.no') }}.</th>
-                                                        <th class="center">Item/Resource</th>
-                                                        <th class="center">Qty Planned</th>
-                                                        <th class="center" width="150px">Persen (%)</th>
-                                                        <th class="center">Qty Real</th>
-                                                        <th class="center">Satuan Produksi</th>
-                                                        <th class="center">Plant</th>
-                                                        <th class="center">Gudang</th>
-                                                        <th class="center">{{ __('translations.delete') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item-issue_edit">
-                                                    <tr id="last-row-item-issue_edit">
-
-                                                    </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <th colspan="9">
-
-                                                        </th>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </p>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
-        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="saveEdit();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -874,9 +731,8 @@
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
         select2ServerSide('#shift_id_edit', '{{ url("admin/select2/shift_production") }}');
         $('#body-item-issue').on('click', '.delete-data-item-issue', function() {
-            let id = $(this).data('id');
-            $('.row_item_batch[data-code="' + id + '"]').remove();
             $(this).closest('tr').remove();
+            countQty();
         });
     });
 
@@ -887,16 +743,21 @@
     }
 
     function addLine(type){
-        if($('#production_order_detail_id').val()){
-            let no_issue = $('.row_item_issue').length + 1;
-            var count = makeid(10);
+        if($('#last-row-item-issue').length > 0){
+            $('#last-row-item-issue').remove();
+        }
+        let no_issue = $('.row_item_issue').length + 1;
+        var count = makeid(10);
+        if(type == 'items'){
             $('#body-item-issue').append(`
-                <tr class="row_item_issue" data-id="">
-                    <input type="hidden" name="arr_type[]" value="1">
+                <tr class="row_item_issue">
                     <input type="hidden" name="arr_lookable_type[]" value="` + type + `">
-                    <input type="hidden" name="arr_qty_bom[]" value="0,000">
-                    <input type="hidden" name="arr_nominal_bom[]" value="0,00">
-                    <input type="hidden" name="arr_total_bom[]" value="0,00">
+                    <input type="hidden" name="arr_unit_id[]" value="">
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
                     <td class="center-align">
                         ` + no_issue + `
                     </td>
@@ -904,10 +765,10 @@
                         <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + type +`')"></select>
                     </td>
                     <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center">
-                        <input name="arr_note[]" onfocus="emptyThis(this);" class="browser-default" type="text"  style="width:100%;" id="rowNote`+ count +`" required data-id="` + count + `">
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center" id="arr_unit` + count + `">
                         -
@@ -924,48 +785,82 @@
                             <option value="">--Silahkan pilih item--</option>
                         </select>
                     </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
                 </tr>
             `);
 
-            if(type == 'items'){
-                select2ServerSideLonger('#arr_lookable_id' + count, '{{ url("admin/select2/item_for_production_issue") }}');
-            }else if(type == 'resources'){
-                select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/resource") }}');
-            }
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih Production Order terlebih dahulu.',
-                icon: 'error'
+            select2ServerSideLonger('#arr_lookable_id' + count, '{{ url("admin/select2/item_for_production_issue") }}');
+        }else if(type == 'manual'){
+            $('#body-item-issue').append(`
+                <tr class="row_item_issue">
+                    <input type="hidden" name="arr_lookable_type[]" value="manual">
+                    <input type="hidden" name="arr_lookable_id[]" value="">
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                    <td class="center-align">
+                        ` + no_issue + `
+                    </td>
+                    <td>
+                        -
+                    </td>
+                    <td class="center">
+                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    </td>
+                    <td class="center" id="arr_unit` + count + `">
+                        <select class="select2 browser-default" id="arr_unit_id` + count + `" name="arr_unit_id[]">
+                            <option value="">--Silahkan pilih--</option>
+                            @foreach ($unit as $row)
+                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="center">
+                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                            @foreach ($place as $rowplace)
+                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="center">
+                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                            <option value="">--Pilih gudang--</option>
+                            @foreach ($warehouse as $rowwarehouse)
+                                <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                </tr>
+            `);
+            $('#arr_unit_id' + count).select2({
+                dropdownAutoWidth: true,
+                width: '100%',
             });
         }
     }
 
+    function countQty(){
+        let total = 0;
+        $('*[name^="arr_qty[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-qty-issue').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
+    }
+
     function getRowUnit(val,type){
         $("#arr_unit" + val).empty();
-        $("#arr_stock" + val).empty();
         $('#arr_warehouse' + val).empty().append(`
             <option value="">--Silahkan pilih item--</option>
         `);
-        $('.row_item_batch[data-code="' + val + '"]').remove();
         if($("#arr_lookable_id" + val).val()){
             $("#arr_unit" + val).text($("#arr_lookable_id" + val).select2('data')[0].uom);
             if(type == 'items'){
-                let optionStock = '<select class="browser-default" id="arr_item_stock_id' + val + '" name="arr_item_stock_id[]" required>';
-                if($("#arr_lookable_id" + val).select2('data')[0].stock_list.length > 0){
-                    $.each($("#arr_lookable_id" + val).select2('data')[0].stock_list, function(i, value) {
-                        optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
-                    });
-                }else{
-                    optionStock += '<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>';
-                }
-                optionStock += '</select>';
-                $("#arr_stock" + val).html(optionStock);
                 if($('select#arr_warehouse' + val).length > 0){
                     $('#arr_warehouse' + val).empty();
                     $.each($("#arr_lookable_id" + val).select2('data')[0].list_warehouse, function(i, value) {
@@ -974,19 +869,9 @@
                         `);
                     });
                 }
-
-            }
-            if(type == 'resources'){
-                $("#arr_stock" + val).html(`
-                    <select class="browser-default" id="arr_item_stock_id` + val + `" name="arr_item_stock_id[]">
-                        <option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>
-                    </select>
-                `);
             }
         }else{
             $("#arr_unit" + val).text('-');
-            $("#arr_stock" + val).text('-');
-            $('#arr_lookable_id' + val).parent().prev().removeAttr('rowspan');
         }
     }
 
@@ -1111,41 +996,6 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });
-    }
-
-    function removeBatch(element,code){
-        $(element).parent().parent().remove();
-        let arr_batch_id = [];
-
-        $('input[name^="arr_batch_id[]"]').each(function(index){
-            arr_batch_id.push($(this).val());
-        });
-
-        $('#arr_batch' + code).select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/production_batch") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        item_id: $('input[name^="arr_lookable_id[]"][data-id="' + code + '"]').val(),
-                        arr_batch_id: arr_batch_id,
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
         });
     }
 
@@ -1359,9 +1209,9 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
-
+                { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
-
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1516,60 +1366,33 @@
             if (willDelete) {
 
                 var formData = new FormData($('#form_data')[0]);
-                formData.delete("arr_batch_id[]");
-                formData.delete("arr_qty_batch[]");
 
-                let passedInput = true, passedStock = true;
+                let passedInput = true;
 
-                $('*[name^="arr_batch[]"]').each(function(index){
-                    let id = $(this).data('id');
-                    if($('.qty-batch-' + id).length == 0){
-                        passedInput = false;
-                    }
-                    let qtyNeeded = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",","."));
-                    let qtyBatch = 0;
-                    $('.qty-batch-' + id).each(function(index){
-                        qtyBatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-                    });
-                    if(qtyNeeded.toFixed(3) !== qtyBatch.toFixed(3)){
-                        passedStock = false;
-                    }
-                });
-
-                $('*[name^="arr_qty[]"]').each(function(index){
-                    let id = $(this).data('id');
-                    if($('.qty-batch-' + id).length > 0){
-                        $('.qty-batch-' + id).each(function(){
-                            let idkuy = $(this).data('id');
-                            formData.append('arr_batch_index[]',index);
-                            formData.append('arr_batch_id[]',$('#arr_batch_id' + idkuy).val());
-                            formData.append('arr_qty_batch[]',$(this).val());
-                        });
-                    }
-                });
-
-                $('*[name^="arr_qty[]"]').each(function(index){
-                    let val = $(this).val();
-                    if($('*[name^="arr_lookable_type[]"]').eq(index).val() == 'items' && $('*[name^="arr_type[]"]').eq(index).val() == '1'){
-                        if(val == '0'){
-                            passedStock = false;
+                $('*[name^="arr_lookable_type[]"]').each(function(index){
+                    let element = $(this);
+                    if(element.val() == 'items'){
+                        if(!$('*[name^="arr_lookable_id[]"]').eq(index).val()){
+                            passedInput = false;
                         }
                     }
+                    if(element.val() == 'manual'){
+                        if(!$('*[name^="arr_unit_id[]"]').eq(index).val()){
+                            passedInput = false;
+                        }
+                        if(!$('*[name^="arr_note[]"]').eq(index).val()){
+                            passedInput = false;
+                        }
+                    }
+                    if(!$('*[name^="arr_qty[]"]').eq(index).val() || !$('*[name^="arr_place[]"]').eq(index).val() || !$('*[name^="arr_warehouse[]"]').eq(index).val()){
+                        passedInput = false;
+                    }
                 });
-
-                if(!passedStock){
-                    swal({
-                        title: 'Ups! Maaf.',
-                        text: 'Terdapat stok Item ISSUE yang tidak ditemukan datanya. Terdapat qty batch yang tidak sesuai dengan qty real pemakaian.',
-                        icon: 'error'
-                    });
-                    return;
-                }
 
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Batch untuk item WIP tidak boleh kosong.',
+                        text: 'Item, keterangan, qty, satuan, plant, dan gudang harus diisi.',
                         icon: 'error'
                     });
                 }else{
@@ -1677,76 +1500,142 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#post_date').val(response.post_date);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#line_id').val(response.line_id).formSelect();
-                $('#company_id').val(response.company_id).formSelect();
-                $('#note').val(response.note);
+                if(response.status == 200){
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#code_place_id').val(response.data.code_place_id).formSelect();
+                    $('#code').val(response.data.code);
+                    $('#post_date').val(response.data.post_date);
+                    $('#place_id').val(response.data.place_id).formSelect();
+                    $('#line_id').val(response.data.line_id).formSelect();
+                    $('#company_id').val(response.data.company_id).formSelect();
+                    $('#item_id').val(response.data.item_id);
+                    $('#note').val(response.note);
 
+                    $('.row_item_issue').remove();
 
-                $('.row_item_issue').remove();
+                    $('#last-row-item-issue').remove();
 
-                $('#last-row-item-issue').remove();
+                    $.each(response.data.details, function(i, val) {
+                        var count = makeid(10);
+                        if(val.lookable_type == 'items'){
+                            let warehouselist = '';
 
-                let no_issue = $('.row_item_issue').length + 1;
+                            $.each(val.list_warehouse, function(i, value) {
+                                warehouselist += '<option value="' + value.id + '" ' + (value.id == val.warehouse_id ? 'selected' : '') + '>' + value.name + '</option>';
+                            });
 
-                $.each(response.detail_issue, function(i, val) {
-                    var count = makeid(10);
-                    let warehouse = `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">`;
-                    if(val.list_warehouse.length > 0){
-                        $.each(val.list_warehouse, function(i, valkuy) {
-                            warehouse += `<option value="` + valkuy.id + `" ` + (valkuy.id == val.warehouse_id ? 'selected' : '') + `>` + valkuy.name + `</option>`;
-                        });
-                    }else{
-                        warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
-                    }
-                    warehouse += `</select>`;
-                    $('#body-item-issue').append(`
-                        <tr class="row_item_issue" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `">
-                            <td>
-                                ` + val.lookable_code + ` - ` + val.lookable_name + `
-                            </td>
-                            <td class="right-align" id="rowPlanned` + count + `">
-                                ` + val.qty_planned + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
-                            </td>
-                            <td class="center" id="arr_unit` + count + `">
-                                ` + val.lookable_unit + `
-                            </td>
-                            <td class="center">
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td class="center" id="arr_stock` + count + `">
-                                ` + warehouse + `
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
-                    `
-                    );
-                    $('#rowQty' + count).trigger('keyup');
+                            $('#body-item-issue').append(`
+                                <tr class="row_item_issue">
+                                    <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                    <input type="hidden" name="arr_unit_id[]" value="">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                    <td class="center-align">
+                                        ` + (i + 1) + `
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + val.lookable_type +`')"></select>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" required data-id="` + count + `" value="` + val.note + `">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                                    </td>
+                                    <td class="center" id="arr_unit` + count + `">
+                                        ` + val.uom + `
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            ` + warehouselist + `
+                                        </select>
+                                    </td>
+                                </tr>
+                            `);
 
-                    $('#arr_place' + count).val(val.place_id);
-                    no_issue++;
-                });
+                            $('#arr_lookable_id' + count).append(`
+                                <option value="` + val.lookable_id + `">` + val.lookable_name + `</option>
+                            `);
 
-                M.updateTextFields();
-                $('.modal-content').scrollTop(0);
+                            select2ServerSideLonger('#arr_lookable_id' + count, '{{ url("admin/select2/item_for_production_issue") }}');
+                        }else if(val.lookable_type == 'manual'){
+                            $('#body-item-issue').append(`
+                                <tr class="row_item_issue">
+                                    <input type="hidden" name="arr_lookable_type[]" value="manual">
+                                    <input type="hidden" name="arr_lookable_id[]" value="">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                    <td class="center-align">
+                                        ` + (i + 1) + `
+                                    </td>
+                                    <td>
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" value="` + val.note + `">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center" id="arr_unit` + count + `">
+                                        <select class="select2 browser-default" id="arr_unit_id` + count + `" name="arr_unit_id[]">
+                                            <option value="">--Silahkan pilih--</option>
+                                            @foreach ($unit as $row)
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            <option value="">--Pilih gudang--</option>
+                                            @foreach ($warehouse as $rowwarehouse)
+                                                <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_unit_id' + count).select2({
+                                dropdownAutoWidth: true,
+                                width: '100%',
+                            });
+                            $('#arr_unit_id' + count).val(val.unit_id).trigger('change');
+                        }
+                        
+                        $('#arr_place' + count).val(val.place_id);
+                        $('#arr_warehouse' + count).val(val.warehouse_id);
+                    });
+
+                    M.updateTextFields();
+                    $('.modal-content').scrollTop(0);
+                    countQty();
+                }else{
+                    M.toast({
+                        html: response.message
+                    });
+                }
+                
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1976,59 +1865,6 @@
                     $('#company_jurnal').append(`Perusahaan : `+data.company);
                     $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
-            }
-        });
-    }
-
-    function done(id){
-        var msg = '';
-        swal({
-            title: "Apakah anda yakin ingin menyelesaikan dokumen ini?",
-            text: "Data yang sudah terupdate tidak dapat dikembalikan.",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: true,
-            content: "input",
-        })
-        .then(message => {
-            if (message != "" && message != null) {
-                $.ajax({
-                    url: '{{ Request::url() }}/done',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: id,
-                        msg : message
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        if(response.status == 200) {
-                            loadDataTable();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
             }
         });
     }

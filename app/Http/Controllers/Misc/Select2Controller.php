@@ -88,6 +88,7 @@ use App\Models\Size;
 use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
+use App\Models\IssueGlaze;
 use App\Models\ItemPricelist;
 use App\Models\CustomerDiscount;
 use App\Models\DeliveryCostStandard;
@@ -2973,6 +2974,39 @@ class Select2Controller extends Controller {
                 'text' 			    => $d->code.' - '.$d->name,
                 'punishment_code'   => $d->getPunishment(),
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function issueGlaze(Request $request)
+    {
+        $response = [];
+        $data = IssueGlaze::where(function($query) use($request){
+            $query->where('note','like',"%$request->search%")
+                ->orWhere('code','like',"%$request->search%")
+                ->orWhereHas('item',function($query) use($request){
+                    $query->where('code', 'like', "%$request->search%")
+                        ->orWhere('name','like',"%$request->search%");
+                });
+        })
+        ->where(function($query) use($request){
+            if($request->arrissue){
+                $query->whereNotIn('id',$request->arrissue);
+            }
+        })
+        ->whereIn('status',['2'])
+        ->get();
+
+        foreach($data as $d) {
+            $qty = $d->balance();
+            if($qty > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->code.' - Target : '.$d->item->code.' - '.$d->item->name.' - Available : '.CustomHelper::formatConditionalQty($qty),
+                    'balance'           => CustomHelper::formatConditionalQty($qty),
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

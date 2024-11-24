@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers\Production;
 
+use App\Exports\ExportReceiveGlaze;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Helpers\TreeHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Item;
+use App\Models\ItemStock;
+use App\Models\ItemCogs;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\ReceiveGlaze;
+use App\Models\ReceiveGlazeDetail;
+use App\Models\IssueGlaze;
+use App\Models\IssueGlazeDetail;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Company;
@@ -16,6 +23,10 @@ use App\Models\Line;
 use App\Models\Place;
 use App\Models\Area;
 use App\Models\UsedData;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductionReceiveGPController extends Controller
 {
@@ -34,8 +45,24 @@ class ProductionReceiveGPController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
 
         $menu = Menu::where('url', $lastSegment)->first();
+        $items = Item::whereIn('code',['102.02.0033','102.02.0035'])->get();
+        $list_warehouse = [];
+        foreach($items as $row){
+            $warehouses = $row->warehouseList();
+            foreach($warehouses as $rowwarehouse){
+                $index = -1;
+                foreach($list_warehouse as $key => $rowcheck){
+                    if($rowcheck['id'] == $rowwarehouse['id']){
+                        $index = $key;
+                    }
+                }
+                if($index < 0){
+                    $list_warehouse[] = $rowwarehouse;
+                }
+            }
+        }
         $data = [
-            'title'         => 'Issue Receive',
+            'title'         => 'Receive Glaze Prep',
             'content'       => 'admin.production.receive_glaze',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
@@ -45,7 +72,9 @@ class ProductionReceiveGPController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'items'         => $items,
+            'list_warehouse'=> $list_warehouse
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -60,16 +89,17 @@ class ProductionReceiveGPController extends Controller
 
     public function datatable(Request $request){
         $column = [
+            'id',
             'code',
             'user_id',
             'company_id',
-            'place_id',
-            'line_id',
-            'document',
+            'post_date',
             'note',
+            'line_id',
+            'place_id',
             'item_id',
             'qty',
-            'post_date',
+            'document',
             'status',
         ];
 
@@ -89,6 +119,10 @@ class ProductionReceiveGPController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('item',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('code','like',"%$search%");
                             });
                     });
                 }
@@ -125,6 +159,10 @@ class ProductionReceiveGPController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('item',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('code','like',"%$search%");
                             });
                     });
                 }
@@ -167,11 +205,11 @@ class ProductionReceiveGPController extends Controller
                     $val->note,
                     $val->line->code,
                     $val->place->code,
+                    $val->item->code.' - '.$val->item->name,
+                    CustomHelper::formatConditionalQty($val->qty),
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
-                    $val->grandtotal,
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -200,11 +238,234 @@ class ProductionReceiveGPController extends Controller
     }
 
     public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            'company_id'			    => 'required',
+            'place_id'                  => 'required',
+            'line_id'                   => 'required',
+            'item_id'                   => 'required',
+            'post_date'		            => 'required',
+            'to_warehouse_id'           => 'required',
+            'to_place_id'               => 'required',
+        ], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+            'place_id.required'                 => 'Plant tidak boleh kosong.',
+            'line_id.required'                  => 'Line tidak boleh kosong.',
+            'item_id.required'                  => 'Item tidak boleh kosong.',
+            'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
+            'to_warehouse_id.required'          => 'Gudang tujuan tidak boleh kosong.',
+            'to_place_id.required'              => 'Plant tujuan tidak boleh kosong.',
+        ]);
 
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+
+            $passedQty = true;
+            $arrNotPassedQty = [];
+
+            foreach($request->arr_qty as $key => $row){
+                $ig = IssueGlaze::find($request->arr_issue_glaze_id[$key]);
+                $itemstock = $ig->item->itemCogs()->where('place_id',$ig->itemStock->place_id)->where('warehouse_id',$ig->itemStock->warehouse_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                $qty = str_replace(',','.',str_replace('.','',$row));
+                if($itemstock){
+                    $qtyFinal = $itemstock->infoFg()['qty'];
+                    if(round($qty,3) > round($qtyFinal,3)){
+                        $passedQty = false;
+                        $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name.' - Qty Dibutuhkan : '.CustomHelper::formatConditionalQty(round($qty,3)).' - Qty Stok : '.CustomHelper::formatConditionalQty(round($qtyFinal,3));
+                    }
+                }else{
+                    $passedQty = false;
+                    $arrNotPassedQty[] = $ig->item->code.' - '.$ig->item->name;
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, item '.implode(' | ',$arrNotPassedQty).' tidak mencukupi stok yang ada. Silahkan atur qty yang ingin diproduksi.'
+                ]);
+            }
+
+            $itemStockHeader = ItemStock::where('item_id',$request->item_id)->where('place_id',$request->to_place_id)->where('warehouse_id',$request->to_warehouse_id)->first();
+            if($itemStockHeader){
+
+            }else{
+                $itemStockHeader = ItemStock::create([
+                    'place_id'			=> $request->to_place_id,
+                    'warehouse_id'		=> $request->to_warehouse_id,
+                    'item_id'			=> $request->item_id,
+                    'qty'				=> 0,
+                ]);
+            }
+
+            if($request->temp){
+                $query = ReceiveGlaze::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                $approved = false;
+                $revised = false;
+
+                if($query->approval()){
+                    foreach ($query->approval() as $detail){
+                        foreach($detail->approvalMatrix as $row){
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
+                            }
+                        }
+                    }
+                }
+
+                if($approved && !$revised){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Receive Glaze Prep telah diapprove, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+
+                if(in_array($query->status,['1','6'])){
+                    if($request->has('file')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('file')->store('public/receive_glazes');
+                    } else {
+                        $document = $query->document;
+                    }
+
+                    $query->user_id = session('bo_id');
+                    $query->code = $request->code;
+                    $query->company_id = $request->company_id;
+                    $query->place_id = $request->place_id;
+                    $query->line_id = $request->line_id;
+                    $query->item_id = $request->item_id;
+                    $query->to_place_id = $request->to_place_id;
+                    $query->to_warehouse_id = $request->to_warehouse_id;
+                    $query->item_stock_id = $itemStockHeader->id;
+                    $query->post_date = $request->post_date;
+                    $query->document = $document;
+                    $query->note = $request->note;
+                    $query->status = '1';
+
+                    $query->save();
+
+                    foreach($query->receiveGlazeDetail as $row){
+                        $row->delete();
+                    }
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Status Receive Glaze Prep sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+            }else{
+
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode = ReceiveGlaze::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+
+                $query = ReceiveGlaze::create([
+                    'code'			            => $newCode,
+                    'user_id'		            => session('bo_id'),
+                    'company_id'                => $request->company_id,
+                    'place_id'                  => $request->place_id,
+                    'line_id'                   => $request->line_id,
+                    'item_id'                   => $request->item_id,
+                    'to_place_id'               => $request->to_place_id,
+                    'to_warehouse_id'           => $request->to_warehouse_id,
+                    'item_stock_id'             => $itemStockHeader->id,
+                    'post_date'                 => $request->post_date,
+                    'document'                  => $request->file('file') ? $request->file('file')->store('public/receive_glazes') : NULL,
+                    'note'                      => $request->note,
+                    'status'                    => '1',
+                ]);
+            }
+
+            if($query) {
+                $grandtotal = 0;
+                $qtyAll = 0;
+                foreach($request->arr_qty as $key => $row){
+                    $ig = IssueGlaze::find($request->arr_issue_glaze_id[$key]);
+                    $nominal = $ig->itemstock->priceDate($query->post_date);
+                    $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
+                    $grandtotal += $total;
+                    $querydetail = ReceiveGlazeDetail::create([
+                        'receive_glaze_id'              => $query->id,
+                        'issue_glaze_id'                => $request->arr_issue_glaze_id[$key],
+                        'qty'                           => str_replace(',','.',str_replace('.','',$row)),
+                        'total'                         => $total,
+                    ]);
+                    $qtyAll += str_replace(',','.',str_replace('.','',$row));
+                }
+
+                $query->update([
+                    'grandtotal'    => $grandtotal,
+                    'qty'           => $qtyAll,
+                ]);
+
+                CustomHelper::sendApproval($query->getTable(),$query->id,'Receive Glaze Prep No. '.$query->code);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Receive Glaze Prep No. '.$query->code,'Pengajuan Receive Glaze Prep No. '.$query->code,session('bo_id'));
+
+                activity()
+                    ->performedOn(new ReceiveGlaze())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit receive glaze prep.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to save.'
+                ];
+            }
+        }
+        return response()->json($response);
     }
 
     public function show(Request $request){
+        $ig = ReceiveGlaze::where('code',CustomHelper::decrypt($request->id))->first();
+        $ig['code_place_id'] = substr($ig->code,7,2);
 
+        if($ig){
+            $arr = [];
+            foreach($ig->receiveGlazeDetail()->orderBy('id')->get() as $row){
+                $max = $row->issueGlaze->balance();
+                $arr[] = [
+                    'issue_glaze_id'            => $row->issueGlaze->id,
+                    'issue_glaze_name'          => $row->issueGlaze->code.' - Target : '.$row->issueGlaze->item->code.' - '.$row->issueGlaze->item->name.' - Available : '.CustomHelper::formatConditionalQty($max),
+                    'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                    'max'                       => CustomHelper::formatConditionalQty($max),
+                ];
+            }
+
+            $ig['details'] = $arr;
+            $result = [
+                'status'    => 200,
+                'data'      => $ig,
+            ];
+        }else{
+            $result = [
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.'
+            ];
+        }
+        
+		return response()->json($result);
     }
 
     public function approval(Request $request,$id){
@@ -217,7 +478,7 @@ class ProductionReceiveGPController extends Controller
                 'data'      => $pr
             ];
 
-            return view('admin.approval.production_issue', $data);
+            return view('admin.approval.receive_glaze', $data);
         }else{
             abort(404);
         }
@@ -228,47 +489,33 @@ class ProductionReceiveGPController extends Controller
         $data   = ReceiveGlaze::where('code',CustomHelper::decrypt($request->id))->first();
 
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="7" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
-                            </tr>
-                            <tr>
-                                <th class="center">No.</th>
-                                <th class="center">Item/Resource</th>
-                                <th class="center">Qty Planned</th>
-                                <th class="center">Qty Real</th>
-                                <th class="center">Satuan UoM</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Gudang</th>
-                            </tr>
-                        </thead><tbody>';
-        $totalqtyplanned=0;
-        $totalqtyreal=0;
-        foreach($data->ReceiveGlazeDetail()->orderBy('id')->get() as $key => $row){
-            $totalqtyplanned+=$row->qty_planned;
-            $totalqtyreal+=$row->qty;
+                <thead>
+                    <tr>
+                        <th class="center-align" colspan="5" style="font-size:20px !important;">Daftar Item Issue (Terpakai)</th>
+                    </tr>
+                    <tr>
+                        <th class="center">No.</th>
+                        <th class="center">Issue GP No.</th>
+                        <th class="center">Item</th>
+                        <th class="center">Qty</th>
+                        <th class="center">Satuan</th>
+                    </tr>
+                </thead><tbody>';
+        foreach($data->receiveGlazeDetail()->orderBy(column: 'id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
-                <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
+                <td>'.$row->issueGlaze->code.'</td>
+                <td>'.$row->issueGlaze->item->code.' - '.$row->issueGlaze->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->lookable->uomUnit->code.'</td>
-                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
-                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->name : '-').'</td>
+                <td class="center-align">'.$row->issueGlaze->item->uomUnit->code.'</td>
             </tr>';
-            if($row->productionBatchUsage()->exists()){
-                $string .= '<tr>
-                    <td class="gradient-45deg-yellow-green" colspan="7">Batch Terpakai : <br>'.$row->listBatchUsed().'</td>
-                </tr>';
-            }
         }
+
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
-                <td colspan="4"></td>
-            </tr>
-        ';
+                <th class="right-align" colspan="3">TOTAL</th>
+                <th class="right-align">'.CustomHelper::formatConditionalQty($data->qty).'</th>
+                <th></th>
+            </tr>';
 
         $string .= '</tbody></table></div>';
 
@@ -335,7 +582,7 @@ class ProductionReceiveGPController extends Controller
         $pr = ReceiveGlaze::where('code',CustomHelper::decrypt($id))->first();
 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Issue','a4','portrait','admin.print.production.issue_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'Receive Glaze Prep','a4','portrait','admin.print.production.receive_glaze_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
 
@@ -384,27 +631,15 @@ class ProductionReceiveGPController extends Controller
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                 }
 
-                foreach($query->ReceiveGlazeDetail as $row){
-                    foreach($row->productionBatchUsage as $rowdetail){
-                        CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
-                        $rowdetail->delete();
+                foreach($query->receiveGlazeDetail as $row){
+                    if($row->issueGlaze()->exists()){
+                        if($row->issueGlaze->hasBalance()){
+                            $row->issueGlaze->update([
+                                'status'    => '2'
+                            ]);
+                        }
                     }
                 }
-
-                /* $query->productionOrderDetail->productionOrder->update([
-                    'standard_item_cost'        => 0,
-                    'standard_resource_cost'    => 0,
-                    'standard_product_cost'     => 0,
-                    'actual_item_cost'          => 0,
-                    'actual_resource_cost'      => 0,
-                    'total_product_cost'        => 0,
-                    'planned_qty'               => 0,
-                    'completed_qty'             => 0,
-                    'rejected_qty'              => 0,
-                    'total_production_time'     => 0,
-                    'total_additional_time'     => 0,
-                    'total_run_time'            => 0,
-                ]); */
 
                 activity()
                     ->performedOn(new ReceiveGlaze())
@@ -471,19 +706,7 @@ class ProductionReceiveGPController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->ReceiveGlazeDetail()->whereNotNull('production_order_detail_id')->get() as $row){
-                $row->productionOrderDetail->update([
-                    'qty_real'      => NULL,
-                    'nominal_real'  => NULL,
-                    'total_real'    => NULL,
-                ]);
-            }
-
-            foreach($query->ReceiveGlazeDetail as $row){
-                foreach($row->productionBatchUsage as $rowdetail){
-                    CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
-                    $rowdetail->delete();
-                }
+            foreach($query->receiveGlazeDetail as $row){
                 $row->delete();
             }
 
@@ -493,7 +716,7 @@ class ProductionReceiveGPController extends Controller
                 ->performedOn(new ReceiveGlaze())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the production issue data');
+                ->log('Delete the receive glaze prep data');
 
             $response = [
                 'status'  => 200,
@@ -639,36 +862,14 @@ class ProductionReceiveGPController extends Controller
         return response()->json($response);
     }
 
-    public function done(Request $request){
-        $query_done = ReceiveGlaze::where('code',CustomHelper::decrypt($request->id))->first();
-
-        if($query_done){
-
-            if(in_array($query_done->status,['1','2'])){
-                $query_done->update([
-                    'status'     => '3',
-                    'done_id'    => session('bo_id'),
-                    'done_date'  => date('Y-m-d H:i:s'),
-                ]);
-
-                activity()
-                        ->performedOn(new ReceiveGlaze())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query_done)
-                        ->log('Done the Production Issue data');
-
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data updated successfully.'
-                ];
-            }else{
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
-                ];
-            }
-
-            return response()->json($response);
-        }
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+        $menu = Menu::where('url','receive_gp')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
+        $nominal = $menuUser->show_nominal ?? '';
+        $line_id = $request->line_id ? $request->line_id : '';
+		return Excel::download(new ExportReceiveGlaze($post_date,$end_date,$mode,$nominal,$line_id), 'issue_glaze'.uniqid().'.xlsx');
     }
 }

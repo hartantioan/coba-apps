@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Setting;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Helpers\ResetCogsHelper;
+use App\Jobs\ResetCogsNewByDate;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\Journal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -137,6 +138,12 @@ class MenuController extends Controller
         } */
 
         /* CustomHelper::accumulateCogs('2024-09-03',1,1,5388); */
+
+        $data = Item::where('item_group_id',2)->get();
+
+        foreach($data as $item){
+            ResetCogsNewByDate::dispatch('2024-10-01',1,1,$item->id,NULL,NULL,NULL,'2024-10-31');
+        }
 
         $data = [
             'title'     => 'Menu',

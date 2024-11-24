@@ -496,6 +496,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('group_outlet', [Select2Controller::class, 'groupOutlet']);
                 Route::get('employee_for_brand', [Select2Controller::class, 'employeeForBrand']);
                 Route::get('item_for_weight', [Select2Controller::class, 'itemForWeight']);
+                Route::get('issue_glaze', [Select2Controller::class, 'issueGlaze']);
             });
 
             Route::prefix('dashboard')->group(function () {

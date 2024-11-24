@@ -124,6 +124,8 @@ class AppServiceProvider extends ServiceProvider
             'production_barcodes'                   => 'App\Models\ProductionBarcode',
             'production_barcode_details'            => 'App\Models\ProductionBarcodeDetail',
             'approval_credit_limits'                => 'App\Models\ApprovalCreditLimit',
+            'issue_glazes'                          => 'App\Models\IssueGlaze',
+            'receive_glazes'                        => 'App\Models\ReceiveGlaze',
         ]);
     }
 }

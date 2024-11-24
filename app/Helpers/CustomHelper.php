@@ -87,6 +87,8 @@ use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
 use App\Models\UsedData;
+use App\Models\IssueGlaze;
+use App\Models\ReceiveGlaze;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -2625,6 +2627,225 @@ class CustomHelper {
 					'status' => '3'
 				]);
 			}
+
+		}elseif($table_name == 'issue_glazes'){
+
+			$ig = IssueGlaze::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $ig->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $ig->getTable(),
+				'lookable_id'	=> $ig->id,
+				'post_date'		=> $ig->post_date,
+				'note'			=> $ig->note,
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			if($ig->grandtotal > 0){	
+				foreach($ig->issueGlazeDetail as $row){
+					if($row->lookable_type == 'items'){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+							'place_id'		=> $row->itemStock->place_id,
+							'warehouse_id'	=> $row->itemStock->warehouse_id,
+							'type'			=> '2',
+							'nominal'		=> $row->total,
+							'nominal_fc'	=> 0,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
+						]);
+	
+						self::sendCogs($ig->getTable(),
+							$ig->id,
+							$row->itemStock->place->company_id,
+							$row->itemStock->place_id,
+							$row->itemStock->warehouse_id,
+							$row->itemStock->item_id,
+							$row->qty,
+							$row->total,
+							'OUT',
+							$ig->post_date,
+							$row->itemStock->area_id ?? NULL,
+							$row->itemStock->item_shading_id ?? NULL,
+							$row->itemStock->production_batch_id ?? NULL,
+							$row->getTable(),
+							$row->id,
+						);
+	
+						self::sendStock(
+							$row->itemStock->place_id,
+							$row->itemStock->warehouse_id,
+							$row->itemStock->item_id,
+							$row->qty,
+							'OUT',
+							$row->itemStock->area_id ?? NULL,
+							$row->itemStock->item_shading_id ?? NULL,
+							$row->itemStock->production_batch_id ?? NULL,
+						);
+					}
+				}
+				
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $ig->item->itemGroup->coa_id,
+					'place_id'		=> $ig->itemStock->place_id,
+					'warehouse_id'	=> $ig->itemStock->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $ig->grandtotal,
+					'nominal_fc'	=> 0,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+
+				self::sendCogs($ig->getTable(),
+					$ig->id,
+					$ig->itemStock->place->company_id,
+					$ig->itemStock->place_id,
+					$ig->itemStock->warehouse_id,
+					$ig->itemStock->item_id,
+					$ig->qty,
+					$ig->grandtotal,
+					'IN',
+					$ig->post_date,
+					$ig->itemStock->area_id ?? NULL,
+					$ig->itemStock->item_shading_id ?? NULL,
+					$ig->itemStock->production_batch_id ?? NULL,
+					NULL,
+					NULL,
+				);
+
+				self::sendStock(
+					$ig->itemStock->place_id,
+					$ig->itemStock->warehouse_id,
+					$ig->itemStock->item_id,
+					$ig->qty,
+					'IN',
+					$ig->itemStock->area_id ?? NULL,
+					$ig->itemStock->item_shading_id ?? NULL,
+					$ig->itemStock->production_batch_id ?? NULL,
+				);
+			}
+
+		}elseif($table_name == 'receive_glazes'){
+
+			$ig = ReceiveGlaze::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $ig->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $ig->getTable(),
+				'lookable_id'	=> $ig->id,
+				'post_date'		=> $ig->post_date,
+				'note'			=> $ig->note,
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			if($ig->grandtotal > 0){	
+				foreach($ig->receiveGlazeDetail as $row){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->issueGlaze->itemStock->item->itemGroup->coa_id,
+						'place_id'		=> $row->issueGlaze->itemStock->place_id,
+						'warehouse_id'	=> $row->issueGlaze->itemStock->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $row->total,
+						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+					]);
+
+					self::sendCogs($ig->getTable(),
+						$ig->id,
+						$row->issueGlaze->itemStock->place->company_id,
+						$row->issueGlaze->itemStock->place_id,
+						$row->issueGlaze->itemStock->warehouse_id,
+						$row->issueGlaze->itemStock->item_id,
+						$row->issueGlaze->qty,
+						$row->total,
+						'OUT',
+						$ig->post_date,
+						$row->issueGlaze->itemStock->area_id ?? NULL,
+						$row->issueGlaze->itemStock->item_shading_id ?? NULL,
+						$row->issueGlaze->itemStock->production_batch_id ?? NULL,
+						$row->getTable(),
+						$row->id,
+					);
+
+					self::sendStock(
+						$row->issueGlaze->itemStock->place_id,
+						$row->issueGlaze->itemStock->warehouse_id,
+						$row->issueGlaze->itemStock->item_id,
+						$row->qty,
+						'OUT',
+						$row->issueGlaze->itemStock->area_id ?? NULL,
+						$row->issueGlaze->itemStock->item_shading_id ?? NULL,
+						$row->issueGlaze->itemStock->production_batch_id ?? NULL,
+					);
+					if($row->issueGlaze()->exists()){
+                        if(!$row->issueGlaze->hasBalance()){
+                            $row->issueGlaze->update([
+                                'status'    => '3'
+                            ]);
+                        }
+                    }
+				}
+				
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $ig->item->itemGroup->coa_id,
+					'place_id'		=> $ig->itemStock->place_id,
+					'warehouse_id'	=> $ig->itemStock->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $ig->grandtotal,
+					'nominal_fc'	=> 0,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+
+				self::sendCogs($ig->getTable(),
+					$ig->id,
+					$ig->itemStock->place->company_id,
+					$ig->itemStock->place_id,
+					$ig->itemStock->warehouse_id,
+					$ig->itemStock->item_id,
+					$ig->qty,
+					$ig->grandtotal,
+					'IN',
+					$ig->post_date,
+					$ig->itemStock->area_id ?? NULL,
+					$ig->itemStock->item_shading_id ?? NULL,
+					$ig->itemStock->production_batch_id ?? NULL,
+					NULL,
+					NULL,
+				);
+
+				self::sendStock(
+					$ig->itemStock->place_id,
+					$ig->itemStock->warehouse_id,
+					$ig->itemStock->item_id,
+					$ig->qty,
+					'IN',
+					$ig->itemStock->area_id ?? NULL,
+					$ig->itemStock->item_shading_id ?? NULL,
+					$ig->itemStock->production_batch_id ?? NULL,
+				);
+			}
+
+			$ig->update([
+				'status'	=> '3'
+			]);
 
 		}elseif($table_name == 'good_return_issues'){
 

@@ -900,10 +900,10 @@ document.addEventListener('focusin', function (event) {
                 },
                 cache: false,
                 beforeSend: function() {
-                    loadingOpen('#main');
+                    loadingOpen('.modal-content');
                 },
                 success: function(data){
-                    loadingClose('#main');
+                    loadingClose('.modal-content');
                     if(data.status == '200'){
                         $('#grandtotalUnsentModCredit').text(data.grandtotalUnsentModCredit);
                         $('#grandtotalUnsentModDp').text(data.grandtotalUnsentModDp);

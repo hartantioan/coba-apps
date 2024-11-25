@@ -474,6 +474,7 @@ class GoodScaleController extends Controller
 
                 $imageName = '';
                 $newFile = '';
+                $desiredPath = NULL;
                 if($request->image_in){
                     // $image = $request->image_in;  // your base64 encoded
                     // $image = str_replace('data:image/png;base64,', '', $image);

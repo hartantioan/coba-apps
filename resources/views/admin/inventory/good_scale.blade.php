@@ -786,7 +786,7 @@
 </div>
 
 <!-- END: Page Main-->
-<script src="{{ url('app-assets/js/custom/timbangan.js') }}"></script>
+<script src="{{ url('app-assets/js/custom/timbangan.js?v=0') }}"></script>
 <script>
     const dropZone = document.getElementById('dropZone');
     const uploadLink = document.getElementById('uploadLink');

@@ -1425,7 +1425,7 @@
                                         $('#arr_percent_wtax' + count).val(val.percent_wtax);
                                         $('#arr_include_tax' + count).val(val.include_tax);
 
-                                        $('#top').val(val.top);
+                                        $('#top').val('30');
 
                                         $('#received_date').val(val.received_date);
                                         $('#due_date').val(val.due_date);
@@ -2404,7 +2404,7 @@
                                                 $('#arr_percent_wtax' + count).val('2.00000');
                                             }
 
-                                            $('#top').val(val.top);
+                                            $('#top').val('30');
 
                                             $('#received_date').val(val.received_date);
                                             $('#due_date').val(val.due_date);
@@ -2522,6 +2522,8 @@
                 }
             }
         });
+
+        M.updateTextFields();
     }
 
     function countStock(element){

@@ -42,7 +42,7 @@ class ExportOutstandingAR implements FromView , WithEvents
                     'customer'          => $row->account->name,
                     'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                     'due_date'          => date('d/m/Y',strtotime($row->due_date)),
-                    'top'               => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->top_internal : '-',
+                    'top'               => $row->account->top_internal,
                     'type'              => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType() : '-',
                     'note'              => $row->note,
                     'total'             => $row->grandtotal,

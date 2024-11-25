@@ -114,11 +114,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
                 }
 
-                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-11-18'){
+                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {
                     $price = $rowdetail->priceBeforeTax();
                     $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                     $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
-                }else{
+                } else {
                     $price = $rowdetail->price;
                     $totalBeforeTax = round($rowdetail->total, 2);
                     $totalDiscountBeforeTax = 0;
@@ -147,11 +147,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
                 }
 
-                if(date('Y-m-d',strtotime($row->created_at)) >= '2024-11-18'){
+                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {
                     $price = $rowdetail->priceBeforeTax();
                     $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                     $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
-                }else{
+                } else {
                     $price = $rowdetail->price;
                     $totalBeforeTax = round($rowdetail->total, 2);
                     $totalDiscountBeforeTax = 0;
@@ -163,8 +163,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $balance -= $tax;
             }
             foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key => $rowdetail) {
+                $price = $rowdetail->priceBeforeTax();
+                $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
                 $arr[] = [
-                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $row->tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $row->tax . ';0;0;;;;;;;;;;',
                 ];
             }
         }

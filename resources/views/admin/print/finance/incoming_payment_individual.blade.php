@@ -310,7 +310,15 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" align="right">{{ __('translations.total') }}</th>
+                                    <th colspan="6" align="right">Total</th>
+                                    <th align="right">{{ number_format($data->total - $data->rounding,2,',','.') }}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="6" align="right">Pembulatan</th>
+                                    <th align="right">{{ number_format($data->rounding,2,',','.') }}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="6" align="right">Grandtotal</th>
                                     <th align="right">{{ number_format($data->grandtotal,2,',','.') }}</th>
                                 </tr>
                                 <tr>

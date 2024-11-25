@@ -27,6 +27,7 @@ use App\Http\Controllers\Inventory\ReportGoodScaleController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\QualityControlController;
 use App\Http\Controllers\Purchase\OutstandingLandedCostController;
+use App\Http\Controllers\Inventory\ReportInventorySummaryStockFGController;
 
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
@@ -2317,6 +2318,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter', [ReportGoodScaleController::class, 'filter']);
                         Route::get('export', [ReportGoodScaleController::class, 'export']);
                     });
+
+                    Route::prefix('inventory_summary_stock_fg')->middleware('operation.access:inventory_summary_stock_fg,view')->group(function () {
+                        Route::get('/', [ReportInventorySummaryStockFGController::class, 'index']);
+                        Route::post('view', [ReportInventorySummaryStockFGController::class, 'view']);
+                        Route::get('export', [ReportInventorySummaryStockFGController::class, 'export']);
+                      
+                    });
+
                 });
             });
 

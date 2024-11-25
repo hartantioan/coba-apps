@@ -143,7 +143,7 @@
                                                     <span class="hide-on-small-onl">Excel</span>
                                                     <i class="material-icons right">view_list</i>
                                                 </a>
-                                                <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel2();">
+                                                <a id="export_button2" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel2();">
                                                     <i class="material-icons hide-on-med-and-up">view_list</i>
                                                     <span class="hide-on-small-onl">Excel Ver 2</span>
                                                     <i class="material-icons right">view_list</i>

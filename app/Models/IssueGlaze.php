@@ -20,6 +20,7 @@ class IssueGlaze extends Model
         'company_id',
         'place_id',
         'line_id',
+        'ballmill_no',
         'item_id',
         'item_stock_id',
         'qty',

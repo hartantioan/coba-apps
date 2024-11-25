@@ -447,7 +447,7 @@ class ProductionReceiveGPController extends Controller
                 $max = $row->issueGlaze->balance();
                 $arr[] = [
                     'issue_glaze_id'            => $row->issueGlaze->id,
-                    'issue_glaze_name'          => $row->issueGlaze->code.' - Target : '.$row->issueGlaze->item->code.' - '.$row->issueGlaze->item->name.' - Available : '.CustomHelper::formatConditionalQty($max),
+                    'issue_glaze_name'          => $row->issueGlaze->code.' - Tgl.Post : '.date('d/m/Y',strtotime($row->issueGlaze->post_date)).' - No.Ballmill : '.$row->issueGlaze->ballmill_no.' - Target : '.$row->issueGlaze->item->code.' - '.$row->issueGlaze->item->name.' - Available : '.CustomHelper::formatConditionalQty($max),
                     'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                     'max'                       => CustomHelper::formatConditionalQty($max),
                 ];

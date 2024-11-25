@@ -18,6 +18,7 @@
             <th>{{ __('translations.post_date') }}</th>
             <th>Plant</th>
             <th>Line</th>
+            <th>No.Ballmill</th>
             <th>Keterangan</th>
             <th>Tipe Item Bahan</th>
             <th>Kode Item Bahan</th>
@@ -57,6 +58,7 @@
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                     <td>{{ $row->place->code }}</td>
                     <td>{{ $row->line->code }}</td>
+                    <td>{{ $row->ballmill_no }}</td>
                     <td>{{ $row->note }}</td>
                     <td>{{ $row_detail->typeItem()}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->code : '' }}</td>

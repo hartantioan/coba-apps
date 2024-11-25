@@ -2985,6 +2985,7 @@ class Select2Controller extends Controller {
         $data = IssueGlaze::where(function($query) use($request){
             $query->where('note','like',"%$request->search%")
                 ->orWhere('code','like',"%$request->search%")
+                ->orWhere('ballmill_no','like',"%$request->search%")
                 ->orWhereHas('item',function($query) use($request){
                     $query->where('code', 'like', "%$request->search%")
                         ->orWhere('name','like',"%$request->search%");
@@ -2993,6 +2994,9 @@ class Select2Controller extends Controller {
         ->where(function($query) use($request){
             if($request->arrissue){
                 $query->whereNotIn('id',$request->arrissue);
+            }
+            if($request->line_id){
+                $query->where('line_id',$request->line_id);
             }
         })
         ->whereIn('status',['2'])
@@ -3003,7 +3007,7 @@ class Select2Controller extends Controller {
             if($qty > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->code.' - Target : '.$d->item->code.' - '.$d->item->name.' - Available : '.CustomHelper::formatConditionalQty($qty),
+                    'text' 			    => $d->code.' - Tgl.Post : '.date('d/m/Y',strtotime($d->post_date)).' - No.Ballmill : '.$d->ballmill_no.' - Target : '.$d->item->code.' - '.$d->item->name.' - Available : '.CustomHelper::formatConditionalQty($qty),
                     'balance'           => CustomHelper::formatConditionalQty($qty),
                 ];
             }

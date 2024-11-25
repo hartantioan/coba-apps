@@ -225,7 +225,7 @@
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
                                     <div class="input-field col m3 s12" >
-                                        <select class="browser-default" id="item_id" name="item_id">
+                                        <select class="browser-default" id="item_id" name="item_id" onchange="getNoteFromItem();">
                                             @foreach ($items as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                             @endforeach
@@ -751,6 +751,7 @@
                     return 'You will lose all changes made since your last save';
                 };
                 $('.disable-class').css('pointer-events','none');
+                getNoteFromItem();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -792,6 +793,14 @@
             countAll();
         });
     });
+
+    function getNoteFromItem(){
+        let item = $("#item_id option:selected").text();
+        let code = $('#code').val();
+        $('#note').val(`
+            PRODUCTION RECEIVE NO. ` + code + ` ( ` + item + ` )
+        `);
+    }
 
     function applyStartEndDate(){
         let date = $('#post_date').val();
@@ -1046,6 +1055,7 @@
                     return {
                         search: params.term,
                         arrissue: arrIssue,
+                        line_id: $('#line_id').val(),
                     };
                 },
                 processResults: function(data) {
@@ -1641,6 +1651,7 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         $('#code').val(response);
+                        getNoteFromItem();
                     },
                     error: function() {
                         swal({

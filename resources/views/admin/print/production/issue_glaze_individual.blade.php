@@ -246,6 +246,17 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td>
+                                            No.Ballmill
+                                        </td>
+                                        <td>
+                                            :
+                                        </td>
+                                        <td>
+                                            {{ $data->ballmill_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
                                             Line
                                         </td>
                                         <td>

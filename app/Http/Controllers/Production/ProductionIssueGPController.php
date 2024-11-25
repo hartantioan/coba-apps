@@ -185,6 +185,7 @@ class ProductionIssueGPController extends Controller
                     $val->note,
                     $val->item->code.' - '.$val->item->name,
                     CustomHelper::formatConditionalQty($val->qty),
+                    $val->ballmill_no,
                     $val->line->code,
                     $val->place->code,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
@@ -223,6 +224,7 @@ class ProductionIssueGPController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'                  => 'required',
+            'ballmill_no'               => 'required',
             'line_id'                   => 'required',
             'item_id'                   => 'required',
             'post_date'		            => 'required',
@@ -231,6 +233,7 @@ class ProductionIssueGPController extends Controller
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required'                 => 'Plant tidak boleh kosong.',
+            'ballmill_no.required'              => 'Ballmill tidak boleh kosong.',
             'line_id.required'                  => 'Line tidak boleh kosong.',
             'item_id.required'                  => 'Item tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
@@ -332,6 +335,7 @@ class ProductionIssueGPController extends Controller
                     $query->company_id = $request->company_id;
                     $query->place_id = $request->place_id;
                     $query->line_id = $request->line_id;
+                    $query->ballmill_no = $request->ballmill_no;
                     $query->item_id = $request->item_id;
                     $query->item_stock_id = $itemStockHeader->id;
                     $query->post_date = $request->post_date;
@@ -362,6 +366,7 @@ class ProductionIssueGPController extends Controller
                     'company_id'                => $request->company_id,
                     'place_id'                  => $request->place_id,
                     'line_id'                   => $request->line_id,
+                    'ballmill_no'               => $request->ballmill_no,
                     'item_id'                   => $request->item_id,
                     'item_stock_id'             => $itemStockHeader->id,
                     'post_date'                 => $request->post_date,

@@ -31,10 +31,10 @@
                 <td>{{ $row['balance'] }}</td>
             </tr>
         @endforeach
-            <tr>
+            {{-- <tr>
                 <td colspan="9" align="right">Grandtotal</td>
                 <td>{{ $grandtotal }}</td>
-            </tr>
+            </tr> --}}
         @endif
         @if(count($data) == 0)
             <tr>

@@ -92,7 +92,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $typesell = $row->lookable->marketingOrderDetail->marketingOrder->type();
             }else{
                 $pricefinal = Round($row->price, 2);
-                $item = $row->note;
+                $item = $row->description;
                 $qty = $row->qty;
                 $uom = $row->unit->code;
                 $disc1 = '';

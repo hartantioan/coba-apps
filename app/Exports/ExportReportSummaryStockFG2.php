@@ -2,17 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\GoodIssueDetail;
-use App\Models\GoodReceiveDetail;
-use App\Models\Item;
-use App\Models\ItemShading;
-use App\Models\MarketingOrderDeliveryDetail;
-use App\Models\MarketingOrderDeliveryProcess;
-use App\Models\MarketingOrderDeliveryProcessDetail;
-use App\Models\ProductionHandover;
-use App\Models\ProductionHandoverDetail;
-use App\Models\ProductionRepackDetail;
-use App\Models\UserBrand;
+
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -48,12 +38,6 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         'Delivery Sudah Barcode(M2)',
         'End Stock All(M2)',
 
-        // 'Qty SJ Blm Terkirim(M2)',
-        // 'Qty SJ Blm Terkirim(Palet)',
-        // 'Qty SJ Blm Terkirim(Box)',
-        // 'Total Aviable (M2)',
-        // 'Total Aviable (Palet)',
-        // 'Total Aviable (Box)',
 
     ];
 
@@ -219,7 +203,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                                                 LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id AND mo.deleted_at IS NULL AND mo.status=1
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                 WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
-                            and a.id not in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status ='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
+                            and a.id not in (select distinct marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status ='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
                                 )h ON h.code=a.code and h.shading=a.shading
                                 LEFT JOIN (
@@ -233,14 +217,14 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id and mo.deleted_at is null and mo.status=2
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                 WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
-                        and a.id in (select marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
+                        and a.id in (select distinct marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
                                 )i ON i.code=a.code and i.shading=a.shading 
                                 LEFT JOIN items it ON it.code=a.code
                                 LEFT JOIN `types` v ON v.code=it.type_id
                                 LEFT JOIN brands br ON br.id=it.brand_id
                                 LEFT JOIN patterns pa ON pa.id=it.pattern_id
-                                LEFT JOIN grades gr ON gr.id=it.grade_id
+                                LEFT JOIN grades gr ON gr.id=it.grade_id 
                                 order by a.name,a.shading");
 
         foreach ($query as $row) {

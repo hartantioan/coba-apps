@@ -170,6 +170,12 @@
                 <div class="col s8">
                     {{ $data->line->code }}
                 </div>
+                <div class="col s4">
+                    No.Ballmill
+                </div>
+                <div class="col s8">
+                    {{ $data->ballmill_no }}
+                </div>
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">

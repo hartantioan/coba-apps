@@ -147,6 +147,7 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                                         <th>Target Item</th>
                                                         <th>Qty Hasil</th>
+                                                        <th>No.Ballmill</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
@@ -221,7 +222,15 @@
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="item_id" name="item_id">
+                                        <select class="browser-default" id="ballmill_no" name="ballmill_no">
+                                            @for ($i=1;$i<=10;$i++)
+                                                <option value="{{ $i }}">{{ $i }}</option>
+                                            @endfor
+                                        </select>
+                                        <label class="active" for="ballmill_no">No. Ballmill</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="item_id" name="item_id" onchange="getNoteFromItem();">
                                             @foreach ($items as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                             @endforeach
@@ -655,6 +664,7 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                getNoteFromItem();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -736,6 +746,13 @@
         });
     });
 
+    function getNoteFromItem(){
+        let item = $("#item_id option:selected").text();
+        let code = $('#code').val();
+        $('#note').val(`
+            PRODUCTION ISSUE NO. ` + code + ` ( ` + item + ` )
+        `);
+    }
 
     function applyStartEndDate(){
         let date = $('#post_date').val();
@@ -1211,6 +1228,7 @@
                 { name: 'note', className: '' },
                 { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'ballmill_no', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -1510,7 +1528,8 @@
                     $('#line_id').val(response.data.line_id).formSelect();
                     $('#company_id').val(response.data.company_id).formSelect();
                     $('#item_id').val(response.data.item_id);
-                    $('#note').val(response.note);
+                    $('#note').val(response.data.note);
+                    $('#ballmill_no').val(response.data.ballmill_no);
 
                     $('.row_item_issue').remove();
 
@@ -1719,6 +1738,7 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         $('#code').val(response);
+                        getNoteFromItem();
                     },
                     error: function() {
                         swal({

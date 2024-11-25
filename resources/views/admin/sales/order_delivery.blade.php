@@ -849,7 +849,7 @@ document.addEventListener('focusin', function (event) {
             }
         });
 
-        $('#customer_id').on('select2:select', function (e) {
+        /* $('#customer_id').on('select2:select', function (e) {
             total_grandtotal = [0];
             $('#grand-total').text(0);
                 $.ajax({
@@ -882,8 +882,45 @@ document.addEventListener('focusin', function (event) {
                     }
                 }
             });
-        });
+        }); */
     });
+
+    function getCustomerInfo(){
+        if($('#customer_id').val()){
+            total_grandtotal = [0];
+            $('#grand-total').text(0);
+                $.ajax({
+                type : "POST",
+                url  : '{{ Request::url() }}/get_customer_info',
+                data : {
+                    id : $('#customer_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                cache: false,
+                beforeSend: function() {
+                    loadingOpen('#main');
+                },
+                success: function(data){
+                    loadingClose('#main');
+                    if(data.status == '200'){
+                        $('#grandtotalUnsentModCredit').text(data.grandtotalUnsentModCredit);
+                        $('#grandtotalUnsentModDp').text(data.grandtotalUnsentModDp);
+                        $('#grandtotalUnsentDoCredit').text(data.grandtotalUnsentDoCredit);
+                        $('#grandtotalUnsentDoDp').text(data.grandtotalUnsentDoDp);
+                        $('#deposit').text(data.deposit);
+                        $('#limit_credit').text(data.limit_credit);
+
+                    }else{
+                        M.toast({
+                            html: data.message
+                        });
+                    }
+                }
+            });
+        }
+    }
 
     function updateSendStatus(code,element){
         var status = $(element).val();

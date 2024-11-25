@@ -2096,7 +2096,7 @@
 
                 var s = $('#previewImage1').attr('src') ? $('#previewImage1').attr('src') : '';
 
-                if(s){
+                /* if(s){ */
 
                     formData.append('image_out', s);
 
@@ -2137,13 +2137,13 @@
                             });
                         }
                     });
-                }else{
+                /* }else{
                     swal({
                         title: 'Ups!',
                         text: 'Foto cctv timbang keluar tidak boleh kosong.',
                         icon: 'warning'
                     });
-                }
+                } */
             }
         });
     }

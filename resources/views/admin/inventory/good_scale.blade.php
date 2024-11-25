@@ -1988,7 +1988,7 @@
                 }
 
                 if(passedMod){
-                    /* if(s){ */
+                    if(s){
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
@@ -2061,13 +2061,13 @@
                                 });
                             }
                         });
-                    /* }else{
+                    }else{
                         swal({
                             title: 'Ups!',
                             text: 'Foto cctv timbang masuk tidak boleh kosong.',
                             icon: 'warning'
                         });
-                    } */
+                    }
                 }else{
                     swal({
                         title: 'Ups!',
@@ -2096,7 +2096,7 @@
 
                 var s = $('#previewImage1').attr('src') ? $('#previewImage1').attr('src') : '';
 
-                /* if(s){ */
+                if(s){
 
                     formData.append('image_out', s);
 
@@ -2137,13 +2137,13 @@
                             });
                         }
                     });
-                /* }else{
+                }else{
                     swal({
                         title: 'Ups!',
                         text: 'Foto cctv timbang keluar tidak boleh kosong.',
                         icon: 'warning'
                     });
-                } */
+                }
             }
         });
     }

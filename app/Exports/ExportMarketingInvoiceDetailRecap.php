@@ -28,13 +28,17 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
         $totalAll = 0;
         $array_filter = [];
         $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice', function ($query) {
-            $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
-                ->where('post_date', '<=', $this->end_date)->where('lookable_type','<>','marketing_order_down_payments');
+            $query->whereIn('status', ['2', '3'])
+                ->where('post_date', '>=', $this->start_date)
+                ->where('post_date', '<=', $this->end_date)
+                ->where(function ($subQuery) {
+                    $subQuery->where('lookable_type', '<>', 'marketing_order_down_payments')
+                        ->orWhereNull('lookable_type');
+                });
         })->get();
 
 
         $code = [];
-
 
         foreach ($data as $row) {
             $code[] = array_push($code, $row->marketingOrderInvoice->code);
@@ -87,18 +91,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $disc3 = $row->lookable->marketingOrderDetail->discount_3;
                 $typesell = $row->lookable->marketingOrderDetail->marketingOrder->type();
             }else{
-                if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == "0") {
-                    $pricefinal = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
-                } else {
-                    $pricefinal = Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price / (($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) / 100), 2);
-                }
+                $pricefinal = Round($row->price, 2);
                 $item = $row->note;
                 $qty = $row->qty;
                 $uom = $row->unit->code;
                 $disc1 = '';
                 $disc2 = '';
                 $disc3 = '';
-                $typesell = 'manual';
+                $typesell = 'Manual';
             }
 
             $array_filter[] = [

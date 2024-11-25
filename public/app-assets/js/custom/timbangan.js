@@ -23,12 +23,11 @@ var imageCapture;
 var takePhotoButton;
 
 function getDevices() {
-  // AFAICT in Safari this only gets default devices until gUM is called :/
   return navigator.mediaDevices.enumerateDevices();
 }
 
 function gotDevices(deviceInfos) {
-  window.deviceInfos = deviceInfos; // make available to console
+  window.deviceInfos = deviceInfos;
   for (const deviceInfo of deviceInfos) {
     const option = document.createElement('option');
     option.value = deviceInfo.deviceId;
@@ -60,7 +59,7 @@ function getStream() {
 }
 
 function gotStream(stream) {
-  window.stream = stream; // make stream available to console
+  window.stream = stream;
   imageCapture = new ImageCapture(stream.getVideoTracks()[0]);
   videoSelect.selectedIndex = [...videoSelect.options].
     findIndex(option => option.text === stream.getVideoTracks()[0].label);
@@ -72,7 +71,7 @@ function handleError(error) {
 }
 
 function takePhoto() {
-    imageCapture.takePhoto().then(function(blob) {
+    /* imageCapture.takePhoto().then(function(blob) {
         img.classList.remove('hidden');
         var reader = new FileReader();
         reader.readAsDataURL(blob); 
@@ -82,5 +81,22 @@ function takePhoto() {
         }
     }).catch(function(error) {
         console.log('takePhoto() error: ', error);
-    });
+    }); */
+    navigator.mediaDevices.getUserMedia({audio: false, video: true}).then((stream) => {
+      let track = window.stream.getVideoTracks()[0];
+      let capture = new ImageCapture(track);
+      return capture.grabFrame();
+   }).then((bitmap) => {
+      let canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      let context = canvas.getContext('2d');
+      context.drawImage(bitmap, 0, 0);
+      return canvas.toDataURL();
+   }).then((src) => {
+      // do something with the source
+      img.classList.remove('hidden');     
+      img.src = src;
+      //console.log(src)
+   }).catch(console.error);
 }

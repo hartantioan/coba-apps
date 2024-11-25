@@ -396,7 +396,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light right submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <button id="save-btn" class="btn waves-effect waves-light right submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -624,6 +624,20 @@ document.addEventListener('focusin', function (event) {
         }
     });
     $(function() {
+
+        $('#save-btn').on('click', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            if ($this.prop('disabled')) {
+                return;
+            }
+
+            $this.prop('disabled', true);
+
+            setTimeout(function () {
+                $this.prop('disabled', false);
+            }, 2000);
+        });
         $("#table-detail th").resizable({
             minWidth: 100,
         });

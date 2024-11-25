@@ -410,14 +410,14 @@ class MarketingOrderDelivery extends Model
             $marketing_order_detail_id = $row->marketing_order_detail_id;
             $arrShading = [];
             $newQty = 0;
-            
+
             foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
                 $newQty += $modpd->qty;
                 if(!in_array($modpd->itemStock->itemShading->code, $arrShading)){
                     $arrShading[] = 'SHADING '.$modpd->itemStock->itemShading->code;
                 }
             }
-            
+
             $listChanges[] = '*'.$row->item->name.' dari '.CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDetail->itemUnit->unit->code.' ke '.CustomHelper::formatConditionalQty($newQty).' '.$row->marketingOrderDetail->itemUnit->unit->code.'*';
 
             $newmodd = MarketingOrderDeliveryDetail::create([
@@ -453,5 +453,28 @@ class MarketingOrderDelivery extends Model
                 WaBlas::kirim_wa($rownumber,'*Revisi Muatan* \nNo MOD '.$this->code.' telah dirubah oleh admin SJ dengan mengedit SJ '.$this->marketingOrderDeliveryProcess->code.' dengan rincian : '.implode(', ',$listChanges).'. \nIni adalah pesan otomatis, jangan membalas pesan ini.');
             }
         }
+    }
+
+    public function getSO(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderDetail){
+                if(!in_array($row->marketingOrderDetail->marketingOrder->code, $arr)){
+                    $arr[] = $row->marketingOrderDetail->marketingOrder->code;
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getInvoice(){
+        $arr = [];
+        if($this->marketingOrderDeliveryProcess()->exists()){
+            if($this->marketingOrderDeliveryProcess->marketingOrderInvoice()->exists())
+            if(!in_array($this->marketingOrderDeliveryProcess->marketingOrderInvoice->code, $arr)){
+                $arr[] = $this->marketingOrderDeliveryProcess->marketingOrderInvoice->code;
+            }
+        }
+        return implode(', ',$arr);
     }
 }

@@ -52,13 +52,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -300,18 +300,18 @@
                             <label class="active" for="month">Periode Penutupan</label>
                         </div>
                         <div class="col m12 s12 l12"></div>
-                        <div class="input-field col s3 step7">
+                        <div class="input-field col s3 step6">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
-                        <div class="col m4 s12 step6">
+                        <div class="col m4 s12 step7">
                             <label class="">Bukti Upload</label>
                             <br>
                             <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
                             <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                 Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                 <br>
-                                
+
                             </div>
                             <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                Clear
@@ -365,7 +365,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -412,7 +412,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -435,7 +435,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -452,7 +452,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -463,10 +463,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -482,7 +482,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -528,7 +528,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -583,7 +583,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -591,18 +591,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -610,16 +610,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -638,22 +638,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -685,17 +685,17 @@
         });
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
-        
+
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -704,9 +704,9 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -730,7 +730,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -743,7 +743,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -753,19 +753,19 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -774,7 +774,7 @@
                 $('#post_date_jurnal').empty();
             }
         });
-        
+
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');
@@ -1024,7 +1024,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -1078,11 +1078,11 @@
                 if(response.status == 200) {
                     $('#checkstock-progress').hide();
                     $('#checkstock-success').show();
-                    
+
                 } else {
                     $('#checkstock-progress').hide();
                     $('#checkstock-fail').show();
-                    
+
                     $.each(response.data, function(i, val) {
                         if(val.passed == '0'){
                             $('#detail-fail-stock').append(`
@@ -1102,7 +1102,7 @@
                 });
             }
         });
-        
+
         return statusStock;
     }
 
@@ -1252,10 +1252,10 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
-    
+
         formData.append('lastsegment',lastSegment);
         $.ajax({
             url: '{{ Request::url() }}/create',
@@ -1288,7 +1288,7 @@
                     $.each(response.error, function(field, errorMessage) {
                         $('#' + field).addClass('error-input');
                         $('#' + field).css('border', '1px solid red');
-                        
+
                     });
                     swal({
                         title: 'Ups! Validation',
@@ -1350,7 +1350,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
@@ -1493,7 +1493,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1501,7 +1501,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -1547,7 +1547,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1592,13 +1592,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1628,11 +1628,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function printPreview(code,aslicode){
@@ -1654,7 +1654,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1663,10 +1663,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function viewJournal(id){
@@ -1677,7 +1677,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1726,37 +1726,38 @@
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Periode / Bulan',
                     element : document.querySelector('.step5'),
-                    intro : 'Periode dimana aset itu menyusut.' 
-                },
-                {
-                    title : 'File lampiran',
-                    element : document.querySelector('.step6'),
-                    intro : 'File lampiran dalam bentuk pdf / gambar.'
+                    intro : 'Periode dimana aset itu menyusut.'
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step7'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
+                {
+                    title : 'File lampiran',
+                    element : document.querySelector('.step7'),
+                    intro : 'File lampiran dalam bentuk pdf / gambar.'
+                },
+
                 {
                     title : 'Preview',
                     element : document.querySelector('.step8'),
-                    intro : 'Digunakan untuk menarik data coa awalan 4,5,6,7,8 pada jurnal dan periode terpilih.' 
+                    intro : 'Digunakan untuk menarik data coa awalan 4,5,6,7,8 pada jurnal dan periode terpilih.'
                 },
                 {
                     title : 'List Data',
                     element : document.querySelector('.step9'),
-                    intro : 'Merupakan List Coa data tarikan dari jurnal pada periode terpilih.' 
+                    intro : 'Merupakan List Coa data tarikan dari jurnal pada periode terpilih.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -1770,7 +1771,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');

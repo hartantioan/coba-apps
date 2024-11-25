@@ -236,7 +236,7 @@
                                 </p>
                             </div>
 
-                            <div class="input-field col m3 s12 step4">
+                            <div class="input-field col m3 s12 step9">
                                 <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
                                 <label class="active">&nbsp;</label>
                             </div>
@@ -277,7 +277,7 @@
                                 <h5>TOTAL <span id="total">0,00</span></h5>
                             </div>
                         </div>
-                        <div class="col s12 mt-3 step9">
+                        <div class="col s12 mt-3 step10">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -1878,8 +1878,13 @@
                     intro : 'Pemilihan Aset yang akan digunakan dalam pembuatan form'
                 },
                 {
-                    title : 'Tombol Simpan',
+                    title : 'Get Data',
                     element : document.querySelector('.step9'),
+                    intro : 'Silahkan tekan tombol ini untuk menampilkan data Asset yang akan dipilih .'
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step10'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]

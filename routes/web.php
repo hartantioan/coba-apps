@@ -219,6 +219,7 @@ use App\Http\Controllers\Accounting\LedgerController;
 use App\Http\Controllers\Accounting\CashBankController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
 use App\Http\Controllers\Accounting\ProfitLossController;
+use App\Http\Controllers\Accounting\ReportGoodScalePOController;
 use App\Http\Controllers\Accounting\ClosingJournalController;
 use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
@@ -3621,6 +3622,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [StockInRupiahShadingController::class, 'index']);
                         Route::post('filter', [StockInRupiahShadingController::class, 'filter']);
                         Route::post('export', [StockInRupiahShadingController::class, 'export']);
+                    });
+
+                    Route::prefix('report_good_scale_po')->middleware('operation.access:report_good_scale_po,view')->group(function () {
+                        Route::get('/', [ReportGoodScalePOController::class, 'index']);
+                        Route::post('filter', [ReportGoodScalePOController::class, 'filter']);
+                        Route::get('export', [ReportGoodScalePOController::class, 'export']);
                     });
 
                     Route::prefix('stock_movement_shading')->middleware('operation.access:stock_movement_shading,view')->group(function () {

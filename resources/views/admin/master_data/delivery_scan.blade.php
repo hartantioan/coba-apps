@@ -604,12 +604,12 @@
                     beforeSend: function() {
                         $('#validation_alert').hide();
                         $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('.main');
                     },
                     success: function(response) {
                         $('input').css('border', 'none');
                         $('input').css('border-bottom', '0.5px solid black');
-                        loadingClose('.modal-content');
+                        loadingClose('.main');
                         if(response.status == 200) {
                             const now = new Date();
                             const formattedDateTime = formatDate(now);

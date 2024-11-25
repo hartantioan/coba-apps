@@ -888,8 +888,8 @@ document.addEventListener('focusin', function (event) {
     function getCustomerInfo(){
         if($('#customer_id').val()){
             total_grandtotal = [0];
-            $('#grand-total').text(0);
-                $.ajax({
+            $('#grand-total').text('0');
+            $.ajax({
                 type : "POST",
                 url  : '{{ Request::url() }}/get_customer_info',
                 data : {

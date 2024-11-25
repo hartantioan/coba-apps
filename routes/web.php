@@ -2668,7 +2668,8 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('production_summary_stock_fg')->middleware('operation.access:production_summary_stock_fg,view')->group(function () {
                         Route::get('/', [ReportProductionSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportProductionSummaryStockFgController::class, 'filter']);
-                        Route::post('export', [ReportProductionSummaryStockFgController::class, 'export']);
+                        Route::post('view', [ReportProductionSummaryStockFgController::class, 'view']);
+                       // Route::post('export', [ReportProductionSummaryStockFgController::class, 'export']);
                         Route::get('export2', [ReportProductionSummaryStockFgController::class, 'export2']);
                     });
 

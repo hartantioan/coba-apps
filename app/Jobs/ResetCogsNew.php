@@ -939,7 +939,7 @@ class ResetCogsNew implements ShouldQueue, ShouldBeUnique
                 $ig = ReceiveGlaze::find(intval($id));
                 if($ig){
                     $ig->updateGrandtotal();
-                    self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id);
+                    //self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id);
                 }
             }   
         }

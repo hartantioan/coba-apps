@@ -217,7 +217,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN marketing_order_delivery_process_tracks mo ON mo.marketing_order_delivery_process_id=a.id and mo.deleted_at is null and mo.status=2
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                 WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
-                        and a.id in (select distinct marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null LIMIT 1)
+                        and a.id in (select distinct marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $this->finish_date . " 23:59:59' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
                                 )i ON i.code=a.code and i.shading=a.shading 
                                 LEFT JOIN items it ON it.code=a.code

@@ -208,10 +208,7 @@ class ReceiveGlaze extends Model
     }
 
     public function updateGrandtotal(){
-        $total = 0;
-        foreach($this->receiveGlazeDetail as $row){
-            $total = $row->total;
-        }
+        $total = $this->receiveGlazeDetail()->sum('total');
         $this->update([
             'grandtotal'    => $total
         ]);

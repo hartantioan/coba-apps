@@ -217,7 +217,7 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="customer_id" name="customer_id" onchange="resetDetail();"></select>
+                                        <select class="browser-default" id="customer_id" name="customer_id" onchange="resetDetail();getCustomerInfo();"></select>
                                         <label class="active" for="customer_id">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">

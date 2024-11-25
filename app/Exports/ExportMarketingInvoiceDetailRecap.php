@@ -86,7 +86,20 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $disc2 = $row->lookable->marketingOrderDetail->percent_discount_2;
                 $disc3 = $row->lookable->marketingOrderDetail->discount_3;
                 $typesell = $row->lookable->marketingOrderDetail->marketingOrder->type();
-            } 
+            }else{
+                if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == "0") {
+                    $pricefinal = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+                } else {
+                    $pricefinal = Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price / (($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) / 100), 2);
+                }
+                $item = $row->note;
+                $qty = $row->qty;
+                $uom = $row->unit->code;
+                $disc1 = '';
+                $disc2 = '';
+                $disc3 = '';
+                $typesell = 'manual';
+            }
 
             $array_filter[] = [
                 'code'  => $row->marketingOrderInvoice->code,

@@ -51,6 +51,11 @@
                                             <p>Info : Untuk GUDANG FG, yang terbentuk DELIVERY hanya yang sudah di barcode satpam</p>
                                         </div>
                                     </div>
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <b>Info : Untuk Item FG, lebih akurat silahkan cek pada menu INVENTORI - LAPORAN - SUMMARY STOCK FG.</b>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="input-field col m4 s12">
                                             <select class="form-control" id="type" name="type">

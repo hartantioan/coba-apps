@@ -339,7 +339,7 @@
                                         }}
                                     </td>
                                     <td>{{ $row->place->code }}</td>
-                                    <td>{{ $row->warehouse->name }}</td>
+                                    <td>{{ $row->warehouse()->exists() ? $row->warehouse->name : '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

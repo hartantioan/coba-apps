@@ -1387,6 +1387,9 @@
                         if(!$('*[name^="arr_lookable_id[]"]').eq(index).val()){
                             passedInput = false;
                         }
+                        if(!$('*[name^="arr_warehouse[]"]').eq(index).val()){
+                            passedInput = false;
+                        }
                     }
                     if(element.val() == 'manual'){
                         if(!$('*[name^="arr_unit_id[]"]').eq(index).val()){
@@ -1396,7 +1399,7 @@
                             passedInput = false;
                         }
                     }
-                    if(!$('*[name^="arr_qty[]"]').eq(index).val() || !$('*[name^="arr_place[]"]').eq(index).val() || !$('*[name^="arr_warehouse[]"]').eq(index).val()){
+                    if(!$('*[name^="arr_qty[]"]').eq(index).val() || !$('*[name^="arr_place[]"]').eq(index).val()){
                         passedInput = false;
                     }
                 });

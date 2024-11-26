@@ -400,7 +400,7 @@ class ProductionIssueGPController extends Controller
                         'qty'                           => str_replace(',','.',str_replace('.','',$row)),
                         'unit_id'                       => $request->arr_unit_id[$key] ?? NULL,
                         'place_id'                      => $request->arr_place[$key],
-                        'warehouse_id'                  => $request->arr_warehouse[$key],
+                        'warehouse_id'                  => $request->arr_warehouse[$key] ?? NULL,
                         'item_stock_id'                 => $itemstock ? $itemstock->id : NULL,
                         'total'                         => $total,
                     ]);
@@ -452,7 +452,7 @@ class ProductionIssueGPController extends Controller
                     'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                     'note'                      => $row->note ? $row->note : '',
                     'place_id'                  => $row->place_id,
-                    'warehouse_id'              => $row->warehouse_id,
+                    'warehouse_id'              => $row->warehouse_id ?? '',
                     'list_warehouse'            => $row->lookable_type == 'items' ? $row->lookable->warehouseList() : [],
                 ];
             }

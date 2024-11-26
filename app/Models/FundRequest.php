@@ -317,6 +317,11 @@ class FundRequest extends Model
     public function totalAllReceivableUsedPaid(){
         $total = 0;
         if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            }
             foreach($this->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
                 $query->whereHas('closeBillDetail');
             })->get() as $row){

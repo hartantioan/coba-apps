@@ -431,7 +431,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_only_stock', [Select2Controller::class, 'itemOnlyStock']);
                 Route::get('item_stock_material_request', [Select2Controller::class, 'itemStockMaterialRequest']);
                 Route::get('department', [Select2Controller::class, 'department']);
-                Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
                 Route::get('purchase_order_detail_scale', [Select2Controller::class, 'purchaseOrderDetailScale']);
                 Route::get('good_scale', [Select2Controller::class, 'goodScale']);

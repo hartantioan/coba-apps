@@ -2636,12 +2636,7 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'price_list'        => $d->currentCogs($this->dataplaces),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
-                'list_warehouse'    => $d->warehouseList(),
-                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
-                'list_shading'      => $d->arrShading(),
-                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
             ];
         }
 

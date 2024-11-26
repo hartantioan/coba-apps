@@ -318,11 +318,7 @@ class FundRequest extends Model
         $total = 0;
         if($this->document_status == '3'){
             foreach($this->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
-                $query->whereHas('closeBillDetail',function($query){
-                    $query->whereHas('closeBill',function($query){
-                        $query->whereIn('status',['2','3']);
-                    });
-                });
+                $query->whereHas('closeBillDetail');
             })->get() as $row){
                 $total += $row->nominal;
             }

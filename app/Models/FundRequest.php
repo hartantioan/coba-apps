@@ -331,7 +331,7 @@ class FundRequest extends Model
             foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
                 $query->whereHas('outgoingPayment');
             })->get() as $row){
-                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+                $total += $row->nominal;
             }
         }
         return $total;

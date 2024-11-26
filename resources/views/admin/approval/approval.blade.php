@@ -315,14 +315,14 @@
             "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
-            "stateSave": $('#filter_form').val() ? false : true,
+            "stateSave": true,
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            /* "fixedColumns": {
+            "fixedColumns": {
                 right: 1
-            }, */
+            },
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',

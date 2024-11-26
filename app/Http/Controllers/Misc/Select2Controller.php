@@ -2636,7 +2636,7 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'stock_list'        => $d->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses),
             ];
         }
 

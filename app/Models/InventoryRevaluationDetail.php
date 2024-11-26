@@ -29,6 +29,12 @@ class InventoryRevaluationDetail extends Model
         'project_id',
     ];
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function inventoryRevaluation()
     {
         return $this->belongsTo('App\Models\InventoryRevaluation', 'inventory_revaluation_id', 'id')->withTrashed();

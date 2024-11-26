@@ -89,6 +89,7 @@ use App\Models\PurchaseRequest;
 use App\Models\UsedData;
 use App\Models\IssueGlaze;
 use App\Models\ReceiveGlaze;
+use App\Models\UserBrand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -764,18 +765,33 @@ class CustomHelper {
 					}
 					if($check){
 						foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
-						
-							ApprovalMatrix::create([
-								'code'							=> strtoupper(Str::random(30)),
-								'approval_template_stage_id'	=> $rowTemplateStage->id,
-								'approval_source_id'			=> $source->id,
-								'user_id'						=> $rowStageDetail->user_id,
-								'date_request'					=> date('Y-m-d H:i:s'),
-								'status'						=> $status
-							]);
-							if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
-								WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
-								WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+							$checkPerUser = true;
+							if($table_name == 'marketing_order_deliveries' && $daysDueInvoiceMod > 0 && $rowTemplateStage->approvalStage->level == 1){
+								if(!$source->lookable->customer->brand()->exists()){
+									$countRow = UserBrand::where('account_id',$rowStageDetail->user_id)->count();
+									if($countRow > 0){
+										$checkPerUser = false;
+									}
+								}else{
+									$countRow = UserBrand::where('account_id',$rowStageDetail->user_id)->where('brand_id',$source->lookable->customer->brand->id)->count();
+									if($countRow == 0 && $rowStageDetail->user_id !== 934){
+										$checkPerUser = false;
+									}
+								}
+							}
+							if($checkPerUser){
+								ApprovalMatrix::create([
+									'code'							=> strtoupper(Str::random(30)),
+									'approval_template_stage_id'	=> $rowTemplateStage->id,
+									'approval_source_id'			=> $source->id,
+									'user_id'						=> $rowStageDetail->user_id,
+									'date_request'					=> date('Y-m-d H:i:s'),
+									'status'						=> $status
+								]);
+								if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
+									WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+									WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+								}
 							}
 						}
 						$count++;

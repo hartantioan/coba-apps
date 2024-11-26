@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Finance\BalanceBsEmployeeController;
 use App\Http\Controllers\HR\AttendanceController;
 use App\Http\Controllers\HR\AttendanceLatenessReportController;
 use App\Http\Controllers\HR\AttendanceMonthlyReportController;
@@ -3294,6 +3295,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [HistoryEmployeeReceivableController::class, 'index']);
                         Route::post('filter', [HistoryEmployeeReceivableController::class, 'filter']);
                         Route::get('export', [HistoryEmployeeReceivableController::class, 'export']);
+                    });
+
+                    Route::prefix('balance_bs_employee')->middleware('operation.access:balance_bs_employee,view')->group(function () {
+                        Route::get('/', [BalanceBsEmployeeController::class, 'index']);
+                        Route::post('filter', [BalanceBsEmployeeController::class, 'filter']);
+                        Route::get('export', [BalanceBsEmployeeController::class, 'export']);
                     });
 
                     Route::prefix('report_ar_invoice_paid')->middleware('operation.access:report_ar_invoice_paid,view')->group(function () {

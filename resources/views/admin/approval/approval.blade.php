@@ -315,7 +315,7 @@
             "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
-            "stateSave": true,
+            "stateSave": $('#filter_form').val() ? false : true,
             "serverSide": true,
             "deferRender": true,
             "destroy": true,

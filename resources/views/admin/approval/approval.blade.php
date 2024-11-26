@@ -111,7 +111,6 @@
                                                         <th>{{ __('translations.information') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.total') }}</th>
-                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -355,7 +354,6 @@
                 { name: 'note_ref', orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'total', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             columnDefs: [
@@ -367,7 +365,7 @@
                 }
             ],
             "createdRow": function( row, data, dataIndex){
-                if(data[10]){
+                if(data[9]){
                     $(row).addClass('cyan lighten-4');
                 }
             },

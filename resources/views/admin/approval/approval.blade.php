@@ -313,7 +313,7 @@
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": false,
+            "responsive": true,
             "scrollX": true,
             "stateSave": $('#filter_form').val() ? false : true,
             "serverSide": true,
@@ -355,8 +355,8 @@
                 { name: 'note_ref', orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'total', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             columnDefs: [
                 {

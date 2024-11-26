@@ -56,6 +56,10 @@ class MarketingOrderOutstandingMODController extends Controller
                 <th  class="center-align" style="min-width:50px !important;">Tanggal</th>
                 <th  class="center-align" style="min-width:250px !important;">Customer</th>
                 <th  class="center-align" style="min-width:250px !important;">Alamat Kirim</th>
+                <th  class="center-align" style="min-width:250px !important;">Tgl. Kirim (Est.)</th>
+                <th  class="center-align" style="min-width:250px !important;">Tipe Pengiriman</th>
+                <th  class="center-align" style="min-width:250px !important;">Tipe Transportasi</th>
+                <th  class="center-align" style="min-width:250px !important;">Ekspedisi</th>
                 <th  class="center-align" style="min-width:200px !important;">Kode Item</th>
                 <th  class="center-align" style="min-width:250px !important;">Nama Item</th>
                 <th  class="center-align" style="min-width:50px !important;">Qty Input</th>
@@ -66,7 +70,12 @@ class MarketingOrderOutstandingMODController extends Controller
           </thead><tbody><tr>';
     foreach ($query_data as $key => $row) {
       foreach ($row->marketingOrderDeliveryDetail as $row_detail) {
-        $html .= '<tr class="row_detail"><td class="center-align">' . ($key + 1) . '</td><td>' . $row->code . '</td><td>' . $row->sendStatus() . '</td><td>' . date('d/m/Y', strtotime($row->post_date)) . '</td><td>' . $row->customer->name   . '</td><td>' . $row->destination_address   . '</td><td>' . $row_detail->item->code   . '</td>
+        $html .= '<tr class="row_detail"><td class="center-align">' . ($key + 1) . '</td><td>' . $row->code . '</td><td>' . $row->sendStatus() . '</td><td>' . date('d/m/Y', strtotime($row->post_date)) . '</td><td>' . $row->customer->name   . '</td><td>' . $row->destination_address   . '</td>
+      <td>' . date('d/m/Y',strtotime($row->delivery_date)) . '</td>
+      <td>' . $row->deliveryType() . '</td>
+      <td>' . $row->transportation->name . '</td>
+      <td>' . ($row->account->name ?? '-') . '</td>
+      <td>' . $row_detail->item->code   . '</td>
       <td>' .  $row_detail->item->name   . '</td>
       <td>' .  $row_detail->qty   . '</td>
       <td>' .  $row_detail->marketingOrderDetail->itemUnit->unit->code    . '</td>

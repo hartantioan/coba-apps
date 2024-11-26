@@ -83,7 +83,7 @@ class MarketingOrderOutstandingMODController extends Controller
       <td>' . ($row->account->name ?? '-') . '</td>
       <td>' . $row_detail->item->code   . '</td>
       <td>' .  $row_detail->item->name   . '</td>
-      <td>' .  $row_detail->qty   . '</td>
+      <td>' .  CustomHelper::formatConditionalQty($row_detail->qty)   . '</td>
       <td>' .  $row_detail->marketingOrderDetail->itemUnit->unit->code    . '</td>
       <td class="right-align">' .  round($row_detail->qty * $row_detail->marketingOrderDetail->qty_conversion, 3)    . '</td>
       <td>' .  $row_detail->note    . '</td></tr>';

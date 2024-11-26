@@ -195,7 +195,7 @@
                                         </select>
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="place_id" name="place_id">
                                             @foreach ($place as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -203,7 +203,7 @@
                                         </select>
                                         <label class="" for="place_id">{{ __('translations.plant') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="line_id" name="line_id">
                                             @foreach ($line as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -211,20 +211,20 @@
                                         </select>
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
-                                    <div class="col m12 s12"></div>
+                                    <div class="col m12 s12 step6"></div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step7">
                                         <input id="group" name="group" type="text" placeholder="Grup">
                                         <label class="active" for="group">Grup</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step4">
+                                    <div class="input-field col m3 s12 step8">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
-                                    <div class="file-field input-field col m3 s12 step5">
+                                    <div class="file-field input-field col m3 s12 step9">
                                         <div class="btn">
                                             <span>File</span>
                                             <input type="file" name="file" id="file">
@@ -234,22 +234,22 @@
                                         </div>
                                     </div>
                                     <div class="col m12 s12"></div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step10">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step11">
                                         <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getItemProductionOrder();"></select>
                                         <label class="active" for="production_order_detail_id">Production Order</label>
                                     </div>
-                                    <div class="input-field col m1 s12 center-align">
+                                    <div class="input-field col m1 s12 center-align step12">
                                         <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text" onclick="getAccountData('1');" id="btn-show"><i class="material-icons right">receipt</i></a>
                                         <label class="active">&nbsp;</label>
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
-                        <div class="row first-inputs">
+                        <div class="row first-inputs step13">
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Opsi Palet/Curah</legend>
@@ -291,7 +291,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s12 step9">
+                            <div class="col s12 step14">
                                 <fieldset style="min-width: 100%;">
                                     <legend>3. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
@@ -355,7 +355,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light mr-1 submit step15" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -2090,38 +2090,58 @@
                     intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
-                    title : 'Tgl. Posting',
+                    title : 'Place',
                     element : document.querySelector('.step4'),
+                    intro : 'Plant yang digunakan dalam form ini.'
+                },
+                {
+                    title : 'Line',
+                    element : document.querySelector('.step5'),
+                    intro : 'Line / Mesin yang digunakan utk mengisi form ini.'
+                },
+                {
+                    title : 'Shift',
+                    element : document.querySelector('.step6'),
+                    intro : 'Pilih shift untuk digunakan pada barcode'
+                },
+                {
+                    title : 'Group',
+                    element : document.querySelector('.step7'),
+                    intro : 'Pilih Group untuk form ini.'
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step8'),
                     intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.'
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step9'),
                     intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Daftar Order Produksi',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step10'),
                     intro : 'Silahkan pilih dokumen Order Produksi yang ingin ditarik komposisi bahannya dari BOM untuk diproses.'
                 },
                 {
                     title : 'Tombol tambah Order Produksi',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step11'),
                     intro : 'Tombol untuk menambahkan data BOM dari Order Produksi terpilih ke dalam tabel Issue dan Receive.'
                 },
                 {
                     title : 'Data Order Produksi Terpakai',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step13'),
                     intro : 'Data Order Produksi yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus bisa diakses oleh pengguna lainnya.'
                 },
                 {
                     title : 'Detail Issue Item/Resource dan Receive Item',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step14'),
                     intro : 'Berisi detail item/resource issue dan receive.'
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]

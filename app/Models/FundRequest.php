@@ -299,6 +299,44 @@ class FundRequest extends Model
         return $total;
     }
 
+    public function totalAllReceivable(){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->nominal;
+            }
+        }
+        if($this->document_status == '2'){
+            $total = $this->grandtotal;
+        }
+        return $total;
+    }
+
+    public function totalAllReceivableUsedPaid(){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
+                $query->whereHas('closeBillDetail',function($query){
+                    $query->whereHas('closeBill',function($query){
+                        $query->whereIn('status',['2','3']);
+                    });
+                });
+            })->get() as $row){
+                $total += $row->nominal;
+            }
+        }
+        if($this->document_status == '2'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            }
+        }
+        return $total;
+    }
+
     public function hasBalancePurchaseDownPayment(){ 
         $has = false;
         foreach($this->fundRequestDetail as $row){

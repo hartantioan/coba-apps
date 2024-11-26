@@ -47,7 +47,13 @@ class MarketingOrderOutstandingMODController extends Controller
 
     $query_data = MarketingOrderDelivery::whereIn('status', ['2', '3'])->whereDoesntHave('marketingOrderDeliveryProcess')->get();
 
-    $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
+    $html = '
+        <div class="card-alert card red">
+            <div class="card-content white-text">
+                <b>Info : Informasi yang tampil <i>BISA BERUBAH SEWAKTU-WAKTU</i>, selalu koordinasikan dengan pihak terkait.</b>
+            </div>
+        </div>
+        <table class="bordered" style="font-size:10px;min-width:100% !important;">
         <thead id="head_detail">
             <tr>
                 <th  class="center-align">No.</th>

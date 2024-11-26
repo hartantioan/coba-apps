@@ -365,7 +365,7 @@
                 }
             ],
             "createdRow": function( row, data, dataIndex){
-                if(data[9]){
+                if(data[10]){
                     $(row).addClass('cyan lighten-4');
                 }
             },

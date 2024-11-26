@@ -495,12 +495,11 @@ class ProductionIssueGPController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7" style="font-size:20px !important;">Daftar Item Issue (Terpakai)</th>
+                                <th class="center-align" colspan="6" style="font-size:20px !important;">Daftar Item Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
                                 <th class="center">Item</th>
-                                <th class="center">Keterangan</th>
                                 <th class="center">Qty</th>
                                 <th class="center">Satuan</th>
                                 <th class="center">Plant</th>
@@ -510,8 +509,7 @@ class ProductionIssueGPController extends Controller
         foreach($data->issueGlazeDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
-                <td>'.($row->lookable_type == 'items' ? $row->lookable->code.' - '.$row->lookable->name : '-').'</td>
-                <td>'.$row->note.'</td>
+                <td>'.($row->lookable_type == 'items' ? $row->lookable->code.' - '.$row->lookable->name : $row->note).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.($row->lookable_type == 'items' ? $row->lookable->uomUnit->code : $row->unit->code).'</td>
                 <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
@@ -522,7 +520,7 @@ class ProductionIssueGPController extends Controller
         $string .= '<tr>
                 <th class="right-align" colspan="3">TOTAL</th>
                 <th class="right-align">'.CustomHelper::formatConditionalQty($data->qty).'</th>
-                <th colspan="3"></th>
+                <th colspan="2"></th>
             </tr>';
 
         $string .= '</tbody></table></div>';

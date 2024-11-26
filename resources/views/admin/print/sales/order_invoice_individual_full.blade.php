@@ -314,7 +314,7 @@
                                     <td style="width:10% !important;padding-left:32px" align="right">0</td>
                                     <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td style="width:5% !important"align="right">{{ $row->unit->code }}</td>
-                                    <td style="width:10% !important" align="right">{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
+                                    <td style="width:10% !important" align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td style="width:10% !important;padding-left:7px" align="center">0</td>
                                     <td style="width:5% !important;padding-left:7px" align="">0</td>
                                     <td style="width:5% !important" align="right">0</td>

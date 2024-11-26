@@ -1309,7 +1309,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                    <select class="browser-default project_need" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
                 <td>
                     <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester...">
@@ -1476,6 +1476,7 @@
     }
 
     function save(){
+
         swal({
             title: "Apakah anda yakin ingin simpan?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
@@ -1487,6 +1488,22 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
+            let isValid = true;
+            $('.project_need').each(function() {
+                console.log('sini2');
+                if ($(this).val() === '' || $(this).val() === null) {
+                    isValid = false;
+                    $(this).addClass('highlight-empty');
+
+                    alert('Please select a project!');
+                } else {
+                    $(this).removeClass('highlight-empty');
+                }
+            });
+            if(isValid == false){
+                return;
+            }
+
                 var formData = new FormData($('#form_data')[0]), passed = true, passedSerial = true;
 
                 formData.delete('arr_item_stock[]');
@@ -1514,6 +1531,7 @@
                         passed = false;
                     }
                 });
+
 
                 $('select[name^="arr_item[]"]').each(function(index){
                     if($('#arr_serial' + $(this).data('id')).length > 0){

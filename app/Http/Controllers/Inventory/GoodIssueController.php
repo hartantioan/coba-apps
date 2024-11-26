@@ -124,43 +124,43 @@ class GoodIssueController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$gi;
-        
-        
-        
+
+
+
         if($query) {
 
-            
+
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_good_issue',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;           
-            
+            $data_link = $array2;
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
-  
+
 
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
                 'link'    => $data_link,
             ];
-            
+
         } else {
             $data_good_receipt = [];
             $response = [
@@ -174,7 +174,7 @@ class GoodIssueController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodIssue::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -199,7 +199,7 @@ class GoodIssueController extends Controller
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
-        
+
         $query_data = GoodIssue::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -234,7 +234,7 @@ class GoodIssueController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -245,7 +245,7 @@ class GoodIssueController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -288,7 +288,7 @@ class GoodIssueController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -299,7 +299,7 @@ class GoodIssueController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -317,14 +317,14 @@ class GoodIssueController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
-               
+
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -357,7 +357,7 @@ class GoodIssueController extends Controller
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -411,6 +411,21 @@ class GoodIssueController extends Controller
             'arr_lookable_id.array'             => 'Id referensi harus dalam bentuk array',
 		]);
 
+        if($request->arr_coa){
+            foreach($request->arr_coa as $key => $row){
+                if ( $row == 105) {
+                    if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+                        $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant 1';
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                }
+            }
+        }
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -432,30 +447,30 @@ class GoodIssueController extends Controller
 
                 $keys = array_keys($arr_item_stock);
 
-                
+
                 array_multisort($arr_item_stock, SORT_ASC, $arr_qty, $keys);
                 $cumulative_qty = [];
-                
+
                 $x=0;
                 foreach ($arr_item_stock as $key_arr => $row_stock) {
                     // Remove commas and convert qty to int
                     $qty = str_replace(',','.',str_replace('.','',$arr_qty[$key_arr]));
                     $qty = floatval($qty);
-                    
+
                     // If the current item matches the previous one, accumulate the quantity
                     if ($key_arr > 0 && $row_stock == $arr_item_stock[$key_arr - 1]) {
                         $cumulative_qty[$x] = $cumulative_qty[$x] + $qty;
                     } else { // Otherwise, set the quantity directly
                         if($key_arr>0){
-                            $x++; 
+                            $x++;
                         }
                         $cumulative_qty[$x] = $qty;
                     }
                 }
                 $unique_array = array_unique($arr_item_stock);
                 $unique_array = array_values($unique_array);
-                
-                
+
+
                 foreach($unique_array as $key => $row){
                     if($cumulative_qty[$key] <= 0){
                         $passedZeroQty = false;
@@ -485,7 +500,7 @@ class GoodIssueController extends Controller
                                     }
                                     if($startqty < 0){
                                         $passedQtyMinus = false;
-                                       
+
                                     }
                                 }
                             }
@@ -529,7 +544,7 @@ class GoodIssueController extends Controller
                         'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
                     ]);
                 }
-    
+
                 if($passed == false){
                     return response()->json([
                         'status'  => 500,
@@ -581,7 +596,7 @@ class GoodIssueController extends Controller
                         } else {
                             $document = $query->document;
                         }
-                        
+
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
@@ -610,7 +625,7 @@ class GoodIssueController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodIssue::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                   
+
                     $query = GoodIssue::create([
                         'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
@@ -622,9 +637,9 @@ class GoodIssueController extends Controller
                         'grandtotal'            => round($grandtotal,2)
                     ]);
                 }
-                
+
                 if($query) {
-                    
+
                     foreach($request->arr_item_stock as $key => $row){
                         $rowprice = NULL;
                         $item_stock = ItemStock::find(intval($row));
@@ -700,7 +715,7 @@ class GoodIssueController extends Controller
                 DB::rollback();
             } */
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -779,7 +794,7 @@ class GoodIssueController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;" colspan="16" ></td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreturn, 3, ',', '.') . '</td>
-                </tr>  
+                </tr>
         ';
 
         $string .= '</tbody></table></div>';
@@ -797,7 +812,7 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -805,7 +820,7 @@ class GoodIssueController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -817,7 +832,7 @@ class GoodIssueController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -840,7 +855,7 @@ class GoodIssueController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -904,7 +919,7 @@ class GoodIssueController extends Controller
 
     public function voidStatus(Request $request){
         $query = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -950,16 +965,16 @@ class GoodIssueController extends Controller
 
                 CustomHelper::removeJournal($query->getTable(),$query->id);
                 CustomHelper::removeCogs($query->getTable(),$query->id);
-    
+
                 activity()
                     ->performedOn(new GoodIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the good issue data');
-    
+
                 CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('good_issues',$query->id);
-                
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data closed successfully.'
@@ -1015,7 +1030,7 @@ class GoodIssueController extends Controller
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1058,9 +1073,9 @@ class GoodIssueController extends Controller
     }
 
     public function approval(Request $request,$id){
-        
+
         $gr = GoodIssue::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($gr){
             $data = [
                 'title'     => 'Print Goods Receive (Barang Keluar)',
@@ -1080,7 +1095,7 @@ class GoodIssueController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -1092,7 +1107,7 @@ class GoodIssueController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = GoodIssue::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Good Issue','a5','landscape','admin.print.inventory.good_issue_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1102,7 +1117,7 @@ class GoodIssueController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -1120,8 +1135,8 @@ class GoodIssueController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -1150,7 +1165,7 @@ class GoodIssueController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1158,19 +1173,19 @@ class GoodIssueController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = GoodIssue::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Good Issue','a5','landscape','admin.print.inventory.good_issue_individual');
@@ -1180,7 +1195,7 @@ class GoodIssueController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1193,21 +1208,21 @@ class GoodIssueController extends Controller
 
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1216,7 +1231,7 @@ class GoodIssueController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1237,22 +1252,22 @@ class GoodIssueController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
-                    
-                    
+
+
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1265,25 +1280,25 @@ class GoodIssueController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = GoodIssue::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
             $pdf = PrintHelper::print($pr,'Good Issue','a5','landscape','admin.print.inventory.good_issue_individual',$menuUser->mode);
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -1344,7 +1359,7 @@ class GoodIssueController extends Controller
                     $total_kredit_asli += $row->nominal_fc;
                     $total_kredit_konversi += $row->nominal;
                 }
-                
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -1363,7 +1378,7 @@ class GoodIssueController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
 
-                
+
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
@@ -1372,12 +1387,12 @@ class GoodIssueController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
-            $response["tbody"] = $string; 
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -1385,7 +1400,7 @@ class GoodIssueController extends Controller
     public function sendUsedData(Request $request){
 
         $data = GoodIssueRequest::find($request->id);
-       
+
         if(!$data->used()->exists()){
             CustomHelper::sendUsedData($request->type,$request->id,'Form Good Issue / Barang Keluar');
             return response()->json([
@@ -1418,13 +1433,13 @@ class GoodIssueController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new GoodIssue())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Good Issue data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'

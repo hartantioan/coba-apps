@@ -147,7 +147,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -217,7 +217,7 @@
                                     <input id="required_date" name="required_date" max="{{ date('9999'.'-12-31') }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                                 </div>
-                                
+
                                 <div class="input-field col m3 s12 step9">
                                     <select class="form-control" id="payment_type" name="payment_type">
                                         <option value="2">Transfer</option>
@@ -263,7 +263,7 @@
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                                 </div>
-                                
+
                                 <div class="input-field col m3 s12 right-align step19">
                                     <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                                 </div>
@@ -368,7 +368,7 @@
                             <legend>4. Konfirmasi</legend>
                             <div class="row">
                                 <div class="col m12 s12 row">
-                                    <div class="input-field col m9 s12 step18">
+                                    <div class="input-field col m9 s12 stepnote">
                                         <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
@@ -420,7 +420,7 @@
                                         </table>
                                     </div>
                                     <div class="col s12 mt-3">
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -485,9 +485,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -496,9 +496,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -630,13 +630,13 @@
     var printService = new WebSocketPrinter({
         onConnect: function () {
         var document = $('#filter-document').val();
-            
+
         },
         onDisconnect: function () {
-           
+
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -761,7 +761,7 @@
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -769,14 +769,14 @@
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                        @endforeach    
+                        @endforeach
                     </select>
                 </td>
                 <td>
@@ -785,7 +785,7 @@
                         @foreach ($division as $rowdiv)
                             <option value="{{ $rowdiv->id }}">{{ $rowdiv->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -963,7 +963,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -1001,7 +1001,7 @@
                                 $('#user_bank_id').append(`
                                     <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank + `" data-no="` + val.no + `">` + val.bank + ` - ` + val.no + ` - ` + val.name + `</option>
                                 `);
-                            }); */                        
+                            }); */
                         }else{
                             $('#user_bank_id').append(`
                                 <option value="">--Pilih Partner Bisnis-</option>
@@ -1082,7 +1082,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
 
                 /* if(grandtotal > limit && $('#type').val() == '1'){
@@ -1108,7 +1108,7 @@
 
                         var segments = path.split('/');
                         var lastSegment = segments[segments.length - 1];
-                    
+
                         formData.append('lastsegment',lastSegment.toString().replace('personal_',''));
                         formData.delete("arr_project[]");
                         formData.delete("arr_checklist_box[]");
@@ -1130,7 +1130,7 @@
                                 formData.append('arr_checklist_note[]',$('input[name^="arr_checklist_note[]"]').eq(index).val());
                             }
                         });
-                        
+
                         if(passedFormDetail){
                             $.ajax({
                                 url: '{{ Request::url() }}/create',
@@ -1163,7 +1163,7 @@
                                         $.each(response.error, function(field, errorMessage) {
                                             $('#' + field).addClass('error-input');
                                             $('#' + field).css('border', '1px solid red');
-                                            
+
                                         });
                                         swal({
                                             title: 'Ups! Validation',
@@ -1224,7 +1224,7 @@
                         icon: 'error'
                     });
                 }
-                
+
             }
         });
     }
@@ -1395,7 +1395,7 @@
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1403,14 +1403,14 @@
                                         @foreach ($line as $rowline)
                                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                        @endforeach    
+                                        @endforeach
                                     </select>
                                 </td>
                                 <td>
@@ -1419,7 +1419,7 @@
                                         @foreach ($division as $rowdiv)
                                             <option value="{{ $rowdiv->id }}">{{ $rowdiv->name }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1469,7 +1469,7 @@
                         });
                     });
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1538,11 +1538,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1564,8 +1564,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1573,7 +1573,7 @@
                 } else {
                     part.expandTree();
                 }
-              
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1582,10 +1582,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1609,7 +1609,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1622,17 +1622,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-   
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
 
-            var rootKey = data[0].key; 
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1651,8 +1651,8 @@
             nodeDataArray: data,
             linkDataArray: link
         });
-            
-            
+
+
     }
 
     function viewStructureTree(id){
@@ -1660,7 +1660,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1671,9 +1671,9 @@
             },
             success: function(response) {
                 loadingClose('#main');
-            
+
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1705,7 +1705,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1714,10 +1714,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function whatPrinting(code){
@@ -1728,7 +1728,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1799,58 +1799,58 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan aktif.' 
+                    intro : 'Perusahaan aktif.'
                 },
                 {
                     title : 'Tipe Permohonan',
                     element : document.querySelector('.step4'),
-                    intro : 'Pilih Pembayaran untuk permohonan dana pembayaran supplier/vendor, pilih pinjaman untuk permohonan dana karyawan (BS).' 
+                    intro : 'Pilih Pembayaran untuk permohonan dana pembayaran supplier/vendor, pilih pinjaman untuk permohonan dana karyawan (BS).'
                 },
                 {
                     title : 'Status Dokumen',
                     element : document.querySelector('.step5'),
-                    intro : 'Pilih Lengkap jika dokumen yang diterima lengkap (bon, bukti transfer dll), dan Tidak Lengkap jika dokumen yang anda terima dari transaksi tidak lengkap.' 
+                    intro : 'Pilih Lengkap jika dokumen yang diterima lengkap (bon, bukti transfer dll), dan Tidak Lengkap jika dokumen yang anda terima dari transaksi tidak lengkap.'
                 },
                 {
                     title : 'Partner Bisnis',
                     element : document.querySelector('.step6'),
-                    intro : 'Target vendor/karyawan yang akan mendapatkan dana.' 
+                    intro : 'Target vendor/karyawan yang akan mendapatkan dana.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step7'),
-                    intro : 'Tanggal posting dokumen.' 
+                    intro : 'Tanggal posting dokumen.'
                 },
                 {
                     title : 'Tgl. Request Pembayaran',
                     element : document.querySelector('.step8'),
-                    intro : 'Tanggal permintaan bayar / transfer sebagai informasi untuk Finance.' 
+                    intro : 'Tanggal permintaan bayar / transfer sebagai informasi untuk Finance.'
                 },
                 {
                     title : 'Tipe pembayaran',
                     element : document.querySelector('.step9'),
-                    intro : 'Tipe pembayaran.' 
+                    intro : 'Tipe pembayaran.'
                 },
                 {
                     title : 'Tgl. Dokumen',
                     element : document.querySelector('.step10'),
-                    intro : 'Tanggal dokumen terlampir.' 
+                    intro : 'Tanggal dokumen terlampir.'
                 },
                 {
                     title : 'No. Faktur Pajak.',
                     element : document.querySelector('.step11'),
-                    intro : 'No faktur pajak yang didapatkan dari vendor jika ada.' 
+                    intro : 'No faktur pajak yang didapatkan dari vendor jika ada.'
                 },
                 {
                     title : 'No. Bukti Potong',
                     element : document.querySelector('.step12'),
-                    intro : 'No bukti potong pajak yang didapatkan dari vendor jika ada.' 
+                    intro : 'No bukti potong pajak yang didapatkan dari vendor jika ada.'
                 },
                 {
                     title : 'Tgl. Bukti Potong',
                     element : document.querySelector('.step13'),
-                    intro : 'Tanggal bukti potong pajak.' 
-                },                
+                    intro : 'Tanggal bukti potong pajak.'
+                },
                 {
                     title : 'Lampiran',
                     element : document.querySelector('.step14'),
@@ -1864,47 +1864,47 @@
                 {
                     title : 'No. Dokumen',
                     element : document.querySelector('.step16'),
-                    intro : 'Nomor dokumen referensi' 
+                    intro : 'Nomor dokumen referensi'
                 },
                 {
                     title : 'No. Invoice',
                     element : document.querySelector('.step17'),
-                    intro : 'Nomor invoice dari bukti yang diterima.' 
+                    intro : 'Nomor invoice dari bukti yang diterima.'
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step18'),
-                    intro : 'Keterangan tambahan untuk menjelaskan secara keseluruhan permohonan dana.' 
+                    element : document.querySelector('.stepnote'),
+                    intro : 'Keterangan tambahan untuk menjelaskan secara keseluruhan permohonan dana.'
                 },
                 {
                     title : 'Limit BS/Kredit',
                     element : document.querySelector('.step19'),
-                    intro : 'Limit BS Karyawan atau limit kredit vendor.' 
+                    intro : 'Limit BS Karyawan atau limit kredit vendor.'
                 },
                 {
                     title : 'Apakah Reimburse?',
                     element : document.querySelector('.step20'),
-                    intro : 'Silahkan pilih Ya, untuk menampilkan rekening seluruh partner bisnis.' 
+                    intro : 'Silahkan pilih Ya, untuk menampilkan rekening seluruh partner bisnis.'
                 },
                 {
                     title : 'Daftar rekening',
                     element : document.querySelector('.step21'),
-                    intro : 'Daftar rekening yang bisa ditarik untuk tujuan jika tipe pembayaran adalah transfer.' 
+                    intro : 'Daftar rekening yang bisa ditarik untuk tujuan jika tipe pembayaran adalah transfer.'
                 },
                 {
                     title : 'Bank Tujuan',
                     element : document.querySelector('.step22'),
-                    intro : 'Nama bank tujuan.' 
+                    intro : 'Nama bank tujuan.'
                 },
                 {
                     title : 'No. Rekening Penerima',
                     element : document.querySelector('.step23'),
-                    intro : 'Nomor rekening penerima.' 
+                    intro : 'Nomor rekening penerima.'
                 },
                 {
                     title : 'Rekening Penerima',
                     element : document.querySelector('.step24'),
-                    intro : 'Atas nama pemilik rekening.' 
+                    intro : 'Atas nama pemilik rekening.'
                 },
                 {
                     title : 'Mata uang',
@@ -1924,7 +1924,7 @@
                 {
                     title : 'Checklist lampiran',
                     element : document.querySelector('.step28'),
-                    intro : 'List checklist lampiran, silahkan centang sesuai dokumen yang ada.' 
+                    intro : 'List checklist lampiran, silahkan centang sesuai dokumen yang ada.'
                 },
                 {
                     title : 'Total',
@@ -1934,7 +1934,7 @@
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step30'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();

@@ -587,7 +587,7 @@
 
         M.updateTextFields();
 
-        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
+        select2ServerSideLonger('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         
@@ -1115,7 +1115,7 @@
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
 
-                        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
+                        select2ServerSideLonger('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         
                         $('#arr_item_stock' + count).append(`

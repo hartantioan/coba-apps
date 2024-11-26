@@ -870,6 +870,6 @@ class ProductionReceiveGPController extends Controller
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $nominal = $menuUser->show_nominal ?? '';
         $line_id = $request->line_id ? $request->line_id : '';
-		return Excel::download(new ExportReceiveGlaze($post_date,$end_date,$mode,$nominal,$line_id), 'issue_glaze'.uniqid().'.xlsx');
+		return Excel::download(new ExportReceiveGlaze($post_date,$end_date,$mode,$nominal,$line_id), 'receive_glaze'.uniqid().'.xlsx');
     }
 }

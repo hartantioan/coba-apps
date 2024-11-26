@@ -320,9 +320,9 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "fixedColumns": {
+            /* "fixedColumns": {
                 right: 1
-            },
+            }, */
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
@@ -355,8 +355,8 @@
                 { name: 'note_ref', orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'total', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note', searchable: false, orderable: false, className: 'center-align' },
             ],
             columnDefs: [
                 {

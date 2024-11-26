@@ -271,7 +271,6 @@
                                                             <th class="center">{{ __('translations.delete') }}</th>
                                                             <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">Item/Manual</th>
-                                                            <th class="center">Ket.</th>
                                                             <th class="center">Qty</th>
                                                             <th class="center">Unit</th>
                                                             <th class="center">Plant</th>
@@ -280,13 +279,13 @@
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="8">
+                                                            <td class="center-align" colspan="7">
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="4">
+                                                            <th colspan="3">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -770,6 +769,7 @@
                 <tr class="row_item_issue">
                     <input type="hidden" name="arr_lookable_type[]" value="` + type + `">
                     <input type="hidden" name="arr_unit_id[]" value="">
+                    <input name="arr_note[]" value="" type="hidden">
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -780,9 +780,6 @@
                     </td>
                     <td>
                         <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + type +`')"></select>
-                    </td>
-                    <td class="center">
-                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center">
                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
@@ -818,9 +815,6 @@
                     </td>
                     <td class="center-align">
                         ` + no_issue + `
-                    </td>
-                    <td>
-                        -
                     </td>
                     <td class="center">
                         <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`">
@@ -1548,6 +1542,7 @@
                                 <tr class="row_item_issue">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                     <input type="hidden" name="arr_unit_id[]" value="">
+                                    <input name="arr_note[]" value="" type="hidden">
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -1558,9 +1553,6 @@
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + val.lookable_type +`')"></select>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" required data-id="` + count + `" value="` + val.note + `">
                                     </td>
                                     <td class="center">
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
@@ -1600,9 +1592,6 @@
                                     </td>
                                     <td class="center-align">
                                         ` + (i + 1) + `
-                                    </td>
-                                    <td>
-                                        -
                                     </td>
                                     <td class="center">
                                         <input name="arr_note[]" onfocus="emptyThis(this);" type="text"  style="width:100%;" id="rowNote`+ count +`" value="` + val.note + `">

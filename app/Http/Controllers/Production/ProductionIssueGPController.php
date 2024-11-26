@@ -518,9 +518,9 @@ class ProductionIssueGPController extends Controller
         }
 
         $string .= '<tr>
-                <th class="right-align" colspan="3">TOTAL</th>
+                <th class="right-align" colspan="2">TOTAL</th>
                 <th class="right-align">'.CustomHelper::formatConditionalQty($data->qty).'</th>
-                <th colspan="2"></th>
+                <th colspan="3"></th>
             </tr>';
 
         $string .= '</tbody></table></div>';

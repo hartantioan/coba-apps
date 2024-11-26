@@ -311,16 +311,18 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": false,
+            "scrollCollapse": true,
+            /* "scrollY": '400px', */
+            "responsive": true,
             "scrollX": true,
-            "stateSave": $('#filter_form').val() ? false : true,
+            "stateSave": true,
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            /* "fixedColumns": {
+            "fixedColumns": {
                 right: 1
-            }, */
+            },
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',

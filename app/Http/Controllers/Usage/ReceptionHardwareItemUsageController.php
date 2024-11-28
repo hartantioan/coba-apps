@@ -43,7 +43,7 @@ class ReceptionHardwareItemUsageController extends Controller
         $item_ready=[];
         foreach ($InStorage as $item) {
             $itemName = $item->item;
-         
+
             $itemData = [
                 'item_id' => $item->id,
                 'itemName' => $itemName,
@@ -66,7 +66,7 @@ class ReceptionHardwareItemUsageController extends Controller
     }
 
     public function store_w_barcode(Request $request){
-        $barcode = $request->input('barcode');       
+        $barcode = $request->input('barcode');
 
         DB::beginTransaction();
         try{
@@ -75,7 +75,7 @@ class ReceptionHardwareItemUsageController extends Controller
             $lastInsertedData = ReceptionHardwareItemsUsage::where('hardware_item_id', $query_hardware_item_id)
                             ->latest()
                             ->first();
-        
+
             if($lastInsertedData->status == '4'|| $lastInsertedData->status == '2' ){
                 $response = [
                     'status'    => 500,
@@ -87,7 +87,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     'message'   => 'Barang masih belum memiliki tuan'
                 ];
             }else{
-               
+
                 $lastInsertedData->status = '2';
                 $lastInsertedData->status_item = '2';
                 $lastInsertedData->return_date = $request->date;
@@ -103,11 +103,11 @@ class ReceptionHardwareItemUsageController extends Controller
                         'message'   => 'Data successfully saved.',
                     ];
                 }
-                
-                
+
+
 
             }
-            
+
 
         }catch(\Exception $e){
             DB::rollback();
@@ -116,23 +116,25 @@ class ReceptionHardwareItemUsageController extends Controller
                 'message'   => 'Data failed to save cause'. $e -> getMessage(),
             ];
         }
-        
-        
-        
-       
+
+
+
+
         return response()->json($response);
     }
 
     public function saveTargeted(Request $request){
-      
+
         $validation = Validator::make($request->all(), [
             'user_id1'                       => 'required',
             'date1'                          => 'required',
             'info1'                          => 'required',
+            'location1'                          => 'required',
         ], [
             'user_id1.required'                => 'Pilih User untuk Penyerahan',
             'date1.required'             => 'Tanggal tidak boleh kosong.',
             'info1.required'    => 'Info tidak boleh kosong.',
+            'location1.required'                          => 'Lokasi tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -141,8 +143,8 @@ class ReceptionHardwareItemUsageController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-			
-			
+
+
             DB::beginTransaction();
             $cek = HardwareItem::where('status', '1')
                     ->where('id',$request->tempes)
@@ -154,7 +156,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     })
                     ->get();
             if(count($cek) > 0){
-                
+
                 $query = ReceptionHardwareItemsUsage::create([
                     'code'              => ReceptionHardwareItemsUsage::generateCode(),
                     'user_id'           => session('bo_id'),
@@ -175,12 +177,12 @@ class ReceptionHardwareItemUsageController extends Controller
 				];
                 return response()->json($response);
             }
-            
+
 
             DB::commit();
-            
-			
-			
+
+
+
 			if($query) {
 
                 activity()
@@ -200,7 +202,7 @@ class ReceptionHardwareItemUsageController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -213,7 +215,7 @@ class ReceptionHardwareItemUsageController extends Controller
             'date',
             'reception_date',
             'info',
-            'return_date', 
+            'return_date',
             'return_note',
             'status',
             'user_return',
@@ -226,17 +228,17 @@ class ReceptionHardwareItemUsageController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ReceptionHardwareItemsUsage::count();
-        
+
         $query_data = ReceptionHardwareItemsUsage::where(function($query) use ($search, $request) {
-               
-               
+
+
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
                               ->orWhere('location', 'like', "%$search%")
                               ->orWhereHas('account', function($query) use ($search) {
                                 $query->where('name', 'like', "%$search%");
-                                    
+
                             });
                     })
                     ->orWhereHas('hardwareItem', function($query) use ($search) {
@@ -247,7 +249,7 @@ class ReceptionHardwareItemUsageController extends Controller
                                   $query->where('name', 'like', "%$search%");
                               });
                     });
-                    
+
                 }
 
                 if($request->status){
@@ -259,17 +261,17 @@ class ReceptionHardwareItemUsageController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        
+
 
         $total_filtered = ReceptionHardwareItemsUsage::where(function($query) use ($search, $request) {
-                
+
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
                               ->orWhere('location', 'like', "%$search%")
                               ->orWhereHas('account', function($query) use ($search) {
                                 $query->where('name', 'like', "%$search%");
-                                    
+
                             });
                     })
                     ->orWhereHas('hardwareItem', function($query) use ($search) {
@@ -280,7 +282,7 @@ class ReceptionHardwareItemUsageController extends Controller
                                   $query->where('name', 'like', "%$search%");
                               });
                     });
-                    
+
                 }
 
                 if($request->status){
@@ -339,13 +341,13 @@ class ReceptionHardwareItemUsageController extends Controller
         if($total_filtered <> FALSE) {
             $response['recordsFiltered'] = $total_filtered;
         }
-       
+
         return response()->json($response);
     }
 
     public function printModal(Request $request){
         $reception = ReceptionHardwareItemsUsage::find($request->id);
-       
+
         $string='';
         $string.='<div class="col s12 center-align" >
                     <h4>Print</h4>
@@ -381,11 +383,11 @@ class ReceptionHardwareItemUsageController extends Controller
     public function diversion(Request $request){
         $validation = Validator::make($request->all(), [
             'date'                          => 'required',
-           
+
             'info'                          => 'required',
         ], [
             'date.required'                 => 'Tanggal tidak boleh kosong.',
-           
+
             'info.required'                 => 'Info tidak boleh kosong.',
         ]);
         if($validation->fails()) {
@@ -395,7 +397,7 @@ class ReceptionHardwareItemUsageController extends Controller
             ];
         } else {
             DB::beginTransaction();
-            
+
             $user = null;
                 try {
                     $query_item= ReceptionHardwareItemsUsage::find($request->temp);
@@ -418,7 +420,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     DB::rollback();
                 }
                 DB::commit();
-                
+
             $response = [
                 'status'  => 200,
                 'message' => 'Item Berhasil Dikembalikan.'
@@ -428,11 +430,11 @@ class ReceptionHardwareItemUsageController extends Controller
     }
 
     public function create(Request $request){
-        
+
         if($request->tempe){
             $validation = Validator::make($request->all(), [
-                
-                
+
+
                 'info'                          => 'required',
                 'location'                      => 'required',
             ], [
@@ -455,7 +457,7 @@ class ReceptionHardwareItemUsageController extends Controller
                 'location.required'                     => 'Lokasi tidak boleh kosong.',
             ]);
         }
-        
+
 
         if($validation->fails()) {
             $response = [
@@ -514,7 +516,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -534,20 +536,20 @@ class ReceptionHardwareItemUsageController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function destroy(Request $request){
         $query = ReceptionHardwareItemsUsage::find($request->id);
-    
+
         if($query->delete()) {
-            
+
             $query->update([
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-            
+
 
             activity()
             ->performedOn(new ReceptionHardwareItemsUsage())
@@ -583,9 +585,9 @@ class ReceptionHardwareItemUsageController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            
+
             $pdf = Pdf::loadView('admin.print.usage.reception_hardware', $data)->setPaper('a4', 'portrait');
-  
+
             $content = $pdf->download()->getOriginalContent();
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
@@ -611,11 +613,11 @@ class ReceptionHardwareItemUsageController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            
-            $pdf = Pdf::loadView('admin.print.usage.return_hardware', $data)->setPaper('a4', 'portrait');
-            
 
-           
+            $pdf = Pdf::loadView('admin.print.usage.return_hardware', $data)->setPaper('a4', 'portrait');
+
+
+
             $content = $pdf->download()->getOriginalContent();
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 

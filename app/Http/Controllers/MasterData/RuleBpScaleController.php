@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Exceptions\RowImportException;
+use App\Helpers\CustomHelper;
 use App\Models\RuleBpScale;
 use Illuminate\Validation\Rule;
 
@@ -40,7 +41,7 @@ class RuleBpScaleController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = RuleBpScale::get();
+        $total_data = RuleBpScale::count();
 
         $query_data = RuleBpScale::whereHas('user',function($query) use ($search){
             $query->where('name','like',"%$search%")
@@ -78,6 +79,7 @@ class RuleBpScaleController extends Controller
                     $val->ruleProcurement->name,
                     date('d/m/Y',strtotime($val->effective_date)),
                     $val->item->name,
+                    CustomHelper::formatConditionalQty($val->water_percent).'%',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -146,6 +148,7 @@ class RuleBpScaleController extends Controller
                         'user_id'       => session('bo_id'),
                         'account_id'	=> $request->account_id,
                         'rule_procurement_id'	=> $request->rule_procurement_id,
+                        'water_percent'	=> $request->water_percent,
                         'item_id'       => $request->item_id,
                         'effective_date'       => $request->effective_date,
                     ]);
@@ -160,6 +163,7 @@ class RuleBpScaleController extends Controller
                         'user_id'       => session('bo_id'),
                         'account_id'	=> $request->account_id,
                         'rule_procurement_id'	=> $request->rule_procurement_id,
+                        'water_percent'	=> $request->water_percent,
                         'item_id'       => $request->item_id,
                         'effective_date'       => $request->effective_date,
 

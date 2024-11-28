@@ -69,6 +69,7 @@
                                                         <th>Nama Rule</th>
                                                         <th>Tanggal Valid</th>
                                                         <th>Nama Item</th>
+                                                        <th>Kadar Air (%)</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -109,6 +110,10 @@
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_id" name="item_id"></select>
                             <label class="active" for="item_id">Item</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="water_percent" name="water_percent" type="number" placeholder="Kadar Air">
+                            <label class="active" for="water_percent">Kadar Air (%)</label>
                         </div>
                         <div class="col m6 s12 ">
                             <label for="effective_date" style="font-size:1rem;">Tanggal Valid : </label>
@@ -197,7 +202,7 @@
     });
     $(function() {
         loadDataTable();
-        select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/item_rm_sm") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
         select2ServerSide('#rule_procurement_id', '{{ url("admin/select2/rule_procurement") }}');
         $('#form_dataimport').submit(function(event) {
@@ -380,6 +385,7 @@
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
+                { name: 'water_percent', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -451,6 +457,62 @@
             error: function() {
                 $('.modal-content').scrollTop(0);
                 loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                $('#temp').val(id);
+                $('#coa_source_id').empty().append(`
+                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                `);
+                $('#coa_source_id').empty().append(`
+                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                `);
+                $('#coa_source_id').empty().append(`
+                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                `);
+                $('#other_name').val(response.other_name);
+                $('#place_id').val(response.place_id).formSelect();
+                $('#uom_unit').val(response.uom_unit).trigger('change');
+                $('#cost').val(response.cost);
+                if(response.coa_id){
+                    $('#coa_id').val(response.coa_id).trigger('change');
+                }
+
+                if(response.status == '1'){
+                    $('#status').prop( "checked", true);
+                }else{
+                    $('#status').prop( "checked", false);
+                }
+                $('.modal-content').scrollTop(0);
+                $('#code').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

@@ -39,11 +39,11 @@ class ImportReceptionHardwareItemUsage implements WithMultipleSheets
 
         return [
             0 => new handleReceptionHardwareItem($this->temp),
-           
+
         ];
     }
 
-    
+
 }
 
 class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
@@ -61,9 +61,9 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
         DB::beginTransaction();
         try {
             if (isset($row['item']) && $row['item']) {
-               
 
-                $note = trim($row['catatan']);;$divisi=$row['divisi'];$location=$row['lokasi'];
+
+                $note = trim($row['catatan']);;$divisi=$row['divisi'];$location = trim($row['lokasi']);
                 $item = HardwareItem::where('code', explode('#', $row['item'])[0])->first();
                 $user = User::where('employee_no',explode('#', $row['user'])[0])->first();
                 if(!$item && $this->error ==null){
@@ -98,12 +98,12 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                     $sheet='Header';
                     throw new RowImportException('ada yang kurang', $row->getIndex(),$this->error,$sheet);
                 }
-                    
-                    
-                   
+
+
+
             }else{
                 return null;
-            } 
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
@@ -111,7 +111,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
-    
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)

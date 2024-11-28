@@ -5402,4 +5402,32 @@ class Select2Controller extends Controller {
 
         return response()->json(['items' => $response]);
     }
+
+    public function itemRMSM(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')
+                ->whereHas('itemGroup',function($query){
+                    $query->whereHas('itemGroupWarehouse',function($query){
+                        $query->whereIn('warehouse_id',['2','3']);
+                    });
+                })
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
 }

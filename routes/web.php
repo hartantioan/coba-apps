@@ -502,6 +502,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_for_weight', [Select2Controller::class, 'itemForWeight']);
                 Route::get('issue_glaze', [Select2Controller::class, 'issueGlaze']);
                 Route::get('rule_procurement', [Select2Controller::class, 'ruleProcurement']);
+                Route::get('item_rm_sm', [Select2Controller::class, 'itemRMSM']);
             });
 
             Route::prefix('dashboard')->group(function () {

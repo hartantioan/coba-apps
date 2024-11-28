@@ -1056,6 +1056,7 @@
                         search: params.term,
                         arrissue: arrIssue,
                         line_id: $('#line_id').val(),
+                        item_id: $('#item_id').val(),
                     };
                 },
                 processResults: function(data) {

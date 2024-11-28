@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\RuleProcurement;
 use App\Models\Area;
 use App\Models\AttendancePeriod;
 use App\Models\Brand;
@@ -5377,6 +5378,25 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function ruleProcurement(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = RuleProcurement::where(function($query) use($search){
+                    $query->orWhere('name', 'like', "%$search%");
+                })->get();
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->name,
+                'name'              => $d->name,
             ];
         }
 

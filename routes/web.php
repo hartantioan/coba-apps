@@ -35,6 +35,8 @@ use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\Inventory\MinimumStockController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
+use App\Http\Controllers\MasterData\RuleBpScaleController;
+use App\Http\Controllers\MasterData\RuleProcurementController;
 use App\Http\Controllers\MasterData\ItemStockLocationController;
 use App\Http\Controllers\MasterData\AttendancePeriodController;
 use App\Http\Controllers\MasterData\DivisionController;
@@ -499,6 +501,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('employee_for_brand', [Select2Controller::class, 'employeeForBrand']);
                 Route::get('item_for_weight', [Select2Controller::class, 'itemForWeight']);
                 Route::get('issue_glaze', [Select2Controller::class, 'issueGlaze']);
+                Route::get('rule_procurement', [Select2Controller::class, 'ruleProcurement']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -1347,6 +1350,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('import', [UserBrandController::class, 'import'])->middleware('operation.access:user_brand,update');
                     });
 
+
+
                     Route::prefix('user_item')->middleware('operation.access:user_item,view')->group(function () {
                         Route::get('/', [UserItemController::class, 'index']);
                         Route::get('datatable', [UserItemController::class, 'datatable']);
@@ -1467,6 +1472,39 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
                 });
+
+
+                Route::prefix('master_purchase')->group(function () {
+                    Route::prefix('rule_bp_scale')->middleware('operation.access:rule_bp_scale,view')->group(function () {
+                        Route::get('/', [RuleBpScaleController::class, 'index']);
+                        Route::get('datatable', [RuleBpScaleController::class, 'datatable']);
+                        Route::post('show', [RuleBpScaleController::class, 'show']);
+                        Route::get('row_detail', [RuleBpScaleController::class, 'rowDetail']);
+                        Route::post('create', [RuleBpScaleController::class, 'create'])->middleware('operation.access:rule_bp_scale,update');
+                        Route::post('destroy', [RuleBpScaleController::class, 'destroy'])->middleware('operation.access:rule_bp_scale,delete');
+                        Route::get('export', [RuleBpScaleController::class, 'export']);
+                        Route::get('get_import_excel', [RuleBpScaleController::class, 'getImportExcel']);
+                        Route::get('export_from_page', [RuleBpScaleController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [RuleBpScaleController::class, 'import'])->middleware('operation.access:rule_bp_scale,update');
+                    });
+
+                    Route::prefix('rule_procurement')->middleware('operation.access:rule_procurement,view')->group(function () {
+                        Route::get('/', [RuleProcurementController::class, 'index']);
+                        Route::get('datatable', [RuleProcurementController::class, 'datatable']);
+                        Route::post('show', [RuleProcurementController::class, 'show']);
+                        Route::get('row_detail', [RuleProcurementController::class, 'rowDetail']);
+                        Route::post('create', [RuleProcurementController::class, 'create'])->middleware('operation.access:rule_procurement,update');
+                        Route::post('destroy', [RuleProcurementController::class, 'destroy'])->middleware('operation.access:rule_procurement,delete');
+                        Route::get('export', [RuleProcurementController::class, 'export']);
+                        Route::get('get_import_excel', [RuleProcurementController::class, 'getImportExcel']);
+                        Route::get('export_from_page', [RuleProcurementController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [RuleProcurementController::class, 'import'])->middleware('operation.access:rule_procurement,update');
+                    });
+                });
+
+
+
+
             });
 
             Route::prefix('setting')->middleware('direct.access')->group(function () {
@@ -2324,7 +2362,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportInventorySummaryStockFGController::class, 'index']);
                         Route::post('view', [ReportInventorySummaryStockFGController::class, 'view']);
                         Route::get('export', [ReportInventorySummaryStockFGController::class, 'export']);
-                      
+
                     });
 
                 });

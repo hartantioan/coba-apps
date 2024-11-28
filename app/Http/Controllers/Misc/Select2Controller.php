@@ -2994,11 +2994,13 @@ class Select2Controller extends Controller {
             }
             if($itemtarget->code == '102.02.0035'){
                 $query->whereHas('item',function($query){
-                    $query->where('code',10148);
+                    $query->where('code','102.02.0034');
                 });
             }
             if($itemtarget->code == '102.02.0033'){
-                $query->where('item_id',10146);
+                $query->whereHas('item',function($query){
+                    $query->where('code','102.02.0032');
+                });
             }
         })
         ->whereIn('status',['2'])

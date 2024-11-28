@@ -23,7 +23,6 @@
             <th>Tipe Item Bahan</th>
             <th>Kode Item Bahan</th>
             <th>Nama Item Bahan</th>
-            <th>Keterangan Item Bahan</th>
             <th>Qty Bahan</th>
             <th>Satuan Bahan</th>
             <th>Nominal Bahan</th>
@@ -62,8 +61,7 @@
                     <td>{{ $row->note }}</td>
                     <td>{{ $row_detail->typeItem()}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->code : '' }}</td>
-                    <td>{{ $row_detail->lookable_type ? $row_detail->lookable->name : '' }}</td>
-                    <th>{{ $row_detail->note }}</th>
+                    <td>{{ $row_detail->lookable_type ? $row_detail->lookable->name : '' }} {{ $row_detail->note ?? '' }}</td>
                     <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->uomUnit->code : $row_detail->unit->code }}</td>
                     <td>{{ $nominal ? number_format($row_detail->total ,2,',','.') : '-' }}</td>

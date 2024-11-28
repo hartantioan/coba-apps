@@ -24,7 +24,7 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
 		$this->end_date = $end_date ? $end_date : '';
         $this->status = $status ? $status : '';
         $this->type_sales = $type_sales ? $type_sales : '';
-       
+
         $this->type_deliv = $type_deliv ? $type_deliv : '';
         $this->company = $company ? $company : '';
         $this->type_pay = $type_pay ? $type_pay : '';
@@ -32,7 +32,8 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
         $this->currency = $currency ? $currency : '';
         $this->delivery = $delivery ? $delivery : '';
         $this->sales = $sales ? $sales : '';
-        
+
+
     }
     private $headings = [
         'No',
@@ -116,13 +117,13 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                     });
                 });
             });
-    
+
             // Other conditions for the 'purchaseOrder' relationship
             if($this->status){
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
             }
-    
+
             if($this->start_date && $this->end_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
                     ->whereDate('post_date', '<=', $this->end_date);
@@ -131,15 +132,15 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
             } else if($this->end_date) {
                 $query->whereDate('post_date','<=', $this->end_date);
             }
-    
+
             if($this->type_sales){
                 $query->where('type',$this->type_sales);
             }
-    
+
             if($this->type_deliv){
                 $query->where('shipping_type',$this->type_deliv);
             }
-    
+
             if($this->customer){
                 $groupIds = explode(',', $this->customer);
                 $query->whereIn('account_id',$groupIds);
@@ -154,23 +155,23 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                 $groupIds = explode(',', $this->delivery);
                 $query->whereIn('sender_id',$groupIds);
             }
-            
+
             if($this->company){
                 $query->where('company_id',$this->company);
             }
-    
+
             if($this->type_pay){
                 $query->where('payment_type',$this->type_pay);
-            }                
-            
+            }
+
             if($this->currency){
                 $groupIds = explode(',', $this->currency);
                 $query->whereIn('currency_id',$groupIds);
             }
-    
-           
+
+
         })->get();
-    
+
 
         foreach($data as $key => $row){
             $subtotal = $row->subtotal * $row->currency_rate;

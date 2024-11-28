@@ -217,6 +217,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['1','2','3']);
     }
 
+    public function marketingOrderDeliveryProcessAll()
+    {
+        return $this->hasOne('App\Models\MarketingOrderDeliveryProcess');
+    }
+
     public function marketingOrderDeliveryProcessVoid()
     {
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcess')->where('status','5');

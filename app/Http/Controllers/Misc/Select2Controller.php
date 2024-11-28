@@ -2974,8 +2974,8 @@ class Select2Controller extends Controller {
     public function issueGlaze(Request $request)
     {
         $response = [];
-        $item_target = Item::find($request->item_id);
-        $data = IssueGlaze::where(function($query) use($request,$item_target){
+        $itemtarget = Item::find($request->item_id);
+        $data = IssueGlaze::where(function($query) use($request){
             $query->where('note','like',"%$request->search%")
                 ->orWhere('code','like',"%$request->search%")
                 ->orWhere('ballmill_no','like',"%$request->search%")
@@ -2984,19 +2984,19 @@ class Select2Controller extends Controller {
                         ->orWhere('name','like',"%$request->search%");
                 });
         })
-        ->where(function($query) use($request,$item_target){
+        ->where(function($query) use($request,$itemtarget){
             if($request->arrissue){
                 $query->whereNotIn('id',$request->arrissue);
             }
             if($request->line_id){
                 $query->where('line_id',$request->line_id);
             }
-            if($item_target->code == '102.02.0035'){
+            if($itemtarget->code == '102.02.0035'){
                 $query->whereHas('item',function($query){
                     $query->where('code','102.02.0034');
                 });
             }
-            if($item_target->code == '102.02.0033'){
+            if($itemtarget->code == '102.02.0033'){
                 $query->whereHas('item',function($query){
                     $query->where('code','102.02.0032');
                 });

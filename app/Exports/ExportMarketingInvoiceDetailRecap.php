@@ -91,7 +91,12 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $disc3 = $row->lookable->marketingOrderDetail->discount_3;
                 $typesell = $row->lookable->marketingOrderDetail->marketingOrder->type();
             }else{
-                $pricefinal = Round($row->price, 2);
+                if ($row->is_include_tax == "0") {
+                    $pricefinal = $row->price;
+                } else {
+                    $pricefinal = Round($row->price / (($row->percent_tax + 100) / 100), 2);
+                }
+              
                 $item = $row->description;
                 $qty = $row->qty;
                 $uom = $row->unit->code;

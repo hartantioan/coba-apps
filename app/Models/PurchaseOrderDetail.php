@@ -266,7 +266,7 @@ class PurchaseOrderDetail extends Model
     public function getBalanceScale()
     {
         $scaled = $this->goodScale()->sum('qty_final');
-        $balance = $this->qty - $scaled;
+        $balance = $this->qty + ($this->qty * ($this->item->tolerance_gr / 100)) - $scaled;
         return $balance;
     }
 

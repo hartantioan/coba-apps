@@ -138,11 +138,11 @@
                                                             <span class="hide-on-small-onl">Reset</span>
                                                             <i class="material-icons right">loop</i>
                                                         </a> --}}
-                                                        <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                        {{-- <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
-                                                        </a>
+                                                        </a> --}}
                                                         <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel2();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel 2</span>
@@ -285,7 +285,7 @@
     }
 
     function exportExcel2(){
-        
+
         var finish_date = $('#finish_date').val();
         var start_date = $('#start_date').val();
         window.location = "{{ Request::url() }}/export2?start_date=" + start_date + "&finish_date=" + finish_date;

@@ -2975,6 +2975,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $itemtarget = Item::find($request->item_id);
+        info($itemtarget);
         $data = IssueGlaze::where(function($query) use($request){
             $query->where('note','like',"%$request->search%")
                 ->orWhere('code','like',"%$request->search%")
@@ -2993,13 +2994,11 @@ class Select2Controller extends Controller {
             }
             if($itemtarget->code == '102.02.0035'){
                 $query->whereHas('item',function($query){
-                    $query->where('code','=','102.02.0034');
+                    $query->where('code',10148);
                 });
             }
             if($itemtarget->code == '102.02.0033'){
-                $query->whereHas('item',function($query){
-                    $query->where('code','=','102.02.0032');
-                });
+                $query->where('item_id',10146);
             }
         })
         ->whereIn('status',['2'])

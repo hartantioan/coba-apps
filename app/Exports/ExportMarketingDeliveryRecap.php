@@ -73,7 +73,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 // 'qty_konversi' => $row->getQtyM2(),
                 'satuan_konversi' => $row->marketingOrderDetail->itemUnit->unit->code,
                 'qty' => $row->qty * $row->getQtyM2(),
-                'satuan' => $row->marketingOrderDelivery->marketingOrderDeliveryProcess->getUnit(),
+                'satuan' => 'M2',
                 'gudang' => $row->marketingOrderDelivery->marketingOrderDeliveryProcess->getWarehouse(),
                 'area' => $row->marketingOrderDelivery->marketingOrderDeliveryProcess->getArea(),
                 'shading' => $row->marketingOrderDelivery->marketingOrderDeliveryProcess->getShading(),

@@ -2998,7 +2998,6 @@ class Select2Controller extends Controller {
             }
             if($itemtarget->code == '102.02.0033'){
                 $query->whereHas('item',function($query){
-                    info('kambing');
                     $query->where('code','=','102.02.0032');
                 });
             }

@@ -763,6 +763,9 @@ class CustomHelper {
 							$check = false;
 						}
 					}
+					if($table_name == 'marketing_order_deliveries' && $daysDueInvoiceMod == 0){
+						$check = false;
+					}
 					if($check){
 						foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
 							$checkPerUser = true;

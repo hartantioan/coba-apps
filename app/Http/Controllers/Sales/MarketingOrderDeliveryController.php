@@ -254,7 +254,7 @@ class MarketingOrderDeliveryController extends Controller
                     ',
                     $val->code,
                     $val->stage_status,
-                    $val->user->name,
+                    $val->user->name.' - '.$val->invoiceDueDate(),
                     $val->userUpdate()->exists() ? $val->userUpdate->name : '-',
                     $val->company->name,
                     $val->account->name ?? '-',

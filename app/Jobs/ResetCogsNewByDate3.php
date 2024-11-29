@@ -73,7 +73,7 @@ class ResetCogsNewByDate3 implements ShouldQueue, ShouldBeUnique
         $this->item_shading_id = $item_shading_id;
         $this->production_batch_id = $production_batch_id;
         $this->end_date = $end_date;
-        $this->queue = 'cogsbydate';
+        $this->queue = 'cogsbydate3';
     }
 
     public function uniqueId(): string

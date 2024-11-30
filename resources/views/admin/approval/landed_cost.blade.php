@@ -241,8 +241,8 @@
                     <tr>
                         <td class="center">{{ ($key + 1) }}</td>
                         <td>{{ $row->place->code.' - '.$row->place->company->name }}</td>
-                        <td>{{ $row->department->name }}</td>
-                        <td>{{ $row->warehouse->name }}</td>
+                        <td>{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                        <td>{{ $row->warehouse()->exists() ? $row->warehouse->name : '-' }}</td>
                         <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center">{{ $row->qty }}</td>
                         <td class="center">{{ $row->item->uomUnit->code }}</td>

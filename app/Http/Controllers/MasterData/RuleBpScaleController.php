@@ -144,7 +144,7 @@ class RuleBpScaleController extends Controller
                 DB::beginTransaction();
                 try {
                     $find = RuleBpScale::find($request->temp);
-                    $query = $find::update([
+                    $query = $find->update([
                         'user_id'       => session('bo_id'),
                         'account_id'	=> $request->account_id,
                         'rule_procurement_id'	=> $request->rule_procurement_id,
@@ -201,6 +201,10 @@ class RuleBpScaleController extends Controller
 
     public function show(Request $request){
         $User = RuleBpScale::find($request->id);
+        $User['rule_procurement_name'] = $User->ruleProcurement->name;
+        $User['item_name'] = $User->item->name;
+        $User['account_name'] = $User->account->name;
+
 
 		return response()->json($User);
     }

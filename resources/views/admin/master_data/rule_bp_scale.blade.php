@@ -203,7 +203,7 @@
     $(function() {
         loadDataTable();
         select2ServerSide('#item_id', '{{ url("admin/select2/item_rm_sm") }}');
-        select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
         select2ServerSide('#rule_procurement_id', '{{ url("admin/select2/rule_procurement") }}');
         $('#form_dataimport').submit(function(event) {
             event.preventDefault();
@@ -484,28 +484,17 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#coa_source_id').empty().append(`
-                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
-                $('#coa_source_id').empty().append(`
-                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                $('#item_id').empty().append(`
+                    <option value="` + response.item_id + `">` + response.item_name + `</option>
                 `);
-                $('#coa_source_id').empty().append(`
-                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                $('#rule_procurement_id').empty().append(`
+                    <option value="` + response.rule_procurement_id + `">` + response.rule_procurement_name + `</option>
                 `);
-                $('#other_name').val(response.other_name);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#uom_unit').val(response.uom_unit).trigger('change');
-                $('#cost').val(response.cost);
-                if(response.coa_id){
-                    $('#coa_id').val(response.coa_id).trigger('change');
-                }
-
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
+                $('#water_percent').val(response.water_percent);
+                $('#effective_date').val(response.effective_date);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

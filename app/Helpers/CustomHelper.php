@@ -446,18 +446,23 @@ class CustomHelper {
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
 					$status = $count == 0 ? '1': '0';
-					foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
-						ApprovalMatrix::create([
-							'code'							=> strtoupper(Str::random(30)),
-							'approval_template_stage_id'	=> $rowTemplateStage->id,
-							'approval_source_id'			=> $source->id,
-							'user_id'						=> $rowStageDetail->user_id,
-							'date_request'					=> date('Y-m-d H:i:s'),
-							'status'						=> $status
-						]);
+					$check = true;
+					if($table_name == 'marketing_order_deliveries'){
+						$check = false;
 					}
-					$count++;
-
+					if($check){
+						foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
+							ApprovalMatrix::create([
+								'code'							=> strtoupper(Str::random(30)),
+								'approval_template_stage_id'	=> $rowTemplateStage->id,
+								'approval_source_id'			=> $source->id,
+								'user_id'						=> $rowStageDetail->user_id,
+								'date_request'					=> date('Y-m-d H:i:s'),
+								'status'						=> $status
+							]);
+						}
+						$count++;
+					}
 				}
 
 			}

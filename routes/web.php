@@ -57,6 +57,7 @@ use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\OutstandingPurchaseOrderController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
+use App\Http\Controllers\Purchase\ReportProcurementController;
 use App\Http\Controllers\Setting\ChangeLogController;
 use App\Http\Controllers\Setting\AnnouncementController;
 use App\Http\Controllers\Setting\UsedDataController;
@@ -1792,6 +1793,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [PurchaseProgressController::class, 'index']);
                         Route::post('filter', [PurchaseProgressController::class, 'filter']);
                         Route::get('export', [PurchaseProgressController::class, 'export']);
+                    });
+
+                    Route::prefix('report_procurement')->middleware('operation.access:report_procurement,view')->group(function () {
+                        Route::get('/', [ReportProcurementController::class, 'index']);
+                        Route::post('filter', [ReportProcurementController::class, 'filter']);
+                        Route::get('export', [ReportProcurementController::class, 'export']);
                     });
 
                     Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {

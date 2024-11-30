@@ -71,6 +71,9 @@ class ApprovalSource extends Model
             if($this->lookable->account()->exists()){
                 $name = $this->lookable->account->name;
             }
+            if($this->lookable_type == 'marketing_order_deliveries'){
+                $name .= ' - '.$this->lookable->customer->name;
+            }
         }else{
             if(isset($this->lookable->user_id)){
                 $name = $this->lookable->user->name;

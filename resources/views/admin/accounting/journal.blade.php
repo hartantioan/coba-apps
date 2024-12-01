@@ -761,6 +761,10 @@
         $('#last-row-coa').before(`
             <tr class="row_coa">
                 <input type="hidden" name="arr_cost_distribution_detail[]" value="">
+                <input type="hidden" name="arr_lookable_type[]" value="0">
+                <input type="hidden" name="arr_lookable_id[]" value="0">
+                <input type="hidden" name="arr_detailable_type[]" value="0">
+                <input type="hidden" name="arr_detailable_id[]" value="0">
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1608,6 +1612,10 @@
                     $('#last-row-coa').before(`
                         <tr class="row_coa">
                             <input type="hidden" name="arr_cost_distribution_detail[]" value="">
+                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                            <input type="hidden" name="arr_detailable_type[]" value="` + val.detailable_type + `">
+                            <input type="hidden" name="arr_detailable_id[]" value="` + val.detailable_id + `">
                             <td class="center disable-class">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>

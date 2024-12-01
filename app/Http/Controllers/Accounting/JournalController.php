@@ -457,6 +457,10 @@ class JournalController extends Controller
                                     'type'                          => '1',
                                     'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
                                     'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
+                                    'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
+                                    'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
+                                    'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
+                                    'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
                                 ]);
                             }
 
@@ -476,6 +480,10 @@ class JournalController extends Controller
                                     'type'                          => '2',
                                     'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
                                     'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
+                                    'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
+                                    'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
+                                    'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
+                                    'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
                                 ]);
                             }
                         }
@@ -717,6 +725,10 @@ class JournalController extends Controller
                 'nominal_fc'                    => number_format($row->nominal_fc,2,',','.'),
                 'note'                          => $row->note ? $row->note : '',
                 'note2'                         => $row->note2 ? $row->note2 : '',
+                'lookable_type'                 => $row->lookable_type ?? '0',
+                'lookable_id'                   => $row->lookable_id ?? '0',
+                'detailable_type'               => $row->detailable_type ?? '0',
+                'detailable_id'                 => $row->detailable_id ?? '0',
             ];
         }
 

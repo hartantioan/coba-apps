@@ -126,6 +126,7 @@ class AppServiceProvider extends ServiceProvider
             'approval_credit_limits'                => 'App\Models\ApprovalCreditLimit',
             'issue_glazes'                          => 'App\Models\IssueGlaze',
             'receive_glazes'                        => 'App\Models\ReceiveGlaze',
+            'good_return_issue_details'             => 'App\Models\GoodReturnIssueDetail',
         ]);
     }
 }

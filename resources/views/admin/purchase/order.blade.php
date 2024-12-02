@@ -30,7 +30,7 @@
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -153,7 +153,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -377,7 +377,7 @@
                                                     <i class="material-icons left">add</i> Purchase Request
                                                 </a>
                                             </div>
-                                        </div> 
+                                        </div>
                                     </p>
                                 </div>
                                 <div class="col m3 s3 step20" id="gi-show">
@@ -467,7 +467,7 @@
                                                 <th>Proyek</th>
                                             </tr>
                                             <tr>
-                                                
+
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
@@ -561,7 +561,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -623,7 +623,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -646,7 +646,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -663,7 +663,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -674,10 +674,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -745,13 +745,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -772,16 +772,16 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -789,7 +789,7 @@
         });
 
         window.table.search('{{ $code }}').draw();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -798,7 +798,7 @@
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -845,9 +845,9 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -857,9 +857,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -873,7 +873,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -883,13 +883,13 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_done').hide();
@@ -900,7 +900,7 @@
                 $('#tempDone').val('');
             }
         });
-        
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
@@ -937,10 +937,10 @@
         if($('.row_item').length > 0){
             setTimeout(function() {
                 countAll();
-            }, 750); 
+            }, 750);
         }
     }
-    
+
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
@@ -949,7 +949,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -994,13 +994,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1030,11 +1030,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -1046,11 +1046,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1072,8 +1072,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1081,7 +1081,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1090,10 +1090,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1117,7 +1117,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1130,17 +1130,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1158,8 +1158,8 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     var defaultValuePpn = 0, defaultValuePph;
@@ -1203,7 +1203,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1216,7 +1216,7 @@
                 loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1229,7 +1229,7 @@
             }
         });
     }
-    
+
     function getRowUnit(val){
         $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
@@ -1377,7 +1377,7 @@
             }else if(type == 'gi'){
                 $('#pr-show,#sj-show').hide();
             }else if(type == 'sj'){
-                
+
             }
 
             $.ajax({
@@ -1526,7 +1526,7 @@
                                                     @foreach ($place as $rowplace)
                                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1534,14 +1534,14 @@
                                                     @foreach ($line as $rowline)
                                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                                     <option value="">--{{ __('translations.empty') }}--</option>
                                                     @foreach ($machine as $row)
                                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                    @endforeach    
+                                                    @endforeach
                                                 </select>
                                             </td>
                                             <td>
@@ -1550,7 +1550,7 @@
                                                     @foreach ($department as $rowdept)
                                                         <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td class="center">
                                                 -
@@ -1595,7 +1595,7 @@
                                             </td>
                                             <td class="center">
                                                 <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `');">
-                                                    <option value="">--Silahkan pilih item--</option>    
+                                                    <option value="">--Silahkan pilih item--</option>
                                                 </select>
                                             </td>
                                             <td class="center" id="qty_stock` + count + `">
@@ -1659,7 +1659,7 @@
                                                     @foreach ($place as $rowplace)
                                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1667,14 +1667,14 @@
                                                     @foreach ($line as $rowline)
                                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                                     <option value="">--{{ __('translations.empty') }}--</option>
                                                     @foreach ($machine as $row)
                                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                    @endforeach    
+                                                    @endforeach
                                                 </select>
                                             </td>
                                             <td>
@@ -1683,7 +1683,7 @@
                                                     @foreach ($department as $rowdept)
                                                         <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                     @endforeach
-                                                </select>    
+                                                </select>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
@@ -1826,7 +1826,7 @@
                     </td>
                     <td class="center">
                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `')">
-                            <option value="">--Silahkan pilih item--</option>    
+                            <option value="">--Silahkan pilih item--</option>
                         </select>
                     </td>
                     <td class="center" id="qty_stock` + count + `">
@@ -1890,7 +1890,7 @@
                             @foreach ($place as $rowplace)
                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1898,14 +1898,14 @@
                             @foreach ($line as $rowline)
                                 <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                             <option value="">--{{ __('translations.empty') }}--</option>
                             @foreach ($machine as $row)
                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                            @endforeach    
+                            @endforeach
                         </select>
                     </td>
                     <td>
@@ -1914,7 +1914,7 @@
                             @foreach ($department as $rowdept)
                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
@@ -1930,7 +1930,7 @@
                 </tr>
             `);
             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-            
+
         }else if($('#inventory_type').val() == '2' || $('#inventory_type').val() == '3'){
 
             $('#last-row-item').before(`
@@ -2023,7 +2023,7 @@
                             @foreach ($place as $rowplace)
                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -2031,14 +2031,14 @@
                             @foreach ($line as $rowline)
                                 <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                             <option value="">--{{ __('translations.empty') }}--</option>
                             @foreach ($machine as $row)
                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                            @endforeach    
+                            @endforeach
                         </select>
                     </td>
                     <td>
@@ -2047,7 +2047,7 @@
                             @foreach ($department as $rowdept)
                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td class="center">
                         -
@@ -2146,7 +2146,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -2154,14 +2154,14 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 if(type !=null){
-                    
+
                 $('.row_item[data-id-header="' + id + '"]').remove();
                 }else{
-                    
+
                 $('.row_item[data-id="' + id + '"]').remove();
                 }
                 countAll();
@@ -2327,7 +2327,7 @@
                 });
             }
         });
-        
+
     }
 
     function rowDetail(data) {
@@ -2424,12 +2424,12 @@
                         var path = window.location.pathname;
                         path = path.replace(/^\/|\/$/g, '');
 
-                        
+
                         var segments = path.split('/');
                         var lastSegment = segments[segments.length - 1];
 
                         formData.append('lastsegment',lastSegment);
-                        
+
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
@@ -2458,7 +2458,7 @@
                                 } else if(response.status == 422) {
                                     $('#validation_alert').show();
                                     $('.modal-content').scrollTop(0);
-                                    
+
                                     swal({
                                         title: 'Ups! Validation',
                                         text: 'Check your form.',
@@ -2467,7 +2467,7 @@
                                     $.each(response.error, function(field, errorMessage) {
                                         $('#' + field).addClass('error-input');
                                         $('#' + field).css('border', '1px solid red');
-                                        
+
                                     });
 
                                     $.each(response.error, function(i, val) {
@@ -2548,7 +2548,7 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#inventory_type').val(response.inventory_type).formSelect();
-                $('#shipping_type').val(response.shipping_type).formSelect(); 
+                $('#shipping_type').val(response.shipping_type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
                 $('#payment_type').val(response.payment_type).formSelect();
@@ -2563,7 +2563,7 @@
                 $('#receiver_name').val(response.receiver_name);
                 $('#receiver_address').val(response.receiver_address);
                 $('#receiver_phone').val(response.receiver_phone);
-                
+
                 $('#note').val(response.note);
                 $('#note_external').val(response.note_external);
                 M.textareaAutoResize($('#note_external'));
@@ -2589,7 +2589,7 @@
                 $('#grandtotal-convert').text(response.grandtotal_convert);
 
                 tempTerm = response.top_master;
-                
+
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
                         $(this).remove();
@@ -2631,7 +2631,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `')">
-                                            <option value="">--Silahkan pilih item--</option>    
+                                            <option value="">--Silahkan pilih item--</option>
                                         </select>
                                     </td>
                                     <td class="center" id="qty_stock` + count + `">
@@ -2694,7 +2694,7 @@
                                             @foreach ($place as $rowplace)
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -2702,14 +2702,14 @@
                                             @foreach ($line as $rowline)
                                                 <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                             <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($machine as $row)
                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                            @endforeach    
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td>
@@ -2718,7 +2718,7 @@
                                             @foreach ($department as $rowdept)
                                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
@@ -2849,7 +2849,7 @@
                                             @foreach ($place as $rowplace)
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -2857,14 +2857,14 @@
                                             @foreach ($line as $rowline)
                                                 <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                             <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($machine as $row)
                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                            @endforeach    
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td>
@@ -2873,7 +2873,7 @@
                                             @foreach ($department as $rowdept)
                                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td class="center">
                                         -
@@ -2925,12 +2925,12 @@
                                 </div>
                             `);
                         });
-                        
+
                     }
                 }
 
                 $('#inventory_type').trigger('change');
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -2966,7 +2966,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2975,10 +2975,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function voidStatus(id){
@@ -3065,11 +3065,11 @@
 
     function countRow(id){
         if($('#arr_item' + id).val() || $('#arr_coa' + id).val()){
-            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-                qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
-                price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-                disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-                disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
+                qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")),
+                price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
+                disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")),
+                disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")),
                 disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
                 conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion')) : 1;
             if($('#inventory_type').val() === '1'){
@@ -3080,7 +3080,7 @@
                     }
                 }
             }
-            
+
 
             let qtyConversion = qty * conversion;
 
@@ -3119,16 +3119,18 @@
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
             rowdiscount = subtotal > 0 ? Math.round(( parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")) /subtotal* discount) * 100) / 100 : 0;
-            
+
             rownominal -= rowdiscount;
 
             if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
+
                 let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
                 if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
                     rownominal = rownominal / (1 + (percent_tax / 100));
                 }
                 rownominal = Math.round(rownominal * 100) / 100;
                 rowtax = Math.floor(rownominal * (percent_tax / 100));
+
             }
 
             rownominal = Math.round(rownominal * 100) / 100;
@@ -3141,7 +3143,6 @@
                 let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
                 rowwtax = Math.floor(rownominal * (percent_wtax / 100));
             }
-
             $('input[name^="arr_nominal_total"]').eq(index).val(
                 (rownominal >= 0 ? '' : '-') + formatRupiahIni(rownominal.toString().replace('.',','))
             );
@@ -3156,16 +3157,14 @@
 
             rowgrandtotal = (rownominal + rowtax - rowwtax).toFixed(2);
 
-            console.log(rowgrandtotal);
-
             $('input[name^="arr_nominal_grandtotal"]').eq(index).val(
                 (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toString().replace('.',','))
             );
-            
+
+
             tax += rowtax;
             wtax += rowwtax;
             total += rownominal;
-            
         });
 
         tax = Math.floor(tax);
@@ -3174,21 +3173,21 @@
         let totaltemp = subtotal - discount;
         let balancetemp = Math.round((total - totaltemp) * 100) /100;
 
-      
+
         if(balancetemp != 0 && id_biggest_total){
             total = totaltemp;
             var biggestTotalValue = parseFloat($('#arr_nominal_total' + id_biggest_total).val().replaceAll(".", "").replaceAll(",","."));
-      
+
             if(balancetemp > 0){
 
                 var newBiggestTotal = biggestTotalValue - balancetemp;
             }else{
-                
+
                 var newBiggestTotal = biggestTotalValue + balancetemp;
             }
-            $('#arr_nominal_total' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ','));
-            $('#arr_nominal_grandtotal' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ','));
-          
+            $('#arr_nominal_total' + id_biggest_total).val(formatRupiahIni(newBiggestTotal.toFixed(2).replace('.', ',')));
+            /* $('#arr_nominal_grandtotal' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ',')); */
+
         }
 
         grandtotal = total + tax - wtax + rounding;
@@ -3249,7 +3248,7 @@
             (grandtotalconvert >= 0 ? '' : '-') + formatRupiahIni(grandtotalconvert.toFixed(2).toString().replace('.',','))
         );
     }
-    
+
 
     function countGrandtotal(val){
         let total = parseFloat($('#savetotal').val().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#savetax').val().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat(val.replaceAll(".", "").replaceAll(",","."));
@@ -3265,7 +3264,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -3273,7 +3272,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -3298,48 +3297,48 @@
                 {
                     title : 'Supplier',
                     element : document.querySelector('.step3'),
-                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.'
                 },
                 {
                     title : 'Tipe Pembelian',
                     element : document.querySelector('.step4'),
-                    intro : 'Tipe Pembelian berisi barang atau jasa, silahkan pilih barang jika pembelian adalah untuk barang yang ada wujudnya, dan pilih jasa, jika tipe pembelian adalah jasa. Hati-hati karena tipe pembelian barang maka, detail produk di tabel akan otomatis mengambil data dari master data item, sedangkan tipe pembelian jasa akan otomatis ke biaya / COA.' 
+                    intro : 'Tipe Pembelian berisi barang atau jasa, silahkan pilih barang jika pembelian adalah untuk barang yang ada wujudnya, dan pilih jasa, jika tipe pembelian adalah jasa. Hati-hati karena tipe pembelian barang maka, detail produk di tabel akan otomatis mengambil data dari master data item, sedangkan tipe pembelian jasa akan otomatis ke biaya / COA.'
                 },
-              
+
                 {
                     title : 'Tipe Pengiriman',
                     element : document.querySelector('.step6'),
-                    intro : 'Franco, merupakan kegiatan jual beli barang di mana biaya pengiriman ditanggung oleh penjual. Sedangkan dalam Loco pembeli yang mendatangi gudang barang dan menanggung semua biaya.' 
+                    intro : 'Franco, merupakan kegiatan jual beli barang di mana biaya pengiriman ditanggung oleh penjual. Sedangkan dalam Loco pembeli yang mendatangi gudang barang dan menanggung semua biaya.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step7'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'No. Dokumen',
                     element : document.querySelector('.step8'),
-                    intro : 'No dokumen bisa diisikan dengan no dokumen penawaran dari supplier.' 
+                    intro : 'No dokumen bisa diisikan dengan no dokumen penawaran dari supplier.'
                 },
                 {
                     title : 'Tipe Pembayaran',
                     element : document.querySelector('.step9'),
-                    intro : 'Tipe pembayaran PO, silahkan pilih sesuai keadaan.' 
+                    intro : 'Tipe pembayaran PO, silahkan pilih sesuai keadaan.'
                 },
                 {
                     title : 'Termin Pembayaran',
                     element : document.querySelector('.step10'),
-                    intro : 'Berapa hari termin pembayaran sejak dokumen diterima. Otomatis terisi, ketika anda memilih supplier dan tipe pembayaran Credit.' 
+                    intro : 'Berapa hari termin pembayaran sejak dokumen diterima. Otomatis terisi, ketika anda memilih supplier dan tipe pembayaran Credit.'
                 },
                 {
                     title : 'Tgl. Terima',
                     element : document.querySelector('.stepreceive'),
-                    intro : 'Tanggal untuk menentukan tanggal terima dari order.' 
+                    intro : 'Tanggal untuk menentukan tanggal terima dari order.'
                 },
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step11'),
-                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.'
                 },
                 {
                     title : 'Konversi',
@@ -3349,77 +3348,77 @@
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step13'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Tgl. Kirim',
                     element : document.querySelector('.step14'),
-                    intro : 'Tanggal perkiraan kirim barang dari Supplier.' 
+                    intro : 'Tanggal perkiraan kirim barang dari Supplier.'
                 },
                 {
                     title : 'Nama Penerima',
                     element : document.querySelector('.step15'),
-                    intro : 'Nama penerima di gudang atau atas nama pembeli.' 
+                    intro : 'Nama penerima di gudang atau atas nama pembeli.'
                 },
                 {
                     title : 'Alamat Penerima',
                     element : document.querySelector('.step16'),
-                    intro : 'Bisa diisikan dengan alamat gudang atau drop point barang.' 
+                    intro : 'Bisa diisikan dengan alamat gudang atau drop point barang.'
                 },
                 {
                     title : 'Kontak Penerima',
                     element : document.querySelector('.step17'),
-                    intro : 'Nomor telepon atau hp dari yang menerima barang di gudang, atau drop point barang.' 
+                    intro : 'Nomor telepon atau hp dari yang menerima barang di gudang, atau drop point barang.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step18'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Purchase Request',
                     element : document.querySelector('.step19'),
-                    intro : 'Pilih ini jika ingin menarik data dari Purchase Request aktif yang masih memiliki tunggakan.' 
+                    intro : 'Pilih ini jika ingin menarik data dari Purchase Request aktif yang masih memiliki tunggakan.'
                 },
                 {
                     title : 'Good Issue / Barang Keluar',
                     element : document.querySelector('.step20'),
-                    intro : 'Pilih ini jika ingin menarik data dari Good Issue / Barang Keluar aktif yang ingin menerbitkan barang baru dengan status REPAIR. Gunakan untuk produk yang keluar karena diperbaiki.' 
+                    intro : 'Pilih ini jika ingin menarik data dari Good Issue / Barang Keluar aktif yang ingin menerbitkan barang baru dengan status REPAIR. Gunakan untuk produk yang keluar karena diperbaiki.'
                 },
                 {
                     title : 'Surat Jalan',
                     element : document.querySelector('.stepsj'),
-                    intro : 'Pilih ini jika ingin menarik data dari Marketing Order Delivery Process / Surat Jalan aktif .' 
+                    intro : 'Pilih ini jika ingin menarik data dari Marketing Order Delivery Process / Surat Jalan aktif .'
                 },
                 {
                     title : 'PR/GI Terpakai',
                     element : document.querySelector('.step21'),
-                    intro : 'Daftar dokumen referensi yang terpakai akan muncul disini jika anda menggunakan Purchase Request ataupun Good Issue. Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.' 
+                    intro : 'Daftar dokumen referensi yang terpakai akan muncul disini jika anda menggunakan Purchase Request ataupun Good Issue. Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.'
                 },
                 {
                     title : 'Detail produk',
                     element : document.querySelector('.step22'),
-                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
+                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step23'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Keterangan Eksternal',
                     element : document.querySelector('.step24'),
-                    intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
+                    intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.'
                 },
                 {
                     title : 'Tabel Informasi Total Transaksi',
                     element : document.querySelector('.step25'),
-                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Nominal PPh bisa disesuaikan dengan kebutuhan.' 
+                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Nominal PPh bisa disesuaikan dengan kebutuhan.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step26'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         })/* .onbeforechange(function(targetElement){
@@ -3445,7 +3444,7 @@
                 loadingClose('.modal-content');
                 $('#modal6').modal('open');
                 $('#tempDone').val(id);
-                
+
                 if(response.details.length > 0){
                     $('#body-done').html('');
 
@@ -3506,7 +3505,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_done')[0]);
 
                 formData.delete("arr_value[]");
@@ -3542,7 +3541,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_done').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -3591,7 +3590,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data) {
                 loadingClose('.modal-content');
@@ -3608,7 +3607,7 @@
                     });
 
                     iframe.contentDocument.oncontextmenu = function(){
-                        return false; 
+                        return false;
                     };
                     iframe.onload = function() {
                         iframe.contentWindow.document.addEventListener('contextmenu', function(e) {
@@ -3644,7 +3643,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -3720,7 +3719,7 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 
     function formatRupiahNominal(angka){
@@ -3735,7 +3734,7 @@
         sisa     		= parseFloat(split[0]).toString().length % 3,
         rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
         ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
-    
+
         if(ribuan){
             separator = sisa ? '.' : '';
             rupiah += separator + ribuan.join('.');
@@ -3750,7 +3749,7 @@
         }else{
             rupiah = rupiah;
         }
-    
+
         angka.value = sign == '-' ? sign + rupiah : rupiah;
     }
 </script>

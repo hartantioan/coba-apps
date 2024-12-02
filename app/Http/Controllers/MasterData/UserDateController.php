@@ -125,7 +125,7 @@ class UserDateController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('user_dates', 'code')->whereNull('deleted_at')->ignore($request->temp)] : ['required', Rule::unique('user_dates', 'code')->whereNull('deleted_at')],
+            'code' 				=> $request->temp ? ['required', Rule::unique('user_dates', 'code')->ignore($request->temp)] : 'required|unique:user_dates,code',
             'name'              => 'required',
             'count_backdate'    => 'required',
             'count_futuredate'  => 'required',

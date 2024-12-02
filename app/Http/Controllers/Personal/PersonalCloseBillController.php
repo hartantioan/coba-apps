@@ -708,7 +708,7 @@ class PersonalCloseBillController extends Controller
 
     public function userIndex(Request $request)
     {
-        $url = 'personal_close_bill';
+        $url = 'close_bill_personal';
         $cekDate = $this->datauser->cekMinMaxPostDate($url);
         $menu = $this->menu;
 

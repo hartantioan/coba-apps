@@ -149,8 +149,8 @@ class UserDateController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            DB::beginTransaction();
-            try {
+            /* DB::beginTransaction();
+            try { */
 
                 $passed = true;
                 $errorMessage = [];
@@ -218,10 +218,10 @@ class UserDateController extends Controller
                     ]);
                 }
 
-                DB::commit();
+                /* DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            }
+            } */
 			
 			if($query) {
 

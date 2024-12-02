@@ -66,6 +66,14 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $yeah;
     }
 
+    public function isBox(){
+        $yeah = false;
+        if(strpos($this->itemStock->item->pallet->prefix_code,'BOX') !== false){
+            $yeah = true;
+        }
+        return $yeah;
+    }
+
     public function itemStock(){
         return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
     }

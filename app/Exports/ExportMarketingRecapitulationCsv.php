@@ -110,8 +110,14 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $hscode = ' ' . $rowdetail->lookable->itemStock->item->type->hs_code;
                 }
                 $boxQty = '';
-                if ($rowdetail->lookable->isPallet()) {
-                    $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
+                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-12-03') {
+                    if ($rowdetail->lookable->isPallet() || $rowdetail->lookable->isBox()) {
+                        $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
+                    }
+                }else{
+                    if ($rowdetail->lookable->isPallet()) {
+                        $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->itemStock->item->pallet->box_conversion) . ' BOX )';
+                    }
                 }
 
                 if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {
@@ -143,8 +149,14 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     $hscode = ' ' . $rowdetail->lookable->item->type->hs_code;
                 }
                 $boxQty = '';
-                if ($rowdetail->lookable->isPallet()) {
-                    $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
+                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-12-03') {
+                    if ($rowdetail->lookable->isPallet() || $rowdetail->lookable->isBox()) {
+                        $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
+                    }
+                }else{
+                    if ($rowdetail->lookable->isPallet()) {
+                        $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
+                    }
                 }
 
                 if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {

@@ -36,6 +36,14 @@ class MarketingOrderDeliveryDetail extends Model
         return $yeah;
     }
 
+    public function isBox(){
+        $yeah = false;
+        if(strpos($this->item->pallet->prefix_code,'BOX') !== false){
+            $yeah = true;
+        }
+        return $yeah;
+    }
+
     public function marketingOrderInvoiceDetail(){
         return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
             $query->whereIn('status',['2','3']);

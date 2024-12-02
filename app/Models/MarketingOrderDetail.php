@@ -83,6 +83,16 @@ class MarketingOrderDetail extends Model
         return $codesString;
     }
 
+    public function priceBeforeDiscWTax(){
+        $pricebeforedisc = 0;
+        if($this->is_include_tax == '1'){
+            $pricebeforedisc = $this->price / (($this->percent_tax  + 100) / 100);
+        }else{
+            $pricebeforedisc = $this->price;
+        }
+        return round($pricebeforedisc,2);
+    }
+
     public function priceWTax(){
         $price = 0;
         if($this->is_include_tax == '1'){

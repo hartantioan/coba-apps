@@ -30,37 +30,57 @@ class MailReportIncomingPaymentAR extends Command
      */
     public function handle()
     {
-        $recipient = ['andrew@superior.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id','annabela@superior.co.id','yorghi@superior.co.id','marisa@superiorporcelain.co.id'];
+        $recipient = ['andrew@superior.co.id', 'henrianto@superior.co.id', 'haidong@superiorporcelain.co.id', 'annabela@superior.co.id', 'yorghi@superior.co.id', 'marisa@superiorporcelain.co.id'];
+       // $recipient = ['edp@superior.co.id'];
 
         $data = [];
+        $date = date('d');
 
-        $query = DB::select("SELECT CONCAT(' 01 - ',DATE_FORMAT(NOW(),'%d %M %Y')) AS tanggal, SUM(b.subtotal) AS total FROM incoming_payments a
-                            LEFT JOIN incoming_payment_details b ON a.id=b.incoming_payment_id AND b.deleted_at IS null
-                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.account_id IS NOT NULL AND a.coa_id <>20 and
-                            a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
-                            UNION ALL
-                            SELECT DATE_FORMAT(NOW(),'%d %M %Y'), coalesce(SUM(b.subtotal),0) AS total FROM incoming_payments a
-                            LEFT JOIN incoming_payment_details b ON a.id=b.incoming_payment_id AND b.deleted_at IS null
-                            WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.account_id IS NOT NULL AND a.coa_id <>20 and
-                            a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
-                            ");
+        if ($date == '01') {
+            $tanggal1 = date('Y-m-01', strtotime("-1 day"));
+            $tanggal2 = date('Y-m-d', strtotime("-1 day"));
+        } else {
+            $tanggal1 = date('Y-m-01');
+            $tanggal2 = date('Y-m-d', strtotime("-1 day"));
+        }
+
+
+        $query = DB::select("SELECT CONCAT(' 01 - ',DATE_FORMAT('$tanggal2','%d %M %Y')) AS tanggal, coalesce(SUM(b.subtotal),0) AS total FROM incoming_payments a
+        LEFT JOIN incoming_payment_details b ON a.id=b.incoming_payment_id AND b.deleted_at IS null
+        WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.account_id IS NOT NULL AND a.coa_id <>20 and
+        a.post_date>='$tanggal1' AND a.post_date<='$tanggal2'
+        UNION ALL
+        SELECT DATE_FORMAT('$tanggal2','%d %M %Y'), coalesce(SUM(b.subtotal),0) AS total FROM incoming_payments a
+        LEFT JOIN incoming_payment_details b ON a.id=b.incoming_payment_id AND b.deleted_at IS null
+        WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.account_id IS NOT NULL AND a.coa_id <>20 and
+        a.post_date='$tanggal2'
+        ");
+
+      
 
         foreach ($query as $row) {
             $data[] = [
                 'tanggal'  => $row->tanggal,
                 'total'  => $row->total,
-              
+
 
             ];
         }
 
         $obj = json_decode(json_encode($data));
 
-        $tanggal1 = date('Y-m-01');
-        $tanggal2 = date('Y-m-d');
-        
 
-        Excel::store(new ExportIncomingPaymentAR($tanggal1,$tanggal2), 'public/auto_email/incoming_payment.xlsx', 'local');
+        if ($date == '01') {
+            $tanggal1 = date('Y-m-01', strtotime("-1 day"));
+            $tanggal2 = date('Y-m-d', strtotime("-1 day"));
+        } else {
+            $tanggal1 = date('Y-m-01');
+            $tanggal2 = date('Y-m-d', strtotime("-1 day"));
+        }
+
+
+
+        Excel::store(new ExportIncomingPaymentAR($tanggal1, $tanggal2), 'public/auto_email/incoming_payment.xlsx', 'local');
         Mail::to($recipient)->send(new SendMailIncomingPaymentAR($obj));
     }
 }

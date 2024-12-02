@@ -70,7 +70,7 @@ class ExportIncomingPaymentAR implements FromCollection, WithTitle, WithHeadings
                     'no' => $row->marketingOrderInvoice->code,
                     'tanggaldok' => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
                     'usia' => CustomHelper::countDays($row->marketingOrderInvoice->post_date, $row->IncomingPayment->post_date),
-                    'nominal' => $row->total,
+                    'nominal' => $row->subtotal,
                     'note' => $row->note,
                 ];
             }
@@ -83,7 +83,7 @@ class ExportIncomingPaymentAR implements FromCollection, WithTitle, WithHeadings
                     'no' => $row->marketingOrderDownPayment->code,
                     'tanggaldok' => date('d/m/Y', strtotime($row->marketingOrderDownPayment->post_date)),
                     'usia' => CustomHelper::countDays($row->marketingOrderDownPayment->post_date, $row->IncomingPayment->post_date),
-                    'nominal' => $row->total,
+                    'nominal' => $row->subtotal,
                     'note' => $row->note,
                 ];
             }

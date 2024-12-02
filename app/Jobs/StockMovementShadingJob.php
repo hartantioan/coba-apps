@@ -17,10 +17,10 @@ class StockMovementShadingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
+    protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group,$batch_id,$shading_id;
 
     protected $user_id;
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group ,string $user_id)
+    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group ,string $user_id,string $batch_id ,string $shading_id)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
@@ -30,6 +30,8 @@ class StockMovementShadingJob implements ShouldQueue
         $this->type = $type ? $type : '';
         $this->group = $group ? $group : '';
         $this->user_id = $user_id;
+        $this->batch_id = $shading_id ? $shading_id : '';
+        $this->shading_id = $shading_id ? $shading_id : '';
         $this->queue = 'report';
     }
 
@@ -37,7 +39,7 @@ class StockMovementShadingJob implements ShouldQueue
     {
         $filename = 'stock_movement_shading_' . uniqid() . '.xlsx';
 
-        Excel::store(new ExportStockMovementShading($this->plant,$this->item,$this->warehouse,$this->start_date,$this->finish_date,$this->type,$this->group), 'public/report/'.$filename);
+        Excel::store(new ExportStockMovementShading($this->plant,$this->item,$this->warehouse,$this->start_date,$this->finish_date,$this->type,$this->group,$this->batch_id,$this->shading_id), 'public/report/'.$filename);
         Notification::create([
             'code'				=> Str::random(20),
             'menu_id'			=> 0,

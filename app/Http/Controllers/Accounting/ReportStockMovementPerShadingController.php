@@ -96,6 +96,14 @@ class ReportStockMovementPerShadingController extends Controller
                     });
                 }
 
+                if($request->shading_id) {
+                    $query->where('item_shading_id',$request->shading_id);
+                }
+
+                if($request->batch_id) {
+                    $query->where('production_batch_id',$request->batch_id);
+                }
+
                 if($request->filter_group){
 
                     $query->whereHas('item',function($query) use($request){
@@ -138,6 +146,14 @@ class ReportStockMovementPerShadingController extends Controller
                     $query->whereHas('warehouse',function($query) use($request){
                         $query->where('id',$request->warehouse);
                     });
+                }
+
+                if($request->shading_id) {
+                    $query->where('item_shading_id',$request->shading_id);
+                }
+
+                if($request->batch_id) {
+                    $query->where('production_batch_id',$request->batch_id);
                 }
 
                 if($request->filter_group){
@@ -267,6 +283,14 @@ class ReportStockMovementPerShadingController extends Controller
                         });
                     }
 
+                    if($request->shading_id) {
+                        $query->where('item_shading_id',$request->shading_id);
+                    }
+
+                    if($request->batch_id) {
+                        $query->where('production_batch_id',$request->batch_id);
+                    }
+
                     if($request->filter_group){
 
                         $query->whereHas('item',function($query) use($request){
@@ -303,6 +327,14 @@ class ReportStockMovementPerShadingController extends Controller
                         $query->whereHas('warehouse',function($query) use($request){
                             $query->where('id',$request->warehouse);
                         });
+                    }
+
+                    if($request->shading_id) {
+                        $query->where('item_shading_id',$request->shading_id);
+                    }
+
+                    if($request->batch_id) {
+                        $query->where('production_batch_id',$request->batch_id);
                     }
 
                     if($request->filter_group){
@@ -399,8 +431,10 @@ class ReportStockMovementPerShadingController extends Controller
         $finish_date = $request->finishdate ? $request->finishdate:'';
         $group = $request->group ? $request->group:'';
         $type = $request->type ? $request->type:'';
+        $batch_id = $request->batch_id ? $request->batch_id:'';
+        $shading_id = $request->shading_id ? $request->shading_id:'';
         $user_id = session('bo_id');
-        StockMovementShadingJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);
+        StockMovementShadingJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id,$batch_id,$shading_id);
 
         return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
 

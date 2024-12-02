@@ -31,7 +31,7 @@ use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderPlan;
-use App\Models\MarketingOrderReturn;
+use App\Models\ItemShading;
 use App\Models\MaterialRequest;
 use App\Models\Menu;
 use App\Models\MenuUser;
@@ -5436,6 +5436,60 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function batchIdMovement(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = ProductionBatch::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%");
+            if($request->item_id){
+                $query->whereHas('item',function($query)use($request){
+                    $query->whereHas('parentFg',function($query)use($request) {
+                        $query->where('parent_id',$request->item_id);
+                    });
+                });
+            }
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function shadingIdMovement(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = ItemShading::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%");
+            if($request->item_id){
+                $query->whereHas('item',function($query)use($request){
+                    $query->whereHas('parentFg',function($query)use($request) {
+                        $query->where('parent_id',$request->item_id);
+                    });
+                });
+            }
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->code.'-'.$d->item->name,
             ];
         }
 

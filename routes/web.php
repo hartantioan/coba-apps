@@ -504,6 +504,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('issue_glaze', [Select2Controller::class, 'issueGlaze']);
                 Route::get('rule_procurement', [Select2Controller::class, 'ruleProcurement']);
                 Route::get('item_rm_sm', [Select2Controller::class, 'itemRMSM']);
+                Route::get('batch_id_movement', [Select2Controller::class, 'batchIdMovement']);
+                Route::get('shading_id_movement', [Select2Controller::class, 'shadingIdMovement']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -1799,6 +1801,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportProcurementController::class, 'index']);
                         Route::post('filter', [ReportProcurementController::class, 'filter']);
                         Route::get('export', [ReportProcurementController::class, 'export']);
+                        Route::get('print_individual', [ReportProcurementController::class, 'PrintIndividual'])->withoutMiddleware('direct.access');
                     });
 
                     Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {

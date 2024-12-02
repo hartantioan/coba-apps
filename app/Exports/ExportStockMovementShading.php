@@ -14,8 +14,8 @@ use App\Models\ItemShading;
 
 class ExportStockMovementShading implements FromView,ShouldAutoSize
 {
-    protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group)
+    protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group,$batch_id,$shading_id;
+    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group, string $batch_id , string $shading_id)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
@@ -24,6 +24,8 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
         $this->group = $group ? $group : '';
+        $this->batch_id = $batch_id ? $batch_id : '';
+        $this->shading_id = $shading_id ? $shading_id : '';
     }
     public function view(): View
     {
@@ -64,6 +66,14 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
                     });
+                }
+
+                if($this->shading_id) {
+                    $query->where('item_shading_id',$this->shading_id);
+                }
+
+                if($this->batch_id) {
+                    $query->where('production_batch_id',$this->batch_id);
                 }
 
                 if($this->group){
@@ -108,6 +118,13 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
                     });
+                }
+                if($this->shading_id) {
+                    $query->where('item_shading_id',$this->shading_id);
+                }
+
+                if($this->batch_id) {
+                    $query->where('production_batch_id',$this->batch_id);
                 }
                 if($this->group){
                     $groupIds = explode(',', $this->group);
@@ -233,7 +250,13 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
+                    if($this->shading_id) {
+                        $query->where('item_shading_id',$this->shading_id);
+                    }
 
+                    if($this->batch_id) {
+                        $query->where('production_batch_id',$this->batch_id);
+                    }
                     if($this->group){
                         $groupIds = explode(',', $this->group);
 
@@ -273,7 +296,13 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                             $query->where('id',$this->warehouse);
                         });
                     }
+                    if($this->shading_id) {
+                        $query->where('item_shading_id',$this->shading_id);
+                    }
 
+                    if($this->batch_id) {
+                        $query->where('production_batch_id',$this->batch_id);
+                    }
                     if($this->group){
 
                         $query->whereHas('item',function($query) {

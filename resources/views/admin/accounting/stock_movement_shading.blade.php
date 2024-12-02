@@ -94,6 +94,18 @@
                                         </div>
                                         <div class="col m12 s12">
                                         </div>
+                                        <div class="input-field col m6 s12">
+                                            <select class="select2 browser-default" id="batch_id" name="batch_id">
+
+                                            </select>
+                                            <label class="active" for="item">Batch</label>
+                                        </div>
+                                        <div class="input-field col m4 s12">
+                                            <select class="select2 browser-default" id="shading_id" name="shading_id">
+
+                                            </select>
+                                            <label class="active" for="item">Shading</label>
+                                        </div>
                                         <div class="input-field col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
 
@@ -199,7 +211,62 @@
         });
 
         select2ServerSide('#item_id', '{{ url("admin/select2/item_parent_fg") }}');
+
+        $('#batch_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/batch_id_movement") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $('#item_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#shading_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/shading_id_movement") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $('#item_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+
     });
+
+
+
     /* $('#export_button').hide(); */
 
     function filter() {
@@ -391,6 +458,8 @@
         var group = $('#filter_group').val() ? $('#filter_group').val() : '';
         var startdate = $('#start_date').val() ? $('#start_date').val() : '';
         var finishdate = $('#finish_date').val() ? $('#finish_date').val() : '';
+        var batch_id = $('#batch_id').val() ? $('#batch_id').val() : '';
+        var shading_id = $('#shading_id').val() ? $('#shading_id').val() : '';
         $.ajax({
             url: '{{ Request::url() }}/export',
             type: 'POST',
@@ -403,6 +472,8 @@
                 group : group,
                 startdate : startdate,
                 finishdate : finishdate,
+                batch_id : batch_id,
+                shading_id : shading_id,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

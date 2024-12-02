@@ -828,15 +828,40 @@
         $("#arr_item_stock_id" + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
-            if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
-                $('#arr_item_stock_id' + val).append(`
-                    <option value="">--Pilih jika ke Stock Lama--</option>
-                `);
-                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    $('#arr_item_stock_id' + val).append(`
-                        <option value="` + value.id + `" data-areaname="` + value.area + `" data-areaid="` + value.area_id + `" data-shading="` + value.item_shading_id + `" data-batch="` + value.batch + `">` + value.warehouse + `</option>
-                    `);
+            if($("#arr_item" + val).select2('data')[0].id){
+                $.ajax({
+                    type : "POST",
+                    url  : '{{ Request::url() }}/get_stock_list',
+                    data : {
+                        id : $("#arr_item" + val).select2('data')[0].id,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    cache: false,
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(data){
+                        loadingClose('.modal-content');
+                        if(data.status == '200'){
+                            $('#arr_item_stock_id' + val).append(`
+                                <option value="">--Pilih jika ke Stock Lama--</option>
+                            `);
+                            $.each(data.stock_list, function(i, value) {
+                                $('#arr_item_stock_id' + val).append(`
+                                    <option value="` + value.id + `" data-areaname="` + value.area + `" data-areaid="` + value.area_id + `" data-shading="` + value.item_shading_id + `" data-batch="` + value.batch + `">` + value.warehouse + `</option>
+                                `);
+                            });
+
+                        }else{
+                            M.toast({
+                                html: data.message
+                            });
+                        }
+                    }
                 });
+
             }else{
                 $('#arr_item_stock_id' + val).append(`
                     <option value="">--Stok tidak ditemukan--</option>

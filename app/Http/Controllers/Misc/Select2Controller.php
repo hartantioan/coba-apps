@@ -571,7 +571,6 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'bom_group'         => $d->bom()->exists() ? $d->bom()->first()->group : '',

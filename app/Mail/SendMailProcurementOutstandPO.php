@@ -11,10 +11,6 @@ class SendMailProcurementOutstandPO extends Mailable
 {
     use Queueable, SerializesModels;
 
-  
-
-   
-
     public function attachments(): array
     {
         return [];

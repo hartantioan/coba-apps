@@ -102,6 +102,21 @@ class MarketingOrderDeliveryDetail extends Model
         return $qtytotal;
     }
 
+    public function totalInvoice(){
+        $total = $this->marketingOrderInvoiceDetail()->sum('total');
+        return $total;
+    }
+
+    public function taxInvoice(){
+        $total = $this->marketingOrderInvoiceDetail()->sum('tax');
+        return $total;
+    }
+
+    public function grandtotalInvoice(){
+        $total = $this->marketingOrderInvoiceDetail()->sum('grandtotal');
+        return $total;
+    }
+
     public function marketingOrderDeliveryProcessDetail()
     {
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail')->whereHas('marketingOrderDeliveryProcess',function($query){

@@ -1489,17 +1489,17 @@
         }).then(function (willDelete) {
             if (willDelete) {
             let isValid = true;
-            $('.project_need').each(function() {
-                console.log('sini2');
-                if ($(this).val() === '' || $(this).val() === null) {
-                    isValid = false;
-                    $(this).addClass('highlight-empty');
+            // $('.project_need').each(function() {
+            //     console.log('sini2');
+            //     if ($(this).val() === '' || $(this).val() === null) {
+            //         isValid = false;
+            //         $(this).addClass('highlight-empty');
 
-                    alert('Please select a project!');
-                } else {
-                    $(this).removeClass('highlight-empty');
-                }
-            });
+            //         alert('Please select a project!');
+            //     } else {
+            //         $(this).removeClass('highlight-empty');
+            //     }
+            // });
             if(isValid == false){
                 return;
             }

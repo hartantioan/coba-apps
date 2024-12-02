@@ -69,6 +69,11 @@
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="whatPrinting();">
+                                                            <i class="material-icons hide-on-med-and-up">picture_as_pdf</i>
+                                                            <span class="hide-on-small-onl">PDF</span>
+                                                            <i class="material-icons right">picture_as_pdf</i>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -161,6 +166,34 @@
         var end_date = $('#finish_date').val();
         window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&item_id=" + item_id;
 
+    }
+
+    function whatPrinting(){
+        var item_id = $('#item_id').val();
+        if (!item_id) {
+            alert("Item ID cannot be empty. Please select an item.");
+            return false;
+        }
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+        var url = '{{ Request::url() }}/print_individual' +
+              '?start_date=' + encodeURIComponent(start_date) +
+              '&end_date=' + encodeURIComponent(end_date)+
+              '&item_id=' + encodeURIComponent(item_id);
+        $.ajax({
+            url: url,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 
 

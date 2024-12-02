@@ -3177,16 +3177,16 @@
         if(balancetemp != 0 && id_biggest_total){
             total = totaltemp;
             var biggestTotalValue = parseFloat($('#arr_nominal_total' + id_biggest_total).val().replaceAll(".", "").replaceAll(",","."));
+            let biggestTax = parseFloat($('#arr_nominal_tax' + id_biggest_total).val().replaceAll(".", "").replaceAll(",","."));
 
             if(balancetemp > 0){
 
                 var newBiggestTotal = biggestTotalValue - balancetemp;
             }else{
-
                 var newBiggestTotal = biggestTotalValue + balancetemp;
             }
             $('#arr_nominal_total' + id_biggest_total).val(formatRupiahIni(newBiggestTotal.toFixed(2).replace('.', ',')));
-            /* $('#arr_nominal_grandtotal' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ',')); */
+            $('#arr_nominal_grandtotal' + id_biggest_total).val(formatRupiahIni((newBiggestTotal + biggestTax).toFixed(2).replace('.', ',')));
 
         }
 

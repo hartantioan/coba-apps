@@ -1141,7 +1141,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
+        select2ServerSideLonger('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
@@ -1543,7 +1543,7 @@
                             `);
                         }
                         $('#arr_place_warehouse' + count).val(val.place_warehouse_id).formSelect();
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
+                        select2ServerSideLonger('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place_cost' + count).val(val.place_cost_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();

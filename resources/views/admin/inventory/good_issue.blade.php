@@ -1489,7 +1489,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
             let isValid = true;
-            // $('.project_need').each(function() {
+        /*     // $('.project_need').each(function() {
             //     console.log('sini2');
             //     if ($(this).val() === '' || $(this).val() === null) {
             //         isValid = false;
@@ -1499,7 +1499,7 @@
             //     } else {
             //         $(this).removeClass('highlight-empty');
             //     }
-            // });
+            // }); */
             if(isValid == false){
                 return;
             }

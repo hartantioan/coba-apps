@@ -65,7 +65,8 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             }
 
             if($this->status){
-                $query->whereIn('status', $this->status);
+                $status = explode(',',$this->status);
+                $query->whereIn('status', $status);
             }
 
             if($this->status_qc){

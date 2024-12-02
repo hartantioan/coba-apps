@@ -21,7 +21,7 @@
             margin-left:-5px;
             margin-right:-5px;
             }
-            
+
             .column1 {
             float: left;
             width: 50%;
@@ -40,14 +40,14 @@
             display: table;
             }
 
-            
+
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
@@ -81,17 +81,17 @@
                     font-size:0.6em !important;
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:11px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:13px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -99,33 +99,33 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-info {
                     font-size:12px !important;
                 }
-        
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -136,22 +136,22 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 border:1px solid black;
                 min-height: auto;
@@ -159,9 +159,9 @@
 
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
-        
-           
+
+
+
         </style>
     </head>
     <body>
@@ -182,18 +182,18 @@
                             </td>
                         </tr>
                     </td>
-                    
+
                     <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
-                
+
             </table>
             <hr style="border-top: 3px solid black; margin-top:0px">
         </header>
         <main>
             <div class="card">
-                
+
                 <table border="0" width="100%" class="tbl-info">
                     <tr>
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
@@ -246,7 +246,7 @@
                                         {{ date('d/m/Y',strtotime($data->due_date)) }}
                                     </td>
                                 </tr>
-                                
+
                             </table>
                         </td>
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
@@ -259,8 +259,8 @@
                                         {{ date('d/m/Y',strtotime($data->post_date)) }}
                                     </td>
                                 </tr>
-                                
-                                
+
+
                                 <tr>
                                     <td width="35%">
                                         Invoice Vendor
@@ -319,8 +319,9 @@
                             </tr>
                             <tr>
                                 <th class="center-align" width="5%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                <th class="center-align" width="35%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Referensi/Item/Jasa</th>
-                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                <th class="center-align" width="15%"style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Refrensi </th>
+                                <th class="center-align" width="25%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Referensi/Item/Jasa</th>
+                                <th class="center-align" width="10%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
                                 <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
                                 <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
                                 <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
@@ -339,7 +340,10 @@
                             @endphp
                             <tr>
                                 <td class="center-align" style="text-align: center;">{{ ($key + 1) }}</td>
-                                <td class="center-align">{!! 
+                                <td class="center-align" style="text-align: center;">
+                                    {{ $row->getHeaderCode() }}
+                                </td>
+                                <td class="center-align">{!!
                                     $row->getCode().'<br>'.$row->getNote()
                                 !!}</td>
                                 <td class="right-align" style="text-align: right;">
@@ -352,7 +356,7 @@
                             </tr>
                             @endforeach
                         </tbody>
-                        
+
                     </table>
                 </div>
                 @php
@@ -382,7 +386,7 @@
                                 </tr>
                                 @endforeach
                             </tbody>
-                            
+
                         </table>
                     </div>
                 @endif
@@ -393,7 +397,7 @@
                         <table style="width:100%">
                             <tr class="break-row">
                                 <td>
-                                   
+
                                     <div class="mt-3">
                                         Catatan : {{ $data->note }}
                                     </div>
@@ -401,7 +405,7 @@
                                     <br>
                                     Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' '.ucwords(strtolower($data->currency->document_text)) }}
                                 </td>
-                                
+
                             </tr>
                         </table>
                     </div>
@@ -479,10 +483,10 @@
                                 @endforeach
                             @endif
                         </tr>
-                    </table>  
+                    </table>
                 </div>
-                
-                
+
+
             </div>
         </main>
     </body>

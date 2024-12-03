@@ -52,7 +52,7 @@ class DeadStockController extends Controller
         })->pluck('id');
         $arr = [];
         foreach($item as $row){
-            $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+            $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
                 if($request->plant != 'all'){
                     $query->whereHas('place',function($query) use($request){
                         $query->where('id',$request->plant);

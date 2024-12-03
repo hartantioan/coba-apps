@@ -43,6 +43,8 @@ class UnbilledAPController extends Controller
                 rs.total_invoice,
                 rs.total_return,
                 rs.total_journal,
+                rs.total_journal_debit,
+                rs.total_journal_credit,
                 rs.currency_rate,
                 rs.total_detail,
                 rs.adjust_nominal,
@@ -165,12 +167,42 @@ class UnbilledAPController extends Controller
                                 AND jd.deleted_at IS NULL
                                 AND jd.note = CONCAT('ADJUST*',gr.code)
                                 AND jd.type = '1'
-                        ),0) AS total_journal
+                        ),0) AS total_journal,
+                        IFNULL((
+                            SELECT
+                                SUM(ROUND(jd.nominal,2))
+                                FROM journal_details jd
+                                JOIN journals j
+                                    ON j.id = jd.journal_id
+                                JOIN coas c
+                                    ON jd.coa_id = c.id
+                                WHERE c.code = '200.01.03.01.02'
+                                AND jd.note = CONCAT('REVERSE*',gr.code)
+                                AND j.post_date <= :date7
+                                AND j.status IN ('2','3')
+                                AND jd.deleted_at IS NULL
+                                AND jd.type = '1'
+                        ),0) AS total_journal_debit,
+                        IFNULL((
+                            SELECT
+                                -1 * SUM(ROUND(jd.nominal,2))
+                                FROM journal_details jd
+                                JOIN journals j
+                                    ON j.id = jd.journal_id
+                                JOIN coas c
+                                    ON jd.coa_id = c.id
+                                WHERE c.code = '200.01.03.01.02'
+                                AND jd.note = CONCAT('REVERSE*',gr.code)
+                                AND j.post_date <= :date8
+                                AND j.status IN ('2','3')
+                                AND jd.deleted_at IS NULL
+                                AND jd.type = '2'
+                        ),0) AS total_journal_credit
                         FROM good_receipts gr
                         LEFT JOIN users u
                             ON u.id = gr.account_id
                         WHERE
-                            gr.post_date <= :date7
+                            gr.post_date <= :date9
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
                     ) AS rs
@@ -183,6 +215,8 @@ class UnbilledAPController extends Controller
             'date5'     => $date,
             'date6'     => $date,
             'date7'     => $date,
+            'date8'     => $date,
+            'date9'     => $date,
         ));
 
         $totalUnbilled = 0;
@@ -203,7 +237,7 @@ class UnbilledAPController extends Controller
             $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return - $row->total_journal,2);
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal,2);
+            $total_invoice_after_adjust = round((($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate) + $row->total_journal + ($row->total_journal_debit + $row->total_journal_credit),2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if(round($balance,2) > 0){
                 $array_filter[] = [

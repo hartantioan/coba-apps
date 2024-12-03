@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Item;
 use App\Models\ItemCogs;
 use Carbon\Carbon;
 use Illuminate\View\View;
@@ -23,32 +24,33 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     }
     public function view(): View
     {
-        $query_data = ItemCogs::whereIn('id', function ($query) {            
-            $query->selectRaw('MAX(id)')
-                ->from('item_cogs')
-                ->where('date', '<=', $this->date)
-                ->groupBy('item_id');
-        })
-        ->where(function($query){
-            $query->whereHas('item',function($query){
-                $query->where('status',1);
-            });
-            if($this->plant != 'all'){
-                $query->where('place_id',$this->plant);
-            }
-            if($this->warehouse != 'all'){
-                $query->where('warehouse_id',$this->warehouse);
-            }
+        $item = Item::where(function($query){
             if($this->group){
-                $groupIds = explode(',', $this->group);
-                $query->whereHas('item',function($query) use($groupIds){
-                    $query->whereIn('item_group_id', $groupIds);
-                });
+                $query->whereIn('item_group_id', $this->group);
             }
-        })
-        ->get();
+        })->pluck('id');
+        $arr = [];
+        foreach($item as $row){
+            $data = ItemCogs::where('date','<=',$this->date)->where('item_id',$row)->where(function($query){
+                if($this->plant != 'all'){
+                    $query->whereHas('place',function($query){
+                        $query->where('id',$this->plant);
+                    });
+                }
+                if($this->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query){
+                        $query->where('id',$this->warehouse);
+                    });
+                }
+            })->orderByDesc('date')->orderByDesc('id')->first();
+            if($data){
+                if($data->qty_final > 0){
+                    $arr[] = $data;
+                }
+            }
+        }
         $array_filter = [];
-        foreach($query_data as $row){
+        foreach($arr as $row){
            
             $date = Carbon::parse($row->date);
             $dateDifference = $date->diffInDays($this->date);

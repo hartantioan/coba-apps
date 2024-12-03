@@ -45,32 +45,23 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 if($data->qty_final > 0){
-                    $arr[] = $data;
+                    $date = Carbon::parse($data->date);
+                    $dateDifference = $date->diffInDays($this->date);
+                    $arr[]=[
+                        'plant'=>$data->place->code,
+                        'gudang'=>$data->warehouse->name,
+                        'kode'=>$data->item->code,
+                        'item'=>$data->item->name,
+                        'satuan' => $data->item->uomUnit->code,
+                        'area'         => $data->area->code ?? '-',
+                        'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
+                        'shading'      => $data->shading->code ?? '-',
+                        'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
+                        'date'=>date('d/m/Y',strtotime($data->date)),
+                        'lamahari'=>$dateDifference,
+                    ];
                 }
             }
-        }
-        $array_filter = [];
-        foreach($arr as $row){
-           
-            $date = Carbon::parse($row->date);
-            $dateDifference = $date->diffInDays($this->date);
-               
-            
-                $array_filter[]=[
-                    'plant'=>$row->place->code,
-                    'gudang'=>$row->warehouse->name,
-                    'kode'=>$row->item->code,
-                    'item'=>$row->item->name,
-                    'satuan' => $row->item->uomUnit->code,
-                    'area'         => $row->area->code ?? '-',
-                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                    'shading'      => $row->shading->code ?? '-',
-                    'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
-                    'date'=>date('d/m/Y',strtotime($row->date)),
-                    'lamahari'=>$dateDifference,
-                ];
-                
-                      
         }
 
         activity()
@@ -80,7 +71,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             ->log('Export Dead stock.');
       
         return view('admin.exports.dead_stock', [
-            'data' => $array_filter,
+            'data' => $arr,
         ]);
     }
 }

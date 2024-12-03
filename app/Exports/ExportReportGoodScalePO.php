@@ -84,8 +84,18 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             if($row->goodScale->type == '1' || $row->goodScale->type =='3'){
                 $no_sj = $row->goodScale->delivery_no ?? '-';
             }else{
-                $no_sj = $row->goodScale->getSalesSuratJalan();
+                $no_sj = $row->lookable->marketingOrderDeliveryProcess->code ?? '-';
             }
+            $po_code = '-';
+            if($row->goodScale->purchaseOrderDetail()->exists()){
+                $po_code =$row->goodScale->purchaseOrderDetail->purchaseOrder->code;
+            }
+
+            $price = 0;
+            if($row->lookable->type_delivery == '1'){
+                $price = $row->total / ($row->qty == 0 ? 1 : $row->qty);
+            }
+
             $arr[] = [
                 'no'                    => ($key+1),
                 'no_document'           => $row->goodScale->code,
@@ -107,10 +117,10 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Metode Hitung Ongkir'                  => $row->lookable->costDeliveryType(),
                 'Tipe Pengiriman'           => $row->lookable->deliveryType(),
                 'Based On'                => $no_sj,
-                'No. PO'              => $row->goodScale->purchaseOrderDetail?->purchaseOrder->code ?? '-',
+                'No. PO'              => $po_code,
                 'Ekspedisi'             => $row->goodScale->account->name,
                 'Qty'            => $row->qty,
-                'Harga'             => $row->total / ($row->qty == 0 ? 1 : $row->qty),
+                'Harga'             => $price,
                 'Total'             => $row->total,
                 'No. APIN'             => $row->lookable->getInvoice() ?? '-',
 

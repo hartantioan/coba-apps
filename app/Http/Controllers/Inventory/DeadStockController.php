@@ -66,41 +66,30 @@ class DeadStockController extends Controller
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 if($data->qty_final > 0){
-                    $arr[] = $data;
-                }
-            }
-        }
-
-        $array_filter=[];
-       
-        foreach($arr as $row){
-           
-            $date = Carbon::parse($row->date);
-            $dateDifference = $date->diffInDays($request->date);
-               
-                //if ($dateDifference >= $request->hari) {
-                    $array_filter[]=[
-                        'plant'=>$row->place->code,
-                        'gudang'=>$row->warehouse->name,
-                        'kode'=>$row->item->code,
-                        'item'=>$row->item->name,
-                        'satuan' => $row->item->uomUnit->code,
-                        'area'         => $row->area->code ?? '-',
-                        'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                        'shading'      => $row->shading->code ?? '-',
-                        'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
-                        'date'=>$row->date,
+                    $date = Carbon::parse($row->date);
+                    $dateDifference = $date->diffInDays($request->date);
+                    $arr[]=[
+                        'plant'=>$data->place->code,
+                        'gudang'=>$data->warehouse->name,
+                        'kode'=>$data->item->code,
+                        'item'=>$data->item->name,
+                        'satuan' => $data->item->uomUnit->code,
+                        'area'         => $data->area->code ?? '-',
+                        'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
+                        'shading'      => $data->shading->code ?? '-',
+                        'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
+                        'date'=>$data->date,
                         'lamahari'=>$dateDifference,
                     ];
-                //}
-                      
-        }
+                }
+            }
+        }    
         $end_time = microtime(true);
   
         $execution_time = ($end_time - $start_time);
         $response =[
             'status'=>200,
-            'message'  =>$array_filter,
+            'message'  =>$arr,
             'time'  => " Waktu proses : ".$execution_time." detik"
         ];
         return response()->json($response);

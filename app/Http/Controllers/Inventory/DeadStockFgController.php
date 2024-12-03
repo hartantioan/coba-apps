@@ -45,12 +45,13 @@ class DeadStockFgController extends Controller
     public function filter(Request $request){
         $start_time = microtime(true);
         $item = Item::where(function($query)use($request){
-
+            $query->where('is_sales_item','1');
             if($request->item_id){
                 $query->where('id', $request->item_id);
             }
         })->pluck('id');
         $arr = [];
+        info($item);
         foreach($item as $row){
             $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
                 if($request->plant != 'all'){
@@ -74,7 +75,7 @@ class DeadStockFgController extends Controller
                         'satuan' => $data->item->uomUnit->code,
                         'area'         => $data->area->code ?? '-',
                         'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
-                        'shading'      => $data->shading->code ?? '-',
+                        'shading'      => $data->itemShading->code ?? '-',
                         'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
                         'date'=>$data->date,
                         'lamahari'=>$dateDifference,

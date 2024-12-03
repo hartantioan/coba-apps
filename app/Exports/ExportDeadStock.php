@@ -55,7 +55,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                         'satuan' => $data->item->uomUnit->code,
                         'area'         => $data->area->code ?? '-',
                         'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
-                        'shading'      => $data->shading->code ?? '-',
+                        'shading'      => $data->itemShading->code ?? '-',
                         'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
                         'date'=>date('d/m/Y',strtotime($data->date)),
                         'lamahari'=>$dateDifference,
@@ -69,7 +69,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             ->causedBy(session('bo_id'))
             ->withProperties(null)
             ->log('Export Dead stock.');
-      
+
         return view('admin.exports.dead_stock', [
             'data' => $arr,
         ]);

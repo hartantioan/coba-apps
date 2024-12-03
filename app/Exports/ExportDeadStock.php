@@ -26,7 +26,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     {
         $item = Item::where(function($query){
             if($this->group){
-                $query->whereIn('item_group_id', $this->group);
+                $query->whereIn('item_group_id', explode(',',$this->group));
             }
         })->pluck('id');
         $arr = [];

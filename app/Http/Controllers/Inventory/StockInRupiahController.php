@@ -252,7 +252,7 @@ class StockInRupiahController extends Controller
                 })
                 ->orderBy('date', 'desc')
                 ->orderBy('id', 'desc')
-                ->get();
+                ->first();
             }else{
                 $query_no=[];
                 $first = ItemCogs::where(function($query) use ( $request,$array_last_item) {

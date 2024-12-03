@@ -9,24 +9,21 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportDeadStock implements FromView,ShouldAutoSize
+class ExportDeadStockProduction implements FromView,ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    protected $plant,$warehouse,$group,$date;
-    public function __construct(string $plant, string $warehouse,string $date,string $group)
+    protected $plant,$item_id,$date;
+    public function __construct(string $plant, string $item_id,string $date)
     {
         $this->plant = $plant ? $plant : '';
-		$this->warehouse = $warehouse ? $warehouse : '';
-        $this->group = $group ? $group : '';
+        $this->item_id = $item_id ? $item_id : '';
         $this->date = $date ? $date : '';
     }
     public function view(): View
     {
         $item = Item::where(function($query){
-            if($this->group){
-                $query->whereIn('item_group_id', explode(',',$this->group));
+            $query->whereHas('productionBatch');
+            if($this->item_id){
+                $query->where('id', explode(',',$this->item_id));
             }
         })->pluck('id');
         $arr = [];
@@ -37,14 +34,11 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                         $query->where('id',$this->plant);
                     });
                 }
-                if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query){
-                        $query->where('id',$this->warehouse);
-                    });
-                }
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
-                if($data->qty_final > 0){
+                $infoFg = $data->infoFg();
+                $qty = $infoFg['qty'];
+                if( $qty > 0){
                     $date = Carbon::parse($data->date);
                     $dateDifference = $date->diffInDays($this->date);
                     $arr[]=[
@@ -55,7 +49,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                         'satuan' => $data->item->uomUnit->code,
                         'area'         => $data->area->code ?? '-',
                         'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
-                        'shading'      => $data->itemShading->code ?? '-',
+                        'shading'      => $data->shading->code ?? '-',
                         'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
                         'date'=>date('d/m/Y',strtotime($data->date)),
                         'lamahari'=>$dateDifference,

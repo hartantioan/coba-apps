@@ -71,11 +71,9 @@ class DeadStockController extends Controller
             }
         }
 
-        $query_data = collect($arr);
-
         $array_filter=[];
        
-        foreach($query_data as $row){
+        foreach($arr as $row){
            
             $date = Carbon::parse($row->date);
             $dateDifference = $date->diffInDays($request->date);

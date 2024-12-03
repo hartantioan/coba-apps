@@ -48,6 +48,7 @@ class DeadStockController extends Controller
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $request->date)
+                ->where('qty_final','>',0)
                 ->groupBy('item_id');
         })
         ->where(function($query)use($request){

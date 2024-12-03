@@ -21,7 +21,6 @@ class ExportDeadStockFG implements FromView,ShouldAutoSize
     public function view(): View
     {
         $item = Item::where(function($query){
-            $query->whereHas('productionBatch');
             if($this->item_id){
                 $query->whereIn('id', $this->item_id);
             }
@@ -34,6 +33,7 @@ class ExportDeadStockFG implements FromView,ShouldAutoSize
                         $query->where('id',$this->plant);
                     });
                 }
+                $query->whereHas('productionBatch');
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 $infoFg = $data->infoFg();

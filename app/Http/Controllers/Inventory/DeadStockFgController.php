@@ -45,7 +45,7 @@ class DeadStockFgController extends Controller
     public function filter(Request $request){
         $start_time = microtime(true);
         $item = Item::where(function($query)use($request){
-            $query->whereHas('productionBatch');
+
             if($request->item_id){
                 $query->where('id', $request->item_id);
             }
@@ -58,6 +58,7 @@ class DeadStockFgController extends Controller
                         $query->where('id',$request->plant);
                     });
                 }
+                $query->whereHas('productionBatch');
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 $infoFg = $data->infoFg();

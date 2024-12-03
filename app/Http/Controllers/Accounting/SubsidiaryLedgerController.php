@@ -148,8 +148,7 @@ class SubsidiaryLedgerController extends Controller
                         <td colspan="7" class="right-align">TOTAL DEBIT & KREDIT</td>
                         <td class="right-align">' .number_format($total_debit, 2, ',', '.'). '</td>
                         <td class="right-align">' .number_format($total_credit, 2, ',', '.'). '</td>
-                        <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
-                        <td colspan="11"></td>
+                        <td colspan="12"></td>
                     </tr>';
             }
         }

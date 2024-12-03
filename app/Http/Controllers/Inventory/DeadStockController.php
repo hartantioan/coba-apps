@@ -52,7 +52,7 @@ class DeadStockController extends Controller
         })->pluck('id');
         $arr = [];
         foreach($item as $row){
-            $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where('qty_final','>',0)->where(function($query)use($request){
+            $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
                 if($request->plant != 'all'){
                     $query->whereHas('place',function($query) use($request){
                         $query->where('id',$request->plant);
@@ -65,9 +65,12 @@ class DeadStockController extends Controller
                 }
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
-                $arr[] = $data;
+                if($data->qty_final > 0){
+                    $arr[] = $data;
+                }
             }
         }
+
         $query_data = collect($arr);
 
         $array_filter=[];
@@ -77,7 +80,7 @@ class DeadStockController extends Controller
             $date = Carbon::parse($row->date);
             $dateDifference = $date->diffInDays($request->date);
                
-                // if ($dateDifference >= $request->hari) {
+                //if ($dateDifference >= $request->hari) {
                     $array_filter[]=[
                         'plant'=>$row->place->code,
                         'gudang'=>$row->warehouse->name,
@@ -91,7 +94,7 @@ class DeadStockController extends Controller
                         'date'=>$row->date,
                         'lamahari'=>$dateDifference,
                     ];
-                // }
+                //}
                       
         }
         $end_time = microtime(true);

@@ -66,7 +66,7 @@ class DeadStockController extends Controller
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 if($data->qty_final > 0){
-                    $date = Carbon::parse($row->date);
+                    $date = Carbon::parse($data->date);
                     $dateDifference = $date->diffInDays($request->date);
                     $arr[]=[
                         'plant'=>$data->place->code,

@@ -8,6 +8,8 @@ use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\Place;
 use App\Models\ItemGroup;
+use App\Models\ItemShading;
+use App\Models\ProductionBatch;
 use App\Models\User;
 use App\Models\Warehouse;
 use Carbon\Carbon;
@@ -51,15 +53,23 @@ class DeadStockFgController extends Controller
             }
         })->pluck('id');
         $arr = [];
-        info($item);
+        $arr_batch_id = [];
         foreach($item as $row){
-            $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
+            $shading = ItemShading::where('item_id',$row)->get();
+            foreach($shading as $row_shading){
+                $mbeng = ProductionBatch::where('item_shading_id',$row_shading->id)->where('post_date','<=',$request->date)->pluck('id')->toArray();
+                $arr_batch_id = array_merge($arr_batch_id, $mbeng);
+            }
+
+        }
+
+        foreach($arr_batch_id as $row_batch_id){
+            $data = ItemCogs::where('production_batch_id',$row_batch_id)->where(function($query)use($request){
                 if($request->plant != 'all'){
                     $query->whereHas('place',function($query) use($request){
                         $query->where('id',$request->plant);
                     });
                 }
-                $query->whereHas('productionBatch');
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 $infoFg = $data->infoFg();
@@ -83,6 +93,8 @@ class DeadStockFgController extends Controller
                 }
             }
         }
+
+
         $end_time = microtime(true);
 
         $execution_time = ($end_time - $start_time);

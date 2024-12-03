@@ -45,7 +45,7 @@
                                 <div class="col s12">
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
-                                            <b>Info : Untuk Item FG, JANGAN GUNAKAN form ini. Silahkan cek pada menu LAPORAN - SUMMARY STOCK FG.</b>
+                                            <b>Info : Untuk Item FG. </b>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -64,13 +64,6 @@
                                         </div>
 
                                         <div class="input-field col m3 s12">
-                                            <select class="form-control" id="warehouse" name="warehouse">
-                                                <option value="all">{{ __('translations.all') }}</option>
-                                                @foreach ($warehouse as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label class="" for="warehouse">WareHouse</label>
                                         </div>
                                         <div class="col m12 s12">
                                         </div>

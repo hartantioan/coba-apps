@@ -4,6 +4,8 @@ namespace App\Exports;
 
 use App\Models\Item;
 use App\Models\ItemCogs;
+use App\Models\ItemShading;
+use App\Models\ProductionBatch;
 use Carbon\Carbon;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -21,19 +23,29 @@ class ExportDeadStockFG implements FromView,ShouldAutoSize
     public function view(): View
     {
         $item = Item::where(function($query){
+            $query->where('is_sales_item','1');
             if($this->item_id){
                 $query->whereIn('id', $this->item_id);
             }
         })->pluck('id');
         $arr = [];
+        $arr_batch_id = [];
         foreach($item as $row){
-            $data = ItemCogs::where('date','<=',$this->date)->where('item_id',$row)->where(function($query){
+            $shading = ItemShading::where('item_id',$row)->get();
+            foreach($shading as $row_shading){
+                $mbeng = ProductionBatch::where('item_shading_id',$row_shading->id)->where('post_date','<=',$this->date)->pluck('id')->toArray();
+                $arr_batch_id = array_merge($arr_batch_id, $mbeng);
+            }
+
+        }
+
+        foreach($arr_batch_id as $row_batch_id){
+            $data = ItemCogs::where('production_batch_id',$row_batch_id)->where(function($query){
                 if($this->plant != 'all'){
-                    $query->whereHas('place',function($query){
+                    $query->whereHas('place',function($query) {
                         $query->where('id',$this->plant);
                     });
                 }
-                $query->whereHas('productionBatch');
             })->orderByDesc('date')->orderByDesc('id')->first();
             if($data){
                 $infoFg = $data->infoFg();
@@ -51,7 +63,7 @@ class ExportDeadStockFG implements FromView,ShouldAutoSize
                         'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
                         'shading'      => $data->itemShading->code ?? '-',
                         'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
-                        'date'=>date('d/m/Y',strtotime($data->date)),
+                        'date'=>$data->date,
                         'lamahari'=>$dateDifference,
                     ];
                 }

@@ -195,7 +195,7 @@ class StockInRupiahController extends Controller
                         'item_id'               => $row->item->id,
                         'id'                    => $query_first->id ?? null,
                         'date'                  => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                        'last_nominal'          => $query_first ? number_format(0, 2, ',', '.') : 0,
+                        'last_nominal'          => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                         'item'                  => $row->item->name,
                         'satuan'                => $row->item->uomUnit->code,
                         'area'                  => $row->area->name ?? '-',
@@ -217,13 +217,7 @@ class StockInRupiahController extends Controller
 
         if($request->type !== 'final'){
             if(!$request->item_id){
-                $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {
-                    $query->selectRaw('MAX(id)')
-                        ->from('item_cogs')
-                        ->where('date', '<=', $request->finish_date)
-                        ->groupBy('item_id');
-                })
-                ->where(function($query) use ( $request,$array_last_item) {
+                $query_no = ItemCogs::where(function($query) use ( $request,$array_last_item) {
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('status',['1','2']);
                     });

@@ -109,7 +109,10 @@ class SubsidiaryLedgerController extends Controller
                     </tr>';
 
             if(count($collect) > 0){
+                $total_credit += ($detail['data']->type == '2' ? round($detail['data']->nominal,2) : 0);
+                $total_debit += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : 0);
                 foreach($collect as $key => $detail){
+
                     $additional_ref = '';
                     if($detail['data']->journal->lookable_type == 'outgoing_payments'){
                         $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;
@@ -140,6 +143,13 @@ class SubsidiaryLedgerController extends Controller
                     </tr>';
 
                 }
+                $html .= '<tr style="font-weight:800;">
+                        <td colspan="7" class="right-align">TOTAL DEBIT & KREDIT</td>
+                        <td class="right-align">' .number_format($total_debit, 2, ',', '.'). '</td>
+                        <td class="right-align">' .number_format($total_credit, 2, ',', '.'). '</td>
+                        <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
+                        <td colspan="11"></td>
+                    </tr>';
             }
         }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportDeadStock;
 use App\Http\Controllers\Controller;
+use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\Place;
 use App\Models\ItemGroup;
@@ -44,30 +45,31 @@ class DeadStockController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-        $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
-            $query->selectRaw('MAX(id)')
-                ->from('item_cogs')
-                ->where('date', '<=', $request->date)
-                ->where('qty_final','>',0)
-                ->groupBy('item_id');
-        })
-        ->where(function($query)use($request){
-            $query->whereHas('item',function($query){
-                $query->where('status',1);
-            });
-            if($request->plant != 'all'){
-                $query->where('place_id',$request->plant);
-            }
-            if($request->warehouse != 'all'){
-                $query->where('warehouse_id',$request->warehouse);
-            }
+        $item = Item::where(function($query)use($request){
             if($request->filter_group){
-                $query->whereHas('item',function($query) use($request){
-                    $query->whereIn('item_group_id', $request->filter_group);
-                });
+                $query->whereIn('item_group_id', $request->filter_group);
             }
-        })
-        ->get();
+        })->pluck('id');
+        $arr = [];
+        foreach($item as $row){
+            $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                if($request->plant != 'all'){
+                    $query->whereHas('place',function($query) use($request){
+                        $query->where('id',$request->plant);
+                    });
+                }
+                if($request->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query) use($request){
+                        $query->where('id',$request->warehouse);
+                    });
+                }
+            })->orderByDesc('date')->orderByDesc('id')->first();
+            if($data){
+                $arr[] = $data;
+            }
+        }
+        $query_data = collect($arr);
+
         $array_filter=[];
        
         foreach($query_data as $row){

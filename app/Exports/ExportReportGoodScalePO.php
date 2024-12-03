@@ -87,12 +87,12 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 $no_sj = $row->lookable->marketingOrderDeliveryProcess->code ?? '-';
             }
             $po_code = '-';
-            if($row->goodScale->purchaseOrderDetail()->exists()){
-                $po_code =$row->goodScale->purchaseOrderDetail->purchaseOrder->code;
+            if($row->goodScale->purchaseOrder()->exists()){
+                $po_code =$row->goodScale->purchaseOrder->code;
             }
 
             $price = 0;
-            if($row->lookable->type_delivery == '1'){
+            if($row->lookable->type_delivery != '1'){
                 $price = $row->total / ($row->qty == 0 ? 1 : $row->qty);
             }
 

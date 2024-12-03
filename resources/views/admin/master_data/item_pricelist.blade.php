@@ -413,6 +413,7 @@
             "scrollCollapse": true,
             "scrollY": '400px',
             "responsive": false,
+            "scrollX": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,

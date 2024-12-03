@@ -24,8 +24,8 @@ class ExportDeadStockFG implements FromView,ShouldAutoSize
     {
         $item = Item::where(function($query){
             $query->where('is_sales_item','1');
-            if($this->item_id){
-                $query->whereIn('id', $this->item_id);
+            if($this->item_id != 'null'){
+                $query->where('id', $this->item_id);
             }
         })->pluck('id');
         $arr = [];

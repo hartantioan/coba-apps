@@ -29,7 +29,7 @@ class ReportGoodScalePOController extends Controller
             });
         })->get();
         $data = [
-            'title'     => 'Laporan Timbangan X PO',
+            'title'     => 'Laporan Timbangan X PO Ekspedisi',
             'group'     =>  $itemGroup,
             'content'   => 'admin.accounting.report_good_scale_po',
             'place'     =>  Place::where('status','1')->get(),

@@ -109,10 +109,11 @@ class SubsidiaryLedgerController extends Controller
                     </tr>';
 
             if(count($collect) > 0){
-                $total_credit += ($detail['data']->type == '2' ? round($detail['data']->nominal,2) : 0);
-                $total_debit += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : 0);
+                $total_credit = 0;
+                $total_debit = 0;
                 foreach($collect as $key => $detail){
-
+                    $total_credit += ($detail['data']->type == '2' ? round($detail['data']->nominal,2) : 0);
+                    $total_debit += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : 0);
                     $additional_ref = '';
                     if($detail['data']->journal->lookable_type == 'outgoing_payments'){
                         $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;

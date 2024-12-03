@@ -22,6 +22,7 @@ use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\HR\RevisionAttendanceHRDController;
 use App\Http\Controllers\Inventory\DeadStockController;
+use App\Http\Controllers\Inventory\DeadStockFgController;
 use App\Http\Controllers\Inventory\AgingGRPOController;
 use App\Http\Controllers\Inventory\ReportGoodScaleItemFGController;
 use App\Http\Controllers\Inventory\ReportGoodScaleController;
@@ -2352,6 +2353,13 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter', [DeadStockController::class, 'filter']);
                         Route::get('export', [DeadStockController::class, 'export']);
                     });
+
+                    Route::prefix('dead_stock_fg')->middleware('operation.access:dead_stock_fg,view')->group(function () {
+                        Route::get('/', [DeadStockFgController::class, 'index']);
+                        Route::post('filter', [DeadStockFgController::class, 'filter']);
+                        Route::get('export', [DeadStockFgController::class, 'export']);
+                    });
+
                     Route::prefix('report_good_scale_item_fg')->middleware('operation.access:report_good_scale_item_fg,view')->group(function () {
                         Route::get('/', [ReportGoodScaleItemFGController::class, 'index']);
                         Route::post('filter', [ReportGoodScaleItemFGController::class, 'filter']);

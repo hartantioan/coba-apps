@@ -25,6 +25,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
         'No.',
         'SO Ref.',
         'No. Dokumen',
+        'Status Timbangan',
         'Status',
         'Post Date',
         'Status Kirim',
@@ -51,11 +52,15 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
 
 
         foreach ($mo as $key=>$row) {
-
+            $ada = 'Belum Timbang Masuk';
+            if($row->marketingOrderDelivery->goodScaleDetail()->exists()){
+                $ada = 'Sudah Timbang Masuk';
+            }
             $array_filter[] = [
                 'No.' => ($key+1), // Assuming you have an ID or a similar unique identifier
                 'SO Ref.' => $row->marketingOrderDetail->marketingOrder->code ?? '-',
                 'No. Dokumen' => $row->marketingOrderDelivery->code,
+                'Status Timbangan' => $ada,
                 'Status' => $row->marketingOrderDelivery->statusRaw(),
                 'Post Date' => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),
                 'Status Kirim' => $row->marketingOrderDelivery->sendStatus(),

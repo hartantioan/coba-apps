@@ -167,7 +167,7 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            if($row->post_date < '2024-10-31'){
+            if($row->post_date < '2024-10-01'){
                 $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             }else{
                 $currency_rate = $row->currency_rate;

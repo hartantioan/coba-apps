@@ -904,7 +904,117 @@ class MarketingOrderDeliveryProcess extends Model
 
         if($this->marketingOrderDelivery->goodScaleDetail()->exists()){
             if(!$this->marketingOrderDelivery->goodScaleDetail->goodScale->purchaseOrder()->exists() && !$this->marketingOrderDelivery->goodScaleDetail->goodScale->journal()->exists()){
-                CustomHelper::sendJournal($this->marketingOrderDelivery->goodScaleDetail->goodScale->getTable(),$this->marketingOrderDelivery->goodScaleDetail->goodScale->id,$this->marketingOrderDelivery->goodScaleDetail->goodScale->account_id);
+                $gs = $this->marketingOrderDelivery->goodScaleDetail->goodScale;
+
+                if($gs){
+                    if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()){
+                        $place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
+
+                        $query = Journal::create([
+                            'user_id'		=> session('bo_id'),
+                            'company_id'	=> $gs->company_id,
+                            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->receive_date)).'00'),
+                            'lookable_type'	=> $gs->getTable(),
+                            'lookable_id'	=> $gs->id,
+                            'post_date'		=> $modp->receive_date,
+                            'note'			=> 'BIAYA KIRIM '.$gs->referenceGRPODO(),
+                            'status'		=> '3',
+                        ]);
+
+                        $coabiayakirim = Coa::where('code','600.01.02.02.01')->where('company_id',$gs->company_id)->first();
+                        $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.06')->where('company_id',$gs->company_id)->first();
+
+                        if($gs->hasRitase()){
+                            $row = $gs->goodScaleDetail()->orderByDesc('qty')->first();
+                            if($row->lookable_type == 'marketing_order_deliveries'){
+                                if($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()){
+                                    $delivery_cost = $row->total;
+                                    if($delivery_cost > 0){
+                                        JournalDetail::create([
+                                            'journal_id'	=> $query->id,
+                                            'account_id'	=> $coabiayakirim->bp_journal ? $gs->account_id : NULL,
+                                            'coa_id'		=> $coabiayakirim->id,
+                                            'place_id'      => $place->id,
+                                            'type'			=> '1',
+                                            'nominal'		=> $delivery_cost,
+                                            'nominal_fc'    => $delivery_cost,
+                                            'note'          => $row->lookable->code,
+                                            'note2'			=> $gs->code,
+                                            'lookable_type'	=> $gs->getTable(),
+                                            'lookable_id'	=> $gs->id,
+                                            'detailable_type'=> $row->getTable(),
+                                            'detailable_id'	=> $row->id,
+                                        ]);
+
+                                        JournalDetail::create([
+                                            'journal_id'	=> $query->id,
+                                            'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
+                                            'coa_id'		=> $coahutangusahabelumditagih->id,
+                                            'place_id'      => $place->id,
+                                            'type'			=> '2',
+                                            'nominal'		=> $delivery_cost,
+                                            'nominal_fc'    => $delivery_cost,
+                                            'note'          => $row->lookable->code,
+                                            'note2'			=> $gs->code,
+                                            'lookable_type'	=> $gs->getTable(),
+                                            'lookable_id'	=> $gs->id,
+                                            'detailable_type'=> $row->getTable(),
+                                            'detailable_id'	=> $row->id,
+                                        ]);
+                                    }
+                                }
+                            }
+                        }else{
+                            foreach($gs->goodScaleDetail as $row){
+                                if($row->lookable_type == 'marketing_order_deliveries'){
+                                    if($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()){
+                                        $delivery_cost = $row->total;
+                                        if($delivery_cost > 0){
+                                            JournalDetail::create([
+                                                'journal_id'	=> $query->id,
+                                                'account_id'	=> $coabiayakirim->bp_journal ? $gs->account_id : NULL,
+                                                'coa_id'		=> $coabiayakirim->id,
+                                                'place_id'      => $place->id,
+                                                'type'			=> '1',
+                                                'nominal'		=> $delivery_cost,
+                                                'nominal_fc'    => $delivery_cost,
+                                                'note'          => $row->lookable->code,
+                                                'note2'			=> $gs->code,
+                                                'lookable_type'	=> $gs->getTable(),
+                                                'lookable_id'	=> $gs->id,
+                                                'detailable_type'=> $row->getTable(),
+                                                'detailable_id'	=> $row->id,
+                                            ]);
+        
+                                            JournalDetail::create([
+                                                'journal_id'	=> $query->id,
+                                                'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
+                                                'coa_id'		=> $coahutangusahabelumditagih->id,
+                                                'place_id'      => $place->id,
+                                                'type'			=> '2',
+                                                'nominal'		=> $delivery_cost,
+                                                'nominal_fc'    => $delivery_cost,
+                                                'note'          => $row->lookable->code,
+                                                'note2'			=> $gs->code,
+                                                'lookable_type'	=> $gs->getTable(),
+                                                'lookable_id'	=> $gs->id,
+                                                'detailable_type'=> $row->getTable(),
+                                                'detailable_id'	=> $row->id,
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $gs->createPurchaseOrder();
+                    }
+                    if($gs->type == '2'){
+                        $gs->update([
+                            'status'	=> '3',
+                        ]);
+                    }
+                }
             }
         }
     }

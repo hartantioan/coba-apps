@@ -452,7 +452,7 @@ class GoodScale extends Model
         return $has;
     }
 
-    public function createPurchaseOrder(){
+    public function createPurchaseOrder($date){
         #CREATE PO
         if($this->purchaseOrder()->exists()){
             $this->purchaseOrder->update([
@@ -469,7 +469,7 @@ class GoodScale extends Model
         }
         $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
         $purchaseOrder = PurchaseOrder::create([
-            'code'						=> PurchaseOrder::generateCode('PORD-'.date('y',strtotime($this->post_date)).$place->code),
+            'code'						=> PurchaseOrder::generateCode('PORD-'.date('y',strtotime($date)).$place->code),
             'user_id'					=> $this->user_id,
             'account_id'				=> $this->account_id,
             'company_id'				=> $place->company_id,
@@ -481,11 +481,11 @@ class GoodScale extends Model
             'payment_term'              => 0,
             'currency_id'               => 1,
             'currency_rate'             => 1,
-            'post_date'                 => $this->post_date,
-            'delivery_date'             => $this->post_date,
-            'received_date'             => $this->post_date,
-            'due_date'                  => $this->post_date,
-            'document_date'             => $this->post_date,
+            'post_date'                 => $date,
+            'delivery_date'             => $date,
+            'received_date'             => $date,
+            'due_date'                  => $date,
+            'document_date'             => $date,
             'note'                      => 'BIAYA KIRIM '.$this->referenceGRPODO(),
             'note_external'             => NULL,
             'subtotal'                  =>0,

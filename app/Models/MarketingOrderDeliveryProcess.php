@@ -1007,7 +1007,7 @@ class MarketingOrderDeliveryProcess extends Model
                             }
                         }
 
-                        $gs->createPurchaseOrder();
+                        $gs->createPurchaseOrder($modp->receive_date);
                     }
                     if($gs->type == '2'){
                         $gs->update([

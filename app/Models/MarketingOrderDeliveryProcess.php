@@ -901,6 +901,12 @@ class MarketingOrderDeliveryProcess extends Model
                 'detailable_id'	=> $row->id,
             ]);
         }
+
+        if($this->marketingOrderDelivery->goodScaleDetail()->exists()){
+            if(!$this->marketingOrderDelivery->goodScaleDetail->goodScale->purchaseOrder()->exists() && !$this->marketingOrderDelivery->goodScaleDetail->goodScale->journal()->exists()){
+                CustomHelper::sendJournal($this->marketingOrderDelivery->goodScaleDetail->goodScale->getTable(),$this->marketingOrderDelivery->goodScaleDetail->goodScale->id,$this->marketingOrderDelivery->goodScaleDetail->goodScale->account_id);
+            }
+        }
     }
 
     public function deliveryCost($qty){

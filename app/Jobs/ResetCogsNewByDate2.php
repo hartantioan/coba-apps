@@ -230,8 +230,8 @@ class ResetCogsNewByDate2 implements ShouldQueue, ShouldBeUnique
         foreach($issueglazeheader as $row){
             $total = $row->grandtotal;
             $qty = $row->qty;
-            $total_final = $totalBefore + $total;
-            $qty_final = $qtyBefore + $qty;
+            $total_final = round($totalBefore,2) + $total;
+            $qty_final = round($qtyBefore,3) + $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->getTable(),
                 'lookable_id'		    => $row->id,
@@ -260,8 +260,8 @@ class ResetCogsNewByDate2 implements ShouldQueue, ShouldBeUnique
                 ]);
             }
 
-            $qtyBefore = $qty_final;
-            $totalBefore = $total_final;
+            $qtyBefore = round($qty_final,3);
+            $totalBefore = round($total_final,2);
         }
 
         $receiveglazeheader = ReceiveGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){
@@ -271,8 +271,8 @@ class ResetCogsNewByDate2 implements ShouldQueue, ShouldBeUnique
         foreach($receiveglazeheader as $row){
             $total = $row->grandtotal;
             $qty = $row->qty;
-            $total_final = $totalBefore + $total;
-            $qty_final = $qtyBefore + $qty;
+            $total_final = round($totalBefore,2) + $total;
+            $qty_final = round($qtyBefore,3) + $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->getTable(),
                 'lookable_id'		    => $row->id,

@@ -170,7 +170,7 @@ class DownPaymentController extends Controller
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
             $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
-            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust - $row->total_journal_debit + $row->total_journal_credit,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->latest_currency;
             /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
@@ -187,7 +187,7 @@ class DownPaymentController extends Controller
                     'total'         => number_format($row->total * $currency_rate,2,',','.'),
                     'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
                     'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
-                    'balance'       => number_format($row->total_journal_credit,2,',','.'),
+                    'balance'       => number_format($balance_after_adjust,2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
                 $totalbalance += round($balance_after_adjust,2);

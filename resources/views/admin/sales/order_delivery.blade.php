@@ -1565,6 +1565,7 @@ document.addEventListener('focusin', function (event) {
             }
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
+            $('#delivery_date').attr('min',$('#post_date').val());
         }
     }
 

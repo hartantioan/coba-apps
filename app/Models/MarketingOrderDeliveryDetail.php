@@ -103,6 +103,7 @@ class MarketingOrderDeliveryDetail extends Model
     }
 
     public function totalInvoice(){
+        $total=0;
         $total = $this->marketingOrderInvoiceDetail()->sum('total');
         return $total;
     }
@@ -123,6 +124,12 @@ class MarketingOrderDeliveryDetail extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function totalInvoice2(){
+        $total = $this->marketingOrderDeliveryProcessDetail()->marketingOrderInvoiceDetail->sum('total');
+        return $total;
+    }
+
 
     public function marketingOrderDeliveryProcessDetailWithPending()
     {

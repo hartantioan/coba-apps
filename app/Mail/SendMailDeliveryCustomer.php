@@ -27,7 +27,7 @@ class SendMailDeliveryCustomer extends Mailable
     public function build()
     {
         return $this->from('porcelain@superiorporcelain.co.id')
-        ->subject('Delivery Report')
+        ->subject('Laporan Delivery Oktober 2024')
         ->view('admin.mail.report_delivery_customer')
        
         ->attach(storage_path('app/public/auto_email/delivery_report.xlsx'), [

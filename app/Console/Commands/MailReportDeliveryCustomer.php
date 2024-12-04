@@ -30,8 +30,8 @@ class MailReportDeliveryCustomer extends Command
      */
     public function handle()
     {
+        //$recipient = ['edp@superior.co.id','marisa@superiorporcelain.co.id'];
         $recipient = ['edp@superior.co.id','marisa@superiorporcelain.co.id'];
-
         $data = [];
 
         $date = date('d');
@@ -42,10 +42,12 @@ class MailReportDeliveryCustomer extends Command
         } else {
         }
 
-        $customer = '961';
+        $customer = '1140';
+        $tanggal1 = '2024-10-01';
+        $tanggal2 = '2024-10-31';
 
         //kirim setiap tanggal 2
-        if ($date == '02') {
+        if ($date == '04') {
             Excel::store(new ExportDeliveryCustomer($tanggal1, $tanggal2, $customer), 'public/auto_email/delivery_report.xlsx', 'local');
             Mail::to($recipient)->send(new SendMailDeliveryCustomer());
         }

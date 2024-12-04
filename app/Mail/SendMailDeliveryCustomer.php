@@ -11,13 +11,9 @@ class SendMailDeliveryCustomer extends Mailable
 {
     use Queueable, SerializesModels;
 
-   
-    public function __construct()
-    {
-       
-      
-    }
-   
+
+    public function __construct() {}
+
 
     public function attachments(): array
     {
@@ -26,17 +22,22 @@ class SendMailDeliveryCustomer extends Mailable
 
     public function build()
     {
-        return $this->from('porcelain@superiorporcelain.co.id')
-        ->subject('Laporan Delivery Oktober 2024')
-        ->view('admin.mail.report_delivery_customer')
-       
-        ->attach(storage_path('app/public/auto_email/delivery_report.xlsx'), [
-           'as' => 'delivery_report.xlsx',
-         'mime' => 'application/xlsx',
-        ]
-        )
-        ;
-      
+        $month = date('F', strtotime("-2 day"));
+        $year = date('Y', strtotime("-2 day"));
 
+
+        return $this->from('porcelain@superiorporcelain.co.id')
+            //->subject('Laporan Delivery ' . $month . ' '.$year)
+            ->subject('Laporan Delivery Oktober 2024')
+            ->view('admin.mail.report_delivery_customer')
+
+            ->attach(
+                storage_path('app/public/auto_email/delivery_report.xlsx'),
+                [
+                    'as' => 'delivery_report.xlsx',
+                    'mime' => 'application/xlsx',
+                ]
+            )
+        ;
     }
 }

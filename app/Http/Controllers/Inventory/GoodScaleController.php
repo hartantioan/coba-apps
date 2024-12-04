@@ -224,7 +224,7 @@ class GoodScaleController extends Controller
                 '.$updateBtn.'
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Informasi Timbangan" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> '.$btn_jurnal;
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> '.$btn_jurnal.' <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green darken-1 white-tex btn-small" data-popup="tooltip" title="Recreate PO dan Jurnal" onclick="recall(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">loop</i></button>';
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -1435,6 +1435,70 @@ class GoodScaleController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function recall(Request $request){
+        if(session('bo_division_id') == 20){
+            $query_done = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
+
+            if($query_done){
+    
+                if(!$query_done->journal()->exists()){
+                    $totalProportional = 0;
+                    $gs = $query_done;
+                    $qty_final = $query_done->qty_final;
+                    foreach($gs->goodScaleDetail as $row){
+                        if($row->lookable_type == 'marketing_order_deliveries'){
+                            if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                                $totalProportional += $row->lookable->marketingOrderDeliveryProcess->totalQty();
+                            }
+                        }
+                    }
+    
+                    if($totalProportional > 0){
+                        foreach($gs->goodScaleDetail as $row){
+                            if($row->lookable_type == 'marketing_order_deliveries'){
+                                if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                                    $bobot = round($row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional,3);
+                                    $qty = round($qty_final * $bobot,3);
+                                    $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                                    $row->lookable->marketingOrderDeliveryProcess->update([
+                                        'weight_netto' => $qty,
+                                    ]);
+                                    $row->update([
+                                        'qty'   => $qty,
+                                        'total' => $total,
+                                    ]);
+                                }
+                            }
+                        }
+                        CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
+                    }
+    
+                    activity()
+                            ->performedOn(new GoodScale())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query_done)
+                            ->log('Recreate jurnal & po from good scale');
+    
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data updated successfully.'
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data sudah memiliki jurnal dan PO.'
+                    ];
+                }
+            }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Ups. Anda tidak bisa menggunakan fitur ini ya.'
+            ];
+        }
+        return response()->json($response);
     }
 
     public function viewJournal(Request $request,$id){

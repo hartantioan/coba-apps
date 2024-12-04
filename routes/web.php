@@ -2056,7 +2056,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('good_scale')->middleware(['operation.access:good_scale,view', 'lockacc'])->group(function () {
                     Route::get('/', [GoodScaleController::class, 'index']);
                     Route::post('datatable', [GoodScaleController::class, 'datatable']);
-
+                    Route::post('recall', [GoodScaleController::class, 'recall'])->middleware('operation.access:good_scale,update');
                     Route::post('done', [GoodScaleController::class, 'done'])->middleware('operation.access:good_scale,update');
                     Route::get('row_detail', [GoodScaleController::class, 'rowDetail']);
                     Route::post('show', [GoodScaleController::class, 'show']);

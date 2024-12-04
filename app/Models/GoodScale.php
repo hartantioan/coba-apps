@@ -452,6 +452,24 @@ class GoodScale extends Model
         return $has;
     }
 
+    public function getReceiveDateSj(){
+        $date = $this->post_date;
+        foreach($this->goodScaleDetail as $key => $row){
+            if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                if($row->lookable->marketingOrderDeliveryProcess->receive_date){
+                    if($key == 0){
+                        $date = $row->lookable->marketingOrderDeliveryProcess->receive_date;
+                    }
+                    if($row->lookable->marketingOrderDeliveryProcess->receive_date < $date){
+                        $date =$row->lookable->marketingOrderDeliveryProcess->receive_date;
+                    }
+                }
+                
+            }
+        }
+        return $date;
+    }
+
     public function createPurchaseOrder($date){
         #CREATE PO
         if($this->purchaseOrder()->exists()){

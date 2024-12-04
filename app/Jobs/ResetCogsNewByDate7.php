@@ -786,8 +786,8 @@ class ResetCogsNewByDate7 implements ShouldQueue, ShouldBeUnique
             }
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
-            $total_final = $totalBefore - $total;
-            $qty_final = $qtyBefore - $qty;
+            $total_final = round($totalBefore,2) - $total;
+            $qty_final = round($qtyBefore,3) - $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->goodIssue->getTable(),
                 'lookable_id'		      => $row->goodIssue->id,
@@ -848,8 +848,8 @@ class ResetCogsNewByDate7 implements ShouldQueue, ShouldBeUnique
             $price = $row->itemStock->priceDate($row->issueGlaze->post_date);
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
-            $total_final = $totalBefore - $total;
-            $qty_final = $qtyBefore - $qty;
+            $total_final = round($totalBefore,2) - $total;
+            $qty_final = round($qtyBefore,3) - $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->issueGlaze->getTable(),
                 'lookable_id'		    => $row->issueGlaze->id,
@@ -910,8 +910,8 @@ class ResetCogsNewByDate7 implements ShouldQueue, ShouldBeUnique
             $price = $row->issueGlaze->itemStock->priceDate($row->receiveGlaze->post_date);
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
-            $total_final = $totalBefore - $total;
-            $qty_final = $qtyBefore - $qty;
+            $total_final = round($totalBefore,2) - $total;
+            $qty_final = round($qtyBefore,3) - $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->receiveGlaze->getTable(),
                 'lookable_id'		    => $row->receiveGlaze->id,

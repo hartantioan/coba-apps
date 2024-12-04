@@ -188,6 +188,9 @@
                                 <td class="center-align" colspan="14">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
+                        setTimeout(function () {
+                            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+                        }, 250);
                     }else{
                         $('#detail-result').append(`
                             <tr>

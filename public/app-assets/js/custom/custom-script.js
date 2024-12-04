@@ -145,6 +145,7 @@ function select2ServerSide(selector, endpoint) {
 		dropdownParent: $('body').parent(),
 		ajax: {
 			url: endpoint,
+            delay:1000,
 			type: 'GET',
 			dataType: 'JSON',
 			data: function(params) {
@@ -171,6 +172,7 @@ function select2ServerSide(selector, endpoint) {
 		dropdownParent: $('body').parent(),
 		ajax: {
 			url: endpoint,
+            delay: 1000,
 			type: 'GET',
 			dataType: 'JSON',
 			data: function(params) {

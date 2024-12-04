@@ -1324,7 +1324,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
+        select2ServerSideLonger('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
         select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
@@ -1380,15 +1380,43 @@
         if($("#arr_item" + val).val()){
             $('#unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             let optionStock = '<select class="browser-default" id="arr_item_stock' + val + '" name="arr_item_stock[]" required onchange="resetQty(`'+ val +'`)">';
-            if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.warehouse + '</option>';
-                });
+            if($("#arr_item" + val).select2('data')[0].id){
+                    $.ajax({
+                        type : "POST",
+                        url  : '{{ Request::url() }}/get_current_stock_more_than_zero',
+                        data : {
+                            id : $("#arr_item" + val).select2('data')[0].id,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        cache: false,
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(data){
+                            loadingClose('.modal-content');
+                            if(data.status == '200'){
+                                $.each(data.stock_list, function(i, value) {
+                                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.warehouse + '</option>';
+                                });
+                                optionStock += '</select>';
+
+                                $('#stock' + val).append(optionStock);
+                            }else{
+                                M.toast({
+                                    html: data.message
+                                });
+                            }
+                        }
+                    });
             }else{
                 optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
+
+                optionStock += '</select>';
+
+                $('#stock' + val).append(optionStock);
             }
-            optionStock += '</select>';
-            $('#stock' + val).append(optionStock);
 
             if($("#arr_item" + val).select2('data')[0].is_activa){
                 $('#serial' + val).append(`

@@ -1454,4 +1454,22 @@ class GoodIssueController extends Controller
             return response()->json($response);
         }
     }
+
+    public function getCurrentStockMoreThanZero(Request $request){
+        $getStockList = Item::find($request->id);
+        if($getStockList){
+            $response =[
+                'status'=>200,
+                'stock_list'  =>$getStockList->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses),
+            ];
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data tidak ada.'
+            ];
+        }
+
+        return response()->json($response);
+
+    }
 }

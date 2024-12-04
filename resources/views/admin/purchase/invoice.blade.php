@@ -2301,7 +2301,7 @@
                                                             <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
                                                         </td>
                                                         <td>
-                                                            <input type="text" name="arr_note2[]" value="-" data-id="` + count + `">
+                                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                                         </td>
                                                         <td class="center">
                                                             ` + val.purchase_no + `

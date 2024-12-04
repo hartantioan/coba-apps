@@ -176,6 +176,123 @@ class FundRequest extends Model
         });
     }
 
+    public function getPaymentRequestAllCode(){
+        $arr = [];
+        if($this->hasPaymentRequestDetail()->exists()){
+            foreach($this->hasPaymentRequestDetail as $row_pyr){
+                if(!in_array( $row_pyr->paymentRequest->code, $arr)){
+                    $arr[]=$row_pyr->paymentRequest->code;
+                }
+            }
+        }
+        foreach($this->fundRequestDetail as $row_detail){
+            if($row_detail->hasPaymentRequestDetail()->exists()){
+                foreach($row_detail->hasPaymentRequestDetail as $row_pyr){
+                    if(!in_array( $row_pyr->paymentRequest->code, $arr)){
+                        $arr[]=$row_pyr->paymentRequest->code;
+                    }
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getOPYMAllCode(){
+        $arr = [];
+        foreach($this->fundRequestDetail as $row_detail){
+            if($row_detail->hasPaymentRequestDetail()->exists()){
+                foreach($row_detail->hasPaymentRequestDetail as $row_pyr){
+                    if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                        if(!in_array( $row_pyr->paymentRequest->outgoingPayment->code, $arr)){
+                            $arr[]=$row_pyr->paymentRequest->outgoingPayment->code;
+                        }
+                    }
+
+                }
+            }
+
+            if($row_detail->purchaseInvoiceDetail()->exists()){
+                foreach($row_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                    if($row_invoice_detail->purchaseInvoice->hasPaymentRequestDetail()->exists()){
+                        foreach($row_invoice_detail->purchaseInvoice->hasPaymentRequestDetail as $row_pyr){
+                            if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                                if(!in_array( $row_pyr->paymentRequest->outgoingPayment->code, $arr)){
+                                    $arr[]=$row_pyr->paymentRequest->outgoingPayment->code;
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+            if($row_detail->purchaseDownPaymentDetail()->exists()){
+                foreach($row_detail->purchaseDownPaymentDetail as $row_down_detail){
+                    if($row_down_detail->purchaseDownPayment->hasPaymentRequestDetail()->exists()){
+                        foreach($row_down_detail->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr){
+                            if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                                if(!in_array( $row_pyr->paymentRequest->outgoingPayment->code, $arr)){
+                                    $arr[]=$row_pyr->paymentRequest->outgoingPayment->code;
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getOPYMAllPayDate(){
+        $arr = [];
+        foreach($this->fundRequestDetail as $row_detail){
+            if($row_detail->hasPaymentRequestDetail()->exists()){
+                foreach($row_detail->hasPaymentRequestDetail as $row_pyr){
+                    if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                        if(!in_array( date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date)), $arr)){
+                            $arr[]=date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date));
+                        }
+                    }
+
+                }
+            }
+
+            if($row_detail->purchaseInvoiceDetail()->exists()){
+                foreach($row_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                    if($row_invoice_detail->purchaseInvoice->hasPaymentRequestDetail()->exists()){
+                        foreach($row_invoice_detail->purchaseInvoice->hasPaymentRequestDetail as $row_pyr){
+                            if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                                if(!in_array( date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date)), $arr)){
+                                    $arr[]=date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date));
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            if($row_detail->purchaseDownPaymentDetail()->exists()){
+                foreach($row_detail->purchaseDownPaymentDetail as $row_down_detail){
+                    if($row_down_detail->purchaseDownPayment->hasPaymentRequestDetail()->exists()){
+                        foreach($row_down_detail->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr){
+                            if($row_pyr->paymentRequest->outgoingPayment()->exists()){
+                                if(!in_array( date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date)), $arr)){
+                                    $arr[]=date('d/m/Y',strtotime($row_pyr->paymentRequest->outgoingPayment->pay_date));
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function listPaymentRequest(){
         $arr = [];
         foreach($this->hasPaymentRequestDetail as $row){
@@ -241,7 +358,7 @@ class FundRequest extends Model
             return implode(', ',$list);
         }else{
             return '-';
-        }   
+        }
     }
 
     public function totalReceivable(){
@@ -338,7 +455,7 @@ class FundRequest extends Model
         return $total;
     }
 
-    public function hasBalancePurchaseDownPayment(){ 
+    public function hasBalancePurchaseDownPayment(){
         $has = false;
         foreach($this->fundRequestDetail as $row){
             if($row->balancePurchaseDownPaymentDetail() > 0){
@@ -557,7 +674,7 @@ class FundRequest extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -567,7 +684,7 @@ class FundRequest extends Model
 
         return $document;
     }
-    public function attachments() 
+    public function attachments()
     {
         if($this->document){
             $arr = explode(',',$this->document);
@@ -698,7 +815,7 @@ class FundRequest extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

@@ -17,6 +17,7 @@ use App\Http\Controllers\Accounting\AdjustRateController;
 use App\Http\Controllers\Production\BomCalculatorController;
 use App\Http\Controllers\Finance\PaymentRequestDateReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
+use App\Http\Controllers\Finance\ReportFundRequestOutgoingController;
 use App\Http\Controllers\Finance\ListBgCheckController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
@@ -3405,6 +3406,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter_by_date', [OutStandingAPController::class, 'filterByDate']);
                         Route::post('sync_report', [OutStandingAPController::class, 'syncReport']);
                         Route::get('export', [OutStandingAPController::class, 'export']);
+                    });
+
+                    Route::prefix('report_freq_to_outgoing')->middleware('operation.access:report_freq_to_outgoing,view')->group(function () {
+                        Route::get('/', [ReportFundRequestOutgoingController::class, 'index']);
+                        Route::post('filter', [ReportFundRequestOutgoingController::class, 'filter']);
+                        Route::get('export', [ReportFundRequestOutgoingController::class, 'export']);
                     });
                 });
 

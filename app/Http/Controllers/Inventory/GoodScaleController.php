@@ -219,12 +219,14 @@ class GoodScaleController extends Controller
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
 
+                $btnRecreate = $val->type == '2' ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green darken-1 white-tex btn-small" data-popup="tooltip" title="Recreate PO dan Jurnal" onclick="recall(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">loop</i></button>' : '';
+
                 $buttons = $val->status == '5' ? '-' : '<button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                 '.$updateBtn.'
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Informasi Timbangan" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> '.$btn_jurnal.' <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green darken-1 white-tex btn-small" data-popup="tooltip" title="Recreate PO dan Jurnal" onclick="recall(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">loop</i></button>';
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> '.$btn_jurnal.' '.$btnRecreate;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,

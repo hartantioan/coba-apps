@@ -105,7 +105,7 @@ class DownPaymentController extends Controller
                 ),0) AS latest_currency,
                 IFNULL((
                     SELECT
-                        SUM(jd.nominal)
+                        SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id

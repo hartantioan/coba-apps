@@ -63,7 +63,7 @@
                     <td>{{ $row->item->name }}</td>
                     <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->uomUnit->code : $row_detail->unit->code }}</td>
-                    <td>{{ $nominal ? number_format($row_detail->total ,3,',','.') : '-' }}</td>
+                    <td>{{ $nominal ? number_format(round($row_detail->total,2) ,3,',','.') : '-' }}</td>
 
                 </tr>
                 @php

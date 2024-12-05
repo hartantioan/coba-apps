@@ -210,7 +210,7 @@
             width: '100%',
         });
 
-        select2ServerSide('#item_id', '{{ url("admin/select2/item_parent_fg") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/sales_item_child") }}');
 
         $('#batch_id').select2({
             placeholder: '-- Kosong --',

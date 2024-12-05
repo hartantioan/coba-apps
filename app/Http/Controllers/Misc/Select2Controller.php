@@ -5451,9 +5451,10 @@ class Select2Controller extends Controller {
             $query->where('code', 'like', "%$search%");
             if($request->item_id){
                 $query->whereHas('item',function($query)use($request){
-                    $query->whereHas('parentFg',function($query)use($request) {
-                        $query->where('parent_id',$request->item_id);
-                    });
+                    $query->where('id',$request->item_id);
+                    // $query->whereHas('parentFg',function($query)use($request) {
+                    //     $query->where('parent_id',$request->item_id);
+                    // });
                 });
             }
         })
@@ -5462,7 +5463,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'    => $d->id,
-                'text'  => $d->code,
+                'text'  => $d->code.'-'.$d->item->name,
             ];
         }
 
@@ -5478,9 +5479,10 @@ class Select2Controller extends Controller {
             $query->where('code', 'like', "%$search%");
             if($request->item_id){
                 $query->whereHas('item',function($query)use($request){
-                    $query->whereHas('parentFg',function($query)use($request) {
-                        $query->where('parent_id',$request->item_id);
-                    });
+                    $query->where('id',$request->item_id);
+                    // $query->whereHas('parentFg',function($query)use($request) {
+                    //     $query->where('parent_id',$request->item_id);
+                    // });
                 });
             }
         })

@@ -78,9 +78,10 @@ class ReportStockMovementPerShadingController extends Controller
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){
-                        $query->whereHas('parentFg',function($query) use($request){
-                            $query->where('parent_id',$request->item_id);
-                        });
+                        $query->where('id',$request->item_id);
+                        // $query->whereHas('parentFg',function($query) use($request){
+                        //     $query->where('parent_id',$request->item_id);
+                        // });
                     });
                 }else{
                     $query->whereIn('item_shading_id', $item_shading_ids);
@@ -130,9 +131,10 @@ class ReportStockMovementPerShadingController extends Controller
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){
-                        $query->whereHas('parentFg',function($query) use($request){
-                            $query->where('parent_id',$request->item_id);
-                        });
+                         $query->where('id',$request->item_id);
+                        // $query->whereHas('parentFg',function($query) use($request){
+                        //     $query->where('parent_id',$request->item_id);
+                        // });
                     });
                 }else{
                     $query->whereIn('item_shading_id', $item_shading_ids);

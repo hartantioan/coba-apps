@@ -61,9 +61,9 @@
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->name : '' }} {{ $row_detail->note ?? '' }}</td>
                     <td>{{ $row->item->code }}</td>
                     <td>{{ $row->item->name }}</td>
-                    <td>{{ CustomHelper::formatConditionalQty(round($row_detail->qty,2))}}</td>
+                    <td>{{ round($row_detail->qty,2)}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->uomUnit->code : $row_detail->unit->code }}</td>
-                    <td>{{ $nominal ? number_format(round($row_detail->total,2) ,3,',','.') : '-' }}</td>
+                    <td>{{ $nominal ? round($row_detail->total,2) : '-' }}</td>
 
                 </tr>
                 @php

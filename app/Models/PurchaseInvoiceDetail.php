@@ -110,7 +110,7 @@ class PurchaseInvoiceDetail extends Model
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
-    
+
     public function coa()
     {
         if($this->lookable_type == 'coas'){
@@ -119,7 +119,7 @@ class PurchaseInvoiceDetail extends Model
             return false;
         }
     }
-    
+
     public function landedCostFeeDetail()
     {
         if($this->lookable_type == 'landed_cost_fee_details'){
@@ -186,11 +186,15 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getHeaderCode(){
+        $fund_code = null;
+        if($this->fundRequestDetail()->exists()){
+            $fund_code = $this->fundRequestDetail->fundRequest->code;
+        }
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
             'landed_cost_fee_details'   => $this->lookable->landedCost->code,
             'purchase_order_details'    => $this->lookable->purchaseOrder->code,
-            'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            'coas'                      => $fund_code ?? $this->lookable->code . ' - ' . $this->lookable->name,
             default                     => '-',
         };
 

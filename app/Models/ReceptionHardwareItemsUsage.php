@@ -31,9 +31,10 @@ class ReceptionHardwareItemsUsage extends Model
         'done_note',
         'division',
         'reception_date',
-        'return_date', 
+        'return_date',
         'user_return',
-        'return_note',   
+        'return_note',
+        'area',
     ];
 
     public function status(){
@@ -86,6 +87,17 @@ class ReceptionHardwareItemsUsage extends Model
         $no = str_pad($code, 6, 0, STR_PAD_LEFT);
 
         return 'RHU'.$no;
+    }
+
+    public function area(){
+        $area = match ($this->area) {
+          '1' => 'JAKARTA',
+          '2' => 'SURABAYA',
+          '3' => 'SUBANG',
+          default => '-',
+        };
+
+        return $area;
     }
 
     public function hardwareItem(){

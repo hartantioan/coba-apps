@@ -169,6 +169,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     'status'            => 1,
                     'status_item'       => 1,
                     'location'			=> $request->location1,
+                    'area'			    => $request->area1,
                 ]);
             }else{
                 $response = [
@@ -318,6 +319,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $val->hardwareItem->code ?? '',
                     $val->hardwareItem->item ?? '',
                     $val->hardwareItem->detail1 ?? '',
+                    $val->area(),
                     $val->location,
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
@@ -470,6 +472,7 @@ class ReceptionHardwareItemUsageController extends Controller
                 try {
                     $query = ReceptionHardwareItemsUsage::find($request->tempe);
                     $query->location	        = $request->location;
+                    $query->area	            = $request->area;
                     $query->division	        = $request->division;
                     $query->info	            = $request->info;
                     // $query->status              = $request->status ? $request->status : '2';
@@ -502,6 +505,7 @@ class ReceptionHardwareItemUsageController extends Controller
                             'reception_date'    => $request->date,
                             'status'            => 1,
                             'status_item'       => 1,
+                            'area'			    => $request->area,
                             'location'			=> $request->location,
                         ]);
                     }else{

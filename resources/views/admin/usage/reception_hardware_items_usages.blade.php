@@ -61,7 +61,7 @@
                                             <div class="col s4 m4"><h6 style="text-align: center;"> Idle Item</h6></div>
                                             <div class="col s4 m4 right-align">
                                                 <a class="btn-flat mb-1 waves-effect"  href="#modalbarcode">
-                                                    <i class="material-icons left">scanner</i> 
+                                                    <i class="material-icons left">scanner</i>
                                                     Barcode Scanner
                                                 </a>
                                             </div>
@@ -70,10 +70,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                            
-                                        
-                                        
+
+
+
+
                                     </div>
                                 </div>
                             </div>
@@ -99,6 +99,7 @@
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.item') }}</th>
                                                         <th>Detail</th>
+                                                        <th>Area</th>
                                                         <th>{{ __('translations.location') }}</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>
@@ -116,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -143,11 +144,11 @@
                             <label class="active" for="item_edit">Item dari inventory</label>
                         </div>
                         <div class="input-field col s12 m6 ">
-                            <input type="hidden" id="tempe" name="tempe"> 
+                            <input type="hidden" id="tempe" name="tempe">
                             <input id="detail1" name="detail1" disabled></input>
                             <label class="active" for="detail1">Detail 1</label>
                         </div>
-                        
+
                         <div class="input-field col s12 m6 step2" id="tab_user">
                             <select class="browser-default" id="user_id" name="user_id" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
@@ -164,7 +165,15 @@
                             <input id="location" name="location" type="text" placeholder="Keterangan">
                             <label class="active" for="location">{{ __('translations.location') }}</label>
                         </div>
-                        <div class="input-field col s12 m6 step4"> 
+                        <div class="input-field col s12 m6">
+                            <select class="form-control" id="area" name="area">
+                                <option value="1">Jakarta</option>
+                                <option value="2">Surabaya</option>
+                                <option value="3">Subang</option>
+                            </select>
+                            <label class="active" for="area">Area</label>
+                        </div>
+                        <div class="input-field col s12 m6 step4">
                             <input type="date" id="date" name="date" min="{{ $minDate }}">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
@@ -208,7 +217,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s12 m6">
-                            <input type="hidden" id="temp" name="temp"> 
+                            <input type="hidden" id="temp" name="temp">
                             <input type="date" id="date_kembali" name="date"  onchange="loadDataTable()">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
@@ -251,7 +260,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s12 m6">
-                            <input type="hidden" id="tempes" name="tempes"> 
+                            <input type="hidden" id="tempes" name="tempes">
                             <input id="items" name="items" disabled></input>
                             <label class="active" for="items">{{ __('translations.item') }}</label>
                         </div>
@@ -259,7 +268,7 @@
                             <input id="detail1s" name="detail1s" disabled></input>
                             <label class="active" for="detail1s">Detail 1</label>
                         </div>
-                        
+
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="user_id1" name="user_id1" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id1" >Pilih User(jika ada)</label>
@@ -273,7 +282,15 @@
                             <label class="active" for="location1">{{ __('translations.location') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
-                          
+                            <select class="form-control" id="area1" name="area1">
+                                <option value="1">Jakarta</option>
+                                <option value="2">Surabaya</option>
+                                <option value="3">Subang</option>
+                            </select>
+                            <label class="active" for="area1">Area</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+
                             <input type="date" id="date1" name="date1"  onchange="loadDataTable()">
                             <label class="active" for="date1">Date(tanggal)</label>
                         </div>
@@ -361,7 +378,7 @@
 <div id="modal_print" class="modal modal-fixed-footer" style="">
     <div class="modal-content">
         <div class="row" id="body_print">
-            
+
         </div>
     </div>
     <div class="modal-footer">
@@ -395,9 +412,9 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -419,16 +436,16 @@
         $('#modalbarcode').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-               
+
                 M.updateTextFields();
             }
         });
@@ -436,7 +453,7 @@
         $('#modal_import').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
@@ -472,8 +489,8 @@
                     } else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
-                       
+
+
                     } else {
                         M.toast({
                             html: response.message
@@ -512,8 +529,8 @@
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         console.log(response);
-                        let errorMessage = response.status === 400 ? 
-                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                        let errorMessage = response.status === 400 ?
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` :
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
 
                         $('#validation_alertImport').append(`
@@ -538,9 +555,9 @@
         $('#modal_print').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                    
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
 
                 M.updateTextFields();
             },
@@ -553,9 +570,9 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-  
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -573,9 +590,9 @@
         $('#modal3').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -599,7 +616,7 @@
     }
 
     function getDetail(){
-        
+
         if($('#hardware_item_id').val()){
             let params = $('#hardware_item_id').select2('data')[0].detail1;
             $('#detail1').val(params);
@@ -609,21 +626,21 @@
         if($('#user_id').val()){
             let paramsdivisi = $('#user_id').select2('data')[0].division;
             $('#division').val(paramsdivisi);
-        
+
         }
         if($('#user_id1').val()){
             let paramsdivisi = $('#user_id1').select2('data')[0].division;
             $('#division1').val(paramsdivisi);
-        
+
         }
-        
-        
+
+
     }
 
     function excel(){
         var search = window.table.search();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search; 
+
+        window.location = "{{ Request::url() }}/export?search=" + search;
     }
 
     function fetchStorage(){
@@ -639,8 +656,8 @@
             },
             success: function(response) {
                 $('#in_storage').empty();
-                
-                
+
+
                 $.each(response.itemInStorage, function(i, val) {
                     $('#in_storage').append(
                         `
@@ -648,20 +665,20 @@
                             <div class="border-radius-6  card_idle grey lighten-1" style="max-height:0.5em;overflow:hidden;padding:1rem;padding-bottom:2rem;border: 2px solid black;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
                                 <div>
                                     <div style="text-align:center;font-size:1em;"> `+val.itemName+`-`+val.itemCode+` : `+val.itemdetail+`</div>
-                                    
+
                                 </div>
                             </div>
                         </div>
                         `
                     );
                 });
-                
+
             },
         });
     }
     function openmodal(id){
         var itemId = $(this).data('item-id');
-        
+
         $.ajax({
             url: '{{ Request::url() }}/modal_print',
             type: 'POST',
@@ -678,7 +695,7 @@
                 $('#body_print').append(
                     response
                 );
-                
+
             },
         });
     }
@@ -704,7 +721,7 @@
                 data: {
                     status : $('#filter_status').val()
                 },
-                
+
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
                 },
@@ -727,6 +744,7 @@
                 { name: 'hardware_item_code', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
                 { name: 'hardware_item_id', className: 'center-align' },
+                { name: 'area', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
@@ -738,20 +756,20 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 
-        
+
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -779,7 +797,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -816,13 +834,13 @@
                 });
             }
         });
-        
+
     }
 
     function saveTargeted(){
-			
+
             var formData = new FormData($('#form_data2')[0]);
-            
+
             $.ajax({
                 url: '{{ Request::url() }}/save_targeted',
                 type: 'POST',
@@ -851,13 +869,13 @@
                     } else if(response.status == 422) {
                         $('#validation_alert2').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
                             icon: 'warning'
                         });
-    
+
                         $.each(response.error, function(i, val) {
                             $.each(val, function(i, val) {
                                 $('#validation_alert2').append(`
@@ -888,7 +906,7 @@
                     });
                 }
             });
-            
+
         }
 
     function success(){
@@ -954,6 +972,7 @@
                 $('#info').val(response.info);
                 $('#date').val(response.date);
                 $('#location').val(response.location);
+                $('#area').val(response.area).formSelect();
                 $('#tab_user').hide();
                 $('#date').prop('disabled', true);
                 $('#tab_hardware').hide();
@@ -962,7 +981,7 @@
                 $('#item_edit').val(response.name);
                 $('#user_edit').val(response.user.name);
                 $('#division').val(response.division);
-                
+
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
             },
@@ -1016,7 +1035,7 @@
 
     function rReturn(){
         var formData = new FormData($('#form_data1')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/diversion',
             type: 'POST',
@@ -1045,7 +1064,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert1').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -1085,7 +1104,7 @@
     }
 
     function printData(id){
-        
+
          $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print',
@@ -1097,14 +1116,14 @@
             },
             cache: false,
             success: function(data){
-               
+
                 window.open(data, '_blank');
             }
         });
     }
 
     function printDataReturn(id){
-       
+
          $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print_return',
@@ -1116,7 +1135,7 @@
             },
             cache: false,
             success: function(data){
-               
+
                 window.open(data, '_blank');
             }
         });
@@ -1143,36 +1162,36 @@
                 {
                     title : 'Lokasi',
                     element : document.querySelector('.step3'),
-                    intro : 'Keterangan Lokasi barang nantinya akan berada dimana.' 
+                    intro : 'Keterangan Lokasi barang nantinya akan berada dimana.'
                 },
                 {
                     title : 'Date(tanggal)',
                     element : document.querySelector('.step4'),
-                    intro : 'Merupakan tanggal dimana penyerahan pada form ini akan dilakukan.' 
+                    intro : 'Merupakan tanggal dimana penyerahan pada form ini akan dilakukan.'
                 },
-              
+
                 {
                     title : 'Keterngan',
                     element : document.querySelector('.step5'),
-                    intro : 'Keterangan tambahan yang akan dicantumkan pada form ini.' 
+                    intro : 'Keterangan tambahan yang akan dicantumkan pada form ini.'
                 },
                 {
                     title : 'Status',
                     element : document.querySelector('.step6'),
-                    intro : 'Merupakan status aktif atau tidaknya penyerahan ini.' 
+                    intro : 'Merupakan status aktif atau tidaknya penyerahan ini.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step7'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar'
                 },
-                
+
             ]
         })/* .onbeforechange(function(targetElement){
             alert(this._currentStep);
         }) */.start();
     }
-    
+
 
     function destroy(id){
         var msg = '';

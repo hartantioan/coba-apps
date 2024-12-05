@@ -83,6 +83,7 @@ class DownPaymentController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
+                        AND ar.post_date < '2024-10-31'
                         AND (
                             CASE 
                                 WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'

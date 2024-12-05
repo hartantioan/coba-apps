@@ -66,12 +66,15 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                 $note = trim($row['catatan']);;$divisi=$row['divisi'];$location = trim($row['lokasi']);
                 $item = HardwareItem::where('code', explode('#', $row['item'])[0])->first();
                 $user = User::where('employee_no',explode('#', $row['user'])[0])->first();
+                $area = explode('#', $row['area'])[0];
                 if(!$item && $this->error ==null){
                     $this->error = "Item ada yang salah.";
                 }elseif(!$note && $this->error ==null){
                     $this->error = "Belum ada keterangan.";
                 }elseif(!$location && $this->error ==null){
                     $this->error = "Belum ada Lokasi.";
+                }elseif(!$area && $this->error ==null){
+                    $this->error = "Belum ada Area.";
                 }
                 if($user->position()->exists()){
                     $divisi = $user->position->division->name;
@@ -92,6 +95,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                         'status'            => 1,
                         'status_item'       => 1,
                         'location'			=> $location,
+                        'area'			    => $area,
                     ]);
                 }else{
                     DB::rollback();

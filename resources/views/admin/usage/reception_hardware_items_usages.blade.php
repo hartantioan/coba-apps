@@ -167,9 +167,9 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="form-control" id="area" name="area">
-                                <option value="1">Jakarta</option>
-                                <option value="2">Surabaya</option>
-                                <option value="3">Subang</option>
+                                <option value="1">JAKARTA</option>
+                                <option value="2">SURABAYA</option>
+                                <option value="3">SUBANG</option>
                             </select>
                             <label class="active" for="area">Area</label>
                         </div>
@@ -283,9 +283,9 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="form-control" id="area1" name="area1">
-                                <option value="1">Jakarta</option>
-                                <option value="2">Surabaya</option>
-                                <option value="3">Subang</option>
+                                <option value="1">JAKARTA</option>
+                                <option value="2">SURABAYA</option>
+                                <option value="3">SUBANG</option>
                             </select>
                             <label class="active" for="area1">Area</label>
                         </div>

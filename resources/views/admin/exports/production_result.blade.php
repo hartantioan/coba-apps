@@ -35,6 +35,7 @@
             <th>Brand Kategori</th>
             <th>Warna</th>
             <th>Kategori KW</th>
+            <th>Kategori Warna</th>
         </tr>
     </thead>
     <tbody>
@@ -77,6 +78,7 @@
                     <td>{{ $row_detail->productionFgReceiveDetail->item->brand->type() ?? '-'}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->item->pattern->name ?? '-'}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->item->grade->name ?? '-'}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->item->variety->name ?? '-'}}</td>
                 </tr>
                 @php
                     $no++;

@@ -71,7 +71,8 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Brand Kategori',
         'Warna',
         'Kategori KW',
-        'Timbangan/Berat Kg per SJ'
+        'Timbangan/Berat Kg per SJ',
+        'Kategori Warna',
         // 'Tgl. Cetak',
     ];
 
@@ -225,6 +226,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'Warna'                        => $row_shading['detail']->itemstock->item->pattern->name,
                         'Kategori KW'                   => $row_shading['detail']->itemstock->item->grade->name,
                         'Timbangan/Berat Kg per SJ'     => $row->weight_netto,
+                        'kategori warna'                => $row_shading['detail']->itemstock->item->variety->name,
                         // 'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
                         /* 'project_name'               => $row->project->name??'-',
                         'other_fee'             => $row_detail->other_fee,

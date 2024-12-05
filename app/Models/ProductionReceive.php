@@ -347,7 +347,7 @@ class ProductionReceive extends Model
         $countbomstandard = $this->productionOrderDetail->productionScheduleDetail->bom->whereHas('bomStandard')->count();
 
         if($countbackflush > 0 || $countbomstandard > 0){
-            info('kambing2');
+            info($countbackflush.' - '.$countbomstandard);
             /* $lastSegment = 'production_issue';
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));

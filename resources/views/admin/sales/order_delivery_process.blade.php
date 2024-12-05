@@ -161,6 +161,7 @@
                                                         <th>Customer</th>
                                                         <th>Ekspedisi</th>
                                                         <th>MOD</th>
+                                                        <th>Tipe Pengiriman</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Terima Cust.</th>
                                                         <th>Tgl.SJ Kembali</th>
@@ -2200,6 +2201,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'customer_id', orderable: false, className: '' },
                 { name: 'account_id', className: '' },
                 { name: 'marketing_order_delivery_no', searchable: false, orderable: false, className: '' },
+                { name: 'delivery_type', searchable: false, orderable: false, className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'receive_date', className: '' },
                 { name: 'return_date', className: '' },

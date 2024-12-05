@@ -430,9 +430,9 @@ class ProductionFgReceive extends Model
                     'qty_planned'                   => round($row['qty'],3),
                     'nominal_planned'               => $row['nominal'],
                     'total_planned'                 => round($row['total'],2),
-                    'from_item_stock_id'            => $row['item_stock_id'] ?? NULL,
-                    'place_id'                      => $row['place_id'] ?? NULL,
-                    'warehouse_id'                  => $row['warehouse_id'] ?? NULL,
+                    'from_item_stock_id'            => $row['item_stock_id'] !== '' ? $row['item_stock_id'] : NULL,
+                    'place_id'                      => $row['place_id'] !== '' ? $row['place_id'] : NULL,
+                    'warehouse_id'                  => $row['warehouse_id'] !== '' ? $row['warehouse_id'] : NULL,
                 ]);
             }
 

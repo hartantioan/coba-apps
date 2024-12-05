@@ -963,7 +963,7 @@ class Item extends Model
     public function getStockPlaceWithUnsentSales($place_id){
         $total = $this->itemStock()->where('place_id',$place_id)->sum('qty');
         $data = $this->marketingOrderDeliveryDetail()->where('place_id',$place_id)->whereHas('marketingOrderDelivery',function($query){
-            $query->where('status','2');
+            $query->whereIn('status',['1','2']);
         })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->get();
         foreach($data as $item){
             $total -= round($item->qty * $item->marketingOrderDetail->qty_conversion,3);

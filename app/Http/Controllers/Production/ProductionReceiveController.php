@@ -728,7 +728,7 @@ class ProductionReceiveController extends Controller
 
                     $queryupdate->createProductionIssue();
 
-                    /* $totalIssue = 0;
+                    $totalIssue = 0;
                     foreach($queryupdate->productionReceiveIssue as $key => $row){
                         if($row->productionReceiveIssueDetail()->exists()){
                             foreach($row->productionReceiveIssueDetail as $rowdetail){
@@ -761,7 +761,7 @@ class ProductionReceiveController extends Controller
                         ->performedOn(new ProductionReceive())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit receive production.'); */
+                        ->log('Add / edit receive production.');
 
                     $response = [
                         'status'    => 200,

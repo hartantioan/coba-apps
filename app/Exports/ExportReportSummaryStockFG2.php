@@ -25,6 +25,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         'Brand',
         'Motif',
         'Grade',
+        'Variety',
         'Kategori',
         'Shading',
         'Initial (M2)',
@@ -49,7 +50,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
         $arr = [];
 
         $query = DB::select("
-              SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade,
+              SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade, va.name as variety,
 	case when br.type='1' then 'HB' ELSE 'OEM' end AS 'kategori',a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
             COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
             COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,  
@@ -225,6 +226,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                                 LEFT JOIN brands br ON br.id=it.brand_id
                                 LEFT JOIN patterns pa ON pa.id=it.pattern_id
                                 LEFT JOIN grades gr ON gr.id=it.grade_id 
+                                  LEFT JOIN varieties va ON va.id=it.variety_id 
                                 order by a.name,a.shading");
 
         foreach ($query as $row) {
@@ -236,6 +238,7 @@ class ExportReportSummaryStockFG2 implements FromCollection, WithTitle, WithHead
                 'Brand' =>$row->brand,
                 'Motif' =>$row->motif,
                 'Grade' =>$row->grade,
+                'Variety' =>$row->variety,
                 'Kategori' =>$row->kategori,
                 'shading' => $row->shading,
                 'initial' => $row->initial,

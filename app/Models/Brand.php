@@ -40,7 +40,7 @@ class Brand extends Model
     public function type(){
         $type = match ($this->type) {
             '1' => 'HB',
-            '2' => 'OEM',
+            '2' => 'EB',
             '3' => 'Selesai',
             '4' => 'Ditolak',
             '5' => 'Ditutup',

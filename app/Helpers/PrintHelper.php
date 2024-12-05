@@ -5,7 +5,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 class PrintHelper {
-    public static function print($pr , $title = null , $size , $orientation , $blade , $modedata = null){
+    public static function print($pr , $title = null , $size = null , $orientation = null , $blade = null, $modedata = null){
         $data = [
             'title'     => $title,
             'data'      => $pr

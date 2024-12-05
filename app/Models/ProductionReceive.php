@@ -344,10 +344,8 @@ class ProductionReceive extends Model
             $query->whereNotNull('is_default');
         })->where('issue_method','2')->count();
 
-        $countbomstandard = $this->productionOrderDetail->productionScheduleDetail->bom->whereHas('bomStandard')->count();
-
-        if($countbackflush > 0 || $countbomstandard > 0){
-            info($countbackflush.' - '.$countbomstandard);
+        if($countbackflush > 0 || $this->productionOrderDetail->productionScheduleDetail->bom->bomStandard()->exists()){
+            info($countbackflush);
             /* $lastSegment = 'production_issue';
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));

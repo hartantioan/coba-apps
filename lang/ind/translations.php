@@ -76,7 +76,7 @@ return [
     'max'       => 'Max',
     'min'       => 'Min',
 
-    //baru 1 
+    //baru 1
     'selected_row'  => 'Baris Dipilih',
     'selected'  => 'Dipilih',
     'row'       => 'Baris',
@@ -144,6 +144,7 @@ return [
     'select_all'     => 'Pilih Semua',
     'good_issue_request' => 'Permintaan Pengeluaran Barang',
     'value_of_goods' => 'Nilai Barang',
+    'shipping_type'  => 'Tipe Pengiriman',
 
     //baru2
     'good_issue'    => 'Good Issue',

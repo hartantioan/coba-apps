@@ -76,7 +76,7 @@ return [
     'max'       => '最大',
     'min'       => '最小',
 
-    // baru 1 
+    // baru 1
     'selected_row'  => '选定的行',
     'selected'  => '已选择',
     'row'       => '行',
@@ -121,6 +121,8 @@ return [
     'send'          => '发送',
     'multi'         => '多',
     //p
+
+    'shipping_type'  => '运输类型',
     'purchase_order' => '采购订单',
     'supplier'       => '供应商',
     'address'        => '地址',

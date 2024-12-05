@@ -129,7 +129,7 @@ return [
     'term'          => 'Term',
     'day'           => 'Day',
     'sent_date'     => 'Sent Date',
-    'shiping_type'  => 'Shipping Type',
+    'shipping_type'  => 'Shipping Type',
     'item_group'    => 'Item Group',
     'group'         => 'Group',
     'item/service'  => 'Item/Service',
@@ -203,7 +203,7 @@ return [
     'customer'          => 'Customer',
     'expedition'        => 'Expedition',
     'shipping_address'  => 'Shipping Address',
-    'destination_address'=> 'Destination Address', 
+    'destination_address'=> 'Destination Address',
     'vehicle'           => 'Vehicle',
     'condition'         => 'Condition',
     'take_items_from'   => 'Take Items from',
@@ -334,7 +334,7 @@ return [
     'starting_city'     => 'Starting City',
     'destination_city'  => 'Destination City',
     'starting_subdistrict' => 'Starting Subdistrict',
-    'destination_subdistrict' => 'Destination Subdistrict', 
+    'destination_subdistrict' => 'Destination Subdistrict',
     'tonnage'           => 'Tonnage',
     'ritage'            => 'Ritage',
     'valid_from'        => 'Valid From',
@@ -363,4 +363,4 @@ return [
     'price'             => 'Price',
     'post_date'         => 'Post Date',
     'conversion'        => 'Conversion',
-];  
+];

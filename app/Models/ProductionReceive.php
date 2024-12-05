@@ -345,8 +345,7 @@ class ProductionReceive extends Model
         })->where('issue_method','2')->count();
 
         if($countbackflush > 0 || $this->productionOrderDetail->productionScheduleDetail->bom->bomStandard()->exists()){
-            info($countbackflush);
-            /* $lastSegment = 'production_issue';
+            $lastSegment = 'production_issue';
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
             
@@ -554,7 +553,7 @@ class ProductionReceive extends Model
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
-            } */
+            }
         }
     }
 

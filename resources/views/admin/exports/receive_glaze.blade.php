@@ -59,7 +59,7 @@
                     <td>{{ $row_detail->issueGlaze->item->name }}</td>
                     <td>{{ $row->item->code }}</td>
                     <td>{{ $row->item->name }}</td>
-                    <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
+                    <td>{{ CustomHelper::formatConditionalQty(round($row_detail->qty,2))}}</td>
                     <td>{{ $row_detail->issueGlaze->item->uomUnit->code }}</td>
                     <td>{{ $nominal ? number_format(round($row_detail->total,2) ,2,',','.') : '-' }}</td>
                 </tr>

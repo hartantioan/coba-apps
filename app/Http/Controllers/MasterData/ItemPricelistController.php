@@ -71,10 +71,6 @@ class ItemPricelistController extends Controller
                         $query->whereHas('type',function($query) use ($search, $request) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('name', 'like', "%$search%");
-                        })
-                        ->orWhereHas('customer',function($query) use ($search, $request) {
-                            $query->where('employee_no', 'like', "%$search%")
-                                ->orWhere('name', 'like', "%$search%");
                         });
                     });
                 }
@@ -94,10 +90,6 @@ class ItemPricelistController extends Controller
                         $query->where(function($query) use ($search, $request) {
                             $query->whereHas('type',function($query) use ($search, $request) {
                                 $query->where('code', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%");
-                            })
-                            ->orWhereHas('customer',function($query) use ($search, $request) {
-                                $query->where('employee_no', 'like', "%$search%")
                                     ->orWhere('name', 'like', "%$search%");
                             });
                         });

@@ -23,14 +23,11 @@
             <th>Tipe Item Bahan</th>
             <th>Kode Item Bahan</th>
             <th>Nama Item Bahan</th>
+            <th>Kode Target Item</th>
+            <th>Nama Target Item</th>
             <th>Qty Bahan</th>
             <th>Satuan Bahan</th>
             <th>Nominal Bahan</th>
-            <th>Kode Target Item</th>
-            <th>Nama Target Item</th>
-            <th>Qty Target</th>
-            <th>Satuan Target</th>
-            <th>Nominal Target</th>
         </tr>
     </thead>
     <tbody>
@@ -62,14 +59,12 @@
                     <td>{{ $row_detail->typeItem()}}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->code : '' }}</td>
                     <td>{{ $row_detail->lookable_type ? $row_detail->lookable->name : '' }} {{ $row_detail->note ?? '' }}</td>
-                    <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
-                    <td>{{ $row_detail->lookable_type ? $row_detail->lookable->uomUnit->code : $row_detail->unit->code }}</td>
-                    <td>{{ $nominal ? number_format($row_detail->total ,2,',','.') : '-' }}</td>
                     <td>{{ $row->item->code }}</td>
                     <td>{{ $row->item->name }}</td>
-                    <td>{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                    <td>{{ $row->item->uomUnit->code }}</td>
-                    <td>{{ $nominal ? number_format($row->grandtotal ,2,',','.') : '-' }}</td>
+                    <td>{{ CustomHelper::formatConditionalQty($row_detail->qty)}}</td>
+                    <td>{{ $row_detail->lookable_type ? $row_detail->lookable->uomUnit->code : $row_detail->unit->code }}</td>
+                    <td>{{ $nominal ? number_format($row_detail->total ,3,',','.') : '-' }}</td>
+
                 </tr>
                 @php
                     $no++;

@@ -182,7 +182,7 @@ class DownPaymentController extends Controller
                     'post_date'     => date('d/m/Y',strtotime(  $row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
-                    'subtotal'      => number_format($row->subtotal * $ ,2,',','.'),
+                    'subtotal'      => number_format($row->subtotal * $currency_rate,2,',','.'),
                     'discount'      => number_format($row->discount * $currency_rate,2,',','.'),
                     'total'         => number_format($row->total * $currency_rate,2,',','.'),
                     'used'          => number_format($row->total_used * $currency_rate,2,',','.'),

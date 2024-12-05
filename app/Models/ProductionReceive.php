@@ -347,7 +347,8 @@ class ProductionReceive extends Model
         $countbomstandard = $this->productionOrderDetail->productionScheduleDetail->bom->whereHas('bomStandard')->count();
 
         if($countbackflush > 0 || $countbomstandard > 0){
-            $lastSegment = 'production_issue';
+            info('kambing2');
+            /* $lastSegment = 'production_issue';
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
             
@@ -555,7 +556,7 @@ class ProductionReceive extends Model
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
-            }
+            } */
         }
     }
 

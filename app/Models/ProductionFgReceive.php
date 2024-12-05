@@ -420,7 +420,7 @@ class ProductionFgReceive extends Model
                     'lookable_type'                 => $row['lookable_type'],
                     'lookable_id'                   => $row['lookable_id'],
                     'bom_id'                        => $row['bom_id'],
-                    'bom_detail_id'                 => $row['bom_detail_id'] ?? NULL,
+                    'bom_detail_id'                 => $row['bom_detail_id'] !== '' ? $row['bom_detail_id'] : NULL,
                     'qty'                           => round($row['qty'],3),
                     'nominal'                       => $row['nominal'],
                     'total'                         => round($row['total'],2),

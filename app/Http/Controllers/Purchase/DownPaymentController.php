@@ -97,7 +97,6 @@ class DownPaymentController extends Controller
                         ON ar.id = ard.adjust_rate_id
                     WHERE 
                         ar.post_date <= :date4
-                        AND ar.post_date < '2024-10-31'
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id

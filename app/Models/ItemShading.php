@@ -36,7 +36,7 @@ class ItemShading extends Model
     public function marketingOrderDeliveryDetailStock(){
         return $this->hasMany('App\Models\MarketingOrderDeliveryDetailStock')->whereHas('marketingOrderDeliveryDetail',function($query){
             $query->whereHas('marketingOrderDelivery',function($query){
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['1','2','3']);
             });
         });
     }

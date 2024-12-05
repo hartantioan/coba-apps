@@ -112,6 +112,8 @@ class PurchaseProgressController extends Controller
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                             'pr_use_date'  => $row_pr_detail->required_date,
                             'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
+                            'pr_note'      => $row_pr_detail->note,
+                            'pr_note2'     => $row_pr_detail->note2,
                             'status'       => $row_pr_detail->purchaseRequest->status(),
                             'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
                             'done_date'    => $row_pr_detail->purchaseRequest->done_date,
@@ -233,6 +235,8 @@ class PurchaseProgressController extends Controller
                                 'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                                 'pr_use_date'  => $row_pr_detail->required_date,
                                 'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
+                                'pr_note'      => $row_pr_detail->note,
+                                'pr_note2'     => $row_pr_detail->note2,
                                 'status'       => $row_pr_detail->purchaseRequest->status(),
                                 'done_user'    => '',
                                 'done_date'    => '',
@@ -290,6 +294,8 @@ class PurchaseProgressController extends Controller
                         'pr_date'      => '',
                         'pr_use_date'  => '',
                         'pr_qty'       => '',
+                        'pr_note'      => '',
+                        'pr_note2'     => '',
                         'status'       => '',
                         'done_user'    => '',
                         'done_date'    => '',
@@ -355,6 +361,8 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<th>PR Date</th>';
         $tableHtml .= '<th>PR Tgl.Pakai</th>';
         $tableHtml .= '<th>PR Qty</th>';
+        $tableHtml .= '<th>PR Ket.1</th>';
+        $tableHtml .= '<th>PR Ket.2</th>';
         $tableHtml .= '<th>PR Status</th>';
         $tableHtml .= '<th>PR Updated By</th>';
         // $tableHtml .= '<th>PR Tanggal Done</th>';
@@ -427,6 +435,8 @@ class PurchaseProgressController extends Controller
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_use_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_qty'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_note'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_note2'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['status'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_user'] . '</td>';
                                 // $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_date'] . '</td>';

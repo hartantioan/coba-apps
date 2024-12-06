@@ -104,7 +104,7 @@ class DownPaymentController extends Controller
                     LIMIT 1
                 ),0) AS latest_currency,
                 IFNULL((SELECT
-                    ar.reverse_date
+                    ar.post_date
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
@@ -115,7 +115,7 @@ class DownPaymentController extends Controller
                         AND ard.lookable_id = pdp.id
                     ORDER BY ar.id DESC
                     LIMIT 1
-                ),'') AS latest_reverse_date,
+                ),'') AS latest_currency_date,
                 IFNULL((
                     SELECT
                         SUM(ROUND(jd.nominal,2))
@@ -183,7 +183,7 @@ class DownPaymentController extends Controller
         foreach($data as $row){
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             $total_adjust_new_rule = 0;
-            if($row->latest_reverse_date >= '2024-11-01'){
+            if($row->latest_currency_date >= '2024-10-31'){
                 $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
             }
             $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);

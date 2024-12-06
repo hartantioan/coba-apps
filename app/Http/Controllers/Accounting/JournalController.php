@@ -601,7 +601,7 @@ class JournalController extends Controller
             DB::beginTransaction();
 
 
-                $temp = '';
+                /* $temp = '';
                 foreach($request->arr_multi_code as $key => $row){
 
                     if($temp !== $row){
@@ -681,6 +681,103 @@ class JournalController extends Controller
                     }
 
                     $temp = $row;
+                } */
+
+                $uniqueArrCode = [];
+                $uniqueArrCurrency = [];
+                $uniqueArrCompany = [];
+                $uniqueArrPostDate = [];
+                $uniqueArrNote = [];
+                $uniqueArrConversion = [];
+                foreach($request->arr_multi_code as $key => $row){
+                    if($row){
+                        if(!in_array($row,$uniqueArrCode)){
+                            $uniqueArrCode[] = $row;
+                            $uniqueArrCurrency[] = $request->arr_multi_currency[$key];
+                            $uniqueArrCompany[] = $request->arr_multi_company[$key];
+                            $uniqueArrPostDate[] = $request->arr_multi_post_date[$key];
+                            $uniqueArrNote[] = $request->arr_multi_note[$key];
+                            $uniqueArrConversion[] = $request->arr_multi_conversion[$key];
+                        }
+                    }
+                }
+
+                foreach($uniqueArrCode as $keymain => $rowunique){
+                    $currency = Currency::where('code',explode('|',$uniqueArrCurrency[$keymain])[0])->first();
+                    $company = Company::where('code',explode('|',$uniqueArrCompany[$keymain])[0])->first();
+                    $menu = Menu::where('url', 'journal')->first();
+                    $newCode = Journal::generateCode(
+                        $menu->document_code . date('y', strtotime(\DateTime::createFromFormat('d/m/Y',$uniqueArrPostDate[$keymain])->format('Y-m-d'))) . '00'
+                    );
+
+                    $query = Journal::create([
+                        'code'			            => $newCode,
+                        'user_id'		            => session('bo_id'),
+                        'currency_id'               => $currency->id,
+                        'company_id'                => $company->id,
+                        'currency_rate'             => $uniqueArrConversion[$keymain] ?? NULL,
+                        'post_date'                 => $uniqueArrPostDate[$keymain] ? \DateTime::createFromFormat('d/m/Y', $uniqueArrPostDate[$keymain])->format('Y-m-d') : NULL,
+                        'note'                      => $uniqueArrNote[$keymain] ?? NULL,
+                        'status'                    => '1'
+                    ]);
+
+                    CustomHelper::sendApproval('journals',$query->id,$query->note);
+                    CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new Journal())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit journal.');
+
+                    foreach($request->arr_multi_code as $key => $row){
+                        if($rowunique == $row){
+                            if($query) {
+                                $account = User::where('employee_no',explode('|',$request->arr_multi_bp[$key])[0])->first();
+                                $place = Place::where('code',explode('|',$request->arr_multi_place[$key])[0])->first();
+                                $line = Line::where('code',explode('|',$request->arr_multi_line[$key])[0])->first();
+                                $machine = Machine::where('code',explode('|',$request->arr_multi_machine[$key])[0])->first();
+                                $project = Project::where('code',explode('|',$request->arr_multi_project[$key])[0])->first();
+                                $department = Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first();
+        
+                                if(floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) < 0){
+                                    JournalDetail::create([
+                                        'journal_id'        => $query->id,
+                                        'coa_id'            => $coaAvailable[$key],
+                                        'account_id'        => $account ? $account->id : NULL,
+                                        'place_id'          => $place ? $place->id : NULL,
+                                        'line_id'           => $line ? $line->id : NULL,
+                                        'machine_id'        => $machine ? $machine->id : NULL,
+                                        'project_id'        => $project ? $project->id : NULL,
+                                        'department_id'     => $department ? $department->id : NULL,
+                                        'type'              => '1',
+                                        'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_debit[$key])),
+                                        'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_debit_fc[$key])),
+                                        'note'              => $request->arr_multi_note_detail[$key],
+                                        'note2'             => $request->arr_multi_note_detail2[$key],
+                                    ]);
+                                }
+        
+                                if(floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) < 0){
+                                    JournalDetail::create([
+                                        'journal_id'        => $query->id,
+                                        'coa_id'            => $coaAvailable[$key],
+                                        'account_id'        => $account ? $account->id : NULL,
+                                        'place_id'          => $place ? $place->id : NULL,
+                                        'line_id'           => $line ? $line->id : NULL,
+                                        'machine_id'        => $machine ? $machine->id : NULL,
+                                        'project_id'        => $project ? $project->id : NULL,
+                                        'department_id'     => $department ? $department->id : NULL,
+                                        'type'              => '2',
+                                        'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])),
+                                        'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_kredit_fc[$key])),
+                                        'note'              => $request->arr_multi_note_detail[$key],
+                                        'note2'             => $request->arr_multi_note_detail2[$key],
+                                    ]);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 $response = [

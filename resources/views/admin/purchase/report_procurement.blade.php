@@ -168,36 +168,6 @@
 
     }
 
-    // function whatPrinting(code){
-    //     var item_id = $('#item_id').val();
-    //     if (!item_id) {
-    //         alert("Item ID cannot be empty. Please select an item.");
-    //         return false;
-    //     }
-    //     var start_date = $('#start_date').val();
-    //     var end_date = $('#finish_date').val();
-
-    //     var url = '{{ Request::url() }}/print_individual' +
-    //         '?start_date=' + encodeURIComponent(start_date) +
-    //         '&finish_date=' + encodeURIComponent(end_date) +
-    //         '&item_id=' + encodeURIComponent(item_id);
-
-    //     $.ajax({
-    //         url: url,
-    //         type: 'GET',
-    //         beforeSend: function() {
-    //             loadingOpen('.modal-content');
-    //         },
-    //         complete: function() {
-
-    //         },
-    //         success: function(data){
-    //             loadingClose('.modal-content');
-    //             window.open(data, '_blank');
-    //         }
-    //     });
-    // }
-
     function whatPrinting() {
         var item_id = $('#item_id').val();
         if (!item_id) {

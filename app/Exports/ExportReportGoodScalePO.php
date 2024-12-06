@@ -87,13 +87,17 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 $no_sj = $row->lookable->marketingOrderDeliveryProcess->code ?? '-';
             }
             $po_code = '-';
+            $list = '';
             if($row->goodScale->purchaseOrder()->exists()){
                 $po_code =$row->goodScale->purchaseOrder->code;
+                $list = $row->goodScale->purchaseOrder->getInvoice();
             }
 
             $price = 0;
+            $customer = $row->goodScale->account->name;
             if($row->lookable->type_delivery != '1'){
                 $price = $row->total / ($row->qty == 0 ? 1 : $row->qty);
+                $customer = $row->lookable->customer->name;
             }
 
             $arr[] = [
@@ -109,9 +113,9 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'nik'                    => $row->goodScale->user->employee_no,
                 'user'                   => $row->goodScale->user->name,
                 'tgl_terima'            => date('d/m/Y', strtotime($row->goodScale->post_date)),
-                'No. SO'                 => $row->lookable->marketingOrderDelivery,
+                'No. SO'                 => $row->lookable->getSO(),
                 'No. MOD'                 => $row->lookable->code,
-                'Customer'         => $row->goodScale->account->name,
+                'Customer'         => $customer,
                 'Kota / Kabupaten'          => $row->lookable->city->name ?? '-',
                 'Tipe Transport'                 => $row->lookable->transportation->name,
                 'Metode Hitung Ongkir'                  => $row->lookable->costDeliveryType(),
@@ -122,7 +126,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Qty'            => $row->qty,
                 'Harga'             => $price,
                 'Total'             => $row->total,
-                'No. APIN'             => $row->lookable->getInvoice() ?? '-',
+                'No. APIN'             => $list,
 
             ];
 

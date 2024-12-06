@@ -109,7 +109,7 @@ class DownPaymentController extends Controller
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
                     WHERE 
-                        ar.post_date <= :date4
+                        ar.post_date <= :date5
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
@@ -126,7 +126,7 @@ class DownPaymentController extends Controller
                             ON jd.coa_id = c.id
                         WHERE c.code = '100.01.07.01.01'
                         AND jd.note = CONCAT('REVERSE*',pdp.code)
-                        AND j.post_date <= :date5
+                        AND j.post_date <= :date6
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
                         AND jd.type = '1'
@@ -141,7 +141,7 @@ class DownPaymentController extends Controller
                             ON jd.coa_id = c.id
                         WHERE c.code = '100.01.07.01.01'
                         AND jd.note = CONCAT('REVERSE*',pdp.code)
-                        AND j.post_date <= :date6
+                        AND j.post_date <= :date7
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
                         AND jd.type = '2'
@@ -152,14 +152,14 @@ class DownPaymentController extends Controller
                 LEFT JOIN users u
                     ON u.id = pdp.account_id
                 WHERE 
-                    pdp.post_date <= :date7
+                    pdp.post_date <= :date8
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7','8')
                     AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date8
+                            cd.post_date <= :date9
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pdp.id
                             AND cd.deleted_at IS NULL
@@ -173,6 +173,7 @@ class DownPaymentController extends Controller
                 'date6' => $date,
                 'date7' => $date,
                 'date8' => $date,
+                'date9' => $date,
             ));
 
         $results = [];

@@ -183,7 +183,7 @@ class DownPaymentController extends Controller
         foreach($data as $row){
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             $total_adjust_new_rule = 0;
-            if($row->latest_reverse_date >= '2024-11-01'){
+            if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
                 $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
                 info($total_adjust_new_rule);
             }

@@ -1028,7 +1028,7 @@ class MarketingOrderDeliveryProcess extends Model
         /* $districtFrom = $place->district_id; */
         $cityTo = $this->marketingOrderDelivery->city_id;
         /* $districtTo = $this->marketingOrderDelivery->district_id; */
-        $deliveryCost = DeliveryCost::where('account_id',$this->account_id)->where('transportation_id',$this->marketingOrderDelivery->transportation_id)->where('from_city_id',$cityFrom)->where('to_city_id',$cityTo)->where('status','1')->orderByDesc('id')->first();
+        $deliveryCost = DeliveryCost::where('account_id',$this->account_id)->where('valid_from','<=',$this->post_date)->where('valid_to','>=',$this->post_date)->where('transportation_id',$this->marketingOrderDelivery->transportation_id)->where('from_city_id',$cityFrom)->where('to_city_id',$cityTo)->where('status','1')->orderByDesc('id')->first();
         if($deliveryCost){
             if($typeTransport == '1'){
                 $price = $deliveryCost->tonnage;

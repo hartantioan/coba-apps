@@ -49,7 +49,7 @@ class EmployeeReceivableController extends Controller
         $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereHas('hasPaymentRequestDetail',function($query)use($date){
             $query->whereHas('paymentRequest',function($query)use($date){
                 $query->whereHas('outgoingPayment',function($query)use($date){
-                    $query->whereDate('post_date','<=',$date);
+                    $query->whereDate('pay_date','<=',$date);
                 });
             });
         })

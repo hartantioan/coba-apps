@@ -27,7 +27,16 @@ class ExportEmployeeReceivable implements FromView , WithEvents
     {
         $totalbalance=0;
         
-        $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereDate('post_date','<=',$this->date)->get();
+        $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereHas('hasPaymentRequestDetail',function($query){
+            $query->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment',function($query){
+                    $query->whereDate('pay_date','<=',$this->date);
+                });
+            });
+        })
+        ->whereHas('account',function($query){
+            $query->where('type','1');
+        })->get();
 
         $results = [];
 

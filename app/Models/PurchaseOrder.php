@@ -235,7 +235,7 @@ class PurchaseOrder extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document_po !== NULL && Storage::exists($this->document_po)) {
             $document_po = asset(Storage::url($this->document_po));
@@ -246,7 +246,7 @@ class PurchaseOrder extends Model
         return $document_po;
     }
 
-    public function attachments() 
+    public function attachments()
     {
         if($this->document_po){
             $arr = explode(',',$this->document_po);
@@ -313,7 +313,7 @@ class PurchaseOrder extends Model
         return $ada;
     }
 
-    
+
     public function hasBalance(){
         $qty = 0;
 
@@ -461,7 +461,7 @@ class PurchaseOrder extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -478,5 +478,20 @@ class PurchaseOrder extends Model
             $secret = true;
         }
         return $secret;
+    }
+
+    public function getInvoice(){
+        $arr = [];
+        foreach($this->purchaseOrderDetail as $row_order_detail ){
+            if($row_order_detail->purchaseInvoiceDetail()->exists()){
+                foreach($row_order_detail->purchaseInvoiceDetail as $row_invoice){
+                    if (!in_array($row_invoice->purchaseInvoice->code, $arr)) {
+                        $arr[] = $row_invoice->purchaseInvoice->code;
+                    }
+                }
+            }
+        }
+
+        return implode(',', $arr);;
     }
 }

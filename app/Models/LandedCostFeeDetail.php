@@ -36,6 +36,21 @@ class LandedCostFeeDetail extends Model
         return $this->belongsTo('App\Models\LandedCostFee', 'landed_cost_fee_id', 'id')->withTrashed();
     }
 
+    public function totalLandedCostFeeSelfByDate($date){
+        $data = $this->landedCost->whereHas('landedCostDetail',function($query)use($date){
+            $query->whereHas('landedCostDetailSelf',function($query)use($date){
+                $query->whereHas('landedCost',function($query)use($date){
+                    $query->where('post_date','<=',$date);
+                });
+            });
+        })->count();
+        if($data > 0){
+            return $this->total;
+        }else{
+            return 0;
+        }
+    }
+
     public function purchaseInvoiceDetail()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){

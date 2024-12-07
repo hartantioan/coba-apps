@@ -27,10 +27,10 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
     {
         $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
             $query->whereIn('status',['2','3'])
-                ->where('post_date','<=',$this->date)
+                ->where('post_date','<=',$this->date)/* 
                 ->whereHas('landedCostDetail',function($query){
                     $query->whereDoesntHave('landedCostDetailSelf');
-                });
+                }) */;
         })
         ->where(function($query){
             if($this->type){
@@ -43,7 +43,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
 
         $array=[];
         foreach($data as $row){
-            $balance = $row->balanceInvoiceByDate($this->date);
+            $balance = $row->balanceInvoiceByDate($this->date) - $row->totalLandedCostFeeSelfByDate($this->date);
             if($balance > 0){
                 $entry = [];
                 $entry["code"]=$row->landedCost->code;

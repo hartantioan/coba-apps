@@ -27,16 +27,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
     {
         $totalAll = 0;
         $array_filter = [];
-        $mo = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->whereHas('marketingOrderDeliveryProcess', function ($query) {
-                $query->where('post_date', '>=', $this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-            });
-        })
-        ->get()
-        ->sortBy(function ($item) {
-            return $item->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '';
-        })->values();
+        $mo = MarketingOrderDeliveryProcess::where('post_date', '>=', $this->start_date)->where('post_date', '<=', $this->end_date)->orderBy('code')->get();
 
         // $array_sudah = [];
         // $array_shading = [];
@@ -45,64 +36,65 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
         // }
         $key = 0;
         foreach ($mo as $key => $row) {
-
-            $array_filter[] = [
-                'no'                => ($key+1),
-                'code'              => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->code,
-                'status'            => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->statusRaw(),
-                'voider'            => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->voidUser()->exists() ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->voidUser->name : '',
-                'tgl_void'         => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->voidUser()->exists() ? date('d/m/Y',strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->void_date)) : '' ,
-                'ket_void'               => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->voidUser()->exists() ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->void_note : '' ,
-                'deleter'              =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->deleteUser()->exists() ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->deleteUser->name : '',
-                'tgl_delete'             => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->deleteUser()->exists() ? date('d/m/Y',strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->deleted_at)) : '',
-                'ket_delete'               => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->deleteUser()->exists() ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->delete_note : '',
-                'doner'        => ($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->status == 3 && is_null($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->done_id)) ? 'sistem' : (($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->status == 3 && !is_null($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->done_id)) ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->doneUser->name : null),
-                'tgl_done'          => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->doneUser ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->done_date : '',
-                'ket_done'              => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->doneUser ? $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->done_note : '' ,
-
-                'nik' =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->user->employee_no,
-                'user' =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->user->name,
-
-                'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->post_date)),
-                'customer' =>$row->marketingOrderDelivery->customer->name,
-                'itemcode' => $row->item->code,
-                'itemname' => $row->item->name,
-
-                'plant' => $row->place->name??'-',
-                'qtysj' => $row->qty,
-                // 'qty_konversi' => $row->getQtyM2(),
-                'satuan_konversi' => $row->marketingOrderDetail->itemUnit->unit->code,
-                'qty' => $row->qty * $row->getQtyM2(),
-                'satuan' => 'M2',
-                'gudang' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->getWarehouse(),
-                'area' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->getArea(),
-                'shading' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->getShading(),
-                'batch' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->getBatch(),
-                'delivery_type' => $row->marketingOrderDelivery->deliveryType(),
-                'list_invoice' =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->marketingOrderInvoice->code ?? '',
-                'expedisi' =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->account->name,
-                'sopir'                => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->driver_name,
-                'no_wa_supir'                => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->driver_hp,
-                'truk'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->vehicle_name,
-                'nopol' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->vehicle_no,
-                'no_kontainer'          => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->no_container,
-                'outlet' => $row->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
-                'alamat_tujuan'=> $row->marketingOrderDelivery->destination_address,
-                'catatan_internal'=>$row->marketingOrderDelivery->note_internal,
-                'catatan_eksternal'=>$row->marketingOrderDelivery->note_external,
-                'tracking'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->statusTrackingRaw(),
-                'status_item_sent'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->isItemSent() ? date('d/m/Y', strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->post_date)) : '',
-                'status_received_by_customer'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->isDelivered() ? date('d/m/Y', strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->receive_date)) : '',
-                'status_returned_document' =>$row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->return_date
-                    ? date('d/m/Y', strtotime($row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->return_date))
-                    : '',
-                'based_on'=>$row->marketingOrderDelivery->code,
-                'so' => $row->marketingOrderDetail->marketingOrder->code,
-                'no_timbangan'=> $row->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
-                'po_customer' => $row->marketingOrderDetail->marketingOrder->document_no,
-                'brand' => $row->marketingOrderDelivery->marketingOrderDeliveryProcessAll->getBrand(),
-                'so_type' => $row->marketingOrderDelivery->soType(),
-            ];
+            foreach($row->marketingOrderDelivery->marketingOrderDeliveryDetail as $rowdetail){
+                $array_filter[] = [
+                    'no'                => ($key+1),
+                    'code'              => $row->code,
+                    'status'            => $row->statusRaw(),
+                    'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                    'tgl_void'         => $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' ,
+                    'ket_void'               => $row->voidUser()->exists() ? $row->void_note : '' ,
+                    'deleter'              =>$row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                    'tgl_delete'             => $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '',
+                    'ket_delete'               => $row->deleteUser()->exists() ? $row->delete_note : '',
+                    'doner'        => ($row->status == 3 && is_null($row->done_id)) ? 'sistem' : (($row->status == 3 && !is_null($row->done_id)) ? $row->doneUser->name : null),
+                    'tgl_done'          => $row->doneUser ? $row->done_date : '',
+                    'ket_done'              => $row->doneUser ? $row->done_note : '' ,
+    
+                    'nik' =>$row->user->employee_no,
+                    'user' =>$row->user->name,
+    
+                    'post_date'         => date('d/m/Y', strtotime($row->post_date)),
+                    'customer' =>$rowdetail->marketingOrderDelivery->customer->name,
+                    'itemcode' => $rowdetail->item->code,
+                    'itemname' => $rowdetail->item->name,
+    
+                    'plant' => $rowdetail->place->name??'-',
+                    'qtysj' => $rowdetail->qty,
+                    // 'qty_konversi' => $row->getQtyM2(),
+                    'satuan_konversi' => $rowdetail->marketingOrderDetail->itemUnit->unit->code,
+                    'qty' => $rowdetail->qty * $rowdetail->getQtyM2(),
+                    'satuan' => 'M2',
+                    'gudang' => $rowdetail->getWarehouse(),
+                    'area' => $rowdetail->getArea(),
+                    'shading' => $rowdetail->getShading(),
+                    'batch' => $rowdetail->getBatch(),
+                    'delivery_type' => $rowdetail->marketingOrderDelivery->deliveryType(),
+                    'list_invoice' =>$row->marketingOrderInvoice->code ?? '',
+                    'expedisi' =>$row->account->name,
+                    'sopir'                => $row->driver_name,
+                    'no_wa_supir'                => $row->driver_hp,
+                    'truk'=>$row->vehicle_name,
+                    'nopol' => $row->vehicle_no,
+                    'no_kontainer'          => $row->no_container,
+                    'outlet' => $rowdetail->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
+                    'alamat_tujuan'=> $rowdetail->marketingOrderDelivery->destination_address,
+                    'catatan_internal'=>$rowdetail->marketingOrderDelivery->note_internal,
+                    'catatan_eksternal'=>$rowdetail->marketingOrderDelivery->note_external,
+                    'tracking'=>$row->statusTrackingRaw(),
+                    'status_item_sent'=>$row->isItemSent() ? date('d/m/Y', strtotime($row->post_date)) : '',
+                    'status_received_by_customer'=>$row->isDelivered() ? date('d/m/Y', strtotime($row->receive_date)) : '',
+                    'status_returned_document' =>$row->return_date
+                        ? date('d/m/Y', strtotime($row->return_date))
+                        : '',
+                    'based_on'=>$rowdetail->marketingOrderDelivery->code,
+                    'so' => $rowdetail->marketingOrderDetail->marketingOrder->code,
+                    'no_timbangan'=> $rowdetail->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
+                    'po_customer' => $rowdetail->marketingOrderDetail->marketingOrder->document_no,
+                    'brand' => $row->getBrand(),
+                    'so_type' => $rowdetail->marketingOrderDelivery->soType(),
+                ];
+            }
         }
 
         activity()

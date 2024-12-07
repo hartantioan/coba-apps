@@ -114,6 +114,10 @@ class GoodScaleController extends Controller
                                 $query->whereHas('purchaseOrder',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%");
                                 });
+                            })->orWhereHas('goodScaleDetail',function($query) use($search, $request){
+                                $query->whereHas('lookable',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
+                                });
                             })->orWhereHas('item',function($query) use($search, $request){
                                 $query->where('code','like',"%$search%")
                                     ->orWhere('name','like',"%$search%");
@@ -162,6 +166,10 @@ class GoodScaleController extends Controller
                             })
                             ->orWhereHas('purchaseOrderDetail',function($query) use($search, $request){
                                 $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                            })->orWhereHas('goodScaleDetail',function($query) use($search, $request){
+                                $query->whereHas('lookable',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%");
                                 });
                             })->orWhereHas('item',function($query) use($search, $request){

@@ -82,6 +82,19 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         ORDER BY ar.id DESC
                         LIMIT 1
                     ),0) AS latest_currency,
+                    IFNULL((SELECT
+                        ar.reverse_date
+                        FROM adjust_rate_details ard
+                        JOIN adjust_rates ar
+                            ON ar.id = ard.adjust_rate_id
+                        WHERE 
+                            ar.post_date <= :date5
+                            AND ar.status IN ('2','3')
+                            AND ard.lookable_type = 'purchase_down_payments'
+                            AND ard.lookable_id = pdp.id
+                        ORDER BY ar.id DESC
+                        LIMIT 1
+                    ),'') AS latest_reverse_date,
                     IFNULL((
                         SELECT
                             SUM(jd.nominal)
@@ -92,7 +105,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                                 ON jd.coa_id = c.id
                             WHERE c.code = '100.01.07.01.01'
                             AND jd.note = CONCAT('REVERSE*',pdp.code)
-                            AND j.post_date <= :date5
+                            AND j.post_date <= :date6
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND jd.type = '1'
@@ -107,7 +120,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                                 ON jd.coa_id = c.id
                             WHERE c.code = '100.01.07.01.01'
                             AND jd.note = CONCAT('REVERSE*',pdp.code)
-                            AND j.post_date <= :date6
+                            AND j.post_date <= :date7
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'
@@ -124,14 +137,14 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     LEFT JOIN users udelete
                         ON udelete.id = pdp.void_id
                     WHERE
-                        pdp.post_date <= :date7
+                        pdp.post_date <= :date8
                         AND pdp.grandtotal > 0
                         AND pdp.status IN ('2','3','7','8')
                         AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE
-                            cd.post_date <= :date8
+                            cd.post_date <= :date9
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pdp.id
                             AND cd.deleted_at IS NULL
@@ -145,13 +158,18 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     'date6' => $this->date,
                     'date7' => $this->date,
                     'date8' => $this->date,
+                    'date9' => $this->date,
                 ));
 
             foreach($query_data as $row_invoice){
                 $currency_rate = $row_invoice->latest_currency > 0 ? $row_invoice->latest_currency : $row_invoice->currency_rate;
+                $total_adjust_new_rule = 0;
+                if($row_invoice->latest_reverse_date >= '2024-11-01' && $row_invoice->post_date >= '2024-10-01'){
+                    $total_adjust_new_rule = round(($row_invoice->total_used / $row_invoice->grandtotal) * $row_invoice->adjust_nominal,2);
+                }
                 $total_received_after_adjust = round($row_invoice->grandtotal * $currency_rate,2);
                 $total_invoice_after_adjust = round(($row_invoice->total_used + $row_invoice->total_memo) * $currency_rate,2);
-                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row_invoice->total_journal_debit - $row_invoice->total_journal_credit,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row_invoice->total_journal_debit - $row_invoice->total_journal_credit,2) + $total_adjust_new_rule;
                 $balance = round($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo,2);
                 $currency_rate = $row_invoice->latest_currency;
                 if($balance > 0){

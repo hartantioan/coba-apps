@@ -1837,7 +1837,9 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('outstanding_landed_cost')->middleware('operation.access:outstanding_landed_cost,view')->group(function () {
                         Route::get('/', [OutstandingLandedCostController::class, 'index']);
 
-                        Route::get('export_outstanding_lc', [OutstandingLandedCostController::class, 'exportOutstandingPO']);
+                        Route::get('export_outstanding_lc', [OutstandingLandedCostController::class, 'exportOutstandingLC']);
+                        Route::get('export_outstanding_lc_local', [OutstandingLandedCostController::class, 'exportOutstandingLCLocal']);
+                        Route::get('export_outstanding_lc_import', [OutstandingLandedCostController::class, 'exportOutstandingLCImport']);
                     });
                 });
 

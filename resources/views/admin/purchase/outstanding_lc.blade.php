@@ -46,7 +46,17 @@
                                                     <div class="col m9 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
-                                                            <span class="hide-on-small-onl">Excel</span>
+                                                            <span class="hide-on-small-onl">Semua</span>
+                                                            <i class="material-icons right">view_list</i>
+                                                        </a>
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcelLocal();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">Local</span>
+                                                            <i class="material-icons right">view_list</i>
+                                                        </a>
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcelImport();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">Import</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
                                                     </div>
@@ -80,5 +90,13 @@
     function exportExcel(){
         var date = $('#date').val();
         window.location = "{{ Request::url() }}/export_outstanding_lc?date=" + date;
+    }
+    function exportExcelLocal(){
+        var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export_outstanding_lc_local?date=" + date;
+    }
+    function exportExcelImport(){
+        var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export_outstanding_lc_import?date=" + date;
     }
 </script>

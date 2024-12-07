@@ -15,12 +15,12 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
     * @return \Illuminate\Support\Collection
     */
 
-    protected $date;
+    protected $date,$type;
 
-    public function __construct(string $date)
+    public function __construct(string $date, string $type)
     {
         $this->date = $date ? $date : '';
-
+        $this->type = $type ? $type : '';
     }
 
     public function view(): View
@@ -28,7 +28,15 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
         $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
             $query->whereIn('status',['2','3'])
                 ->where('post_date','<=',$this->date);
-        })->get();
+        })
+        ->where(function($query){
+            if($this->type){
+                $query->whereHas('landedCostFee',function($query){
+                    $query->where('type',$this->type);
+                });
+            }
+        })
+        ->get();
 
         $array=[];
         foreach($data as $row){

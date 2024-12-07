@@ -25,8 +25,21 @@ class OutstandingLandedCostController extends Controller
 
     }
 
-    public function exportOutstandingPO(Request $request){
+    public function exportOutstandingLC(Request $request){
         $date = $request->date? $request->date : '';
-		return Excel::download(new ExportOutstandingLandedCost($date), 'outstanding_lc'.uniqid().'.xlsx');
+        $type = 'all';
+		return Excel::download(new ExportOutstandingLandedCost($date,$type), 'outstanding_lc'.uniqid().'.xlsx');
+    }
+
+    public function exportOutstandingLCLocal(Request $request){
+        $date = $request->date? $request->date : '';
+        $type = '1';
+		return Excel::download(new ExportOutstandingLandedCost($date,$type), 'outstanding_lc_local'.uniqid().'.xlsx');
+    }
+
+    public function exportOutstandingLCImport(Request $request){
+        $date = $request->date? $request->date : '';
+        $type = '2';
+		return Excel::download(new ExportOutstandingLandedCost($date,$type), 'outstanding_lc_import'.uniqid().'.xlsx');
     }
 }

@@ -28,14 +28,14 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
         $totalAll = 0;
         $array_filter = [];
         $mo = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->whereHas('marketingOrderDeliveryProcessAll', function ($query) {
+            $query->whereHas('marketingOrderDeliveryProcess', function ($query) {
                 $query->where('post_date', '>=', $this->start_date)
                     ->where('post_date', '<=', $this->end_date);
             });
         })
         ->get()
         ->sortBy(function ($item) {
-            return $item->marketingOrderDelivery->marketingOrderDeliveryProcessAll->code ?? '';
+            return $item->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '';
         })->values();
 
         // $array_sudah = [];

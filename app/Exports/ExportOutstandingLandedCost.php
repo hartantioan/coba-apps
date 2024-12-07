@@ -43,8 +43,8 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
 
         $array=[];
         foreach($data as $row){
-            $balance = $row->balanceInvoiceByDate($this->date) - $row->totalLandedCostFeeSelfByDate($this->date);
-            if($balance > 0){
+            $balance = $row->balanceInvoiceByDate($this->date);
+            if($balance > 0 && !$row->totalLandedCostFeeSelfByDate($this->date)){
                 $entry = [];
                 $entry["code"]=$row->landedCost->code;
                 $entry["post_date"] = date('d/m/Y',strtotime($row->landedCost->post_date));

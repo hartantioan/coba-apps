@@ -37,6 +37,7 @@ class LandedCostFeeDetail extends Model
     }
 
     public function totalLandedCostFeeSelfByDate($date){
+        $has = false;
         $data = $this->landedCost->whereHas('landedCostDetail',function($query)use($date){
             $query->whereHas('landedCostDetailSelf',function($query)use($date){
                 $query->whereHas('landedCost',function($query)use($date){
@@ -45,10 +46,9 @@ class LandedCostFeeDetail extends Model
             });
         })->count();
         if($data > 0){
-            return $this->total;
-        }else{
-            return 0;
+            $has = true;
         }
+        return $has;
     }
 
     public function purchaseInvoiceDetail()

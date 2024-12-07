@@ -38,15 +38,13 @@ class LandedCostFeeDetail extends Model
 
     public function totalLandedCostFeeSelfByDate($date){
         $has = false;
-        $data = $this->landedCost->whereHas('landedCostDetail',function($query)use($date){
-            $query->whereHas('landedCostDetailSelf',function($query)use($date){
-                $query->whereHas('landedCost',function($query)use($date){
-                    $query->where('post_date','<=',$date);
-                });
-            });
-        })->count();
-        if($data > 0){
-            $has = true;
+        foreach($this->landedCost->landedCostDetail as $row){
+            $data = $row->landedCostDetailSelf()->whereHas('landedCost',function($query)use($date){
+                $query->where('post_date','<=',$date);
+            })->count();
+            if($data > 0){
+                $has = true;
+            }
         }
         return $has;
     }

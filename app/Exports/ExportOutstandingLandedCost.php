@@ -27,7 +27,10 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
     {
         $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
             $query->whereIn('status',['2','3'])
-                ->where('post_date','<=',$this->date);
+                ->where('post_date','<=',$this->date)
+                ->whereHas('landedCostDetail',function($query){
+                    $query->whereDoesntHave('landedCostDetailSelf');
+                });
         })
         ->where(function($query){
             if($this->type){

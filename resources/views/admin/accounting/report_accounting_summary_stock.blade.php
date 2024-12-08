@@ -66,7 +66,7 @@
                                                 </a>
                                                 <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                     <i class="material-icons hide-on-med-and-up">view_list</i>
-                                                    <span class="hide-on-small-onl">Excel</span>
+                                                    <span class="hide-on-small-onl">Excel With Value</span>
                                                     <i class="material-icons right">view_list</i>
                                                 </a>
                                             </div>
@@ -111,9 +111,7 @@
 
 <script>
     $(function() {
-        select2ServerSide('#sales_id,#filter_sales', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/vendor") }}');
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
+       
     });
 
 
@@ -157,7 +155,7 @@
                         $('.result').html(response.content);
                     } else {
                         $('.result').append(`
-                        Silahkan Klik Button View / View (Compare With Stock).
+                        Silahkan Klik Button View.
                      `);
                     }
                     M.toast({

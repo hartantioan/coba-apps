@@ -36,7 +36,7 @@ class ReportInventorySummaryStockFGController extends Controller
         $parentSegment = request()->segment(2);
 
         $data = [
-            'title'     => 'Summary Stock FG',
+            'title'     => 'Summary Stock FG Accounting',
             'content'   => 'admin.inventory.inventory_summary_stock_fg',
 
         ];
@@ -323,6 +323,6 @@ class ReportInventorySummaryStockFGController extends Controller
 
 
 
-        return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock_' . uniqid() . '.xlsx');
+        return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock_fg' . uniqid() . '.xlsx');
     }
 }

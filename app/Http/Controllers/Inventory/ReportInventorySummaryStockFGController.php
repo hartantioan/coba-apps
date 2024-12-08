@@ -323,6 +323,6 @@ class ReportInventorySummaryStockFGController extends Controller
 
 
 
-        return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock_fg' . uniqid() . '.xlsx');
+        return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock' . uniqid() . '.xlsx');
     }
 }

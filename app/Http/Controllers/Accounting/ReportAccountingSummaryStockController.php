@@ -319,6 +319,6 @@ class ReportAccountingSummaryStockController extends Controller
 
 
 
-        return Excel::download(new ExportReportAccountingSummaryStock($start_date, $finish_date), 'summary_stock_' . uniqid() . '.xlsx');
+        return Excel::download(new ExportReportAccountingSummaryStock($start_date, $finish_date), 'summary_stock_fg_value' . uniqid() . '.xlsx');
     }
 }

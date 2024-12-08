@@ -25,7 +25,7 @@ class ExportReportAccountingSummaryStock implements FromCollection, WithTitle, W
         'Brand',
         'Motif',
         'Grade',
-        'Variety',
+       
         'Kategori',
         'Shading',
         'Initial (M2)',

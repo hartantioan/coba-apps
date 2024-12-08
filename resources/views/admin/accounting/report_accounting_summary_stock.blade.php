@@ -38,207 +38,75 @@
                                                 <div id="validation_alert_multi" style="display:none;"></div>
                                             </div>
                                             <div class="col s12">
-                                                <div class="row">
-                                                    {{-- <div class="col m4 s6 ">
-                                                        <label for="filter_status" style="font-size:1rem;">Status :</label>
-                                                        <div class="input-field">
-                                                            <select class="form-control" id="filter_status"  multiple>
-                                                                <option value="1">Menunggu</option>
-                                                                <option value="2">Dalam Proses</option>
-                                                                <option value="3">Selesai</option>
-                                                                <option value="4">Ditolak</option>
-                                                                <option value="5">Ditutup</option>
-                                                                <option value="6">Direvisi</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_type" style="font-size:1rem;">Tipe Penjualan :</label>
-                                                        <div class="input-field">
-                                                            <select class="form-control" id="filter_type" >
-                                                                <option value="">{{ __('translations.all') }}</option>
-                                                                <option value="1">Proyek</option>
-                                                                <option value="2">Retail</option>
-                                                                <option value="3">Khusus</option>
-                                                                <option value="4">Sample</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_payment" style="font-size:1rem;">Tipe Pembayaran :</label>
-                                                        <div class="input-field">
-                                                            <select class="form-control" id="filter_payment" >
-                                                                <option value="">{{ __('translations.all') }}</option>
-                                                                <option value="1">DP</option>
-                                                                <option value="2">Credit</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_delivery" style="font-size:1rem;">Tipe Pengiriman :</label>
-                                                        <div class="input-field">
-                                                            <select class="form-control" id="filter_delivery" >
-                                                                <option value="">{{ __('translations.all') }}</option>
-                                                                <option value="1">Loco</option>
-                                                                <option value="2">Franco</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
-                                                        <div class="input-field">
-                                                            <select class="form-control" id="filter_company" >
-                                                                <option value="">{{ __('translations.all') }}</option>
-                                                                @foreach ($company as $rowcompany)
-                                                                    <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_supplier" style="font-size:1rem;">Customer :</label>
-                                                        <div class="input-field">
-                                                            <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" ></select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m12 s12 "></div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_supplier" style="font-size:1rem;">Pengirim / Ekspedisi :</label>
-                                                        <div class="input-field">
-                                                            <select class="browser-default" id="filter_sender" name="filter_sender" multiple="multiple" style="width:100% !important;" ></select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_supplier" style="font-size:1rem;">Sales :</label>
-                                                        <div class="input-field">
-                                                            <select class="browser-default" id="filter_sales" name="filter_sales" multiple="multiple" style="width:100% !important;" ></select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col m3 s6 ">
-                                                        <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
-                                                    </div> --}}
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_place" style="font-size:1rem;">Filter Plant :</label>
-                                                        <div class="input-field col s12">
-                                                            <select class="browser-default" id="filter_place" onchange="addItemFromStock()">
-                                                                @foreach ($place as $row)
-                                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m4 s6 ">
-                                                        <label for="filter_warehouse" style="font-size:1rem;">Warehouse :</label>
-                                                        <div class="input-field col s12">
-                                                            <select class="browser-default" id="filter_warehouse">
-                                                                @foreach ($warehouse as $row)
-                                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col m12 s12"></div>
-                                                    <div class="col m3 s6 ">
-                                                        <label for="start_date" style="font-size:1rem;">Tanggal Awal :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
-                                                    </div>
-                                                    <div class="col m3 s6 ">
-                                                        <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}">
-                                                    </div>
-                                                    <div class="col m6 s6 pt-2">
-                                                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filter();">
-                                                            <i class="material-icons hide-on-med-and-up">search</i>
-                                                            <span class="hide-on-small-onl">Filter</span>
-                                                            <i class="material-icons right">search</i>
-                                                        </a>
-                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
-                                                            <i class="material-icons hide-on-med-and-up">loop</i>
-                                                            <span class="hide-on-small-onl">Reset</span>
-                                                            <i class="material-icons right">loop</i>
-                                                        </a> --}}
-                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                                                            <span class="hide-on-small-onl">Excel</span>
-                                                            <i class="material-icons right">view_list</i>
-                                                        </a>
-                                                    </div>
-                                                </div>
+                                                
+                                                   
                                             </div>
+                                           
+                                            
+                                           
+                                         
+                                         
+                                            
 
+                                         
+                                            <div class="col m3 s6 ">
+                                                <label for="start_date" style="font-size:1rem;">Tanggal Awal :</label>
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                             </div>
-                                        </form>
+                                            <div class="col m3 s6 ">
+                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}">
+                                            </div>
+                                            <div class="col m6 s6 pt-2">
+                                               
+                                                <a id="view_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="viewList();">
+                                                    <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                    <span class="hide-on-small-onl">View</span>
+                                                    <i class="material-icons right">view_list</i>
+                                                </a>
+                                                <a id="export_button" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                    <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                    <span class="hide-on-small-onl">Excel</span>
+                                                    <i class="material-icons right">view_list</i>
+                                                </a>
+                                            </div>
                                     </div>
-                                </li>
-                            </ul>
                         </div>
-                        {{-- <div class="card">
-                            <div class="card-content">
-                                <h4 class="card-title">
-                                    Hasil
-                                </h4>
-                                <div class="row">
-                                    <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result" style="width:2500px;">
-                                            <table class="bordered" style="font-size:10px;">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{{ __('translations.no') }}.</th>
-                                                        <th>No. Dokumen</th>
-                                                        <th>{{ __('translations.status') }}</th>
-                                                        <th>Voider</th>
-                                                        <th>Tgl. Void</th>
-                                                        <th>Ket. Void</th>
-                                                        <th>Deleter</th>
-                                                        <th>Tgl. Delete</th>
-                                                        <th>Ket. Delete</th>
-                                                        <th>Doner</th>
-                                                        <th>Tgl. Done</th>
-                                                        <th>Ket. Done</th>
-                                                        <th>NIK</th>
-                                                        <th>{{ __('translations.user') }}</th>
-                                                        <th>{{ __('translations.post_date') }}</th>
-                                                        <th>Status Kirim</th>
-                                                        <th>Tgl. Kirim</th>
-                                                        <th>Tipe Pengiriman</th>
-                                                        <th>Ekspedisi</th>
-                                                        <th>Pelanggan</th>
-                                                        <th>Kode Item</th>
-                                                        <th>{{ __('translations.item') }}</th>
-                                                        <th>Plant</th>
-                                                        <th>Qty Konversi</th>
-                                                        <th>Satuan Konversi</th>
-                                                        <th>Qty </th>
-                                                        <th>{{ __('translations.unit') }}</th>
-                                                        <th>Note Internal</th>
-                                                        <th>Note External</th>
-                                                        <th>Note </th>
-                                                        <th>No.SJ</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="detail_mod">
-                                                    <tr>
-                                                        <td class="center-align" colspan="20">Silahkan pilih tanggal dan tekan tombol filter.</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
 
-                                    </div>
-                                </div>
+                    </div>
+                    </form>
+                </div>
+                </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <h4 class="card-title">
+                        Hasil
+                    </h4>
+                    <div class="row">
+                        <div class="col s12 m12">
+                            <div class="result" style="overflow: auto !important;width:100% !important;">
+                                Silakan Klik View
                             </div>
-                        </div> --}}
+                        </div>
                     </div>
                 </div>
-
-
-                <!-- / Intro -->
             </div>
-            <div class="content-overlay"></div>
+
         </div>
     </div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- / Intro -->
+</div>
+<div class="content-overlay"></div>
+</div>
+</div>
 </div>
 
 <script>
@@ -247,23 +115,27 @@
         select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/vendor") }}');
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
     });
-    function exportExcel(){
 
-        var warehouse_id = $('#filter_warehouse').val();
-        var place_id = $('#filter_place').val();
+
+
+    function exportExcel() {
+
+
+        var finish_date = $('#finish_date').val();
         var start_date = $('#start_date').val();
-        var end_date = $('#finish_date').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&finish_date=" + finish_date;
 
     }
-    function exportCsv(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export_csv?start_date=" + start_date + "&end_date=" + end_date;
-    }
-    function filter(){
+
+
+    function viewList() {
+
+        let urlgas = '';
         var formData = new FormData($('#form_data_filter')[0]);
+        urlgas = '{{ Request::url() }}/view';
+
         $.ajax({
-            url: '{{ Request::url() }}/filter',
+            url: urlgas,
             type: 'POST',
             dataType: 'JSON',
             data: formData,
@@ -274,63 +146,20 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('#main-display');
+                $('#validation_alert').html('');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
-                if(response.status == 200) {
-                    $('#detail_mod').empty();
-                    if(response.content.length > 0){
-                        $.each(response.content, function(i, val) {
-                            $('#detail_mod').append(`
-                                <tr>
-                                    <td>`+val.no+`</td>
-                                    <td>`+val.no_document+`</td>
-                                    <td>`+val.status+`</td>
-                                    <td>`+val.voider+`</td>
-                                    <td>`+val.tgl_void+`</td>
-                                    <td>`+val.ket_void+`</td>
-                                    <td>`+val.deleter+`</td>
-                                    <td>`+val.tgl_delete+`</td>
-                                    <td>`+val.ket_delete+`</td>
-                                    <td>`+val.doner+`</td>
-                                    <td>`+val.tgl_done+`</td>
-                                    <td>`+val.ket_done+`</td>
-                                    <td>`+val.nik+`</td>
-                                    <td>`+val.user+`</td>
-                                    <td>`+val.post_date+`</td>
-                                    <td>`+val.status_kirim+`</td>
-                                    <td>`+val.tgl_kirim+`</td>
-                                    <td>`+val.tipe_pengiriman+`</td>
-                                    <td>`+val.ekspedisi+`</td>
-                                    <td>`+val.pelanggan+`</td>
-                                    <td>`+val.kode_item+`</td>
-                                    <td>`+val.item+`</td>
-                                    <td>`+val.plant+`</td>
-                                    <td>`+val.qty_konversi+`</td>
-                                    <td>`+val.satuan_konversi+`</td>
-                                    <td>`+val.qty+`</td>
-                                    <td>`+val.unit+`</td>
-                                    <td>`+val.note_internal+`</td>
-                                    <td>`+val.note_external+`</td>
-                                    <td>`+val.note+`</td>
-                                    <td>`+val.no_sj+`</td>
-                                </tr>
-                            `);
-                        });
-                        $('#detail_mod').append(`
-                            <tr>
-                                <td class="" colspan="20">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
-                            </tr>
-                        `);
-                    }else{
-                        $('#detail_mod').append(`
-                            <tr>
-                                <td class="center-align" colspan="20">Data tidak ditemukan.</td>
-                            </tr>
-                        `);
+                loadingClose('#main');
+                if (response.status == 200) {
+                    $('.result').html('');
+                    if (response.content) {
+                        $('.result').html(response.content);
+                    } else {
+                        $('.result').append(`
+                        Silahkan Klik Button View / View (Compare With Stock).
+                     `);
                     }
-
                     M.toast({
                         html: 'Sukses proses data'
                     });
@@ -341,19 +170,18 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
                     icon: 'error'
                 });
             }
-
         });
     }
 
-    function reset(){
+    function reset() {
         $('#form_data_filter')[0].reset();
 
     }

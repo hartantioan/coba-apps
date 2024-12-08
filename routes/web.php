@@ -3679,6 +3679,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportAccountingSummaryStockController::class, 'index']);
                         Route::post('filter', [ReportAccountingSummaryStockController::class, 'filter']);
                         Route::get('export', [ReportAccountingSummaryStockController::class, 'export']);
+                        Route::post('view', [ReportAccountingSummaryStockController::class, 'view']);
                     });
 
                     Route::prefix('report_delivery_process_accounting')->middleware('operation.access:report_delivery_process_accounting,view')->group(function () {

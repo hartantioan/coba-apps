@@ -1452,6 +1452,26 @@ class GoodScaleController extends Controller
             $query_done = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
 
             if($query_done){
+
+                if($query_done->journal()->exists()){
+                    $query_done->journal->journalDetail()->delete();
+                    $query_done->journal->delete();
+                }
+
+                if($query_done->purchaseOrder()->exists()){
+                    $query_done->purchaseOrder->update([
+                        'status'    => '5',
+                        'void_id'   => session('bo_id'),
+                        'void_note' => 'VOID FROM EDP GOOD SCALE FORM',
+                        'void_date' => date('Y-m-d H:i:s')
+                    ]);
+        
+                    activity()
+                        ->performedOn(new PurchaseOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Void the purchase order data from good scale');
+                }
     
                 if(!$query_done->journal()->exists()){
                     $totalProportional = 0;

@@ -50,6 +50,8 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                 rs.total_invoice,
                 rs.total_return,
                 rs.total_journal,
+                rs.total_journal_debit,
+                rs.total_journal_credit,
                 rs.currency_rate,
                 rs.total_detail,
                 rs.adjust_nominal,

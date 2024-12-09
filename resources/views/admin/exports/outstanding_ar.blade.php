@@ -4,6 +4,7 @@
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
+            <th class="center-align">Brand</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
             <th class="center-align">TOP (Internal)</th>
             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo</th>
@@ -21,6 +22,7 @@
                 <td>{{ $key + 1 }}.</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['customer'] }}</td>
+                <td>{{ $row['brand'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['top'] }}</td>
                 <td>{{ $row['due_date'] }}</td>
@@ -38,7 +40,7 @@
         @endif
         @if(count($data) == 0)
             <tr>
-                <td colspan="9" align="center">
+                <td colspan="10" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

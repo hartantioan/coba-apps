@@ -40,6 +40,7 @@ class ExportOutstandingAR implements FromView , WithEvents
                 $array_filter[] = [
                     'code'              => $row->code,
                     'customer'          => $row->account->name,
+                    'brand'             => $row->account->brand->name ?? '-',
                     'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                     'due_date'          => date('d/m/Y',strtotime($row->due_date_internal)),
                     'top'               => $row->account->top_internal,

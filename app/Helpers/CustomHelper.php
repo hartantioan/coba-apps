@@ -3138,6 +3138,24 @@ class CustomHelper {
 								'detailable_id'	=> $rowfee->id,
 							]);
 							$totalfccost += $rowfc;
+						}else{
+							$rowfc = round(0 - $rowfee->total,2);
+							$rowtotal = round(0 * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
+							$totalcost += $rowtotal;
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowfee->landedCostFee->coa_id,
+								'account_id'	=> $rowfee->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
+								'note'			=> $rowfee->landedCostFee->name,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowfee->getTable(),
+								'detailable_id'	=> $rowfee->id,
+							]);
+							$totalfccost += $rowfc;
 						}
 					}
 				}else{

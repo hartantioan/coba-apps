@@ -777,12 +777,7 @@ class ResetCogsNewByDate10 implements ShouldQueue, ShouldBeUnique
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
-                $price = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
-                if($tempgiprice > 0){
-                   $price = $tempgiprice;
-               }else{
-                   $tempgiprice = $price;
-               }
+                $price = round($totalBefore,2) / round($qtyBefore,3);
             }
             $total = round($row->qty * $price,2);
             $qty = $row->qty;

@@ -78,7 +78,7 @@ class MarketingOrderDeliveryProcess extends Model
             $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
             if (!isset($arr[$row->itemStock->item_shading_id])) {
                 $arr[$row->itemStock->item_shading_id] = [
-                    'item'=> $row->itemStock->item->name,
+                    'item'=> $row->itemStock->item->print_name,
                     'hs_code'=> $row->itemStock->item->type->hs_code ?? '',
                     'shading'=>$row->itemStock->itemShading->code,
                     'total_box'=> 0,

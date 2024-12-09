@@ -1801,7 +1801,7 @@ document.addEventListener('focusin', function (event) {
 	}
 
     function saveUpdate(){
-        let passedNoteDetail = true, detail_id = [], detail_note = [];
+        let passedNoteDetail = true, detail_id = [], detail_note = [], detail_modd = [], detail_shading = [], detail_qty = [], detail_stock = [];
 
         $('input[name^="arr_note_update[]"]').each(function(index){
             detail_note.push($(this).val());
@@ -1811,6 +1811,16 @@ document.addEventListener('focusin', function (event) {
             }
             if(!$('input[name^="arr_id_update[]"]').eq(index).val()){
                 passedNoteDetail = false;
+            }
+        });
+
+        $('input[name^="arr_modd_id_update[]"]').each(function(index){
+            let stock = parseFloat($('input[name^="arr_item_shading_qty_update[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            if(stock > 0){
+                detail_modd.push($(this).val());
+                detail_stock.push($('input[name^="arr_stock_qty_update[]"]').eq(index).val());
+                detail_shading.push($('input[name^="arr_item_shading_id_update[]"]').eq(index).val());
+                detail_qty.push($('input[name^="arr_item_shading_qty_update[]"]').eq(index).val());
             }
         });
 
@@ -1847,6 +1857,10 @@ document.addEventListener('focusin', function (event) {
                             note2 : $('#note_external_update').val(),
                             detail_id : detail_id,
                             detail_note : detail_note,
+                            detail_modd : detail_modd,
+                            detail_shading : detail_shading,
+                            detail_qty : detail_qty,
+                            detail_stock : detail_stock
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2348,6 +2362,40 @@ document.addEventListener('focusin', function (event) {
                     $('#body-item-update').empty();
 
                     $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        let rowstock = ``;
+                        if(val.stock_by_shading.length > 0){
+                            $.each(val.stock_by_shading, function(j, value) {
+                                let initValue = 0;
+                                let initOutstandMod = parseFloat(value.qty_outstanding_mod.toString().replaceAll(".", "").replaceAll(",","."));
+                                let initMaxStock = parseFloat(value.qty.toString().replaceAll(".", "").replaceAll(",","."));
+                                $.each(val.stock_used, function(k, valuekuy) {
+                                    if(value.item_shading_id == valuekuy.item_shading_id){
+                                        initValue += parseFloat(valuekuy.qty.toString().replaceAll(".", "").replaceAll(",","."));
+                                        initOutstandMod -= parseFloat(valuekuy.qty.toString().replaceAll(".", "").replaceAll(",","."));
+                                        initMaxStock += parseFloat(valuekuy.qty.toString().replaceAll(".", "").replaceAll(",","."));
+                                    }
+                                });
+
+                                rowstock += `<tr>
+                                    <input type="hidden" name="arr_modd_id_update[]" value="` + val.id + `">
+                                    <input type="hidden" name="arr_stock_qty_update[]" value="` + formatRupiahIni(initMaxStock.toFixed(3).toString().replace('.',',')) + `">
+                                    <input type="hidden" name="arr_item_shading_id_update[]" value="` + value.item_shading_id + `">
+                                    <td class="center-align">` + (j+1) + `</td>
+                                    <td>` + value.item_shading_code + `</td>
+                                    <td>` + value.stock + `</td>
+                                    <td>` + formatRupiahIni(initOutstandMod.toFixed(3).toString().replace('.',',')) + `</td>
+                                    <td>` + value.qty_unsent_sj + `</td>
+                                    <td><input name="arr_item_shading_qty_update[]" type="text" value="` + formatRupiahIni(initValue.toFixed(3).toString().replace('.',',')) + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + formatRupiahIni(initMaxStock.toFixed(3).toString().replace('.',',')) + `" data-id="` + val.id + `" ></td>
+                                    <td class="center">
+                                        <span>` + val.unit + `</span>
+                                    </td>
+                                </tr>`;
+                            });
+                        }else{
+                            rowstock += `<tr><td class="center" colspan="7">Stock shading tidak ditemukan</td></tr>`;
+                        }
+
                         $('#body-item-update').append(`
                             <tr class="row_item_update">
                                 <input type="hidden" name="arr_id_update[]" value="` + val.id + `">
@@ -2370,6 +2418,29 @@ document.addEventListener('focusin', function (event) {
                                     <input name="arr_note_update[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                 </td>
                             </tr>
+                            <tr>
+                                <td colspan="6">
+                                    <table class="bordered" style="width:100% !important;background-color:` + getRandomColor() + `;">
+                                        <thead>
+                                            <tr>
+                                                <th class="center" colspan="7">DAFTAR STOK / SHADING <i>(Qty bisa berubah sewaktu-waktu)</i> Harga total SO bisa berbeda dengan aslinya karena ada selisih pembulatan PPN.</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="center">No</th>
+                                                <th class="center">Shading</th>
+                                                <th class="center">Qty Stock</th>
+                                                <th class="center">Qty Outstanding MOD</th>
+                                                <th class="center">Qty Unsent SJ</th>
+                                                <th class="center">Qty Available</th>
+                                                <th class="center">Satuan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-update` + count + `">
+                                            ` + rowstock + `
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>  
                         `);
                     });
 

@@ -988,14 +988,16 @@ class Item extends Model
             $unsent =  $row->totalUnsentSj();
             $stock = round($row->itemStock()->sum('qty') / $conversion,3);
             $balance = $stock - $outstanding - $unsent;
-            $arr[] = [
-                'item_shading_id'   => $row->id,
-                'item_shading_code' => $row->code,
-                'qty'               => CustomHelper::formatConditionalQty($balance),
-                'qty_outstanding_mod'               => CustomHelper::formatConditionalQty($outstanding),
-                'qty_unsent_sj'               => CustomHelper::formatConditionalQty($unsent),
-                'stock'       => CustomHelper::formatConditionalQty($stock),
-            ];
+            /* if($balance > 0){ */
+                $arr[] = [
+                    'item_shading_id'       => $row->id,
+                    'item_shading_code'     => $row->code,
+                    'qty'                   => CustomHelper::formatConditionalQty($balance),
+                    'qty_outstanding_mod'   => CustomHelper::formatConditionalQty($outstanding),
+                    'qty_unsent_sj'         => CustomHelper::formatConditionalQty($unsent),
+                    'stock'                 => CustomHelper::formatConditionalQty($stock),
+                ];
+            //}
         }
         return $arr;
     }

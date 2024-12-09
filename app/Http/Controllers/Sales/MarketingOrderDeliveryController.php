@@ -737,6 +737,42 @@ class MarketingOrderDeliveryController extends Controller
         $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->where('status','2')->first();
 
         if($query){
+            $passedQty = true;
+
+            if($request->detail_modd){
+                foreach($request->detail_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($row);
+                    $qtyRequest = round($modd->qty,3);
+                    $qtyShading = 0;
+                    foreach($request->detail_modd as $keydetail => $rowdetail){
+                        if($row == $rowdetail){
+                            $qtyShading += round(str_replace(',', '.', str_replace('.', '', $request->detail_qty[$keydetail])),3);
+                        }
+                    }
+                    if($qtyShading !== $qtyRequest){
+                        $passedQty = false;
+                    }
+                }
+            }
+
+            if($request->detail_modd){
+                foreach($request->detail_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($row);
+                    if($modd){
+                        $modd->marketingOrderDeliveryDetailStock()->delete();
+                    }
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Qty mod item dengan shading tidak sama.',
+                ]);
+            }
+
+
+
             $query->update([
                 'delivery_date'     => $request->delivery_date,
                 'note_internal'     => $request->note,
@@ -750,6 +786,18 @@ class MarketingOrderDeliveryController extends Controller
                         $modd->update([
                             'note'  => $request->detail_note[$key],
                         ]);
+                        if($request->detail_modd){
+                            foreach($request->detail_modd as $keydetail => $rowdetail){
+                                if($row == $rowdetail){
+                                    MarketingOrderDeliveryDetailStock::create([
+                                        'marketing_order_delivery_detail_id'    => $modd->id,
+                                        'item_shading_id'                       => $request->detail_shading[$keydetail],
+                                        'qty'                                   => round(str_replace(',', '.', str_replace('.', '', $request->detail_qty[$keydetail])),3),
+                                        'stock'                                 => round(str_replace(',', '.', str_replace('.', '', $request->detail_stock[$keydetail])),3),
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -758,18 +806,14 @@ class MarketingOrderDeliveryController extends Controller
                 ->performedOn(new MarketingOrderDelivery())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('update note the Marketing Order Delivery data');
+                ->log('Edit note delivery date dan internal / external note marketing order delivery.');
 
             $response = [
                 'status'  => 200,
                 'message' => 'Data berhasil diupdate.'
             ];
 
-            activity()
-                ->performedOn(new MarketingOrderDelivery())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Edit note delivery date dan internal / external note marketing order delivery.');
+            
         }else{
             $response = [
                 'status'  => 500,
@@ -889,6 +933,13 @@ class MarketingOrderDeliveryController extends Controller
         $details = [];
 
         foreach($po->marketingOrderDeliveryDetail()->orderBy('id')->get() as $key => $row){
+            $arrStock = [];
+            foreach($row->marketingOrderDeliveryDetailStock as $rowstock){
+                $arrStock[] = [
+                    'item_shading_id'   => $rowstock->item_shading_id,
+                    'qty'               => CustomHelper::formatConditionalQty($rowstock->qty),
+                ];
+            }
             $details[] = [
                 'no'                    => $key + 1,
                 'id'                    => $row->id,
@@ -897,6 +948,8 @@ class MarketingOrderDeliveryController extends Controller
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
+                'stock_by_shading'      => $row->item->arrayStockByShading($row->marketingOrderDetail->qty_conversion),
+                'stock_used'            => $arrStock,
             ];
         }
 

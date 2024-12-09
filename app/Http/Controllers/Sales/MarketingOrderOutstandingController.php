@@ -58,6 +58,7 @@ class MarketingOrderOutstandingController extends Controller
                         'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
                         'payment'           => CustomHelper::formatConditionalQty($payment),
                         'balance'           => CustomHelper::formatConditionalQty($balance),
+                        'brand'             => $row->account->brand->name ?? '-',
                     ];
                     $grandtotalAll += $balance;
                 }

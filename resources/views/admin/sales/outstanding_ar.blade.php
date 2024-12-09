@@ -83,6 +83,7 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
+                                                        <th class="center-align">Brand</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
                                                         <th class="center-align">TOP (Internal)</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo</th>
@@ -95,7 +96,7 @@
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="11">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="12">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -155,6 +156,7 @@
                                     <td class="center-align">`+(i+1)+`.</td>
                                     <td>`+val.code+`</td>
                                     <td>`+val.customer+`</td>
+                                    <td>`+val.brand+`</td>
                                     <td class="center-align">`+val.post_date+`</td>
                                     <td class="center-align">`+val.top+`</td>
                                     <td class="center-align">`+val.due_date+`</td>

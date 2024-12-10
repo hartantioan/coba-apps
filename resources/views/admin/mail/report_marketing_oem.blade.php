@@ -902,19 +902,7 @@
         @endif
 
 
-        @foreach ($code as $row5)
-        @if ($totalexpcode[$row][$row2][$row3][$row4][$row5]==0 and $totalecocode[$row][$row2][$row3][$row4][$row5]==0 and $totalstdcode[$row][$row2][$row3][$row4][$row5]==0 and $totalgcode[$row][$row2][$row3][$row4][$row5]==0)
-
-        @else
-        <!-- <tr>
-            <td style="font-size:12px;" align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{$row5}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalexpcode[$row][$row2][$row3][$row4][$row5]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalecocode[$row][$row2][$row3][$row4][$row5]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalstdcode[$row][$row2][$row3][$row4][$row5]?? 0,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($totalgcode[$row][$row2][$row3][$row4][$row5]?? 0,0,",",".")}}</td>
-        </tr> -->
-        @endif
-        @endforeach
+       
 
         @endforeach
 

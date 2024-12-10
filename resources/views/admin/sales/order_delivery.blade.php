@@ -1801,7 +1801,7 @@ document.addEventListener('focusin', function (event) {
 	}
 
     function saveUpdate(){
-        let passedNoteDetail = true, detail_id = [], detail_note = [], detail_modd = [], detail_shading = [], detail_qty = [], detail_stock = [];
+        let passedNoteDetail = true, detail_id = [], detail_note = [], detail_modd = [], detail_shading = [], detail_qty = [], detail_stock = [], detail_conversion = [];
 
         $('input[name^="arr_note_update[]"]').each(function(index){
             detail_note.push($(this).val());
@@ -1821,6 +1821,7 @@ document.addEventListener('focusin', function (event) {
                 detail_stock.push($('input[name^="arr_stock_qty_update[]"]').eq(index).val());
                 detail_shading.push($('input[name^="arr_item_shading_id_update[]"]').eq(index).val());
                 detail_qty.push($('input[name^="arr_item_shading_qty_update[]"]').eq(index).val());
+                detail_conversion.push($('input[name^="arr_item_shading_conversion_update[]"]').eq(index).val());
             }
         });
 
@@ -1860,7 +1861,8 @@ document.addEventListener('focusin', function (event) {
                             detail_modd : detail_modd,
                             detail_shading : detail_shading,
                             detail_qty : detail_qty,
-                            detail_stock : detail_stock
+                            detail_stock : detail_stock,
+                            detail_conversion : detail_conversion,
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2381,6 +2383,7 @@ document.addEventListener('focusin', function (event) {
                                     <input type="hidden" name="arr_modd_id_update[]" value="` + val.id + `">
                                     <input type="hidden" name="arr_stock_qty_update[]" value="` + formatRupiahIni(initMaxStock.toFixed(3).toString().replace('.',',')) + `">
                                     <input type="hidden" name="arr_item_shading_id_update[]" value="` + value.item_shading_id + `">
+                                    <input type="hidden" name="arr_item_shading_conversion_update[]" value="` + val.qty_conversion + `">
                                     <td class="center-align">` + (j+1) + `</td>
                                     <td>` + value.item_shading_code + `</td>
                                     <td>` + value.stock + `</td>

@@ -771,7 +771,41 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
 
-
+            if($request->detail_shading){
+                $arrShadingItem = [];
+                $arrShadingQty = [];
+                $arrConversion = [];
+                $passedQtyShading = true;
+                $arrItemError = [];
+                foreach($request->detail_shading as $key => $row){
+                    if(!in_array($row,$arrShadingItem)){
+                        $arrShadingItem[] = $row;
+                        $arrShadingQty[] = round(str_replace(',', '.', str_replace('.', '', $request->detail_qty[$key])),3);
+                        $arrConversion[] = round(str_replace(',', '.', str_replace('.', '', $request->detail_conversion[$key])),3);
+                    }else{
+                        $index = array_search($row,$arrShadingItem);
+                        $arrShadingQty[$index] += round(str_replace(',', '.', str_replace('.', '', $request->detail_qty[$key])),3);
+                    }
+                }
+                foreach($arrShadingItem as $key => $row){
+                    $itemShading = ItemShading::find($row);
+                    if($itemShading){
+                        $stock = round($itemShading->stockAvailable()/$arrConversion[$key],3);
+                        if($stock < round($arrShadingQty[$key],3)){
+                            $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty(round($arrShadingQty[$key],3)).' Stok : '.CustomHelper::formatConditionalQty($stock);
+                            $passedQtyShading = false;
+                        }
+                    }else{
+                        $passedQtyShading = false;
+                    }
+                }
+                if(!$passedQtyShading){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => implode(', ',$arrItemError),
+                    ]);
+                }
+            }
 
             $query->update([
                 'delivery_date'     => $request->delivery_date,
@@ -949,6 +983,7 @@ class MarketingOrderDeliveryController extends Controller
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
                 'stock_by_shading'      => $row->item->arrayStockByShading($row->marketingOrderDetail->qty_conversion),
+                'qty_conversion'        => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty_conversion),
                 'stock_used'            => $arrStock,
             ];
         }

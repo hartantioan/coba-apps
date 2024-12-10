@@ -207,6 +207,8 @@ use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
 use App\Http\Controllers\Inventory\InventoryTransferOutController;
 use App\Http\Controllers\Inventory\InventoryTransferInController;
+use App\Http\Controllers\Inventory\TruckQueueController;
+use App\Http\Controllers\Inventory\TruckQueueUpdaterController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
 use App\Http\Controllers\Inventory\GoodIssueRequestController;
@@ -2190,6 +2192,26 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [InventoryTransferInController::class, 'voidStatus'])->middleware('operation.access:transfer_in,void');
                     Route::post('destroy', [InventoryTransferInController::class, 'destroy'])->middleware('operation.access:transfer_in,delete');
                     Route::get('export_from_page', [InventoryTransferInController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('truck_queue')->middleware(['operation.access:truck_queue,view', 'lockacc'])->group(function () {
+                    Route::get('/', [TruckQueueController::class, 'index']);
+                    Route::get('datatable', [TruckQueueController::class, 'datatable']);
+                   Route::post('create', [TruckQueueController::class, 'create'])->middleware('operation.access:truck_queue,update');
+                    Route::post('destroy', [TruckQueueController::class, 'destroy'])->middleware('operation.access:truck_queue,delete');
+                    Route::get('export_from_page', [TruckQueueController::class, 'exportFromTransactionPage']);
+                    Route::get('row_detail', [TruckQueueController::class, 'rowDetail']);
+                });
+
+                Route::prefix('truck_queue_updater')->middleware(['operation.access:truck_queue_updater,view', 'lockacc'])->group(function () {
+                    Route::get('/', [TruckQueueUpdaterController::class, 'index']);
+                    Route::get('datatable', [TruckQueueUpdaterController::class, 'datatable']);
+                    Route::post('create', [TruckQueueUpdaterController::class, 'create'])->middleware('operation.access:truck_queue_updater,update');
+                    Route::post('update_muat_status', [TruckQueueUpdaterController::class, 'updateMuatStatus'])->middleware('operation.access:truck_queue_updater,update');
+                    Route::post('update_done_muat', [TruckQueueUpdaterController::class, 'updateDoneMuat'])->middleware('operation.access:truck_queue_updater,update');
+                    Route::post('destroy', [TruckQueueUpdaterController::class, 'destroy'])->middleware('operation.access:truck_queue_updater,delete');
+                    Route::get('export_from_page', [TruckQueueUpdaterController::class, 'exportFromTransactionPage']);
+                    Route::get('row_detail', [TruckQueueUpdaterController::class, 'rowDetail']);
                 });
 
                 Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,report'])->withoutMiddleware('direct.access')->group(function () {

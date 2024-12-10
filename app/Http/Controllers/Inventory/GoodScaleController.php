@@ -943,7 +943,7 @@ class GoodScaleController extends Controller
                 foreach($gs->goodScaleDetail as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         if($row->lookable->marketingOrderDeliveryProcess()->exists()){
-                            $bobot = round($row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional,3);
+                            $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
                             $qty = round($qty_final * $bobot,3);
                             $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
                             $row->lookable->marketingOrderDeliveryProcess->update([

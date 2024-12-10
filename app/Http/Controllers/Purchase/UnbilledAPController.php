@@ -52,10 +52,20 @@ class UnbilledAPController extends Controller
                 rs.account_name,
                 rs.post_date,
                 rs.delivery_no,
+                rs.status_cancel,
                 rs.note
                 FROM
                     (SELECT
                         gr.*,
+                        IFNULL((SELECT
+                            '1'
+                            FROM cancel_documents cdu
+                            WHERE 
+                                cdu.post_date <= :date9
+                                AND cdu.lookable_type = 'good_receipts'
+                                AND cdu.lookable_id = gr.id
+                                AND cdu.deleted_at IS NULL
+                        ),'0') AS status_cancel,
                         u.name AS account_name,
                         IFNULL((SELECT
                             SUM(ROUND(grd.total * (SELECT po.currency_rate FROM purchase_order_details pod, purchase_orders po WHERE po.id = pod.purchase_order_id AND pod.id = grd.purchase_order_detail_id),2))
@@ -202,11 +212,12 @@ class UnbilledAPController extends Controller
                         LEFT JOIN users u
                             ON u.id = gr.account_id
                         WHERE
-                            gr.post_date <= :date9
-                            AND gr.status IN ('2','3')
+                            gr.post_date <= :date10
+                            AND gr.status IN ('2','3','8')
                             AND gr.deleted_at IS NULL
                     ) AS rs
                 WHERE (rs.total - rs.total_invoice - rs.total_return - rs.total_journal) > 0
+                AND rs.status_cancel = '0'
         ", array(
             'date1'     => $date,
             'date2'     => $date,
@@ -217,6 +228,7 @@ class UnbilledAPController extends Controller
             'date7'     => $date,
             'date8'     => $date,
             'date9'     => $date,
+            'date10'    => $date,
         ));
 
         $totalUnbilled = 0;

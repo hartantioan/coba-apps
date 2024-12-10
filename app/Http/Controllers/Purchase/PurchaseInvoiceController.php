@@ -399,7 +399,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->get();
+        $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->whereDoesntHave('cancelDocument')->get();
 
         foreach($datagr as $row){
             $invoice = $row->totalInvoice();
@@ -591,71 +591,73 @@ class PurchaseInvoiceController extends Controller
                 $datagr = GoodReceipt::find(intval($request->arr_id[$key]));
                 $top = 0;
                 $info = '';
-                foreach($datagr->goodReceiptDetail as $rowdetail){
-                    if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
-                        $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
+                if(!$datagr->cancelDocument()->exists()){
+                    foreach($datagr->goodReceiptDetail as $rowdetail){
+                        if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
+                            $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
+                        }
+                        $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
                     }
-                    $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
-                }
-                $currency_rate = $datagr->latestCurrencyRate();
-                foreach($datagr->goodReceiptDetail as $rowdetail){
-                    if($rowdetail->balanceTotalInvoice() > 0){
-                        $price = round($rowdetail->total / $rowdetail->qty,5);
-                        $details[] = [
-                            'type'          => 'good_receipt_details',
-                            'id'            => $rowdetail->id,
-                            'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
-                            'qty_received'  => CustomHelper::formatConditionalQty($rowdetail->qty),
-                            'qty_returned'  => CustomHelper::formatConditionalQty($rowdetail->qtyReturn()),
-                            'qty_balance'   => CustomHelper::formatConditionalQty($rowdetail->balanceQtyInvoice() - $rowdetail->qtyReturn()),
-                            'price'         => number_format($price,2,',','.'),
-                            'raw_price'     => number_format($price,5,',','.'),
-                            'buy_unit'      => $rowdetail->itemUnit->unit->code,
-                            'rawcode'       => $datagr->code,
-                            'post_date'     => date('d/m/Y',strtotime($datagr->post_date)),
-                            'due_date'      => '',
-                            'total'         => number_format($rowdetail->total,2,',','.'),
-                            'tax'           => number_format($rowdetail->tax,2,',','.'),
-                            'wtax'          => number_format($rowdetail->wtax,2,',','.'),
-                            'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
-                            'info'          => $info,
-                            'note'          => $rowdetail->note ? $rowdetail->note : '',
-                            'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
-                            'top'           => $top,
-                            'delivery_no'   => $datagr->delivery_no,
-                            'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
-                            'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
-                            'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
-                            'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
-                            'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
-                            'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
-                            'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
-                            'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
-                            'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
-                            'project_id'    => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : '',
-                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
-                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
-                            'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
-                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
-                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
-                            'project_name'  => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project->name : '-',
-                            'qty_stock'     => number_format(($rowdetail->qty - $rowdetail->qtyReturn()) * $rowdetail->qty_conversion),
-                            'unit_stock'    => $rowdetail->item->uomUnit->code,
-                            'qty_conversion'=> $rowdetail->qty_conversion,
-                            'received_date' => '',
-                            'document_date' => '',
-                            'document_no'   => '',
-                            'tax_no'        => '',
-                            'tax_cut_no'    => '',
-                            'cut_date'      => '',
-                            'spk_no'        => '',
-                            'invoice_no'    => '',
-                            'header_note'   => $rowdetail->purchaseOrderDetail->purchaseOrder->note,
-                            'currency_rate' => number_format($currency_rate,2,',','.'),
-                            'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
-                            'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),
-                            'is_expedition' => '',
-                        ];
+                    $currency_rate = $datagr->latestCurrencyRate();
+                    foreach($datagr->goodReceiptDetail as $rowdetail){
+                        if($rowdetail->balanceTotalInvoice() > 0){
+                            $price = round($rowdetail->total / $rowdetail->qty,5);
+                            $details[] = [
+                                'type'          => 'good_receipt_details',
+                                'id'            => $rowdetail->id,
+                                'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                                'qty_received'  => CustomHelper::formatConditionalQty($rowdetail->qty),
+                                'qty_returned'  => CustomHelper::formatConditionalQty($rowdetail->qtyReturn()),
+                                'qty_balance'   => CustomHelper::formatConditionalQty($rowdetail->balanceQtyInvoice() - $rowdetail->qtyReturn()),
+                                'price'         => number_format($price,2,',','.'),
+                                'raw_price'     => number_format($price,5,',','.'),
+                                'buy_unit'      => $rowdetail->itemUnit->unit->code,
+                                'rawcode'       => $datagr->code,
+                                'post_date'     => date('d/m/Y',strtotime($datagr->post_date)),
+                                'due_date'      => '',
+                                'total'         => number_format($rowdetail->total,2,',','.'),
+                                'tax'           => number_format($rowdetail->tax,2,',','.'),
+                                'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                                'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                                'info'          => $info,
+                                'note'          => $rowdetail->note ? $rowdetail->note : '',
+                                'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
+                                'top'           => $top,
+                                'delivery_no'   => $datagr->delivery_no,
+                                'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
+                                'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
+                                'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
+                                'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
+                                'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                                'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                                'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
+                                'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                                'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                                'project_id'    => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : '',
+                                'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                                'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                                'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                                'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
+                                'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
+                                'project_name'  => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project->name : '-',
+                                'qty_stock'     => number_format(($rowdetail->qty - $rowdetail->qtyReturn()) * $rowdetail->qty_conversion),
+                                'unit_stock'    => $rowdetail->item->uomUnit->code,
+                                'qty_conversion'=> $rowdetail->qty_conversion,
+                                'received_date' => '',
+                                'document_date' => '',
+                                'document_no'   => '',
+                                'tax_no'        => '',
+                                'tax_cut_no'    => '',
+                                'cut_date'      => '',
+                                'spk_no'        => '',
+                                'invoice_no'    => '',
+                                'header_note'   => $rowdetail->purchaseOrderDetail->purchaseOrder->note,
+                                'currency_rate' => number_format($currency_rate,2,',','.'),
+                                'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
+                                'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),
+                                'is_expedition' => '',
+                            ];
+                        }
                     }
                 }
             }elseif($row == 'landed_costs'){

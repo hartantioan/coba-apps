@@ -7372,6 +7372,67 @@ class CustomHelper {
 					]);
 				}
 			} */
+		}elseif($data->lookable_type == 'good_receipts'){
+			$grpo = GoodReceipt::find($data->lookable_id);
+
+			$coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$grpo->company_id)->first();
+			$coapendapatanlainlain = Coa::where('code','700.01.01.01.99')->where('company_id',$grpo->company_id)->first();
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $grpo->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
+				'lookable_type'	=> $data->getTable(),
+				'lookable_id'	=> $data->id,
+				'currency_id'	=> 1,
+				'currency_rate'	=> 1,
+				'post_date'		=> $date,
+				'note'			=> 'VOID CANCEL '.$grpo->code,
+				'status'		=> '3'
+			]);
+
+			foreach($grpo->goodReceiptDetail as $rowdetail){
+				$balance = $rowdetail->balanceInvoice();
+				if($balance > 0){
+					$rowtotal = round($balance * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,2);
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusahabelumditagih->id,
+						'place_id'		=> $rowdetail->place_id,
+						'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+						'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+						'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $grpo->account_id : NULL,
+						'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+						'warehouse_id'	=> $rowdetail->warehouse_id,
+						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $rowtotal,
+						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : round($balance,2),
+						'note'			=> $grpo->delivery_no,
+						'lookable_type'	=> $grpo->getTable(),
+						'lookable_id'	=> $grpo->id,
+					]);
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapendapatanlainlain->id,
+						'place_id'		=> $rowdetail->place_id,
+						'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+						'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+						'account_id'	=> $coapendapatanlainlain->bp_journal ? $grpo->account_id : NULL,
+						'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+						'warehouse_id'	=> $rowdetail->warehouse_id,
+						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $rowtotal,
+						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : round($balance,2),
+						'note'			=> $grpo->delivery_no,
+						'lookable_type'	=> $grpo->getTable(),
+						'lookable_id'	=> $grpo->id,
+					]);
+				}
+			}
 		}
 	}
 

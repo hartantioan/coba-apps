@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Models\CancelDocument;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Exports\ExportOutstandingGRPO;
@@ -251,21 +252,28 @@ class GoodReceiptPOController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $isOpenPeriod = $val->isOpenPeriod();
                 $dis = '';
-                if($val->isOpenPeriod()){
-
+                $nodis = '';
+                if($isOpenPeriod){
                     $dis = 'style="cursor: default;
                     pointer-events: none;
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+                }else{
+                    $nodis = 'style="cursor: default;
+                    pointer-events: none;
+                    color: #9f9f9f !important;
+                    background-color: #dfdfdf !important;
+                    box-shadow: none;"';
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
+                $btn_cancel = $val->status == '2' ? '<button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>' : '';
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -302,7 +310,7 @@ class GoodReceiptPOController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+                        '.$btn_cancel.'
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Multiple LC" onclick="multiple(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">share</i></button>
@@ -1076,7 +1084,7 @@ class GoodReceiptPOController extends Controller
                 ]);
             }
 
-            if(in_array($query->status,['4','5'])){
+            if(in_array($query->status,['4','5','8'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -1098,6 +1106,12 @@ class GoodReceiptPOController extends Controller
 
                 foreach($query->goodReceiptDetail as $row){
                     $row->itemSerial()->delete();
+                }
+
+                if($query->cancelDocument()->exists()){
+                    $query->cancelDocument->journal->journalDetail()->delete();
+                    $query->cancelDocument->journal->delete();
+                    $query->cancelDocument->delete();
                 }
 
                 CustomHelper::removeJournal('good_receipts',$query->id);
@@ -1566,6 +1580,49 @@ class GoodReceiptPOController extends Controller
 
                 
             }
+
+            if($query->cancelDocument()->exists()){
+
+                $string .= '<tr>
+                        <td class="center-align" colspan="15">
+                            <h5>CANCEL DOCUMENT '.$query->cancelDocument->code.' - '.date('d/m/Y',strtotime($query->cancelDocument->post_date)).' - '.$query->cancelDocument->journal->code.'</h5>
+                        </td>
+                    </tr>';
+
+                foreach($query->cancelDocument->journal->journalDetail()->where(function($query){
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+                    if($row->type == '1'){
+                        $total_debit_asli += $row->nominal_fc;
+                        $total_debit_konversi += $row->nominal;
+                    }
+                    if($row->type == '2'){
+                        $total_kredit_asli += $row->nominal_fc;
+                        $total_kredit_konversi += $row->nominal;
+                    }
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                        <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                        <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
+                }
+            }
+
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
@@ -1689,6 +1746,70 @@ class GoodReceiptPOController extends Controller
                 }
             }
         }
+        return response()->json($response);
+    }
+
+    public function cancelStatus(Request $request){
+        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($request->cancel_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif(!$query->hasBalanceInvoice()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak memiliki saldo atau sudah 100% digunakan pada APIN.'
+                ];
+            }else{
+
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+
+                $query->update([
+                    'status'    => '8',
+                    'done_id'   => session('bo_id'),
+                ]);
+
+                $cd = CancelDocument::create([
+                    'code'          => CancelDocument::generateCode('CAPN',substr($query->code,7,2),$request->cancel_date),
+                    'user_id'       => session('bo_id'),
+                    'post_date'     => $request->cancel_date,
+                    'lookable_type' => $query->getTable(),
+                    'lookable_id'   => $query->id,
+                ]);
+
+                CustomHelper::cancelJournal($cd,$request->cancel_date);
+
+                activity()
+                    ->performedOn(new GoodReceipt())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void cancel the good receipt po data');
+
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Good Receipt PO No. '.$query->code.' telah ditutup dengan tombol cancel void.','Good Receipt PO No. '.$query->code.' telah ditutup dengan tombol cancel void.',$query->user_id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
         return response()->json($response);
     }
 }

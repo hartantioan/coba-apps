@@ -2119,6 +2119,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
                     Route::get('export_from_page', [GoodReceiptPOController::class, 'exportFromTransactionPage']);
+                    Route::post('cancel_status', [GoodReceiptPOController::class, 'cancelStatus'])->middleware('operation.access:good_receipt_po,void');
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,report'])->withoutMiddleware('direct.access')->group(function () {

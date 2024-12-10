@@ -78,6 +78,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         'code' => $row['code'],
                         'name' => $row['name'],
                         'other_name' => $row['other_name'],
+                        'print_name' => $row['print_name'],
                         'item_group_id' =>$item_group_id->id,
                         'uom_unit' => $item_unit_id->id,
                         'tolerance_gr' => $row['toleransi_gr'],
@@ -119,6 +120,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         }
                         $check->name = $row['name'];
                         $check->other_name=$row['other_name'];
+                        $check->print_name=$row['print_name'];
                         $check->item_group_id=$item_group_id->id;
                         $check->uom_unit=$item_unit_id->id;
                         $check->tolerance_gr=$row['toleransi_gr'];

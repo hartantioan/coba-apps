@@ -101,6 +101,20 @@ class GoodScale extends Model
         return implode(', ',$arr);
     }
 
+    public function getSuratJalanKeluarPabrik(){
+        $arr = [];
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable_type == 'marketing_order_deliveries'){
+                if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                    if($row->lookable->marketingOrderDeliveryProcess->deliveryScan()->exists()){
+                        $arr[] = $row->lookable->marketingOrderDeliveryProcess->created_at;
+                    }
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function itemUnit()
     {
         return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
@@ -464,7 +478,7 @@ class GoodScale extends Model
                         $date =$row->lookable->marketingOrderDeliveryProcess->receive_date;
                     }
                 }
-                
+
             }
         }
         return $date;

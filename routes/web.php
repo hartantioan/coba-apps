@@ -31,6 +31,7 @@ use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\QualityControlController;
 use App\Http\Controllers\Purchase\OutstandingLandedCostController;
 use App\Http\Controllers\Inventory\ReportInventorySummaryStockFGController;
+use App\Http\Controllers\Inventory\ReportTruckQueueController;
 
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
@@ -510,6 +511,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_rm_sm', [Select2Controller::class, 'itemRMSM']);
                 Route::get('batch_id_movement', [Select2Controller::class, 'batchIdMovement']);
                 Route::get('shading_id_movement', [Select2Controller::class, 'shadingIdMovement']);
+                Route::get('truck_queue_good_scale', [Select2Controller::class, 'truckQueueGoodScale']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -2201,6 +2203,7 @@ Route::prefix('admin')->group(function () {
                    Route::post('create', [TruckQueueController::class, 'create'])->middleware('operation.access:truck_queue,update');
                     Route::post('destroy', [TruckQueueController::class, 'destroy'])->middleware('operation.access:truck_queue,delete');
                     Route::get('export_from_page', [TruckQueueController::class, 'exportFromTransactionPage']);
+                    Route::post('show', [TruckQueueController::class, 'show']);
                     Route::get('row_detail', [TruckQueueController::class, 'rowDetail']);
                 });
 
@@ -2212,7 +2215,10 @@ Route::prefix('admin')->group(function () {
                     Route::post('update_done_muat', [TruckQueueUpdaterController::class, 'updateDoneMuat'])->middleware('operation.access:truck_queue_updater,update');
                     Route::post('destroy', [TruckQueueUpdaterController::class, 'destroy'])->middleware('operation.access:truck_queue_updater,delete');
                     Route::get('export_from_page', [TruckQueueUpdaterController::class, 'exportFromTransactionPage']);
+                    Route::post('show', [TruckQueueUpdaterController::class, 'show']);
                     Route::get('row_detail', [TruckQueueUpdaterController::class, 'rowDetail']);
+                    Route::post('update_muat_scan', [TruckQueueUpdaterController::class, 'updateMuatScan'])->middleware('operation.access:truck_queue_updater,update');
+                    Route::post('update_done_muat_scan', [TruckQueueUpdaterController::class, 'updateDoneMuatScan'])->middleware('operation.access:truck_queue_updater,update');
                 });
 
                 Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,report'])->withoutMiddleware('direct.access')->group(function () {
@@ -2410,6 +2416,11 @@ Route::prefix('admin')->group(function () {
                         Route::post('view', [ReportInventorySummaryStockFGController::class, 'view']);
                         Route::get('export', [ReportInventorySummaryStockFGController::class, 'export']);
 
+                    });
+                    Route::prefix('report_truck_queue')->middleware('operation.access:stock_movement,view')->group(function () {
+                        Route::get('/', [ReportTruckQueueController::class, 'index']);
+                        Route::post('filter', [ReportTruckQueueController::class, 'filter']);
+                        Route::get('export', [ReportTruckQueueController::class, 'export']);
                     });
 
                 });

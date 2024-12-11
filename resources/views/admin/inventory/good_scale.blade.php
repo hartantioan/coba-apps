@@ -261,6 +261,10 @@
                                 <label class="ac" for="company_id">{{ __('translations.company') }}</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="browser-default" id="no_queue" name="no_queue"></select>
+                                <label class="active" for="no_queue">No Antrian</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="type" name="type" onchange="changeMode(this.value);">
                                     <option value="1">Timbang Barang Masuk (Pembelian)</option>
                                     <option value="2">Timbang Barang Keluar (Penjualan)</option>
@@ -1190,6 +1194,30 @@
         });
 
         select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item_scale") }}');
+        $('#no_queue').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/truck_queue_good_scale") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        type: $('#type').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     var arrMod = [];

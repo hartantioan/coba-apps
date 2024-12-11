@@ -7,6 +7,8 @@ use App\Exports\ExportGoodScaleTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodScale;
+use App\Models\TruckQueue;
+use App\Models\TruckQueueDetail;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use App\Models\Warehouse;
@@ -471,7 +473,7 @@ class GoodScaleController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            
+
             /* if($request->post_date < date('Y-m-d')){
                 return response()->json([
                     'status'  => 500,
@@ -612,6 +614,24 @@ class GoodScaleController extends Controller
                     }
 
                 }else{
+                    if($request->no_queue){
+                        $truck_queue = TruckQueue::find($request->no_queue);
+                        if($truck_queue){
+                            $truck_queue->update([
+                                'status'=>'2',
+                            ]);
+                        }else{
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Kode Tidak Ditemukan atau sudah dipakai di timbangan lain',
+                            ]);
+                        }
+                    }else{
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Harap isi No Antrian',
+                        ]);
+                    }
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodScale::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -666,6 +686,14 @@ class GoodScaleController extends Controller
                         'water_content'             => 0,
                         'status'                    => '1',
                     ]);
+
+                    if($request->no_queue){
+                        $truckQueueDetail = TruckQueueDetail::find($truck_queue->id);
+                        $truckQueueDetail->update([
+                            'good_scale_id' => $query->id,
+                            'time_in' => Date::now(),
+                        ]);
+                    }
 
                 }
 
@@ -959,6 +987,14 @@ class GoodScaleController extends Controller
                 /* CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id); */
             }
 
+            $truckQueueDetail = TruckQueueDetail::where('good_scale_id',$gs->id)->first();
+            if($truckQueueDetail){
+                $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
+                $header_queue->update([
+                    'status'=>'5',
+                ]);
+            }
+
             /* if($adapo){
                 if($idgs > 0){
                     GoodScale::find($idgs)->createGoodReceipt();
@@ -1033,7 +1069,10 @@ class GoodScaleController extends Controller
         $query = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query) {
-
+            $truckQueueDetail = TruckQueueDetail::where('good_scale_id',$query->id);
+            $truckQueueDetail->update([
+                'good_scale_id' => null,
+            ]);
             if(!$request->msg){
                 return response()->json([
                     'status'  => 500,
@@ -1453,26 +1492,6 @@ class GoodScaleController extends Controller
 
             if($query_done){
 
-                if($query_done->journal()->exists()){
-                    $query_done->journal->journalDetail()->delete();
-                    $query_done->journal->delete();
-                }
-
-                if($query_done->purchaseOrder()->exists()){
-                    $query_done->purchaseOrder->update([
-                        'status'    => '5',
-                        'void_id'   => session('bo_id'),
-                        'void_note' => 'VOID FROM EDP GOOD SCALE FORM',
-                        'void_date' => date('Y-m-d H:i:s')
-                    ]);
-        
-                    activity()
-                        ->performedOn(new PurchaseOrder())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query_done)
-                        ->log('Void the purchase order data from good scale');
-                }
-    
                 if(!$query_done->journal()->exists()){
                     $totalProportional = 0;
                     $gs = $query_done;
@@ -1484,7 +1503,7 @@ class GoodScaleController extends Controller
                             }
                         }
                     }
-    
+
                     if($totalProportional > 0){
                         foreach($gs->goodScaleDetail as $row){
                             if($row->lookable_type == 'marketing_order_deliveries'){
@@ -1504,13 +1523,13 @@ class GoodScaleController extends Controller
                         }
                         CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
                     }
-    
+
                     activity()
                             ->performedOn(new GoodScale())
                             ->causedBy(session('bo_id'))
                             ->withProperties($query_done)
                             ->log('Recreate jurnal & po from good scale');
-    
+
                     $response = [
                         'status'  => 200,
                         'message' => 'Data updated successfully.'

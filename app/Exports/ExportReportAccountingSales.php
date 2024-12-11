@@ -130,13 +130,9 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
 
 
             if($row->lookable_type != 'marketing_order_down_payments'){
-                if($row->lookable_type){
-                    if($row->getMoDetail()->is_include_tax == 1){
-                        $taxy ="include";
-                    } else{
-                        $taxy ="exclude";
-                    }
-                }else{
+                if($row->getMoDetail()->is_include_tax == 1){
+                    $taxy ="include";
+                } else{
                     $taxy ="exclude";
                 }
                 $arr[] = [

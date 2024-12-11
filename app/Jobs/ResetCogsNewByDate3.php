@@ -129,7 +129,7 @@ class ResetCogsNewByDate3 implements ShouldQueue, ShouldBeUnique
         }
 
         $goodreceipt = GoodReceiptDetail::whereHas('goodReceipt',function($query)use($dateloop){
-            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+            $query->whereIn('status',['2','3','8'])->whereDate('post_date',$dateloop);
         })->where('item_id',$item_id)->get();
 
         foreach($goodreceipt as $row){

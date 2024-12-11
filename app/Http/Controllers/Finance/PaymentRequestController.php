@@ -2238,32 +2238,32 @@ class PaymentRequestController extends Controller
     }
 
     public function createPay(Request $request){
-        $validation = Validator::make($request->all(), [
-            /* 'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code', */
-            'pay_date_pay'              => 'required',
-            'currency_id_pay'           => 'required',
-            'currency_rate_pay'         => 'required',
-		], [
-            /* 'codePay.required' 	        => 'Kode tidak boleh kosong.',
-            'codePay.string'            => 'Kode harus dalam bentuk string.',
-            'codePay.min'               => 'Kode harus minimal 18 karakter.',
-            'codePay.unique'            => 'Kode telah dipakai.', */
-            'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
-            'currency_id_pay.required'  => 'Mata uang tidak boleh kosong.',
-            'currency_rate_pay.required'=> 'Konversi mata uang tidak boleh kosong.',
-		]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                /* 'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code', */
+                'pay_date_pay'              => 'required',
+                'currency_id_pay'           => 'required',
+                'currency_rate_pay'         => 'required',
+            ], [
+                /* 'codePay.required' 	        => 'Kode tidak boleh kosong.',
+                'codePay.string'            => 'Kode harus dalam bentuk string.',
+                'codePay.min'               => 'Kode harus minimal 18 karakter.',
+                'codePay.unique'            => 'Kode telah dipakai.', */
+                'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
+                'currency_id_pay.required'  => 'Mata uang tidak boleh kosong.',
+                'currency_rate_pay.required'=> 'Konversi mata uang tidak boleh kosong.',
+            ]);
 
-			if($request->tempPay){
-                DB::beginTransaction();
-                try {
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
 
+                if($request->tempPay){
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
                     $passedDate = true;
@@ -2315,36 +2315,37 @@ class PaymentRequestController extends Controller
                     /* $cek->update([
                         'pay_date'                  => $request->pay_date_pay,
                     ]); */
-
-                    DB::commit();
-
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
 
-			if($query) {
+                if($query) {
 
-                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas Bank Out / Kas Keluar No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::sendJournal('outgoing_payments',$query->id,$query->account_id);
+                    CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas Bank Out / Kas Keluar No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendJournal('outgoing_payments',$query->id,$query->account_id);
 
-                activity()
-                    ->performedOn(new OutgoingPayment())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit payment request.');
+                    activity()
+                        ->performedOn(new OutgoingPayment())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit payment request.');
 
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+
+        }catch(\Exception $e){
+            info($e->getMessage());
+            DB::rollback();
+        }
 
 		return response()->json($response);
     }

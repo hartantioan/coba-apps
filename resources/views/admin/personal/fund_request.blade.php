@@ -1657,7 +1657,7 @@
 
     function viewStructureTree(id){
         $.ajax({
-            url: '{{ Request::url() }}/viewstructuretree',
+            url: '{{ URL::to('/') }}/admin/finance/fund_request/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
             data: {

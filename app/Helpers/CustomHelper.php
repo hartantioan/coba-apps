@@ -3047,6 +3047,9 @@ class CustomHelper {
 						$otherLc = $rowdetail->lookable->landedCost;
 						$rowfc = round($rowdetail->nominal - $rowdetail->lookable->nominal,2);
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2) - round($rowdetail->lookable->nominal * $rowdetail->lookable->landedCost->currency_rate,2);
+						$rowdetail->lookable->landedCost->update([
+							'status'	=> '3',
+						]);
 					}else{
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
 						$rowdetail->lookable->goodReceipt->update([

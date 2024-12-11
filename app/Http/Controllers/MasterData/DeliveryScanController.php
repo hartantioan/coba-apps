@@ -200,7 +200,7 @@ class DeliveryScanController extends Controller
                         'marketing_order_delivery_process_id'   => $request->temp,
                         'status'                                => '2',
                     ]);
-                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) {
+                    /* $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) {
                         $query->whereHas('goodScaleDetail', function($query) {
                             $query->whereHas('lookable',function($query){
                                 $query->where('id', $query->id);
@@ -212,7 +212,7 @@ class DeliveryScanController extends Controller
                         $header_queue->update([
                             'status'=>'6',
                         ]);
-                    }
+                    } */
                     $query->createJournalSentDocument();
                     $response = [
                         'status'    => 200,

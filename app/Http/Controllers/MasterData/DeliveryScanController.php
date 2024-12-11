@@ -213,6 +213,13 @@ class DeliveryScanController extends Controller
                             'status'=>'6',
                         ]);
                     } */
+
+                    activity()
+                        ->performedOn(new MarketingOrderDeliveryProcess())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Update sent journal document DO.');
+
                     $query->createJournalSentDocument();
                     $response = [
                         'status'    => 200,

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 use App\Helpers\CustomHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 
 class DeliveryScanController extends Controller
 {
@@ -199,7 +200,13 @@ class DeliveryScanController extends Controller
                         'marketing_order_delivery_process_id'   => $request->temp,
                         'status'                                => '2',
                     ]);
-                    $truckQueueDetail = TruckQueueDetail::where('marketing_delivery_oder_process_id',$query->id)->first();
+                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) {
+                        $query->whereHas('goodScaleDetail', function($query) {
+                            $query->whereHas('lookable',function($query){
+                                $query->where('id', $query->id);
+                            });
+                        });
+                    });
                     if($truckQueueDetail){
                         $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
                         $header_queue->update([
@@ -226,10 +233,32 @@ class DeliveryScanController extends Controller
 
             }
         }else{
-            $response = [
-                'status'  => 500,
-                'message' => 'Data tidak ditemukan'
-            ];
+            $query = TruckQueue::where('code_barcode',$request->temp)->latest()->first();
+            if($query){
+                if($query->status == '6'){
+                    $response = [
+                        'status'    => 500,
+                        'message'   => 'Antrian sudah keluar Pabrik',
+                    ];
+                }else{
+                    $query->update([
+                        'status'=>'6',
+                    ]);
+                    if($query){
+                        $response = [
+                            'status'    => 200,
+                            'message'   => 'Data successfully saved.',
+                        ];
+                    }
+                }
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak ditemukan'
+                ];
+            }
+
+
         }
 
         return response()->json($response);

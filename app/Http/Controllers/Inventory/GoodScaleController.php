@@ -626,11 +626,6 @@ class GoodScaleController extends Controller
                                 'message' => 'Kode Tidak Ditemukan atau sudah dipakai di timbangan lain',
                             ]);
                         }
-                    }else{
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Harap isi No Antrian',
-                        ]);
                     }
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();

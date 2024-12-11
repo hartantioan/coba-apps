@@ -4,6 +4,8 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryScan;
+use App\Models\TruckQueueDetail;
+use App\Models\TruckQueue;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessTrack;
 use Illuminate\Http\Request;
@@ -197,6 +199,13 @@ class DeliveryScanController extends Controller
                         'marketing_order_delivery_process_id'   => $request->temp,
                         'status'                                => '2',
                     ]);
+                    $truckQueueDetail = TruckQueueDetail::where('marketing_delivery_oder_process_id',$query->id)->first();
+                    if($truckQueueDetail){
+                        $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
+                        $header_queue->update([
+                            'status'=>'6',
+                        ]);
+                    }
                     $query->createJournalSentDocument();
                     $response = [
                         'status'    => 200,

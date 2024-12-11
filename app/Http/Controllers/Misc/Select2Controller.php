@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\TruckQueue;
 use App\Models\RuleProcurement;
 use App\Models\Area;
 use App\Models\AttendancePeriod;
@@ -5492,6 +5493,30 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'    => $d->id,
                 'text'  => $d->code.'-'.$d->item->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function truckQueueGoodScale(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = TruckQueue::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%")
+            ->whereNotIn('status',['3','4','5','6']);
+            if($request->type){
+                $query->where('type',$request->type);
+            }
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->code.'-'.$d->code_barcode,
             ];
         }
 

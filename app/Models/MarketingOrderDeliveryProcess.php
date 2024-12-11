@@ -334,6 +334,11 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function deliveryScan(){
+        return $this->hasOne('App\Models\DeliveryScan','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+
     public function marketingOrderInvoice(){
         return $this->hasOne('App\Models\MarketingOrderInvoice')->whereIn('status',['1','2','3']);
     }
@@ -985,7 +990,7 @@ class MarketingOrderDeliveryProcess extends Model
                                                 'detailable_type'=> $row->getTable(),
                                                 'detailable_id'	=> $row->id,
                                             ]);
-        
+
                                             JournalDetail::create([
                                                 'journal_id'	=> $query->id,
                                                 'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,

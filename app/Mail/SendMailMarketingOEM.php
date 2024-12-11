@@ -36,6 +36,11 @@ class SendMailMarketingOEM extends Mailable
         return $this->from('porcelain@superior.co.id')
             ->subject('[SUPERIOR PORCELAIN SUKSES] Report Marketing OEM')
             ->view('admin.mail.report_marketing_oem')
+            ->attach(storage_path('app/public/auto_email/stock.xlsx'), [
+                'as' => 'Stock.xlsx',
+              'mime' => 'application/xlsx',
+             ]
+             )
             ->with(
                 'data',
                 $this->data

@@ -7,6 +7,9 @@ use App\Mail\SendMailMarketingOEM;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportStockOEM;
+
 
 class MailReportMarketingOEM extends Command
 {
@@ -569,7 +572,7 @@ END
 		$obj5 = json_decode(json_encode($data5));
 
 
-
+		Excel::store(new ExportStockOEM(), 'public/auto_email/stock.xlsx', 'local');
 		Mail::to($recipient)->send(new SendMailMarketingOEM($obj, $obj2, $obj3, $obj4, $obj5));
 
 		// }

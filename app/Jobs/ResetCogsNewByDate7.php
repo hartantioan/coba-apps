@@ -687,7 +687,9 @@ class ResetCogsNewByDate7 implements ShouldQueue, ShouldBeUnique
     
         $revaluation = InventoryRevaluationDetail::whereHas('inventoryRevaluation',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-        })->where('item_id',$item_id)->get();
+        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
+            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
+        })->get();
 
         foreach($revaluation as $row){
             $total = $row->nominal;

@@ -869,7 +869,8 @@ class PersonalCloseBillController extends Controller
             $totalReceivable = $row->totalReceivable();
             $totalReceivableUsed = $row->totalReceivableUsedPaid();
             $balance = $totalReceivable - $totalReceivableUsed;
-            if(!$row->used()->exists() && $balance > 0){
+            /* if(!$row->used()->exists() && $balance > 0){ */
+            if(!$row->used()->exists() && $row->balanceReceivable() > 0){
                 $details[] = [
                     'id'                    => $row->id,
                     'type'                  => $row->getTable(),

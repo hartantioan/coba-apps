@@ -596,7 +596,7 @@ class LandedCostController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <!-- <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button> -->
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -1093,7 +1093,7 @@ class LandedCostController extends Controller
                 ]);
             }
 
-            if(in_array($query->status,['4','5'])){
+            if(in_array($query->status,['4','5','8'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -1609,6 +1609,49 @@ class LandedCostController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
             }
+
+            if($query->cancelDocument()->exists()){
+
+                $string .= '<tr>
+                        <td class="center-align" colspan="15">
+                            <h5>CANCEL DOCUMENT '.$query->cancelDocument->code.' - '.date('d/m/Y',strtotime($query->cancelDocument->post_date)).' - '.$query->cancelDocument->journal->code.'</h5>
+                        </td>
+                    </tr>';
+
+                foreach($query->cancelDocument->journal->journalDetail()->where(function($query){
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+                    if($row->type == '1'){
+                        $total_debit_asli += $row->nominal_fc;
+                        $total_debit_konversi += $row->nominal;
+                    }
+                    if($row->type == '2'){
+                        $total_kredit_asli += $row->nominal_fc;
+                        $total_kredit_konversi += $row->nominal;
+                    }
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                        <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                        <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
+                }
+            }
+
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
@@ -1682,7 +1725,7 @@ class LandedCostController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada A/P Invoice.'
+                    'message' => 'Data telah digunakan pada A/P Invoice atau LC lainnya.'
                 ];
             }else{
 

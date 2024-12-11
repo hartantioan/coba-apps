@@ -277,6 +277,11 @@ class LandedCost extends Model
             }
         }
 
+        foreach($this->landedCostDetail as $row){
+            if($row->landedCostDetailSelf()->exists()){
+                $hasRelation = true;
+            }
+        }
 
         return $hasRelation;
     }
@@ -332,6 +337,16 @@ class LandedCost extends Model
         }
 
         return $total;
+    }
+
+    public function hasCancelDocumentByDate($date){
+        $has = false;
+        if($this->cancelDocument()->exists()){
+            if($date >= $this->cancelDocument->post_date){
+                $has = true;
+            }
+        }
+        return $has;
     }
 
     public function journal(){
@@ -443,5 +458,9 @@ class LandedCost extends Model
             }
         }
         return $status;
+    }
+
+    public function cancelDocument(){
+        return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
     }
 }

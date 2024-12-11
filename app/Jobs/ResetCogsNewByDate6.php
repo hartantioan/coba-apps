@@ -640,7 +640,7 @@ class ResetCogsNewByDate6 implements ShouldQueue, ShouldBeUnique
         }
 
         $landedcost = LandedCostDetail::whereHas('landedCost',function($query)use($dateloop){
-            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+            $query->whereIn('status',['2','3','8'])->whereDate('post_date',$dateloop);
         })->where('item_id',$item_id)->get();
 
         foreach($landedcost as $row){
@@ -675,13 +675,63 @@ class ResetCogsNewByDate6 implements ShouldQueue, ShouldBeUnique
                 'type'				        => 'IN'
             ]);
             foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $rowfc,
-                    'nominal'     => $total,
-                ]);
+                if($rowjournal->journal->lookable_type == 'cancel_documents'){
+                    $rowjournal->update([
+                        'nominal_fc'  => -1 * $rowfc,
+                        'nominal'     => -1 * $total,
+                    ]);
+                }else{
+                    $rowjournal->update([
+                        'nominal_fc'  => $rowfc,
+                        'nominal'     => $total,
+                    ]);
+                }
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+            }
+        }
+
+        $landedcost = LandedCostDetail::whereHas('landedCost',function($query)use($dateloop){
+            $query->where('status','8')
+                ->whereHas('cancelDocument',function($query)use($dateloop){
+                    $query->whereDate('post_date',$dateloop);
+                });
+        })->where('item_id',$item_id)->get();
+
+        foreach($landedcost as $row){
+            $rowfc = $row->nominal;
+            if($row->lookable_type == 'landed_cost_details'){
+                $rowfc = round($row->nominal - $row->lookable->nominal,2);
+                $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2) - round($row->lookable->nominal * $row->lookable->landedCost->currency_rate,2);
+            }else{
+                $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2);
+            }
+            if($qtyBefore > 0){
+                $total = -1 * $rowtotal;
+                $qty = 0;
+                $total_final = $totalBefore + $total;
+                $qty_final = $qtyBefore + $qty;
+                ItemCogs::create([
+                    'lookable_type'		    => $row->landedCost->getTable(),
+                    'lookable_id'		    => $row->landedCost->id,
+                    'detailable_type'	    => $row->getTable(),
+                    'detailable_id'		    => $row->id,
+                    'company_id'		    => $row->landedCost->company_id,
+                    'place_id'			    => $row->place_id,
+                    'warehouse_id'		    => $row->warehouse_id,
+                    'item_id'			    => $row->item_id,
+                    'qty_in'			    => $qty,
+                    'price_in'			    => 0,
+                    'total_in'			    => $total,
+                    'qty_final'			    => $qty_final,
+                    'price_final'		    => round($total_final / $qty_final,5),
+                    'total_final'		    => $total_final,
+                    'date'				    => $dateloop,
+                    'type'				    => 'IN'
+                ]);
+                $qtyBefore = $qty_final;
+                $totalBefore = $total_final;
             }
         }
     

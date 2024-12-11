@@ -7222,7 +7222,7 @@ class CustomHelper {
 
 			$pi->updateRootDocumentStatusProcess();
 		}elseif($data->lookable_type == 'landed_costs'){
-			/* $lc = LandedCost::find($data->lookable_id);
+			$lc = LandedCost::find($data->lookable_id);
 
 			if($lc){
 				$arrNote = [];
@@ -7237,8 +7237,8 @@ class CustomHelper {
 					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 					'lookable_type'	=> $data->getTable(),
 					'lookable_id'	=> $data->id,
-					'post_date'		=> $data->post_date,
-					'note'			=> $data->note,
+					'post_date'		=> $date,
+					'note'			=> 'VOID CANCEL '.$lc->code,
 					'status'		=> '3',
 					'currency_id'	=> $lc->currency_id,
 					'currency_rate'	=> $lc->currency_rate,
@@ -7257,10 +7257,6 @@ class CustomHelper {
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2) - round($rowdetail->lookable->nominal * $rowdetail->lookable->landedCost->currency_rate,2);
 					}else{
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
-						$rowdetail->lookable->goodReceipt->update([
-							'status_lc' 		=> '2',
-							'is_multiple_lc'	=> NULL,
-						]);
 					}
 					$totalitem += $rowtotal;
 					$totalfcitem += $rowfc;
@@ -7278,10 +7274,15 @@ class CustomHelper {
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
-								'nominal'		=> $rowtotal,
-								'nominal_fc'	=> $rowfc,
+								'nominal'		=> -1 * $rowtotal,
+								'nominal_fc'	=> -1 * $rowfc,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
 							]);
-							self::sendCogs('landed_costs',
+
+							self::sendCogs($lc->getTable(),
 								$lc->id,
 								$rowdetail->place->company_id,
 								$rowdetail->place_id,
@@ -7290,7 +7291,7 @@ class CustomHelper {
 								0,
 								-1 * $rowtotal,
 								'IN',
-								$lc->post_date,
+								$date,
 								NULL,
 								NULL,
 								NULL,
@@ -7309,8 +7310,12 @@ class CustomHelper {
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
-								'nominal'		=> $rowtotal,
-								'nominal_fc'	=> $rowfc,
+								'nominal'		=> -1 * $rowtotal,
+								'nominal_fc'	=> -1 * $rowfc,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
 							]);
 						}
 					}
@@ -7328,11 +7333,29 @@ class CustomHelper {
 								'coa_id'		=> $dataother->landedCostFee->coa_id,
 								'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
 								'type'			=> '2',
-								'nominal'		=> $rowtotal,
-								'nominal_fc'	=> $rowfc,
+								'nominal'		=> -1 * $rowtotal,
+								'nominal_fc'	=> -1 * $rowfc,
 								'note'			=> $dataother->landedCostFee->name,
-								'lookable_type'	=> $table_name,
-								'lookable_id'	=> $table_id,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowfee->getTable(),
+								'detailable_id'	=> $rowfee->id,
+							]);
+							$totalfccost += $rowfc;
+						}else{
+							$rowfc = round(0 - $rowfee->total,2);
+							$rowtotal = round(0 * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
+							$totalcost += $rowtotal;
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowfee->landedCostFee->coa_id,
+								'account_id'	=> $rowfee->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> -1 * $rowtotal,
+								'nominal_fc'	=> -1 * $rowfc,
+								'note'			=> $rowfee->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
 								'detailable_type'=> $rowfee->getTable(),
 								'detailable_id'	=> $rowfee->id,
 							]);
@@ -7347,11 +7370,11 @@ class CustomHelper {
 							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
 							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
-							'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
+							'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+							'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
 							'note'			=> $rowdetail->landedCostFee->name,
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
+							'lookable_type'	=> $data->lookable_type,
+							'lookable_id'	=> $data->lookable_id,
 							'detailable_type'=> $rowdetail->getTable(),
 							'detailable_id'	=> $rowdetail->id,
 						]);
@@ -7366,15 +7389,15 @@ class CustomHelper {
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coarounding->id,
-						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+						'account_id'	=> $coarounding->bp_journal ? $data->lookable->account_id : NULL,
 						'type'			=> $balance < 0 ? '1' : '2',
-						'nominal'		=> abs($balance),
-						'nominal_fc'	=> abs($balancefc),
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
+						'nominal'		=> -1 * abs($balance),
+						'nominal_fc'	=> -1 * abs($balancefc),
+						'lookable_type'	=> $data->lookable_type,
+						'lookable_id'	=> $data->lookable_id,
 					]);
 				}
-			} */
+			}
 		}elseif($data->lookable_type == 'good_receipts'){
 			$grpo = GoodReceipt::find($data->lookable_id);
 

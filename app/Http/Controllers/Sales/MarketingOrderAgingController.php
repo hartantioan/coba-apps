@@ -6,6 +6,7 @@ use App\Exports\ExportAgingAR;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderMemo;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -78,6 +79,41 @@ class MarketingOrderAgingController extends Controller
             'date2' => $date,
         ));
 
+        $results2 = DB::select("
+            SELECT 
+                *,
+                IFNULL((SELECT 
+                    SUM(ipd.subtotal) 
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
+                    WHERE 
+                        ipd.lookable_id = moi.id 
+                        AND ipd.lookable_type = 'marketing_order_memos'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
+                ),0) AS total_payment,
+                IFNULL((SELECT 
+                    gr.name 
+                    FROM groups gr
+                    WHERE gr.id = u.group_id
+                ),'-') AS grup,
+                0 AS outstandcheck,
+                0 AS total_memo,
+                u.name AS account_name,
+                u.employee_no AS account_code
+                FROM marketing_order_memos moi
+                JOIN users u
+                    ON u.id = moi.account_id
+                WHERE 
+                    moi.post_date <= :date2
+                    AND moi.grandtotal > 0
+                    AND moi.status IN ('2','3')
+        ", array(
+            'date1' => $date,
+            'date2' => $date,
+        ));
+
         $countPeriod = 1;
         $column = intval($request->column);
         $countPeriod += $column + 1;
@@ -113,6 +149,58 @@ class MarketingOrderAgingController extends Controller
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
             if ($balance > 0) {
                 $daysDiff = $this->dateDiffInDays($row->due_date_internal, $date);
+                $index = $this->findDuplicate($row->account_code, $newData);
+                if ($index >= 0) {
+                    foreach ($newData[$index]['data'] as $key => $rowdata) {
+                        if ($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']) {
+                            $newData[$index]['data'][$key]['balance'] += $balance;
+                            $newData[$index]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance;
+                            $newData[$index]['credit_balance'] -= $balance;
+                            $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
+                        }
+                    }
+                } else {
+                    $arrDetail = [];
+                    foreach ($arrColumn as $key => $rowcolumn) {
+                        if ($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']) {
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => $balance,
+                                'list_invoice'  => array($row->code),
+                            ];
+                            $arrColumn[$key]['total'] += $balance;
+                        } else {
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => 0,
+                                'list_invoice'  => [],
+                            ];
+                        }
+                    }
+                    $newData[] = [
+                        'customer_code'         => $row->account_code,
+                        'customer_name'         => $row->account_name,
+                        'customer_group'        => $row->grup,
+                        'data'                  => $arrDetail,
+                        'total'                 => $balance,
+                        'credit_balance'        => $row->limit_credit - $balance,
+                        'limit_credit'          => $row->limit_credit,
+                        'outstand_check'        => $row->outstandcheck ?? 0,
+
+                    ];
+                }
+            }
+        }
+
+        foreach ($results2 as $row) {
+            $balance = (-1 * $row->grandtotal) - $row->total_payment - $row->total_memo;
+            if ($balance < 0) {
+                $daysDiff = $this->dateDiffInDays($row->post_date, $row->post_date);
                 $index = $this->findDuplicate($row->account_code, $newData);
                 if ($index >= 0) {
                     foreach ($newData[$index]['data'] as $key => $rowdata) {
@@ -276,6 +364,41 @@ class MarketingOrderAgingController extends Controller
             'date4' => $date,
         ));
 
+        $results2 = DB::select("
+            SELECT 
+                *,
+                IFNULL((SELECT 
+                    SUM(ipd.subtotal) 
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
+                    WHERE 
+                        ipd.lookable_id = moi.id 
+                        AND ipd.lookable_type = 'marketing_order_memos'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
+                ),0) AS total_payment,
+                IFNULL((SELECT 
+                    gr.name 
+                    FROM groups gr
+                    WHERE gr.id = u.group_id
+                ),'-') AS grupcust,
+                0 AS total_memo,
+                u.name AS account_name,
+                u.employee_no AS account_code, datediff(post_date,post_date) as invoiceage,
+                datediff(post_date,post_date) as dueage, moi.code as invoice
+                FROM marketing_order_memos moi
+                JOIN users u
+                    ON u.id = moi.account_id
+                WHERE 
+                    moi.post_date <= :date2
+                    AND moi.grandtotal > 0
+                    AND moi.status IN ('2','3')
+        ", array(
+            'date1' => $date,
+            'date2' => $date,
+        ));
+
         $countPeriod = 1;
         $column = intval($request->column);
         $countPeriod += $column + 1;
@@ -337,6 +460,43 @@ class MarketingOrderAgingController extends Controller
                     'date' => $row->post_date,
                     'invoice_age' => $row->invoiceage,
                     'due_age' => $row->dueage,
+                    'invoice'               => $row->invoice,
+                    'data'                  => $arrDetail,
+                    'total'                 => $balance,
+                ];
+            }
+        }
+
+        foreach ($results2 as $row) {
+            $balance = (-1 * $row->grandtotal) - $row->total_payment - $row->total_memo;
+            if ($balance < 0) {
+                $daysDiff = $this->dateDiffInDays($row->post_date, $row->post_date);
+                $arrDetail = [];
+                foreach ($arrColumn as $key => $rowcolumn) {
+                    if ($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']) {
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => $balance,
+                        ];
+                        $arrColumn[$key]['total'] += $balance;
+                    } else {
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => 0,
+                        ];
+                    }
+                }
+                $newData[] = [
+                    'customer_code'         => $row->account_code,
+                    'customer_name'         => $row->account_name,
+                    'customer_group'        => $row->grupcust,
+                    'date'                  => $row->post_date,
+                    'invoice_age'           => $row->invoiceage,
+                    'due_age'               => $row->dueage,
                     'invoice'               => $row->invoice,
                     'data'                  => $arrDetail,
                     'total'                 => $balance,
@@ -426,23 +586,44 @@ class MarketingOrderAgingController extends Controller
 
         foreach ($arrInvoice as $row) {
             $prefix = substr($row, 0, 4);
-            $pi = MarketingOrderInvoice::where('code', $row)->first();
-            if ($pi) {
-                $memo = $pi->totalMemoByDate($date);
-                $paid = $pi->totalPayByDate($date);
-                $balance = $pi->grandtotal - $memo - $paid;
-                $results[] = [
-                    'code'          => $pi->code,
-                    'vendor'        => $pi->account->name,
-                    'post_date'     => date('d/m/Y', strtotime($pi->post_date)),
-                    'due_date'      => date('d/m/Y', strtotime($pi->due_date_internal)),
-                    'due_days'      => $this->dateDiffInDays($pi->due_date_internal, $date),
-                    'grandtotal'    => number_format($pi->grandtotal, 2, ',', '.'),
-                    'memo'          => number_format($memo, 2, ',', '.'),
-                    'paid'          => number_format($paid, 2, ',', '.'),
-                    'balance'       => number_format($balance, 2, ',', '.'),
-                ];
-                $grandtotal += $balance;
+            if($prefix == 'ARIN'){
+                $pi = MarketingOrderInvoice::where('code', $row)->first();
+                if ($pi) {
+                    $memo = $pi->totalMemoByDate($date);
+                    $paid = $pi->totalPayByDate($date);
+                    $balance = $pi->grandtotal - $memo - $paid;
+                    $results[] = [
+                        'code'          => $pi->code,
+                        'vendor'        => $pi->account->name,
+                        'post_date'     => date('d/m/Y', strtotime($pi->post_date)),
+                        'due_date'      => date('d/m/Y', strtotime($pi->due_date_internal)),
+                        'due_days'      => $this->dateDiffInDays($pi->due_date_internal, $date),
+                        'grandtotal'    => number_format($pi->grandtotal, 2, ',', '.'),
+                        'memo'          => number_format($memo, 2, ',', '.'),
+                        'paid'          => number_format($paid, 2, ',', '.'),
+                        'balance'       => number_format($balance, 2, ',', '.'),
+                    ];
+                    $grandtotal += $balance;
+                }
+            }elseif($prefix == 'ARMO'){
+                $pm = MarketingOrderMemo::where('code', $row)->first();
+                if ($pm) {
+                    $memo = 0;
+                    $paid = $pm->totalPayByDate($date);
+                    $balance = (-1 * $pm->grandtotal) - $memo - $paid;
+                    $results[] = [
+                        'code'          => $pm->code,
+                        'vendor'        => $pm->account->name,
+                        'post_date'     => date('d/m/Y', strtotime($pm->post_date)),
+                        'due_date'      => '-',
+                        'due_days'      => 0,
+                        'grandtotal'    => number_format(-1 * $pm->grandtotal, 2, ',', '.'),
+                        'memo'          => number_format($memo, 2, ',', '.'),
+                        'paid'          => number_format($paid, 2, ',', '.'),
+                        'balance'       => number_format($balance, 2, ',', '.'),
+                    ];
+                    $grandtotal += $balance;
+                }
             }
         }
 

@@ -7,6 +7,7 @@ use App\Exports\ExportOutstandingAR;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderMemo;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -41,6 +42,13 @@ class MarketingOrderOutstandingController extends Controller
             })
             ->whereIn('status',['2','3'])
             ->get();
+        $query_data2 = MarketingOrderMemo::where(function($query) use ( $request) {
+                if($request->date) {
+                    $query->whereDate('post_date', '<=', $request->date);
+                }
+            })
+            ->whereIn('status',['2','3'])
+            ->get();
         if($query_data){
             $grandtotalAll = 0;
             foreach($query_data as $row){
@@ -55,6 +63,27 @@ class MarketingOrderOutstandingController extends Controller
                         'note'              => $row->note,
                         'top'               => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->top_internal : '-',
                         'type'              => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType() : '-',
+                        'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
+                        'payment'           => CustomHelper::formatConditionalQty($payment),
+                        'balance'           => CustomHelper::formatConditionalQty($balance),
+                        'brand'             => $row->account->brand->name ?? '-',
+                    ];
+                    $grandtotalAll += $balance;
+                }
+            }
+
+            foreach($query_data2 as $row){
+                $payment = round($row->totalPayByDate($request->date),2);
+                $balance = round((-1 * $row->grandtotal) - $payment,2);
+                if($balance < 0){
+                    $array_filter[] = [
+                        'code'              => $row->code,
+                        'customer'          => $row->account->name,
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                        'due_date'          => date('d/m/Y',strtotime($row->post_date)),
+                        'note'              => $row->note,
+                        'top'               => '-',
+                        'type'              => '-',
                         'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
                         'payment'           => CustomHelper::formatConditionalQty($payment),
                         'balance'           => CustomHelper::formatConditionalQty($balance),

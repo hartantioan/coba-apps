@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderMemo;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -32,6 +33,14 @@ class ExportOutstandingAR implements FromView , WithEvents
         })
         ->whereIn('status',['2','3'])
         ->get();
+
+        $query_data2 = MarketingOrderMemo::where(function($query) {
+            if($this->date) {
+                $query->whereDate('post_date', '<=', $this->date);
+            }
+        })
+        ->whereIn('status',['2','3'])
+        ->get();
         
         foreach($query_data as $row){
             $payment = round($row->totalPayByDate($this->date),2);
@@ -49,6 +58,27 @@ class ExportOutstandingAR implements FromView , WithEvents
                     'total'             => $row->grandtotal,
                     'payment'           => $payment,
                     'balance'           => $balance,
+                ];
+                $grandtotalAll += $balance;
+            }
+        }
+
+        foreach($query_data2 as $row){
+            $payment = round($row->totalPayByDate($this->date),2);
+            $balance = round((-1 * $row->grandtotal) - $payment,2);
+            if($balance < 0){
+                $array_filter[] = [
+                    'code'              => $row->code,
+                    'customer'          => $row->account->name,
+                    'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                    'due_date'          => date('d/m/Y',strtotime($row->post_date)),
+                    'note'              => $row->note,
+                    'top'               => '-',
+                    'type'              => '-',
+                    'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
+                    'payment'           => CustomHelper::formatConditionalQty($payment),
+                    'balance'           => CustomHelper::formatConditionalQty($balance),
+                    'brand'             => $row->account->brand->name ?? '-',
                 ];
                 $grandtotalAll += $balance;
             }

@@ -292,4 +292,16 @@ class MarketingOrderMemo extends Model
             return false;
         }
     }
+
+    public function totalPayByDate($date){
+        $total = 0;
+
+        foreach($this->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $row){
+            $total += $row->subtotal;
+        }
+
+        return $total;
+    }
 }

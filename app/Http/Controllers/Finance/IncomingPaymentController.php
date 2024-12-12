@@ -60,6 +60,7 @@ use App\Models\Menu;
 use App\Models\FundRequest;
 use App\Models\MenuUser;
 use App\Models\UsedData;
+use App\Jobs\ReportFinanceJob;
 class IncomingPaymentController extends Controller
 {
 
@@ -1157,10 +1158,15 @@ class IncomingPaymentController extends Controller
     }
 
     public function export(Request $request){
+
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportIncomingPayment($post_date,$end_date,$mode), 'incoming_payment_'.uniqid().'.xlsx');
+        $file_name = 'incoming_payment_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportIncomingPayment::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportIncomingPayment($post_date,$end_date,$mode), 'incoming_payment_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

@@ -17,7 +17,7 @@ use App\Models\GoodScale;
 use App\Models\GoodIssue;
 use App\Models\InventoryTransferOut;
 use App\Models\MaterialRequest;
-
+use App\Jobs\ReportFinanceJob;
 
 use App\Models\Item;
 use App\Models\Line;
@@ -2030,8 +2030,11 @@ class PaymentRequestController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-
-		return Excel::download(new ExportPaymentRequest($post_date,$end_date,$mode), 'payment_request'.uniqid().'.xlsx');
+        $file_name = 'payment_request'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportPaymentRequest::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportPaymentRequest($post_date,$end_date,$mode), 'payment_request'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

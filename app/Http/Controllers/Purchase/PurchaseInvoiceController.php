@@ -18,6 +18,7 @@ use App\Models\CloseBill;
 use App\Exports\ExportOutstandingInvoice;
 use App\Models\LandedCost;
 
+use App\Jobs\ReportFinanceJob;
 use App\Models\MaterialRequest;
 use App\Models\PaymentRequest;
 use App\Models\PersonalCloseBill;
@@ -2417,7 +2418,11 @@ class PurchaseInvoiceController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportPurchaseInvoice($post_date,$end_date,$mode), 'purchase_invoice'.uniqid().'.xlsx');
+        $file_name = 'purchase_invoice_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportPurchaseInvoice::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportPurchaseInvoice($post_date,$end_date,$mode), 'purchase_invoice'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

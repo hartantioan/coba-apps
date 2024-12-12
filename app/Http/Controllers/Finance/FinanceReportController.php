@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\User;
+use App\Jobs\ReportFinanceJob;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -48,5 +49,16 @@ class FinanceReportController extends Controller
         $modedata = $menuUser->mode ?? '';
         $nominal = $menuUser->show_nominal ?? '';
 		return Excel::download(new ExportGoodReceiptFinance($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
+    }
+
+    public function exportGoodReceiptFinance(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		$file_name = 'good_receipt_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportGoodReceiptFinance::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportGoodReceiptFinance($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     }
 }

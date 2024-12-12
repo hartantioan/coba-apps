@@ -51,6 +51,16 @@ class MarketingOrderDetail extends Model
         return $type;
     }
 
+    public function isIncludeTaxEnglish(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Exclude',
+          '1' => 'Include',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function pricePerMeter(){
         return $this->price_after_discount;
     }

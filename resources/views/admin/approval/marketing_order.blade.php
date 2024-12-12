@@ -331,6 +331,7 @@
                         <th class="center-align">{{ __('translations.qty') }} Stok</th>
                         <th class="center-align">{{ __('translations.unit') }} Stok</th>
                         <th class="center-align">{{ __('translations.price') }}</th>
+                        <th class="center-align">Incl/Excl.PPN</th>
                         <th class="center-align">{{ __('translations.disc') }}.1 (%)</th>
                         <th class="center-align">{{ __('translations.disc') }}.2 (%)</th>
                         <th class="center-align">{{ __('translations.disc') }}.3 (Rp)</th>
@@ -348,6 +349,7 @@
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_uom) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->price) }}</td>
+                        <td class="center-align">{{ $row->isIncludeTaxEnglish() }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_1) }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_2) }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->discount_3) }}</td>

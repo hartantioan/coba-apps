@@ -7,7 +7,7 @@ use App\Models\CloseBill;
 use App\Models\FundRequest;
 use App\Models\CloseBillDetail;
 use App\Models\CostDistribution;
-use App\Models\GoodReceipt;
+use App\Jobs\ReportFinanceJob;
 use App\Models\CancelDocument;
 use App\Models\LandedCost;
 use App\Models\InventoryTransferOut;
@@ -1334,7 +1334,11 @@ class CloseBillController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportCloseBill($post_date,$end_date,$mode), 'close_bill_'.uniqid().'.xlsx');
+        $file_name = 'close_bill_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportCloseBill::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportCloseBill($post_date,$end_date,$mode), 'close_bill_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

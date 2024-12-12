@@ -17,6 +17,7 @@ use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\Place;
 use App\Models\User;
+use App\Jobs\ReportFinanceJob;
 
 class ListBgCheckController extends Controller
 {

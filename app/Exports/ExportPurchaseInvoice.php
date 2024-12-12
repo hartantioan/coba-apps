@@ -98,7 +98,6 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         $arr = [];
 
         foreach($data as $key => $row){
-            info($row->id);
             $arr[] = [
                 'no'                => ($key + 1),
                 'invoice_code'              => $row->purchaseInvoice->code,
@@ -148,7 +147,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
                 'wtax'              => number_format($row->wtax,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
             ];
-            
+
         }
         activity()
         ->performedOn(new PurchaseInvoiceDetail())

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
-use App\Models\ApprovalMatrix;
+use App\Jobs\ReportFinanceJob;
 use App\Models\ApprovalSource;
 use App\Models\CloseBill;
 use App\Models\CloseBillDetail;
@@ -87,7 +87,7 @@ class PersonalCloseBillController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = PersonalCloseBill::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -125,7 +125,7 @@ class PersonalCloseBillController extends Controller
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
-        
+
         $query_data = PersonalCloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -238,7 +238,7 @@ class PersonalCloseBillController extends Controller
     public function rowDetail(Request $request){
         $data   = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $menu = $this->menu;
-        
+
         $totalDocument = 0;
         $string = $data->code.'<div class="row pt-1 pb-1 lighten-4"><div class="col s8"><table style="min-width:100%;max-width:100%;">
                         <thead>
@@ -294,7 +294,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
-        
+
         foreach($data->personalCloseBillCost as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
@@ -313,7 +313,7 @@ class PersonalCloseBillController extends Controller
                 <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
-        
+
         $string .= '</tbody>
                         <tfoot>
                             <tr>
@@ -336,7 +336,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -344,7 +344,7 @@ class PersonalCloseBillController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -356,7 +356,7 @@ class PersonalCloseBillController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -379,13 +379,13 @@ class PersonalCloseBillController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function voidStatus(Request $request){
         $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             // if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -412,13 +412,13 @@ class PersonalCloseBillController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-    
+
                 activity()
                     ->performedOn(new PersonalCloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the personal close bill data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Tutup BS Personal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -444,7 +444,7 @@ class PersonalCloseBillController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -456,9 +456,9 @@ class PersonalCloseBillController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = FundRequest::where('code',$row)->first();
-                
+
                 if($pr){
-                    
+
                     $pdf = PrintHelper::print($pr,'Tutup BS Personal','a4','portrait','admin.print.personal.close_bill_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
@@ -467,7 +467,7 @@ class PersonalCloseBillController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -485,8 +485,8 @@ class PersonalCloseBillController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -515,7 +515,7 @@ class PersonalCloseBillController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -523,19 +523,19 @@ class PersonalCloseBillController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = FundRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Tutup BS Personal','a4','portrait','admin.print.personal.close_bill_individual');
@@ -545,7 +545,7 @@ class PersonalCloseBillController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -556,21 +556,21 @@ class PersonalCloseBillController extends Controller
 
                     $result = $merger->merge();
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -579,7 +579,7 @@ class PersonalCloseBillController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -600,22 +600,22 @@ class PersonalCloseBillController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
-                    
-                    
+
+
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -628,36 +628,36 @@ class PersonalCloseBillController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
 
             $pdf = PrintHelper::print($pr,'Tutup BS Personal','a4','portrait','admin.print.personal.close_bill_individual',$menuUser->mode);
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $temp_pdf[]=$content;
-            
-            $randomString = Str::random(10); 
-         
+
+            $randomString = Str::random(10);
+
             $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
+
             Storage::put($filePath, $content);
-            
+
             $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -665,33 +665,33 @@ class PersonalCloseBillController extends Controller
     }
 
     public function userPrintIndividual(Request $request,$id){
-        
+
         $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
 
             $pdf = PrintHelper::print($pr,'Tutup BS Personal','a4','Portrait','admin.print.personal.close_bill_individual');
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $temp_pdf[]=$content;
-            
-            $randomString = Str::random(10); 
-         
+
+            $randomString = Str::random(10);
+
             $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
+
             Storage::put($filePath, $content);
-            
+
             $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -702,8 +702,11 @@ class PersonalCloseBillController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		
-		return Excel::download(new ExportPersonalCloseBill($post_date,$end_date,$mode), 'personal_close_bill_'.uniqid().'.xlsx');
+		$file_name = 'personal_close_bill_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportPersonalCloseBill::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportPersonalCloseBill($post_date,$end_date,$mode), 'personal_close_bill_'.uniqid().'.xlsx');
     }
 
     public function userIndex(Request $request)
@@ -762,7 +765,7 @@ class PersonalCloseBillController extends Controller
         $search = $request->input('search.value');
 
         $total_data = PersonalCloseBill::where('user_id',session('bo_id'))->count();
-        
+
         $query_data = PersonalCloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -887,7 +890,7 @@ class PersonalCloseBillController extends Controller
         return response()->json([
             'status'    => 200,
             'data'      => $details,
-            'message'   => 'Data tidak ditemukan.' 
+            'message'   => 'Data tidak ditemukan.'
         ]);
     }
 
@@ -1011,7 +1014,7 @@ class PersonalCloseBillController extends Controller
         } else {
 
             $balance = 0;
-            
+
             foreach($request->arr_nominal as $key => $row){
                 $balance += str_replace(',','.',str_replace('.','',$row));
             }
@@ -1026,7 +1029,7 @@ class PersonalCloseBillController extends Controller
                     'message' => 'Mohon maaf data tidak bisa disimpan karena ada selisih dokumen terpakai dan biaya sebesar '.number_format($balance,2,',','.'),
                 ]);
             }
-                    
+
 			if($request->temp){
                 $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -1041,7 +1044,7 @@ class PersonalCloseBillController extends Controller
                     } else {
                         $document = $query->document;
                     }
-                    
+
                     $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
@@ -1063,7 +1066,7 @@ class PersonalCloseBillController extends Controller
                     $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
                     $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                     $query->status = '1';
-                    
+
                     $query->save();
 
                     $query->personalCloseBillCost()->delete();
@@ -1075,10 +1078,10 @@ class PersonalCloseBillController extends Controller
                     ]);
                 }
 			}else{
-                
+
                 $menu = Menu::where('url', 'close_bill_personal')->first();
                 $newCode=PersonalCloseBill::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                
+
                 $query = PersonalCloseBill::create([
                     'code'			    => $newCode,
                     'user_id'		    => session('bo_id'),
@@ -1104,7 +1107,7 @@ class PersonalCloseBillController extends Controller
                 ]);
 
 			}
-			
+
 			if($query) {
                 foreach($request->arr_nominal as $key => $row){
                     PersonalCloseBillDetail::create([
@@ -1159,12 +1162,12 @@ class PersonalCloseBillController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function userFinish(Request $request){
-        
+
         DB::beginTransaction();
         try {
             $query = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
@@ -1172,14 +1175,14 @@ class PersonalCloseBillController extends Controller
                 /* if($query->document_status == '3'){ */
                     $query->status = '3';
                     $query->save();
-    
+
                     $response = [
                         'status'    => 200,
                         'message'   => 'Data successfully updated.',
                     ];
 
                     CustomHelper::sendNotification('fund_requests',$query->id,'Status Permohonan Dana No. '.$query->code.' dinyatakan SELESAI','Status dokumen anda telah dinyatakan selesai.',session('bo_id'));
-    
+
                     DB::commit();
                 /* }else{
                     return response()->json([
@@ -1203,7 +1206,7 @@ class PersonalCloseBillController extends Controller
     public function userRowDetail(Request $request){
         $data   = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $menu = $this->menu;
-        
+
         $totalDocument = 0;
         $string = $data->code.'<div class="row pt-1 pb-1 lighten-4"><div class="col s8"><table style="min-width:100%;max-width:100%;">
                         <thead>
@@ -1259,7 +1262,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
-        
+
         foreach($data->personalCloseBillCost as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
@@ -1278,7 +1281,7 @@ class PersonalCloseBillController extends Controller
                 <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
-        
+
         $string .= '</tbody>
                         <tfoot>
                             <tr>
@@ -1312,7 +1315,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -1320,7 +1323,7 @@ class PersonalCloseBillController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -1332,7 +1335,7 @@ class PersonalCloseBillController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -1355,7 +1358,7 @@ class PersonalCloseBillController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -1422,7 +1425,7 @@ class PersonalCloseBillController extends Controller
 
         $fr['details'] = $arr;
         $fr['docs'] = $arrDoc;
-        				
+
 		return response()->json($fr);
     }
 
@@ -1474,7 +1477,7 @@ class PersonalCloseBillController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-            
+
             $query->personalCloseBillCost()->delete();
             $query->personalCloseBillDetail()->delete();
             CustomHelper::removeApproval($query->getTable(),$query->id);
@@ -1500,9 +1503,9 @@ class PersonalCloseBillController extends Controller
     }
 
     public function approval(Request $request,$id){
-        
+
         $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $data = [
                 'title'     => 'Tutup BS Personal',
@@ -1537,31 +1540,31 @@ class PersonalCloseBillController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$pcb;
-        
-        
+
+
 
         if($query) {
-            
+
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_pcb',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;   
+            $data_link = $array2;
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1570,8 +1573,8 @@ class PersonalCloseBillController extends Controller
                 'message' => $data_go_chart,
                 'link'    => $data_link
             ];
-            
-        
+
+
         } else {
             $data_good_receipt = [];
             $response = [

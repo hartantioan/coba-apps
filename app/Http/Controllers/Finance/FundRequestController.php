@@ -54,6 +54,8 @@ use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Exports\ExportFundRequestTransactionPage;
 use App\Models\UsedData;
+use App\Jobs\ReportFinanceJob;
+
 class FundRequestController extends Controller
 {
     protected $dataplaces, $datauser, $dataplacecode, $menu;
@@ -812,8 +814,11 @@ class FundRequestController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-
-		return Excel::download(new ExportFundRequest($post_date,$end_date,$mode), 'fund_request_'.uniqid().'.xlsx');
+        $file_name = 'fund_request_'.uniqid().'.xlsx';
+        $user_id = session('bo_id');
+        ReportFinanceJob::dispatch(\App\Exports\ExportFundRequest::class,$post_date, $end_date, $mode,$user_id,$file_name);
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+		// return Excel::download(new ExportFundRequest($post_date,$end_date,$mode), 'fund_request_'.uniqid().'.xlsx');
     }
 
     public function userIndex(Request $request)

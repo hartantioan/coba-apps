@@ -84,7 +84,7 @@
         var status = $('#end_date').val();
         var mode = $('#mode').val();
         if(tipe == 'good_receipt'){
-            // $.ajax({
+            /* // $.ajax({
             //     url: '{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt_finance',
             //     type: 'POST',
             //     dataType: 'JSON',
@@ -114,7 +114,7 @@
             //             icon: 'error'
             //         });
             //     }
-            // });
+            // }); */
             window.location ="{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
         }else{
             swal({

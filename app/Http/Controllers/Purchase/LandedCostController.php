@@ -671,12 +671,12 @@ class LandedCostController extends Controller
                 $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
                 $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
-                if($grandtotal <= 0){
+                /* if($grandtotal <= 0){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Nominal grandtotal tidak boleh dibawah sama dengan 0.'
                     ]);
-                }
+                } */
 
                 if($request->temp){
 

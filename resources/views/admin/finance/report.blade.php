@@ -78,57 +78,58 @@
         });
     });
     function exportExcel(){
-        swal({
-            title: 'ALERT',
-            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
-        });
-        $('#validation_alert').show();
-        $('#validation_alert').append(`
-            <div class="card-alert card red">
-                <div class="card-content white-text">
-                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
-                </div>
-            </div>
-        `);
         var tipe = $('#type').val();
         var search = $('#start_date').val();
         var status = $('#end_date').val();
         var mode = $('#mode').val();
         if(tipe == 'good_receipt'){
-            $.ajax({
-                url: '{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt_finance',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    mode : mode,
-                    start_date : search,
-                    end_date : status,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('#main-display');
-                },
-                success: function(response) {
-                    loadingClose('#main-display');
-                    M.toast({
-                        html: response.message
-                    });
-                },
-                error: function() {
-                    $('#main-display').scrollTop(0);
-                    loadingClose('#main-display');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-            // window.location ="{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
+            // $.ajax({
+            //     url: '{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt_finance',
+            //     type: 'POST',
+            //     dataType: 'JSON',
+            //     data: {
+            //         mode : mode,
+            //         start_date : search,
+            //         end_date : status,
+            //     },
+            //     headers: {
+            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     },
+            //     beforeSend: function() {
+            //         loadingOpen('#main-display');
+            //     },
+            //     success: function(response) {
+            //         loadingClose('#main-display');
+            //         M.toast({
+            //             html: response.message
+            //         });
+            //     },
+            //     error: function() {
+            //         $('#main-display').scrollTop(0);
+            //         loadingClose('#main-display');
+            //         swal({
+            //             title: 'Ups!',
+            //             text: 'Check your internet connection.',
+            //             icon: 'error'
+            //         });
+            //     }
+            // });
+            window.location ="{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
         }else{
+            swal({
+                title: 'ALERT',
+                text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
+
+            });
+            $('#validation_alert').show();
+            $('#validation_alert').append(`
+                <div class="card-alert card red">
+                    <div class="card-content white-text">
+                        <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                    </div>
+                </div>
+            `);
             $.ajax({
                 url: '{{ URL::to("/") }}/admin/' + tipe + '/export',
                 type: 'POST',

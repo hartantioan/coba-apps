@@ -357,16 +357,16 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->total) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="13" class="red-text">Harga Per M2 : {{ CustomHelper::formatConditionalQty($row->pricePerMeter()) }} || HPP + Margin Segment : {{ CustomHelper::formatConditionalQty($row->price_nett) }}</td>
+                        <td colspan="14" class="red-text">Harga Per M2 : {{ CustomHelper::formatConditionalQty($row->pricePerMeter()) }} || HPP + Margin Segment : {{ CustomHelper::formatConditionalQty($row->price_nett) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="10">{{ __('translations.note') }}: {{ $row->note }}</td>
                         <td colspan="4">{{ __('translations.taken_from') }}: {{ $row->place->code }}</td>
                     </tr>
                     
                     @endforeach
                     <tr>
-                        <td colspan="9" rowspan="8">
+                        <td colspan="10" rowspan="8">
                             {{ __('translations.bank_account') }} :
                             {!! $data->company->banks() !!}
                             <div class="mt-3">

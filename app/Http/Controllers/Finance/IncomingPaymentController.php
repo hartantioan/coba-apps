@@ -1040,12 +1040,16 @@ class IncomingPaymentController extends Controller
                             }
                         }
                     }
-                    if($query->listBgCheck()->exists()){
-                        $query->listBgCheck->update([
-                            'status'    => '2',
-                            'grandtotal'=> 0,
-                            'pay_date'  => NULL,
-                        ]);
+                    if($query->incomingPaymentList()->exists()){
+                        foreach($query->incomingPaymentList as $row){
+                            if($row->listBgCheck()->exists()){
+                                $row->listBgCheck->update([
+                                    'status'    => '2',
+                                    'grandtotal'=> 0,
+                                    'pay_date'  => NULL,
+                                ]);
+                            }
+                        }
                     }
                 }
 

@@ -168,7 +168,7 @@
                                                         <th rowspan="2" class="center-align">{{ __('translations.bussiness_partner') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.company') }}</th>
                                                         <th rowspan="2" class="center-align">Kas/Bank</th>
-                                                        <th rowspan="2" class="center-align">BG/Check</th>
+                                                        {{-- <th rowspan="2" class="center-align">BG/Check</th> --}}
                                                         <th rowspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.total') }}</th>
@@ -177,6 +177,7 @@
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.note') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.status') }}</th>
+                                                        <th rowspan="2" class="center-align">BG/Check</th>
                                                         <th rowspan="2" class="center-align">By</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.action') }}</th>
                                                     </tr>
@@ -242,10 +243,10 @@
                                     <select class="browser-default" id="coa_id" name="coa_id"></select>
                                     <label class="active" for="coa_id">Kas / Bank</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                {{-- <div class="input-field col m3 s12">
                                     <select class="browser-default" id="list_bg_check_id" name="list_bg_check_id"></select>
                                     <label class="active" for="list_bg_check_id">List BG/Check (OPSIONAL)</label>
-                                </div>
+                                </div> --}}
                                 <div class="input-field col m3 s12 step6">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">Tgl.Cair/Masuk Uang</label>
@@ -336,9 +337,39 @@
                             </div>
                         </fieldset>
                     </div>
+                    <div class="col s12 stepdetaildokumen">
+                        <fieldset style="min-width: 100%;">
+                            <legend>4. List BG/Check Terpakai</legend>
+                            <div class="row">
+                                <div class="col m6 s6">
+                                    <p class="mt-2 mb-2">
+                                        <div>
+                                            <table class="bordered" id="table-bg">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-bg">
+                                                    <tr id="last-row-bg">
+                                                        <td colspan="3">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addBg()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Check/BG
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>4. Keterangan dan Total</legend>
+                            <legend>5. Keterangan dan Total</legend>
                             <div class="row">
                                 <div class="input-field col m4 s12 step13">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -891,7 +922,7 @@
                 $('input').css('border', 'none');
                 $('input').css('border-bottom', '0.5px solid black');
                 M.updateTextFields();
-                $('.row_detail').remove();
+                $('.row_detail,.row_bg').remove();
                 $('#account_id,#coa_id').empty();
                 $('#total,#wtax,#grandtotal').text('0,00');
                 if($('.data-used').length > 0){
@@ -901,7 +932,6 @@
                     return null;
                 };
                 countAll();
-                $('#list_bg_check_id').empty();
             }
         });
 
@@ -1045,7 +1075,7 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/employee_customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
 
-        $('#list_bg_check_id').select2({
+        /* $('#list_bg_check_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -1068,7 +1098,7 @@
                     }
                 }
             }
-        });
+        }); */
 
         $('#body-detail').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
@@ -1078,6 +1108,10 @@
                     $('.data-used').trigger('click');
                 }
             }
+        });
+
+        $('#body-bg').on('click', '.delete-data-bg', function() {
+            $(this).closest('tr').remove();
         });
     });
 
@@ -1138,6 +1172,46 @@
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
         }
+    }
+
+    function addBg(){
+        var count = makeid(10);
+        $('#last-row-bg').before(`
+            <tr class="row_bg">
+                <td>
+                    <select class="browser-default" id="arr_list_bg_check` + count + `" name="arr_list_bg_check[]"></select>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bg" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $('#arr_list_bg_check' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/list_bg_check") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function addItem(){
@@ -1582,7 +1656,7 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'coa_id', className: 'center-align' },
-                { name: 'list_bg_check_id', className: 'center-align' },
+                /* { name: 'list_bg_check_id', className: 'center-align' }, */
                 { name: 'post_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -1592,6 +1666,7 @@
                 { name: 'document', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'list_bg_check', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1676,8 +1751,28 @@
                 formData.delete("arr_note[]");
                 formData.delete("arr_type[]");
                 formData.delete("arr_id[]");
+                formData.delete("arr_list_bg_check[]");
 
-                let passed = true;
+                let passed = true, passedBg = true;
+
+                if($('select[name^="arr_list_bg_check[]"]').length > 0){
+                    $('select[name^="arr_list_bg_check[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedBg = false;
+                        }else{
+                            formData.append('arr_list_bg_check[]',$(this).val());
+                        }
+                    });
+                }
+
+                if(!passedBg){
+                    swal({
+                        title: 'Ups! Hayo',
+                        text: 'List check BG tidak boleh kosong ya.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
 
                 if($('input[name^="arr_coa[]"]').length > 0){
                     $('input[name^="arr_coa[]"]').each(function(index){
@@ -1871,6 +1966,52 @@
                     $('#list_bg_check_id').empty().append(`
                         <option value="` + response.list_bg_check_id + `">` + response.list_bg_check_name + `</option>
                     `);
+                }
+                
+                if(response.lists.length > 0){
+                    $('.row_bg').remove();
+                    $.each(response.lists, function(i, val){
+                        var count = makeid(10);
+                        $('#last-row-bg').before(`
+                            <tr class="row_bg">
+                                <td>
+                                    <select class="browser-default" id="arr_list_bg_check` + count + `" name="arr_list_bg_check[]"></select>
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bg" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        $('#arr_list_bg_check' + count).append(`
+                            <option value="` + val.id + `">` + val.document_no +  `</option>
+                        `);
+                        $('#arr_list_bg_check' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/list_bg_check") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        account_id: $('#account_id').val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+                    });
                 }
                 
                 if(response.details.length > 0){

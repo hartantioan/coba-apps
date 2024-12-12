@@ -87,6 +87,11 @@ class ListBgCheck extends Model
         return $this->hasOne('App\Models\IncomingPayment','list_bg_check_id','id')->whereIn('status',['2','3']);
     }
 
+    public function incomingPaymentList()
+    {
+        return $this->hasOne('App\Models\IncomingPaymentList','list_bg_check_id','id')->whereIn('status',['2','3']);
+    }
+
     public function account()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
@@ -133,5 +138,15 @@ class ListBgCheck extends Model
         };
 
         return $type;
+    }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->incomingPaymentList()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
     }
 }

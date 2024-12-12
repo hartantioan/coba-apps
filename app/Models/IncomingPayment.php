@@ -95,6 +95,11 @@ class IncomingPayment extends Model
         return $this->hasMany('App\Models\IncomingPaymentDetail');
     }
 
+    public function incomingPaymentList()
+    {
+        return $this->hasMany('App\Models\IncomingPaymentList');
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -227,6 +232,14 @@ class IncomingPayment extends Model
         return $this->hasMany('App\Models\AdjustRateDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('adjustRate',function($query){
             $query->whereIn('status',['2','3']);
         });
+    }
+    
+    public function textBgCheck(){
+        $arr = [];
+        foreach($this->incomingPaymentList as $row){
+            $arr[] = $row->listBgCheck->document_no;
+        }
+        return implode(', ',$arr);
     }
 
     public function latestCurrencyRate(){

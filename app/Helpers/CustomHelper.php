@@ -1559,12 +1559,16 @@ class CustomHelper {
 					]);
 				}
 
-				if($ip->listBgCheck()->exists()){
-					$ip->listBgCheck->update([
-						'status'		=> '3',
-						'pay_date'		=> $ip->post_date,
-						'grandtotal'	=> $ip->grandtotal,
-					]);
+				if($ip->incomingPaymentList()->exists()){
+					foreach($ip->incomingPaymentList as $row){
+						if($row->listBgCheck()->exists()){
+							$row->listBgCheck->update([
+								'status'		=> '3',
+								'pay_date'		=> $ip->post_date,
+								'grandtotal'	=> $ip->grandtotal,
+							]);
+						}
+					}
 				}
 			}
 

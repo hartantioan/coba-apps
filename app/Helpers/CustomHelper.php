@@ -3196,6 +3196,12 @@ class CustomHelper {
 						'lookable_id'	=> $table_id,
 					]);
 				}
+
+				if($lc->grandtotal == 0){
+					$lc->update([
+						'status'	=> '3',
+					]);
+				}
 			}
 		}elseif($table_name == 'inventory_revaluations'){
 

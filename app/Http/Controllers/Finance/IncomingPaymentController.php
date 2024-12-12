@@ -950,8 +950,8 @@ class IncomingPaymentController extends Controller
     public function show(Request $request){
         $ip = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $ip['code_place_id'] = substr($ip->code,7,2);
-        $ip['grandtotal'] = number_format($ip->grandtotal,2,',','.');
         $ip['total'] = number_format($ip->grandtotal - $ip->rounding,2,',','.');
+        $ip['grandtotal'] = number_format($ip->grandtotal,2,',','.');
         $ip['rounding'] = number_format($ip->rounding,2,',','.');
         $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
         $ip['coa_name'] = $ip->coa()->exists() ? $ip->coa->code.' - '.$ip->coa->name : '';

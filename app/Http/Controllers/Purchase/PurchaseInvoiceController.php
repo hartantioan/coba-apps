@@ -1135,7 +1135,7 @@ class PurchaseInvoiceController extends Controller
             {
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'No Faktur Pajak Belum Diisi'
+                    'message' => 'No Faktur Pajak Belum Diisi / Minimal nomor pajak 5 huruf.'
                 ]);
             }
 

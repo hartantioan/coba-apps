@@ -26,6 +26,7 @@
             <th>JUAL</th>
             <th>BELI</th>
             <th>DEFAULT</th>
+            <th>TOLERANSI</th>
         </tr>
     </thead>
     <tbody>
@@ -61,6 +62,7 @@
                         <td >{{ $rowUnit->sellUnitRaw() }}</td>
                         <td >{{ $rowUnit->buyUnitRaw() }}</td>
                         <td >{{ $rowUnit->defaultRaw() }}</td>
+                        <td >{{ $row->tolerance_gr }}</td>
                     </tr>
                 @endforeach
             @else
@@ -90,9 +92,10 @@
                     <td >-</td>
                     <td >-</td>
                     <td >-</td>
-                </tr>    
+                    <td >{{ $row->tolerance_gr }}</td>
+                </tr>
             @endif
-            
+
             @php
                 $no++;
             @endphp

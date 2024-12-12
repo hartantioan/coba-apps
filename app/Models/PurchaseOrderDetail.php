@@ -317,6 +317,16 @@ class PurchaseOrderDetail extends Model
         return $total;
     }
 
+    public function balanceInvoiceNew(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
     public function totalInvoice(){
         $total = 0;
 

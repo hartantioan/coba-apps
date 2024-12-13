@@ -1469,9 +1469,11 @@ class MarketingOrderInvoiceController extends Controller
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
                 }
 
-                $query->marketingOrderDeliveryProcess->update([
-                    'status'    => '2'
-                ]);
+                if($query->marketingOrderDeliveryProcess()->exists()){
+                    $query->marketingOrderDeliveryProcess->update([
+                        'status'    => '2'
+                    ]);
+                }
 
                 $newtaxno = '';
                 if($query->tax_no){

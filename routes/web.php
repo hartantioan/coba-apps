@@ -1740,6 +1740,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('print_individual_chi/{id}', [MaterialRequestController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree', [MaterialRequestController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MaterialRequestController::class, 'simpleStructrueTree']);
                     Route::post('create', [MaterialRequestController::class, 'create'])->middleware('operation.access:material_request,update');
                     Route::post('create_done', [MaterialRequestController::class, 'createDone'])->middleware('operation.access:material_request,update');
                     Route::post('void_status', [MaterialRequestController::class, 'voidStatus'])->middleware('operation.access:material_request,void');
@@ -1860,6 +1861,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range', [PurchaseOrderController::class, 'printByRange']);
                     Route::get('export_from_page', [PurchaseOrderController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree', [PurchaseOrderController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [PurchaseOrderController::class, 'simpleStructrueTree']);
                     Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
                     Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                     Route::post('create', [PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
@@ -3325,6 +3327,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('get_import_excel', [PurchaseInvoiceController::class, 'getImportExcel']);
                     Route::get('view_journal/{id}', [PurchaseInvoiceController::class, 'viewJournal'])->middleware('operation.access:purchase_invoice,journal');
                     Route::get('viewstructuretree', [PurchaseInvoiceController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [PurchaseInvoiceController::class, 'simpleStructrueTree']);
                     Route::post('create', [PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
                     Route::post('create_multi', [PurchaseInvoiceController::class, 'createMulti'])->middleware('operation.access:purchase_invoice,update');
                     Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');

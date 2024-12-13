@@ -12,16 +12,17 @@ class ExportReceptionHardwareUsage implements FromView,ShouldAutoSize
     protected $start_date,$finish_date,$search,$multiple;
     public function __construct(string $search)
     {
-       
+
         $this->search = $search ? $search : '';
-       
+
     }
     public function view(): View
     {
-        
+
         return view('admin.exports.reception_hardware', [
-            'data' => ReceptionHardwareItemsUsage::where(function($query) {
-               
+            'data' => ReceptionHardwareItemsUsage::withTrashed()
+            ->where(function($query) {
+
                 if($this->search) {
                     $query->where(function($query)  {
                         $query->orWhere('code', 'like', "%$this->search%")
@@ -39,6 +40,6 @@ class ExportReceptionHardwareUsage implements FromView,ShouldAutoSize
             })
             ->get()
         ]);
-        
+
     }
 }

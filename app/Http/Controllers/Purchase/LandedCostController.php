@@ -599,6 +599,7 @@ class LandedCostController extends Controller
                         <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat brown white-text btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -1519,6 +1520,70 @@ class LandedCostController extends Controller
             $data_go_chart[]=$lc;
 
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_lc',$query->id);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+
+
+        } else {
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data not Found.'
+            ];
+        }
+        return response()->json($response);
+    }
+
+    public function simpleStructrueTree(Request $request){
+        $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+        function formatNominals($model) {
+            if ($model->currency) {
+                return $model->currency->symbol;
+            } else {
+                return "Rp.";
+            }
+        }
+        $data_link = [];
+        $data_go_chart = [];
+        if($query) {
+            $lc = [
+                "key" => $query->code,
+                "name" => $query->code,
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    ['name'=> "Nominal :".formatNominals($query).number_format($query->grandtotal,2,',','.')],
+                 ],
+                'color'=>"lightblue",
+                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($query->code),
+            ];
+            $data_go_chart[]=$lc;
+
+            $result = TreeHelper::simpleTree($data_go_chart,$data_link,'data_id_lc',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

@@ -8,7 +8,6 @@
             <th>{{ __('translations.item') }}</th>
             <th>Keterangan </th>
             <th>{{ __('translations.location') }}</th>
-           
             <th>Tanggal Penyerahan</th>
             <th>Keterangan Penyerahan</th>
             <th>User(Bersangkutan)</th>
@@ -22,20 +21,34 @@
             $no = 1;
         @endphp
         @foreach($data as $key => $row)
-            <tr align="center">
-                <td>{{ $no }}</td>
-                <td>{{ $row->code }}</td>
-                <td>{{ $row->user->name ?? '-' }}</td>
-                <td>{{ $row->hardwareItem->code ?? '' }}</td>
-                <td>{{ $row->hardwareItem->item ?? '' }}</td>
-                <td>{{ $row->hardwareItem->detail1 ?? '' }}</td>
-                <td>{{ $row->location }}</td>
-                <td>{{ $row->reception_date }}</td>
-                <td>{{ $row->info }}</td>
-                <td>{{ $row->account->name ?? '' }}</td>
-                <td>{{ $row->return_date ? date('d/m/Y', strtotime($row->return_date)) : ' ' }}</td>
-                <td>{{ $row->return_note }}</td>
-                <td>{{ $row->statusRaw() }}</td>
+            @php
+                // Check if the row is soft-deleted
+                $isDeleted = $row->trashed();
+                $mbeng = '';
+                if($isDeleted){
+                    $mbeng = 'background-color: red;';
+                }
+            @endphp
+            <tr align="center" >
+                <td style="{{$mbeng}}">{{ $no }}</td>
+                <td style="{{$mbeng}}">{{ $row->code }}</td>
+                <td style="{{$mbeng}}">{{ $row->user->name ?? '-' }}</td>
+                <td style="{{$mbeng}}">{{ $row->hardwareItem->code ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ $row->hardwareItem->item ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ $row->hardwareItem->detail1 ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ $row->location }}</td>
+                <td style="{{$mbeng}}">{{ $row->reception_date }}</td>
+                <td style="{{$mbeng}}">{{ $row->info }}</td>
+                <td style="{{$mbeng}}">{{ $row->account->name ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ $row->return_date ? date('d/m/Y', strtotime($row->return_date)) : ' ' }}</td>
+                <td style="{{$mbeng}}">{{ $row->return_note }}</td>
+                <td style="{{$mbeng}}">
+                    @if($isDeleted)
+                        DELETED <!-- Display "Deleted" status if soft-deleted -->
+                    @else
+                        {{ $row->statusRaw() }}  <!-- Otherwise show the normal status -->
+                    @endif
+                </td>
             </tr>
             @php
                 $no++;

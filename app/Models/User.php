@@ -364,7 +364,7 @@ class User extends Authenticatable
     }
 
     public function fundRequest(){
-        return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3','7']);
+        return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['1','2','3','7']);
     }
 
     public function purchaseOrder(){

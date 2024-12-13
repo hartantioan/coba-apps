@@ -49,7 +49,7 @@
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable()">
                             <i class="material-icons hide-on-med-and-up">refresh</i>
                             <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
@@ -123,7 +123,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -181,7 +181,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -284,7 +284,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -310,7 +310,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -357,7 +357,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -411,7 +411,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -434,7 +434,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -451,7 +451,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -462,10 +462,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -497,13 +497,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -524,19 +524,19 @@
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
             }
         });
-        
+
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
@@ -583,7 +583,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -596,7 +596,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -606,19 +606,19 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -630,9 +630,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -798,7 +798,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -826,7 +826,7 @@
             },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -875,7 +875,7 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
+
                     if(response.status == 500){
                         swal({
                             title: 'Ups!',
@@ -891,7 +891,7 @@
                             </div>
                         `);
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -916,17 +916,17 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
-                
+
             },
             error: function() {
                 swal({
@@ -946,7 +946,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -995,11 +995,11 @@
                     $('#currency_id').val(response.currency_id).formSelect();
                     $('#currency_rate').val(response.currency_rate);
                     $('#post_date').val(response.post_date);
-                    $('#pay_date').val(response.pay_date);                
+                    $('#pay_date').val(response.pay_date);
                     $('#note').val(response.note);
                     $('#admin').val(response.admin);
                     $('#grandtotal').val(response.grandtotal);
-                    
+
                     if(response.payment_request_id){
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
@@ -1045,12 +1045,12 @@
                 var path = window.location.pathname;
                 path = path.replace(/^\/|\/$/g, '');
 
-                
+
                 var segments = path.split('/');
                 var lastSegment = segments[segments.length - 1];
-            
+
                 formData.append('lastsegment',lastSegment);
-                    
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -1082,7 +1082,7 @@
                             $.each(response.error, function(field, errorMessage) {
                                 $('#' + field).addClass('error-input');
                                 $('#' + field).css('border', '1px solid red');
-                                
+
                             });
                             swal({
                                 title: 'Ups! Validation',
@@ -1126,7 +1126,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1134,16 +1134,16 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
-    
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-            
+
         });
         $.ajax({
             url: '{{ Request::url() }}/print',
@@ -1181,7 +1181,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1226,13 +1226,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1262,11 +1262,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function printPreview(code,aslicode){
@@ -1288,7 +1288,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1297,10 +1297,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -1312,11 +1312,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1338,8 +1338,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1347,7 +1347,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1356,10 +1356,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1383,7 +1383,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1396,17 +1396,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1425,8 +1425,8 @@
             nodeDataArray: data,
             linkDataArray: link
         });
-            
-            
+
+
     }
 
     function viewStructureTree(id){
@@ -1434,7 +1434,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1445,12 +1445,43 @@
             },
             success: function(response) {
                 loadingClose('#main');
-            
+
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal4').modal('open');
             },
             error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+    function simpleStructrueTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/simplestructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                makeTreeOrg(response.message,response.link);
+
+                $('#modal4').modal('open');
+            },
+            error: function() {
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -1467,7 +1498,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1501,67 +1532,67 @@
                 {
                     title : 'Partner Bisnis',
                     element : document.querySelector('.step1'),
-                    intro : 'Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step2'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Kas / Bank',
                     element : document.querySelector('.step3'),
-                    intro : 'COA bank yang akan digunakan dalam form ini.' 
+                    intro : 'COA bank yang akan digunakan dalam form ini.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal Tenggat dari grpo pada form' 
+                    intro : 'Tanggal Tenggat dari grpo pada form'
                 },
                 {
                     title : 'Tgl. Bayar',
                     element : document.querySelector('.step5'),
-                    intro : 'Tanggal Bayar yang ditentukan untuk form ini' 
+                    intro : 'Tanggal Bayar yang ditentukan untuk form ini'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step6'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step7'),
-                    intro : 'Mata Uang yang digunakan dalam mendefinisikan' 
+                    intro : 'Mata Uang yang digunakan dalam mendefinisikan'
                 },
                 {
                     title : 'Konversi',
                     element : document.querySelector('.step8'),
-                    intro : 'Konversi mata uang pada form ini' 
+                    intro : 'Konversi mata uang pada form ini'
                 },
                 {
                     title : 'Permintaan Pembayaraan',
                     element : document.querySelector('.step9'),
-                    intro : 'Pilih Payment Request yang terkait form ini' 
+                    intro : 'Pilih Payment Request yang terkait form ini'
                 },
                 {
                     title : 'Biaya Admin',
                     element : document.querySelector('.step10'),
-                    intro : 'Biaya admin yang dikeluarkan dalam pembuatan form ini.' 
+                    intro : 'Biaya admin yang dikeluarkan dalam pembuatan form ini.'
                 },
                 {
                     title : 'Total Bayar(Keluar)',
                     element : document.querySelector('.step11'),
-                    intro : 'Total pembayaran form  yang terotomasi dari penjumlahan data yang diinputini.' 
+                    intro : 'Total pembayaran form  yang terotomasi dari penjumlahan data yang diinputini.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step12'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step13'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -1575,7 +1606,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1584,7 +1615,7 @@
         });
     }
 
-    
+
 
     function exportExcel(){
         var search = table.search();
@@ -1597,6 +1628,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

@@ -117,7 +117,7 @@ class MaterialRequestController extends Controller
             $query->whereIn('warehouse_id',$this->datawarehouses);
         })
         ->count();
-        
+
         $query_data = MaterialRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -151,7 +151,7 @@ class MaterialRequestController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -162,7 +162,7 @@ class MaterialRequestController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             ->whereHas('materialRequestDetail',function($query){
@@ -207,7 +207,7 @@ class MaterialRequestController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -218,7 +218,7 @@ class MaterialRequestController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             ->whereHas('materialRequestDetail',function($query){
@@ -239,7 +239,7 @@ class MaterialRequestController extends Controller
                 //     color: #9f9f9f !important;
                 //     background-color: #dfdfdf !important;
                 //     box-shadow: none;"';
-                   
+
                 // }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -272,9 +272,10 @@ class MaterialRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat brown white-text btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat yellow accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -356,9 +357,9 @@ class MaterialRequestController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty). '</td>
-            </tr>  
+            </tr>
         ';
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s6 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -374,7 +375,7 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -382,7 +383,7 @@ class MaterialRequestController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -394,7 +395,7 @@ class MaterialRequestController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -417,13 +418,13 @@ class MaterialRequestController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function voidStatus(Request $request){
         $query = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             /* if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -450,13 +451,13 @@ class MaterialRequestController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-    
+
                 activity()
                     ->performedOn(new MaterialRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the Item Request data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Item Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -475,13 +476,73 @@ class MaterialRequestController extends Controller
         return response()->json($response);
     }
 
+    public function simpleStructrueTree(Request $request){
+        $query = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
+        $mr = [
+                'key'   => $query->code,
+                "name"  => $query->code,
+                "color" => "lightblue",
+                'properties'=> [
+                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
+                  ],
+                'url'   =>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($query->code),
+                "title" =>$query->code,
+            ];
+
+        $data_go_chart[]=$mr;
+
+
+        if($query) {
+
+            //Pengambilan Main Branch beserta id terkait
+
+
+            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mr',$query->id,'1');
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
+    }
+
     public function print(Request $request){
         $validation = Validator::make($request->all(), [
             'arr_id'                => 'required',
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -493,11 +554,11 @@ class MaterialRequestController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = MaterialRequest::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Item Request','a5','landscape','admin.print.inventory.request_individual');
-                  
-                    
+
+
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -505,7 +566,7 @@ class MaterialRequestController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -521,8 +582,8 @@ class MaterialRequestController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -567,7 +628,7 @@ class MaterialRequestController extends Controller
 
             foreach($request->arr_qty as $key => $row){
                 if(str_replace(',','.',str_replace('.','',$row)) == 0){
-                   $passedQty = false; 
+                   $passedQty = false;
                 }
             }
 
@@ -638,7 +699,7 @@ class MaterialRequestController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MaterialRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MaterialRequest::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
@@ -654,7 +715,7 @@ class MaterialRequestController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 DB::beginTransaction();
@@ -716,7 +777,7 @@ class MaterialRequestController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -752,14 +813,14 @@ class MaterialRequestController extends Controller
         }
 
         $pr['details'] = $arr;
-        				
+
 		return response()->json($pr);
     }
 
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MaterialRequest::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -796,7 +857,7 @@ class MaterialRequestController extends Controller
                 'message' => 'Item Request sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->hasChildDocument()){
             return response()->json([
                 'status'  => 500,
@@ -809,7 +870,7 @@ class MaterialRequestController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-            
+
             $query->materialRequestDetail()->delete();
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -853,46 +914,46 @@ class MaterialRequestController extends Controller
                 'url'   =>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
-        
+
         $data_go_chart[]=$mr;
-        
-        
+
+
         if($query) {
-            
+
             //Pengambilan Main Branch beserta id terkait
-            
-            
+
+
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mr',$query->id,'1');
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;          
-            
+            $data_link = $array2;
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
-  
+
 
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
                 'link'    => $data_link,
             ];
-            
+
         } else {
             $data_good_receipt = [];
             $response = [
@@ -903,12 +964,12 @@ class MaterialRequestController extends Controller
         return response()->json($response);
     }
 
-    
+
 
     public function approval(Request $request,$id){
-        
+
         $pr = MaterialRequest::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $data = [
                 'title'     => 'Item Request',
@@ -923,25 +984,25 @@ class MaterialRequestController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MaterialRequest::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Item Request','a5','landscape','admin.print.inventory.request_individual',$menuUser->mode);
-            
-    
+
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
-            
+
+
             $content = $pdf->download()->getOriginalContent();
-            
-        
+
+
             $document_po = PrintHelper::savePrint($content);
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -949,22 +1010,22 @@ class MaterialRequestController extends Controller
     }
 
     public function printIndividualChi(Request $request,$id){
-        
+
         $pr = MaterialRequest::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Item Request','a4','portrait','admin.print.inventory.request_individual_chi');
-            
-    
+
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
-            
+
+
             $content = $pdf->download()->getOriginalContent();
-            
-        
+
+
             $document_po = PrintHelper::savePrint($content);
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -996,7 +1057,7 @@ class MaterialRequestController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1004,19 +1065,19 @@ class MaterialRequestController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MaterialRequest::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Item Request','a5','landscape','admin.print.inventory.request_individual');
@@ -1026,7 +1087,7 @@ class MaterialRequestController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1034,22 +1095,22 @@ class MaterialRequestController extends Controller
                         $merger->addRaw($pdfContent);
                     }
                     $result = $merger->merge();
-                    
+
                     $document_po = PrintHelper::savePrint($result);
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1058,7 +1119,7 @@ class MaterialRequestController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1071,7 +1132,7 @@ class MaterialRequestController extends Controller
                     foreach($merged as $code){
                         $query = MaterialRequest::where('code', 'LIKE', '%'.$merged)->first();
                         if($query){
-                            
+
                             $pdf = PrintHelper::print($query,'Item Request','a5','landscape','admin.print.inventory.request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
@@ -1079,18 +1140,18 @@ class MaterialRequestController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1122,7 +1183,7 @@ class MaterialRequestController extends Controller
     }
 
     public function getOutstanding(Request $request){
-       
+
 		return Excel::download(new ExportOutstandingMaterialRequest($this->datawarehouses), 'item_request_'.uniqid().'.xlsx');
     }
 
@@ -1137,13 +1198,13 @@ class MaterialRequestController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MaterialRequest())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Material Request data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'

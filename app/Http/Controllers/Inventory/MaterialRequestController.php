@@ -499,7 +499,7 @@ class MaterialRequestController extends Controller
             //Pengambilan Main Branch beserta id terkait
 
 
-            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mr',$query->id,'1');
+            $result = TreeHelper::simpleTree2($data_go_chart,$data_link,'data_id_mr',$query->id,'1');
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

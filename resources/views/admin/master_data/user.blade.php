@@ -210,7 +210,7 @@
                             <label for="type_body">Tipe Perusahaan Customer / Broker</label>
                         </div>
                         <div class="col s12"></div>
-                        <div class="input-field col s12 m3 employee_inputs">
+                        <div class="input-field col s12 m3{{--  employee_inputs --}}">
                             <input id="password" name="password" type="password" placeholder="Password">
                             <label class="active" for="password">Password</label>
                         </div>

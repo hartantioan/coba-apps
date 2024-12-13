@@ -8330,7 +8330,7 @@ class TreeHelper {
             default => 100,
         };
         $putaran = 0;
-        while($added && $putaran < 1){
+        while($added && $putaran < 2){
 
 
             if($putaran == 0 || $urutan <= 15){

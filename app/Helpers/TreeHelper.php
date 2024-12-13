@@ -8313,7 +8313,7 @@ class TreeHelper {
         $added = true;
 
         $urutan = match ($data_id) {
-            'data_id_mr' => 1,
+            'data_id_mr' => 3,
             'data_id_pr' => 2,
             'data_id_po' => 3,
             'data_id_good_scale' => 4,

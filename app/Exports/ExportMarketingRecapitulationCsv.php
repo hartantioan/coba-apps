@@ -179,7 +179,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
                 $arr[] = [
-                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $row->tax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . round($row->tax,2) . ';0;0;;;;;;;;;;',
                 ];
             }
         }

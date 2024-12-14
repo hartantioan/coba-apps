@@ -75,9 +75,9 @@ class ExportOutstandingAR implements FromView , WithEvents
                     'note'              => $row->note,
                     'top'               => '-',
                     'type'              => '-',
-                    'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
-                    'payment'           => CustomHelper::formatConditionalQty($payment),
-                    'balance'           => CustomHelper::formatConditionalQty($balance),
+                    'total'             => $row->grandtotal,
+                    'payment'           => $payment,
+                    'balance'           => $balance,
                     'brand'             => $row->account->brand->name ?? '-',
                 ];
                 $grandtotalAll += $balance;

@@ -172,9 +172,9 @@
 
                                 <td width="80%" style="font-size: 9px !important">
                                     <div style="min-height:40px">
-                                    {{ $data->userData->title }}
+                                    <strong>{{ $data->userData->title }}
                                     <br>
-                                    {{ $data->userData->address }}
+                                    <strong>{{ $data->userData->address }}
                                     </div>
                                 </td>
                             </tr>
@@ -188,7 +188,7 @@
                                 </td>
 
                                 <td width="50%" style="font-size: 9px !important">
-                                    {{ date('d/m/Y',strtotime($data->post_date)) }}
+                                <strong> {{ date('d/m/Y',strtotime($data->post_date)) }}
                                 </td>
                             </tr>
                             <tr>
@@ -197,7 +197,7 @@
                                 </td>
 
                                 <td style="font-size: 9px !important">
-                                    {{ date('d/m/Y',strtotime($data->due_date)) }}
+                                <strong>  {{ date('d/m/Y',strtotime($data->due_date)) }}
                                 </td>
                             </tr>
                         </table>
@@ -212,7 +212,7 @@
                     </td>
 
                     <td width="80%" style="font-size: 9px !important">
-                        {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-' }}
+                    <strong> {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-' }}
                     </td>
                 </tr>
                 <tr>
@@ -221,7 +221,7 @@
                     </td>
 
                     <td width="80%" style="font-size: 9px !important">
-                        {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->code : '-' }}
+                    <strong> {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->code : '-' }}
                     </td>
                 </tr>
             </table>
@@ -241,9 +241,9 @@
 
                                         <td width="80%">
                                             <div style="min-height:40px">
-                                            {{ $data->userData->title }}
+                                            <strong> {{ $data->userData->title }}
                                             <br>
-                                            {{ $data->userData->address }}
+                                            <strong>  {{ $data->userData->address }}
                                             </div>
                                         </td>
                                     </tr>
@@ -257,7 +257,7 @@
                                         </td>
 
                                         <td width="50%">
-                                            {{ date('d/m/Y',strtotime($data->post_date)) }}
+                                        <strong> {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -266,7 +266,7 @@
                                         </td>
 
                                         <td>
-                                            {{ date('d/m/Y',strtotime($data->due_date)) }}
+                                        <strong>  {{ date('d/m/Y',strtotime($data->due_date)) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -281,7 +281,7 @@
                             </td>
 
                             <td width="80%">
-                                {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-' }}
+                            <strong>  {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code : '-' }}
                             </td>
                         </tr>
                         <tr>
@@ -290,7 +290,7 @@
                             </td>
 
                             <td width="80%">
-                                {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->code : '-' }}
+                            <strong> {{ $data->marketingOrderDeliveryProcess()->exists() ? $data->marketingOrderDeliveryProcess->code : '-' }}
                             </td>
                         </tr>
                     </table> --}}
@@ -346,17 +346,17 @@
                                     }
                                 @endphp
                                 <tr>
-                                    <td style="width:5% !important">{{ ($key + 1) }}</td>
-                                    <td style="width:40% !important;padding-left:5px">{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
-                                    <td style="width:9% !important;padding-right:5px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
-                                    <td style="width:6% !important;padding-right:3px" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
-                                    <td style="width:5% !important"align="right">{{ $row->lookable->item->uomUnit->code }}</td>
-                                    <td style="width:10% !important" align="right">{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
-                                    <td style="width:10% !important;padding-left:7px" align="center">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
-                                    <td style="width:5% !important;padding-left:7px" align="">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
-                                    <td style="width:5% !important" align="right">{{ number_format($row->lookable->marketingOrderDetail->discount_3,2,',','.') }}</td>
+                                    <td style="width:5% !important"><strong>{{ ($key + 1) }}</td>
+                                    <td style="width:40% !important;padding-left:5px"><strong>{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
+                                    <td style="width:9% !important;padding-right:5px" align="right"><strong>{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td style="width:6% !important;padding-right:3px" align="right"><strong>{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                    <td style="width:5% !important"align="right"><strong>{{ $row->lookable->item->uomUnit->code }}</td>
+                                    <td style="width:10% !important" align="right"><strong>{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
+                                    <td style="width:10% !important;padding-left:7px" align="center"><strong>{{ number_format($row->lookable->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
+                                    <td style="width:5% !important;padding-left:7px" align=""><strong>{{ number_format($row->lookable->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
+                                    <td style="width:5% !important" align="right"><strong>{{ number_format($row->lookable->marketingOrderDetail->discount_3,2,',','.') }}</td>
 
-                                    <td style="width:20% !important" align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td style="width:20% !important" align="right"><strong>{{ number_format($row->total,2,',','.') }}</td>
 
                                 </tr>
 
@@ -387,7 +387,7 @@
                                 <tr class="break-row">
                                     <td style="width: 20%"></td>
                                     <td>
-                                        <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        <i><strong>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
                                     </td>
 
                                 </tr>
@@ -397,23 +397,23 @@
                             <table style="border:none;" width="74%">
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px">{{ number_format($data->subtotal,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->subtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr style="margin-top: -9px !important">
                                     <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px">{{ number_format($data->downpayment,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->downpayment,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px">{{ number_format($data->total,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px">{{ number_format($data->tax,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>
                             </table>
                         </div>

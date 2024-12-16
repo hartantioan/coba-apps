@@ -291,6 +291,51 @@ class MarketingOrderInvoice extends Model
         return $hasRelation;
     }
 
+    public function totalSales(){
+        $total = 0;
+        foreach ($this->marketingOrderInvoiceDetail as $key => $row) {
+            if($row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos') {
+                if($row->lookable->is_include_tax == 1) {
+                    $price = $row->lookable->total;
+                }else{
+                    $price = $row->lookable->total;
+
+                }
+                $pricefirst = 0;
+                $discount = $row->lookable->discount ?? 0;
+                $total = $row->lookable->grandtotal;
+            }if($row->lookable_type == null){
+                if($row->is_include_tax == 1) {
+                    $price = $row->price / (($row->percent_tax + 100) / 100);
+                }else{
+                    $price = $row->price;
+                }
+                $pricefirst=$row->price;
+                $discount = 0;
+                $total = $row->grandtotal;
+            }
+            else{
+
+                if($row->is_include_tax == 1) {
+                    $price = $row->price / (($row->percent_tax + 100) / 100);
+                }else{
+                    $price = $row->price;
+                }
+
+                if($row->is_include_tax == 1) {
+                    $pricefirst = $row->getMoDetail()->price ?? 0;
+                }else{
+                    $pricefirst = $row->getMoDetail()->price ?? 0;
+                    // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
+                }
+                $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
+                $total = ($row->getQtyM2() ?? $row->qty) * $price;
+            }
+        }
+
+        return $total;
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }

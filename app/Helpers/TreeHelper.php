@@ -5599,7 +5599,7 @@ class TreeHelper {
                                 }
 
                             }
-                            if($lc_detail->landedCostDetailSelf()){
+                            if($lc_detail->landedCostDetail()){
                                 $properties = [
                                     ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
                                 ];

@@ -99,7 +99,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 }
                 $pricefirst = 0;
                 $discount = $row->lookable->discount ?? 0;
-                $total = $row->lookable->grandtotal;
+                $total = $row->lookable->total;
             }if($row->lookable_type == null){
                 if($row->is_include_tax == 1) {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
@@ -108,7 +108,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 }
                 $pricefirst=$row->price;
                 $discount = 0;
-                $total = $row->grandtotal;
+                $total = $row->total;
             }
             else{
 

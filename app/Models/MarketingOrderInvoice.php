@@ -295,18 +295,18 @@ class MarketingOrderInvoice extends Model
         $total = 0;
         foreach ($this->marketingOrderInvoiceDetail as $key => $row) {
             if($row->lookable_type == null){
-                if($row->is_include_tax == 1) {
+                if($row->is_include_tax == '1') {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
                 }else{
                     $price = $row->price;
                 }
                 $pricefirst=$row->price;
                 $discount = 0;
-                $total += $row->grandtotal;
+                $total += $row->total;
             }
             else{
 
-                if($row->is_include_tax == 1) {
+                if($row->is_include_tax == '1') {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
                 }else{
                     $price = $row->price;

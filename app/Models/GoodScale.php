@@ -541,27 +541,27 @@ class GoodScale extends Model
 
                 foreach($this->goodScaleDetail()->orderByDesc('qty')->get() as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
-                        $qty = $row->lookable->cost_delivery_type == '1' ? $row->qty : 1;
-                        $price = $row->lookable->cost_delivery_type == '1' ? ($row->qty > 0 ? $row->total / $row->qty : 0) : ($tempQty < $qty ? $row->total : 0);
-                        $total += ( $price > 0 ? $row->total : 0 );
+                        $qty = $row->qty;
+                        $price = $row->total / $row->qty;
+                        $total += $row->total;
                         $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'                     => $purchaseOrder->id,
                             'marketing_order_delivery_process_id'   => $row->lookable->marketingOrderDeliveryProcess->id,
                             'coa_id'                                => $coahutangusahaekspedisi->id,
                             'qty'                                   => $qty,
                             'coa_unit_id'                           => $unit->id,
-                            'price'                                 => round($price,5),
+                            'price'                                 => $price,
                             'percent_discount_1'                    => 0,
                             'percent_discount_2'                    => 0,
                             'discount_3'                            => 0,
-                            'subtotal'                              => $price > 0 ? $row->total : 0,
+                            'subtotal'                              => $row->total,
                             'tax'                                   => 0,
                             'wtax'                                  => 0,
-                            'grandtotal'                            =>  $price > 0 ? $row->total : 0,
+                            'grandtotal'                            => $row->total,
                             'note'                                  => $row->lookable->code,
                             'note2'                                 => $row->lookable->marketingOrderDeliveryProcess->code,
                             'note3'                                 => $this->code,
-                            'total'                                 => $row->lookable->cost_delivery_type == '2' ? ($tempQty < $qty ? ( $price > 0 ? $row->total : 0) : 0) : ( $price > 0 ? $row->total : 0 ),
+                            'total'                                 => $row->total,
                             'is_tax'                                => '0',
                             'is_include_tax'                        => '0',
                             'percent_tax'                           => 0,

@@ -963,12 +963,29 @@ class GoodScaleController extends Controller
             }
 
             if($totalProportional > 0){
+
+                $totalCost = 0;
+                
+                foreach($gs->goodScaleDetail as $key => $row){
+                    if($gs->hasRitase()){
+                        if($key == 0){
+                            $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                            $qty = round($qty_final * $bobot,2);
+                            $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                        }
+                    }else{
+                        $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                        $qty = round($qty_final * $bobot,2);
+                        $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                    }
+                }
+
                 foreach($gs->goodScaleDetail as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                             $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
                             $qty = round($qty_final * $bobot,2);
-                            $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                            $total = round($totalCost * $bobot,2);
                             $row->lookable->marketingOrderDeliveryProcess->update([
                                 'weight_netto' => $qty,
                             ]);
@@ -1520,12 +1537,28 @@ class GoodScaleController extends Controller
                     }
 
                     if($totalProportional > 0){
+                        $totalCost = 0;
+                
+                        foreach($gs->goodScaleDetail as $key => $row){
+                            if($gs->hasRitase()){
+                                if($key == 0){
+                                    $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                                    $qty = round($qty_final * $bobot,2);
+                                    $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                                }
+                            }else{
+                                $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                                $qty = round($qty_final * $bobot,2);
+                                $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                            }
+                        }
+
                         foreach($gs->goodScaleDetail as $row){
                             if($row->lookable_type == 'marketing_order_deliveries'){
                                 if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                                     $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
                                     $qty = round($qty_final * $bobot,2);
-                                    $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                                    $total = round($totalCost * $bobot,2);
                                     $row->lookable->marketingOrderDeliveryProcess->update([
                                         'weight_netto' => $qty,
                                     ]);

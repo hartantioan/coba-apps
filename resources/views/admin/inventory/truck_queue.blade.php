@@ -241,50 +241,51 @@
 
 <script src="{{ url('app-assets/js/custom/camera_scan.js') }}"></script>
 <script>
-    $(function() {
+    window.addEventListener('load', function () {
+        let selectedDeviceId;
+        const codeReader = new ZXing.BrowserMultiFormatReader();
 
-        window.addEventListener('load', function () {
-            let selectedDeviceId;
-            const codeReader = new ZXing.BrowserMultiFormatReader();
+        codeReader.listVideoInputDevices()
+        .then((videoInputDevices) => {
+            const sourceSelect = document.getElementById('sourceSelect');
+            selectedDeviceId = videoInputDevices[0].deviceId;
+            if (videoInputDevices.length >= 1) {
+            videoInputDevices.forEach((element) => {
+                $('#sourceSelect').append(`<option value="${element.deviceId}">${element.label}</option>`);
+            });
 
-            codeReader.listVideoInputDevices()
-            .then((videoInputDevices) => {
-                const sourceSelect = document.getElementById('sourceSelect');
-                selectedDeviceId = videoInputDevices[0].deviceId;
-                if (videoInputDevices.length >= 1) {
-                videoInputDevices.forEach((element) => {
-                    $('#sourceSelect').append(`<option value="${element.deviceId}">${element.label}</option>`);
-                });
+            sourceSelect.onchange = () => {
+                selectedDeviceId = sourceSelect.value;
+            };
 
-                sourceSelect.onchange = () => {
-                    selectedDeviceId = sourceSelect.value;
-                };
+            const sourceSelectPanel = document.getElementById('sourceSelectPanel');
+            sourceSelectPanel.style.display = 'block';
+            }
 
-                const sourceSelectPanel = document.getElementById('sourceSelectPanel');
-                sourceSelectPanel.style.display = 'block';
+            document.getElementById('startButton').addEventListener('click', () => {
+            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                if (result) {
+                    document.getElementById('code_barcode').value = result.text;
                 }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
 
-                document.getElementById('startButton').addEventListener('click', () => {
-                codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
-                    if (result) {
-                        document.getElementById('code_barcode').value = result.text;
-                    }
-                    if (err && !(err instanceof ZXing.NotFoundException)) {
-
-                    }
-                });
-
-                });
-
-                document.getElementById('resetButton').addEventListener('click', () => {
-                    codeReader.reset();
-                });
-
-            })
-            .catch((err) => {
+                }
+            });
 
             });
+
+            document.getElementById('resetButton').addEventListener('click', () => {
+                codeReader.reset();
+            });
+
+        })
+        .catch((err) => {
+
         });
+    });
+    $(function() {
+
+
         $("#table-detail th").resizable({
             minWidth: 100,
         });

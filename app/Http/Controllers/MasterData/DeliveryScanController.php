@@ -200,19 +200,18 @@ class DeliveryScanController extends Controller
                         'marketing_order_delivery_process_id'   => $request->temp,
                         'status'                                => '2',
                     ]);
-                    /* $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) {
-                        $query->whereHas('goodScaleDetail', function($query) {
-                            $query->whereHas('lookable',function($query){
-                                $query->where('id', $query->id);
-                            });
+                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) use($request) {
+                        $query->whereHas('goodScaleDetail', function($query) use($request) {
+                            $query->where('lookable_type','marketing_order_deliveries')
+                            ->where('lookable_id',$request->temp);
                         });
-                    });
+                    })->first();
                     if($truckQueueDetail){
                         $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
                         $header_queue->update([
                             'status'=>'6',
                         ]);
-                    } */
+                    }
 
                     activity()
                         ->performedOn(new MarketingOrderDeliveryProcess())

@@ -1741,8 +1741,9 @@ class TreeHelper {
                             }
 
                         }
-                        if($lc_detail->landedCostDetail()){
-                            $properties = [
+                        if($lc_detail->landedCostDetailSelf()->exists()){
+                            info('kambing');
+                            /* $properties = [
                                 ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
                             ];
 
@@ -1766,7 +1767,7 @@ class TreeHelper {
                             if(!in_array($lc_detail->lookable->landedCost->id,$data_id_lc)){
                                 $data_id_lc[] = $lc_detail->lookable->landedCost->id;
                                 $added = true;
-                            }
+                            } */
 
 
                         }//??
@@ -5599,36 +5600,35 @@ class TreeHelper {
                                 }
 
                             }
-                            if($lc_detail->landedCostDetailSelf()->exists()){
-                                info('kambing');
-                                /* foreach($lc_detail->landedCostDetailSelf as $rowself){
-                                    $properties = [
-                                        ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
+                            if($lc_detail->landedCostDetail()){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
+                                ];
+
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominalSimple($lc_detail->lookable->landedCost).number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')]
+                                    ;
+                                }
+                                $lc_other = [
+                                    "key" => $lc_detail->lookable->landedCost->code,
+                                    "name" => $lc_detail->lookable->landedCost->code,
+                                    'properties'=>$properties,
+                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
+                                ];
+                                if( $putaran==0 || $urutan <= 6){
+                                    $data_go_chart[]=$lc_other;
+                                    $data_link[]=[
+                                        'from'=>$query->code,
+                                        'to'=>$lc_detail->lookable->landedCost->code,
+                                        'string_link'=>$query->code.$lc_detail->lookable->landedCost->code,
                                     ];
-    
-                                    if (!$hide_nominal) {
-                                        $properties[] =['name'=> "Nominal :".formatNominalSimple($lc_detail->lookable->landedCost).number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')]
-                                        ;
+                                    if(!in_array($lc_detail->lookable->landedCost->id,$data_id_lc)){
+                                        $data_id_lc[] = $lc_detail->lookable->landedCost->id;
+                                        $added = true;
                                     }
-                                    $lc_other = [
-                                        "key" => $lc_detail->lookable->landedCost->code,
-                                        "name" => $lc_detail->lookable->landedCost->code,
-                                        'properties'=>$properties,
-                                        'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
-                                    ];
-                                    if( $putaran==0 || $urutan <= 6){
-                                        $data_go_chart[]=$lc_other;
-                                        $data_link[]=[
-                                            'from'=>$query->code,
-                                            'to'=>$lc_detail->lookable->landedCost->code,
-                                            'string_link'=>$query->code.$lc_detail->lookable->landedCost->code,
-                                        ];
-                                        if(!in_array($lc_detail->lookable->landedCost->id,$data_id_lc)){
-                                            $data_id_lc[] = $lc_detail->lookable->landedCost->id;
-                                            $added = true;
-                                        }
-                                    }
-                                } */
+                                }
+
+
                             }//??
                             if($lc_detail->inventoryTransferOutDetail()){
                                 $properties = [

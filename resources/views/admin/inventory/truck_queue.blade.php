@@ -17,6 +17,11 @@
     .preserveLines {
         white-space: pre-line;
     }
+
+    #document_status:disabled {
+        background-color: #e9ecef;
+        pointer-events: none !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -116,6 +121,7 @@
                                                         <th>Kode Barcode</th>
                                                         <th>Status Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -166,6 +172,7 @@
                         </div>
 
                         <div class="input-field col s12 m3 step7">
+                            <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text">
                             <label class="active" for="name">Nama</label>
                         </div>
@@ -204,6 +211,14 @@
                             </select>
                             <label class="" for="document_status">Kelengkapan Dokumen</label>
                         </div>
+                        <div class="input-field col s12 m3 step7">
+                            <input id="no_container" name="no_container" type="text">
+                            <label class="active" for="no_container">No Kontainer</label>
+                        </div>
+                        <div class="input-field col s12 m3 step7">
+                            <input id="note" name="note" type="text">
+                            <label class="active" for="note">Keterangan: </label>
+                        </div>
                         <div class="col s12"></div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -230,6 +245,30 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
+
+<div id="modal_status" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="statusd">
+                <div class="col s12 mt-3">
+                    <div class="input-field col s12 m3 step2">
+                        <input type="hidden" id="temp_status" name="temp_status">
+                        <select class="form-control" id="document_status_edit" name="document_status_edit" >
+                            <option value="1">Lengkap</option>
+                            <option value="2">Tidak Lengkap</option>
+                        </select>
+                        <label class="" for="document_status_edit">Kelengkapan Dokumen</label>
+                    </div>
+                    <button class="btn waves-effect waves-light right submit step10" onclick="changeStatus()">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
@@ -310,9 +349,7 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
-                if(!$('#temp').val()){
-                    loadCurrency();
-                }
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -334,6 +371,17 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
+            }
+        });
+
+        $('#modal_status').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#temp_status').val('');
             }
         });
 
@@ -409,6 +457,7 @@
                 { name: 'note', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'act', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
@@ -573,7 +622,11 @@
                 $('#truck').val(response.truck);
                 $('#code_barcode').val(response.code_barcode);
                 $('#document_status').val(response.document_status).formSelect();
-
+                $('#note').val(response.note);
+                $('#expedition').val(response.expedition);
+                $('#no_container').val(response.no_container);
+                $('#document_status').prop('disabled', true);
+                $('#document_status').formSelect();
 
                 $('#note').focus();
                 M.updateTextFields();
@@ -588,6 +641,108 @@
                 });
             }
         });
+    }
+
+    function showStatus(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal_status').modal('open');
+                $('#temp_status').val(id);
+
+                $('#document_status_edit').val(response.document_status).formSelect();
+
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function changeStatus(){
+		$.ajax({
+            url: '{{ Request::url() }}/update_status_document',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: $('#temp_status').val(),
+                document_status_edit: $('#document_status_edit').val(),
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
     }
 
     function success(){

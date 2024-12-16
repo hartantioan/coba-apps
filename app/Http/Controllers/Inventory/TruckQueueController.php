@@ -153,6 +153,10 @@ class TruckQueueController extends Controller
                     $val->code_barcode,
                     $val->documentStatus(),
                     $val->status(),
+                    '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat lime darken-3 accent-2 white-text btn-small" data-popup="tooltip" title="Ganti Status" onclick="showStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">low_priority</i></button>
+					'
                 ];
 
                 $nomor++;
@@ -178,6 +182,30 @@ class TruckQueueController extends Controller
 		return response()->json($po);
     }
 
+    public function updateStatusDocument(Request $request){
+        $iti = TruckQueue::where('code',CustomHelper::decrypt($request->id))->latest()->first();
+
+        if($iti->status == '6'){
+            $response = [
+                'status'    => 500,
+                'message'   => 'Antrian sudah di status berikutnya',
+            ];
+        }else{
+            $iti->update([
+                'document_status'=> $request->document_status_edit,
+                'change_status'  => Date::now(),
+            ]);
+            if($iti){
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            }
+        }
+
+		return response()->json($response);
+    }
+
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
@@ -200,14 +228,24 @@ class TruckQueueController extends Controller
         } else {
             if($request->temp){
                 $query = TruckQueue::where('code',CustomHelper::decrypt($request->temp))->first();
-                $query->user_id = session('bo_id');
-                $query->no_pol = $request->no_pol;
-                $query->truck = $request->truck;
-                $query->document_status = $request->document_status;
-                $query->type = $request->type;
-                $query->expedition = $request->expedition;
-                $query->code_barcode = $request->code_barcode;
-                $query->save();
+                if($query->status == '6'){
+                    $response = [
+                        'status'    => 500,
+                        'message'   => 'Antrian sudah keluar',
+                    ];
+                    return response()->json($response);
+                }else{
+                    $query->user_id = session('bo_id');
+                    $query->no_pol = $request->no_pol;
+                    $query->truck = $request->truck;
+                    $query->type = $request->type;
+                    $query->expedition = $request->expedition;
+                    $query->code_barcode = $request->code_barcode;
+                    $query->no_container = $request->no_container;
+                    $query->note = $request->note;
+                    $query->save();
+                }
+
             }else{
                 $newCode=TruckQueue::generateCode('ATR'.date('y',strtotime($request->date)).'P');
 
@@ -221,18 +259,21 @@ class TruckQueueController extends Controller
                     'date'              => Date::now(),
                     'type'              => $request->type,
                     'expedition'        => $request->expedition,
+                    'no_container'      => $request->no_container,
+                    'note'              => $request->note,
                     'status'            => '1',
                     'user_id'           => session('bo_id'),
                 ]);
-            }
-
-            if($query) {
                 $query_detail = TruckQueueDetail::create([
                     'truck_queue_id'			            => $query->id,
                     'good_scale_id'		                => null,
                     'marketing_delivery_oder_process_id'	=> null,
                     'time_in'	=> null,
                 ]);
+            }
+
+            if($query) {
+
                 activity()
                     ->performedOn(new TruckQueue())
                     ->causedBy(session('bo_id'))
@@ -258,48 +299,65 @@ class TruckQueueController extends Controller
     {
         $data   = TruckQueue::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.' - '.$data->user->name.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
-                        <thead>
-                            <tr>
-                                <th class="center-align">Status Dokumen</th>
-                                <th class="center-align">Kode Barcode</th>
-                                <th class="center-align">Antri</th>
-                                <th class="center-align">No Timbangan</th>
-                                <th class="center-align">Timbang Masuk</th>
-                                <th class="center-align">Muat FG</th>
-                                <th class="center-align">Selesai Muat FG</th>
-                                <th class="center-align">Timbang Keluar</th>
-                                <th class="center-align">Kode SJ</th>
-                                <th class="center-align">Keluar Pabrik</th>
-                            </tr>
-                        </thead><tbody>';
-                        $gs_code="-";
-                        $gs_time_out="-";
-                        $sj_code="-";
-                        $gs_time_out="-";
-        if($data->truckQueueDetail->goodScale()->exists()){
+        $string = '<div class="row pt-1 pb-1 lighten-4">
+            <div class="col s12">
+                <h5>'.$data->code.' - '.$data->user->name.'</h5>
+            </div>
+            <div class="col s12" style="overflow:auto;">';
+
+        $gs_code = "-";
+        $gs_time_out = "-";
+        $sj_code = "-";
+        $gs_time_out = "-";
+
+        if ($data->truckQueueDetail->goodScale()->exists()) {
             $gs_code = $data->truckQueueDetail->goodScale->code;
             $gs_time_out=$data->truckQueueDetail->goodScale->time_scale_out;
-        }
-        if($data->truckQueueDetail->marketingOrderDeliveryProcess()->exists()){
-            $sj_code = $data->truckQueueDetail->marketingOrderDeliveryProcess->code;
+            $sj_code = $data->truckQueueDetail->goodScale->getSalesSuratJalan();
             $gs_time_out=$data->truckQueueDetail->goodScale->time_scale_out;
+            $sj_keluar=$data->truckQueueDetail->goodScale->getSuratJalanKeluarPabrik();
         }
 
-        $string .= '<tr>
-            <td class="center-align">'.$data->status().'</td>
-            <td class="center-align">'.$data->code_barcode.'</td>
-            <td class="center-align">'.$data->date.'</td>
-            <td class="center-align">'.$gs_code.'</td>
-            <td class="center-align">'.$data->truckQueueDetail->time_in.'</td>
-            <td class="center-align">'.$data->time_load_fg.'</td>
-            <td class="center-align">'.$data->time_done_load_fg.'</td>
-            <td class="center-align">'.$gs_time_out.'</td>
-            <td class="center-align">'.$sj_code.'</td>
-            <td class="center-align">'.$data->truckQueueDetail->marketingOrderDeliveryProcess?->deliveryScan?->created_at ?? '-'.'</td>
-        </tr>';
+        $string .= '<div class="card-panel">
+                <div class="row">
+                    <div class="col s12 m6 l4">
+                        <p><strong>Status Dokumen</strong><br>'.$data->status().'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Kode Barcode</strong><br>'.$data->code_barcode.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Antri</strong><br>'.$data->date.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>No Timbangan</strong><br>'.$gs_code.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Timbang Masuk</strong><br>'.$data->truckQueueDetail->time_in.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Muat FG</strong><br>'.$data->time_load_fg.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Selesai Muat FG</strong><br>'.$data->time_done_load_fg.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Timbang Keluar</strong><br>'.$gs_time_out.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Kode SJ</strong><br>'.$sj_code.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Keluar Pabrik</strong><br>'.$sj_keluar.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Ganti Status Dokumen</strong><br>'.$data->change_status.'</p>
+                    </div>
+                </div>
+            </div>';
 
-        $string .= '</tbody></table></div>';
+        $string .= '</div></div>';
+
 
         return response()->json($string);
     }

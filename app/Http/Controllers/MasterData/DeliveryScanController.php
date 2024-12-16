@@ -155,10 +155,46 @@ class DeliveryScanController extends Controller
                 'message'   => 'Data successfully Fetch.',
             ];
         }else{
-            $response = [
-                'status'  => 500,
-                'message' => 'Barcode Tidak Ditemukan'
-            ];
+            $query = TruckQueue::where('code_barcode',$barcode)->where('type','1')->latest()->first();
+            if($query){
+                if($query->status == '6'){
+                    $response = [
+                        'status'    => 500,
+                        'message'   => 'Antrian sudah keluar Pabrik',
+                    ];
+                }else{
+                    // if($query->truckQueueDetail->goodScale()->exists()){
+                    //     foreach($query->truckQueueDetail->goodScale->goodScaleDetail as $row_detail_gs ){
+                    //         if($row_detail_gs->lookable->marketingOrderDeliveryProcess()->exists()){
+                    //             $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$row_detail_gs->lookable->marketingOrderDeliveryProcess->id)->where('status','2')->first();
+                    //             if(!$ceksent){
+                    //                 MarketingOrderDeliveryProcessTrack::create([
+                    //                     'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                    //                     'marketing_order_delivery_process_id'   => $row_detail_gs->lookable->marketingOrderDeliveryProcess->id,
+                    //                     'status'                                => '2',
+                    //                 ]);
+                    //                 $row_detail_gs->lookable->marketingOrderDeliveryProcess->createJournalSentDocument();
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                    $query->update([
+                        'status'=>'6',
+                    ]);
+                    if($query){
+                        $response = [
+                            'status'    => 200,
+                            'message'   => 'Data successfully saved.',
+                        ];
+                    }
+                }
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Barcode Tidak Ditemukan'
+                ];
+            }
+
         }
 
 		return response()->json($response);
@@ -169,6 +205,7 @@ class DeliveryScanController extends Controller
         if($query){
             $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$request->temp)
             ->whereIn('status',values: ['2'])->get();
+
             if(count($query_track) > 0){
 
                 $response = [
@@ -200,10 +237,10 @@ class DeliveryScanController extends Controller
                         'marketing_order_delivery_process_id'   => $request->temp,
                         'status'                                => '2',
                     ]);
-                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($query) use($request) {
-                        $query->whereHas('goodScaleDetail', function($query) use($request) {
-                            $query->where('lookable_type','marketing_order_deliveries')
-                            ->where('lookable_id',$request->temp);
+                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($querys) use($query) {
+                        $querys->whereHas('goodScaleDetail', function($querys) use($query) {
+                            $querys->where('lookable_type','marketing_order_deliveries')
+                            ->where('lookable_id',$query->marketingOrderDelivery->id);
                         });
                     })->first();
                     if($truckQueueDetail){
@@ -247,6 +284,21 @@ class DeliveryScanController extends Controller
                         'message'   => 'Antrian sudah keluar Pabrik',
                     ];
                 }else{
+                    if($query->truckQueueDetail->goodScale()->exists()){
+                        foreach($query->truckQueueDetail->goodScale->goodScaleDetail as $row_detail_gs ){
+                            if($row_detail_gs->lookable->marketingOrderDeliveryProcess()->exists()){
+                                $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$row_detail_gs->lookable->marketingOrderDeliveryProcess->id)->where('status','2')->first();
+                                if(!$ceksent){
+                                    MarketingOrderDeliveryProcessTrack::create([
+                                        'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                                        'marketing_order_delivery_process_id'   => $row_detail_gs->lookable->marketingOrderDeliveryProcess->id,
+                                        'status'                                => '2',
+                                    ]);
+                                    $row_detail_gs->lookable->marketingOrderDeliveryProcess->createJournalSentDocument();
+                                }
+                            }
+                        }
+                    }
                     $query->update([
                         'status'=>'6',
                     ]);

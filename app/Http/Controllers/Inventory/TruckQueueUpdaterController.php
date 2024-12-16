@@ -154,7 +154,7 @@ class TruckQueueUpdaterController extends Controller
                     $val->documentStatus(),
                     $val->status(),
                     '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+
                         <button type="button" class="btn-floating mb-1 btn-flat lime darken-3 accent-2 white-text btn-small" data-popup="tooltip" title="Muat FG" onclick="StartMuat(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">rv_hookup</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  gradient-45deg-cyan-light-green white-text btn-small" data-popup="tooltip" title="Selesai Muat FG" onclick="doneMuat(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">done_all</i></button>
 					'
@@ -279,27 +279,18 @@ class TruckQueueUpdaterController extends Controller
     {
         $data   = TruckQueue::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.' - '.$data->user->name.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
-                        <thead>
-                            <tr>
-                                <th class="center-align">Status Dokumen</th>
-                                <th class="center-align">Kode Barcode</th>
-                                <th class="center-align">Antri</th>
-                                <th class="center-align">No Timbangan</th>
-                                <th class="center-align">Timbang Masuk</th>
-                                <th class="center-align">Muat FG</th>
-                                <th class="center-align">Selesai Muat FG</th>
-                                <th class="center-align">Timbang Keluar</th>
-                                <th class="center-align">Kode SJ</th>
-                                <th class="center-align">Keluar Pabrik</th>
-                            </tr>
-                        </thead><tbody>';
-                        $gs_code="-";
-                        $gs_time_out="-";
-                        $sj_code="-";
-                        $gs_time_out="-";
-                        $sj_keluar="-";
-        if($data->truckQueueDetail->goodScale()->exists()){
+        $string = '<div class="row pt-1 pb-1 lighten-4">
+            <div class="col s12">
+                <h5>'.$data->code.' - '.$data->user->name.'</h5>
+            </div>
+            <div class="col s12" style="overflow:auto;">';
+
+        $gs_code = "-";
+        $gs_time_out = "-";
+        $sj_code = "-";
+        $gs_time_out = "-";
+
+        if ($data->truckQueueDetail->goodScale()->exists()) {
             $gs_code = $data->truckQueueDetail->goodScale->code;
             $gs_time_out=$data->truckQueueDetail->goodScale->time_scale_out;
             $sj_code = $data->truckQueueDetail->goodScale->getSalesSuratJalan();
@@ -307,20 +298,46 @@ class TruckQueueUpdaterController extends Controller
             $sj_keluar=$data->truckQueueDetail->goodScale->getSuratJalanKeluarPabrik();
         }
 
-        $string .= '<tr>
-            <td class="center-align">'.$data->status().'</td>
-            <td class="center-align">'.$data->code_barcode.'</td>
-            <td class="center-align">'.$data->date.'</td>
-            <td class="center-align">'.$gs_code.'</td>
-            <td class="center-align">'.$data->truckQueueDetail->time_in.'</td>
-            <td class="center-align">'.$data->time_load_fg.'</td>
-            <td class="center-align">'.$data->time_done_load_fg.'</td>
-            <td class="center-align">'.$gs_time_out.'</td>
-            <td class="center-align">'.$sj_code.'</td>
-            <td class="center-align">'.$sj_keluar.'</td>
-        </tr>';
+        $string .= '<div class="card-panel">
+                <div class="row">
+                    <div class="col s12 m6 l4">
+                        <p><strong>Status Dokumen</strong><br>'.$data->status().'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Kode Barcode</strong><br>'.$data->code_barcode.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Antri</strong><br>'.$data->date.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>No Timbangan</strong><br>'.$gs_code.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Timbang Masuk</strong><br>'.$data->truckQueueDetail->time_in.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Muat FG</strong><br>'.$data->time_load_fg.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Selesai Muat FG</strong><br>'.$data->time_done_load_fg.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Timbang Keluar</strong><br>'.$gs_time_out.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Kode SJ</strong><br>'.$sj_code.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Keluar Pabrik</strong><br>'.$sj_keluar.'</p>
+                    </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Ganti Status Dokumen</strong><br>'.$data->change_status.'</p>
+                    </div>
+                </div>
+            </div>';
 
-        $string .= '</tbody></table></div>';
+        $string .= '</div></div>';
+
 
         return response()->json($string);
     }

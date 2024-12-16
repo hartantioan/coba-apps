@@ -11,12 +11,13 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportReportTruckQueue implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-    protected $start_date, $finish_date;
+    protected $start_date, $finish_date,$status;
 
-    public function __construct(string $start_date,string $finish_date)
+    public function __construct(string $start_date,string $finish_date , string $status)
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
+        $this->status = $status ? $status : '';
     }
 
     private $headings = [
@@ -39,8 +40,7 @@ class ExportReportTruckQueue implements FromCollection, WithTitle, WithHeadings,
         'Timbang Keluar',
         'Kode SJ',
         'Keluar Pabrik',
-
-
+        'Jam Ganti Dokumen'
     ];
 
     public function collection()
@@ -48,6 +48,14 @@ class ExportReportTruckQueue implements FromCollection, WithTitle, WithHeadings,
         $mo = TruckQueue::where(function($query) {
             $query->where('date', '>=', $this->start_date)
                 ->where('date', '<=', $this->finish_date);
+            if($this->status){
+                $arr = explode(',',$this->status);
+                if (in_array(7, $arr)) {
+                    $query->where('status','!=',6);
+                }else{
+                    $query->whereIn('status', $arr);
+                }
+            }
         })->get();
 
 
@@ -91,6 +99,7 @@ class ExportReportTruckQueue implements FromCollection, WithTitle, WithHeadings,
                 'Timbang Keluar'=>$gs_time_out,
                 'Kode SJ'=>$sj_code,
                 'Keluar Pabrik'=>$sj_keluar,
+                'Jam Ganti Dokumen'=>$row->change_status,
 
 
             ];

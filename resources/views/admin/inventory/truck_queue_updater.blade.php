@@ -362,51 +362,53 @@
 
         });
     });
+
+    window.addEventListener('load', function () {
+        let selectedDeviceId;
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+
+        codeReader.listVideoInputDevices()
+        .then((videoInputDevices) => {
+            const sourceSelect = document.getElementById('sourceSelect2');
+            selectedDeviceId = videoInputDevices[0].deviceId;
+            if (videoInputDevices.length >= 1) {
+            videoInputDevices.forEach((element) => {
+                $('#sourceSelect2').append(`<option value="${element.deviceId}">${element.label}</option>`);
+            });
+
+            sourceSelect.onchange = () => {
+                selectedDeviceId = sourceSelect.value;
+            };
+
+            const sourceSelectPanel = document.getElementById('sourceSelectPanel2');
+            sourceSelectPanel.style.display = 'block';
+            }
+
+            document.getElementById('startButton2').addEventListener('click', () => {
+            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video2', (result, err) => {
+                if (result) {
+                    document.getElementById('code_barcode_done').value = result.text;
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+
+                }
+            });
+
+            });
+
+            document.getElementById('resetButton2').addEventListener('click', () => {
+                codeReader.reset();
+            });
+
+        })
+        .catch((err) => {
+
+        });
+    });
     $(function() {
 
 
-        window.addEventListener('load', function () {
-            let selectedDeviceId;
-            const codeReader = new ZXing.BrowserMultiFormatReader();
 
-            codeReader.listVideoInputDevices()
-            .then((videoInputDevices) => {
-                const sourceSelect = document.getElementById('sourceSelect2');
-                selectedDeviceId = videoInputDevices[0].deviceId;
-                if (videoInputDevices.length >= 1) {
-                videoInputDevices.forEach((element) => {
-                    $('#sourceSelect2').append(`<option value="${element.deviceId}">${element.label}</option>`);
-                });
-
-                sourceSelect.onchange = () => {
-                    selectedDeviceId = sourceSelect.value;
-                };
-
-                const sourceSelectPanel = document.getElementById('sourceSelectPanel2');
-                sourceSelectPanel.style.display = 'block';
-                }
-
-                document.getElementById('startButton2').addEventListener('click', () => {
-                codeReader.decodeFromVideoDevice(selectedDeviceId, 'video2', (result, err) => {
-                    if (result) {
-                        document.getElementById('code_barcode_done').value = result.text;
-                    }
-                    if (err && !(err instanceof ZXing.NotFoundException)) {
-
-                    }
-                });
-
-                });
-
-                document.getElementById('resetButton2').addEventListener('click', () => {
-                    codeReader.reset();
-                });
-
-            })
-            .catch((err) => {
-
-            });
-        });
 
 
         $("#table-detail th").resizable({
@@ -639,7 +641,9 @@
                 $('#truck').val(response.truck);
                 $('#code_barcode').val(response.code_barcode);
                 $('#document_status').val(response.document_status).formSelect();
-
+                $('#note').val(response.note);
+                $('#expedition').val(response.expedition);
+                $('#no_container').val(response.no_container);
 
                 $('#note').focus();
                 M.updateTextFields();

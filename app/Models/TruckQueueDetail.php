@@ -16,7 +16,6 @@ class TruckQueueDetail extends Model
     protected $fillable = [
         'truck_queue_id',
         'good_scale_id',
-        'marketing_delivery_oder_process_id',
         'time_in',
     ];
 
@@ -30,8 +29,4 @@ class TruckQueueDetail extends Model
         return $this->hasOne('App\Models\GoodScale','id','good_scale_id');
     }
 
-    public function marketingOrderDeliveryProcess()
-    {
-        return $this->hasOne('App\Models\MarketingOrderDeliveryProcess','id','marketing_delivery_oder_process_id');
-    }
 }

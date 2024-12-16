@@ -30,7 +30,11 @@ class TruckQueue extends Model
         'date',
         'time_load_fg',
         'time_done_load_fg',
-        'expedition'
+        'expedition',
+
+        'note',
+        'no_container',
+        'change_status',
     ];
 
     public function user()

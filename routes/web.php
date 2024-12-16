@@ -2209,6 +2209,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [TruckQueueController::class, 'destroy'])->middleware('operation.access:truck_queue,delete');
                     Route::get('export_from_page', [TruckQueueController::class, 'exportFromTransactionPage']);
                     Route::post('show', [TruckQueueController::class, 'show']);
+                    Route::post('update_status_document', [TruckQueueController::class, 'updateStatusDocument'])->middleware('operation.access:truck_queue,update');
                     Route::get('row_detail', [TruckQueueController::class, 'rowDetail']);
                 });
 

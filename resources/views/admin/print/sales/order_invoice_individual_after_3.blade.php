@@ -348,8 +348,8 @@
                                 <tr>
                                     <td style="width:5% !important">{{ ($key + 1) }}</td>
                                     <td style="width:40% !important;padding-left:5px">{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
-                                    <td style="width:10% !important;padding-left:32px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
-                                    <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                    <td style="width:9% !important;padding-right:5px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td style="width:6% !important;padding-right:3px" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:5% !important"align="right">{{ $row->lookable->item->uomUnit->code }}</td>
                                     <td style="width:10% !important" align="right">{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>
                                     <td style="width:10% !important;padding-left:7px" align="center">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>

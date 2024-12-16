@@ -294,17 +294,7 @@ class MarketingOrderInvoice extends Model
     public function totalSales(){
         $total = 0;
         foreach ($this->marketingOrderInvoiceDetail as $key => $row) {
-            if($row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos') {
-                if($row->lookable->is_include_tax == 1) {
-                    $price = $row->lookable->total;
-                }else{
-                    $price = $row->lookable->total;
-
-                }
-                $pricefirst = 0;
-                $discount = $row->lookable->discount ?? 0;
-                $total += $row->lookable->grandtotal;
-            }if($row->lookable_type == null){
+            if($row->lookable_type == null){
                 if($row->is_include_tax == 1) {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
                 }else{

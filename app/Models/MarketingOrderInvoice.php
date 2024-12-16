@@ -303,7 +303,7 @@ class MarketingOrderInvoice extends Model
                 }
                 $pricefirst = 0;
                 $discount = $row->lookable->discount ?? 0;
-                $total = $row->lookable->grandtotal;
+                $total += $row->lookable->grandtotal;
             }if($row->lookable_type == null){
                 if($row->is_include_tax == 1) {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
@@ -312,7 +312,7 @@ class MarketingOrderInvoice extends Model
                 }
                 $pricefirst=$row->price;
                 $discount = 0;
-                $total = $row->grandtotal;
+                $total += $row->grandtotal;
             }
             else{
 
@@ -329,7 +329,7 @@ class MarketingOrderInvoice extends Model
                     // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
                 }
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
-                $total = ($row->getQtyM2() ?? $row->qty) * $price;
+                $total += ($row->getQtyM2() ?? $row->qty) * $price;
             }
         }
 

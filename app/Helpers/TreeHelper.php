@@ -5606,7 +5606,7 @@ class TreeHelper {
                                     ];
         
                                     if (!$hide_nominal) {
-                                        $properties[] =['name'=> "Nominal :".formatNominal($rowself->landedCost).number_format($rowself->landedCost->grandtotal,2,',','.')]
+                                        $properties[] =['name'=> "Nominal :".formatNominalSimple($rowself->landedCost).number_format($rowself->landedCost->grandtotal,2,',','.')]
                                         ;
                                     }
                                     $lc_other = [

@@ -5599,7 +5599,7 @@ class TreeHelper {
                                 }
 
                             }
-                            if($lc_detail->landedCostDetailSelf()){
+                            if($lc_detail->landedCostDetailSelf()->exists()){
                                 foreach($lc_detail->landedCostDetailSelf as $rowself){
                                     $properties = [
                                         ['name'=> "Tanggal :".$rowself->landedCost->post_date],

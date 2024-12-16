@@ -1118,7 +1118,7 @@ class LandedCostController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada A/P Invoice.'
+                    'message' => 'Data telah digunakan pada A/P Invoice atau ditarik ke Landed Cost yang lainnya.'
                 ];
             }else{
                 $query->update([

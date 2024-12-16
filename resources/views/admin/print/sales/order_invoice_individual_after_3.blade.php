@@ -7,8 +7,7 @@
     <head>
         <style>
 
-            @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
-            body { font-family: 'china', Tahoma, Arial, sans-serif;}
+            body { font-family: serif;}
             .break-row {
                 page-break-inside: avoid;
             }
@@ -59,7 +58,7 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:1em !important;
+                    font-size:1.1em !important;
 
                 }
             }
@@ -347,7 +346,7 @@
                                 @endphp
                                 <tr>
                                     <td style="width:5% !important"><strong>{{ ($key + 1) }}</td>
-                                    <td style="width:40% !important;padding-left:5px"><strong>{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
+                                    <td style="width:41% !important;padding-left:5px"><strong>{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
                                     <td style="width:9% !important;padding-right:5px" align="right"><strong>{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td style="width:6% !important;padding-right:3px" align="right"><strong>{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:5% !important"align="right"><strong>{{ $row->lookable->item->uomUnit->code }}</td>
@@ -380,7 +379,7 @@
                     </div>
 
                     <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row" style="position: fixed;bottom: 73px; left: 0px; right: 45px;">
+                    <div class="invoice-subtotal break-row" style="position: fixed;bottom: 60px; left: 0px; right: 45px;">
                         <div class="row">
                         <div class="column1">
                             <table style="width:100%">

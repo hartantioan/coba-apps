@@ -1524,7 +1524,7 @@ class GoodScaleController extends Controller
                             if($row->lookable_type == 'marketing_order_deliveries'){
                                 if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                                     $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
-                                    $qty = round($qty_final * $bobot,3);
+                                    $qty = round($qty_final * $bobot,2);
                                     $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
                                     $row->lookable->marketingOrderDeliveryProcess->update([
                                         'weight_netto' => $qty,

@@ -406,14 +406,25 @@
                                     <td align="right"></td>
                                     <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
-                                <tr class="break-row">
-                                    <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td align="right"></td>
-                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
+                                @if($data->isExport())
+                                    <tr class="break-row">
+                                        <td align="right"></td>
+                                        <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format(0,2,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td align="right"></td>
+                                        <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->total,2,',','.') }}</td>
+                                    </tr>
+                                @else
+                                    <tr class="break-row">
+                                        <td align="right"></td>
+                                        <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->tax,2,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td align="right"></td>
+                                        <td align="right" align="right" style="padding-top: 0px;padding-bottom:0px"><strong>{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    </tr>
+                                @endif
                             </table>
                         </div>
                         </div>

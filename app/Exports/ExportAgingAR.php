@@ -133,7 +133,11 @@ class ExportAgingAR implements FromView, WithEvents
 
         if ($this->type == 1) {
             foreach ($query_data as $row) {
-                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                if(substr($row->tax_no,0,3) == '070'){
+                    $balance = $row->total - $row->total_payment - $row->total_memo;
+                }else{
+                    $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                }
                 if ($balance > 0) {
                     $totalAll += $balance;
                     $daysDiff = $this->dateDiffInDays($row->due_date_internal, $this->date);
@@ -244,7 +248,11 @@ class ExportAgingAR implements FromView, WithEvents
             ]);
         } else {
             foreach ($query_data as $row) {
-                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                if(substr($row->tax_no,0,3) == '070'){
+                    $balance = $row->total - $row->total_payment - $row->total_memo;
+                }else{
+                    $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                }
                 if ($balance > 0) {
                     $daysDiff = $this->dateDiffInDays($row->due_date_internal, $this->date);
                     $arrDetail = [];

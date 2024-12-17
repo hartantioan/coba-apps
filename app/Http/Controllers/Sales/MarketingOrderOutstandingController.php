@@ -53,7 +53,14 @@ class MarketingOrderOutstandingController extends Controller
             $grandtotalAll = 0;
             foreach($query_data as $row){
                 $payment = round($row->totalPayByDate($request->date),2);
-                $balance = round($row->grandtotal - $payment,2);
+                $grandtotal = 0;
+                if($row->isExport()){
+                    $balance = round($row->total - $payment,2);
+                    $grandtotal = $row->total;
+                }else{
+                    $balance = round($row->grandtotal - $payment,2);
+                    $grandtotal = $row->grandtotal;
+                }
                 if($balance > 0){
                     $array_filter[] = [
                         'code'              => $row->code,
@@ -63,7 +70,7 @@ class MarketingOrderOutstandingController extends Controller
                         'note'              => $row->note,
                         'top'               => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->top_internal : '-',
                         'type'              => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType() : '-',
-                        'total'             => CustomHelper::formatConditionalQty($row->grandtotal),
+                        'total'             => CustomHelper::formatConditionalQty($grandtotal),
                         'payment'           => CustomHelper::formatConditionalQty($payment),
                         'balance'           => CustomHelper::formatConditionalQty($balance),
                         'brand'             => $row->account->brand->name ?? '-',

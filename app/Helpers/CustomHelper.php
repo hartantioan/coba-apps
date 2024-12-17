@@ -4194,20 +4194,48 @@ class CustomHelper {
 			}
 
 			if($moi->grandtotal > 0){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coapiutang->id,
-					'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
-					'place_id'		=> $place->id,
-					'type'			=> '1',
-					'nominal'		=> $moi->grandtotal,
-					'nominal_fc'	=> $moi->grandtotal,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-				]);
+				if($moi->isExport()){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapiutang->id,
+						'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
+						'place_id'		=> $place->id,
+						'type'			=> '1',
+						'nominal'		=> $moi->subtotal,
+						'nominal_fc'	=> $moi->subtotal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+					]);
+					if($moi->tax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $moi->taxMaster->coa_sale_id,
+							'account_id'	=> $moi->taxMaster->coaSale->bp_journal ? $moi->account_id : NULL,
+							'place_id'		=> $place->id,
+							'type'			=> '1',
+							'nominal'		=> $moi->tax,
+							'nominal_fc'	=> $moi->tax,
+							'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+						]);
+					}
+					CustomHelper::addCountLimitCredit($moi->account_id,$moi->subtotal);
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapiutang->id,
+						'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
+						'place_id'		=> $place->id,
+						'type'			=> '1',
+						'nominal'		=> $moi->grandtotal,
+						'nominal_fc'	=> $moi->grandtotal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+					]);
+					CustomHelper::addCountLimitCredit($moi->account_id,$moi->grandtotal);
+				}
 			}
-
-			CustomHelper::addCountLimitCredit($moi->account_id,$moi->grandtotal);
 
 			/* $total = 0;
 			$tax = 0;

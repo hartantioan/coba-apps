@@ -331,7 +331,7 @@ class MarketingOrderInvoice extends Model
     }
 
     public function balance(){
-        $total = $this->grandtotal;
+        $total = $this->isExport() ? $this->total : $this->grandtotal;
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             foreach($row->marketingOrderMemoDetail as $momd){
@@ -471,12 +471,21 @@ class MarketingOrderInvoice extends Model
     }
 
     public function balancePaymentIncoming(){
-        $total = $this->grandtotal - $this->totalPayMemo();
+        if($this->isExport()){
+            $total = $this->total - $this->totalPayMemo();
+        }else{
+            $total = $this->grandtotal - $this->totalPayMemo();
+        }
+        
         return $total;
     }
 
     public function balancePaymentIncomingByDate($date){
-        $total = $this->grandtotal - $this->totalPayByDate($date);
+        if($this->isExport()){
+            $total = $this->total - $this->totalPayByDate($date);
+        }else{
+            $total = $this->grandtotal - $this->totalPayByDate($date);
+        }
         return $total;
     }
 
@@ -508,7 +517,11 @@ class MarketingOrderInvoice extends Model
     }
 
     public function getPercentPayment(){
-        $total = $this->grandtotal - $this->totalMemo();
+        if($this->isExport()){
+            $total = $this->total - $this->totalMemo();
+        }else{
+            $total = $this->grandtotal - $this->totalMemo();
+        }
         $percent = $total > 0 ? round(($this->totalPay() / $total) * 100) : 0;
         return $percent;
     }
@@ -531,5 +544,13 @@ class MarketingOrderInvoice extends Model
         }else{
             return false;
         }
+    }
+
+    public function isExport(){
+        $ya = false;
+        if(substr($this->tax_no,0,3) == '070'){
+            $ya = true;
+        }
+        return $ya;
     }
 }

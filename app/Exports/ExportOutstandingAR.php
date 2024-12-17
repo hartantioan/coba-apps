@@ -44,7 +44,14 @@ class ExportOutstandingAR implements FromView , WithEvents
         
         foreach($query_data as $row){
             $payment = round($row->totalPayByDate($this->date),2);
-            $balance = round($row->grandtotal - $payment,2);
+            $grandtotal = 0;
+            if($row->isExport()){
+                $balance = round($row->total - $payment,2);
+                $grandtotal = $row->total;
+            }else{
+                $balance = round($row->grandtotal - $payment,2);
+                $grandtotal = $row->grandtotal;
+            }
             if($balance > 0){
                 $array_filter[] = [
                     'code'              => $row->code,
@@ -55,7 +62,7 @@ class ExportOutstandingAR implements FromView , WithEvents
                     'top'               => $row->account->top_internal,
                     'type'              => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType() : '-',
                     'note'              => $row->note,
-                    'total'             => $row->grandtotal,
+                    'total'             => $grandtotal,
                     'payment'           => $payment,
                     'balance'           => $balance,
                 ];

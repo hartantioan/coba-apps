@@ -146,7 +146,12 @@ class MarketingOrderAgingController extends Controller
         $newData = [];
 
         foreach ($results as $row) {
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            if(substr($row->tax_no,0,3) == '070'){
+                $balance = $row->total - $row->total_payment - $row->total_memo;
+            }else{
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            }
+            
             if ($balance > 0) {
                 $daysDiff = $this->dateDiffInDays($row->due_date_internal, $date);
                 $index = $this->findDuplicate($row->account_code, $newData);
@@ -431,7 +436,11 @@ class MarketingOrderAgingController extends Controller
         $newData = [];
 
         foreach ($results as $row) {
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            if(substr($row->tax_no,0,3) == '070'){
+                $balance = $row->total - $row->total_payment - $row->total_memo;
+            }else{
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            }
             if ($balance > 0) {
                 $daysDiff = $this->dateDiffInDays($row->due_date_internal, $date);
                 $arrDetail = [];
@@ -591,14 +600,22 @@ class MarketingOrderAgingController extends Controller
                 if ($pi) {
                     $memo = $pi->totalMemoByDate($date);
                     $paid = $pi->totalPayByDate($date);
-                    $balance = $pi->grandtotal - $memo - $paid;
+                    
+                    $grandtotal = 0;
+                    if(substr($pi->tax_no,0,3) == '070'){
+                        $balance = $pi->total - $memo - $paid;
+                        $grandtotal = $pi->total;
+                    }else{
+                        $balance = $pi->grandtotal - $memo - $paid;
+                        $grandtotal = $pi->grandtotal;
+                    }
                     $results[] = [
                         'code'          => $pi->code,
                         'vendor'        => $pi->account->name,
                         'post_date'     => date('d/m/Y', strtotime($pi->post_date)),
                         'due_date'      => date('d/m/Y', strtotime($pi->due_date_internal)),
                         'due_days'      => $this->dateDiffInDays($pi->due_date_internal, $date),
-                        'grandtotal'    => number_format($pi->grandtotal, 2, ',', '.'),
+                        'grandtotal'    => number_format($grandtotal, 2, ',', '.'),
                         'memo'          => number_format($memo, 2, ',', '.'),
                         'paid'          => number_format($paid, 2, ',', '.'),
                         'balance'       => number_format($balance, 2, ',', '.'),

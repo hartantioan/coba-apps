@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 
-use App\Exports\ExportDeliveryOrderProcessAccountingRecap;
+use App\Exports\ExportNewSJAccountingReport;
 use App\Http\Controllers\Controller;
 use App\Jobs\DeliveryOrderProcessAccountingJob;
 use Illuminate\Http\Request;
@@ -45,5 +45,14 @@ class ReportMarketingDeliveryOrderProcessRecapController extends Controller
         DeliveryOrderProcessAccountingJob::dispatch($start_date, $finish_date,$user_id);
 
         return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+    }
+
+    public function exportnew(Request $request)
+    {
+
+        $start_date = $request->start_date ? $request->start_date : '';
+        $finish_date = $request->end_date ? $request->end_date : '';
+
+        return Excel::download(new ExportNewSJAccountingReport($start_date, $finish_date), 'sj_accounting_recap_' . uniqid() . '.xlsx');
     }
 }

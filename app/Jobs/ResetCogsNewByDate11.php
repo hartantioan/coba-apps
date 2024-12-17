@@ -53,7 +53,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ResetCogsNewByDate11 implements ShouldQueue, ShouldBeUnique
+class ResetCogsNewByDate11 implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     

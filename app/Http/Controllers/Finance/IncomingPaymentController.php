@@ -251,6 +251,12 @@ class IncomingPaymentController extends Controller
                     if($moi){
                         $balance = $moi->balancePaymentIncoming();
                         if(!$moi->used()->exists() && $balance > 0){
+                            $grandtotal = 0;
+                            if($moi->isExport()){
+                                $grandtotal = $moi->total;
+                            }else{
+                                $grandtotal = $moi->grandtotal;
+                            }
                             CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Incoming Payment');
                             $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$moi->company_id)->first();
                             $details[] = [
@@ -263,8 +269,8 @@ class IncomingPaymentController extends Controller
                                 'post_date'             => date('d/m/Y',strtotime($moi->post_date)),
                                 'coa_name'              => $coapiutang->name,
                                 'admin'                 => number_format(0,2,',','.'),
-                                'total'                 => number_format($moi->grandtotal,2,',','.'),
-                                'grandtotal'            => number_format($moi->grandtotal,2,',','.'),
+                                'total'                 => number_format($grandtotal,2,',','.'),
+                                'grandtotal'            => number_format($grandtotal,2,',','.'),
                                 'used'                  => number_format($moi->totalPayMemo(),2,',','.'),
                                 'balance'               => number_format($balance,2,',','.'),
                                 'coa_id'                => $coapiutang->id,

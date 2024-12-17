@@ -17,6 +17,7 @@
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
             <th>Plant</th>
+            <th>Warehouse</th>
             <th>Line</th>
             <th>No.Ballmill</th>
             <th>Keterangan</th>
@@ -53,6 +54,7 @@
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                     <td>{{ $row->place->code }}</td>
+                    <td>{{ $row->warehouse->code }}</td>
                     <td>{{ $row->line->code }}</td>
                     <td>{{ $row->ballmill_no }}</td>
                     <td>{{ $row->note }}</td>

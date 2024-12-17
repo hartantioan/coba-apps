@@ -70,7 +70,7 @@
                                     <tr>
                                         <td>
                                             PALET : {{ $row->itemTarget->pallet->prefix_code }}
-                                            @if ($row->item->pallet->box_conversion <= 1)
+                                            @if ($row->itemTarget->pallet->box_conversion <= 1)
                                                 | QTY : {{ CustomHelper::formatConditionalQty($row->qty_sell) }}
                                             @endif
                                         </td>

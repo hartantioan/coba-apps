@@ -76,10 +76,10 @@ class ResetCogsNewByDate9 implements ShouldQueue, ShouldBeUnique
         $this->queue = 'cogsbydate9';
     }
 
-    public function uniqueId(): string
+    /* public function uniqueId(): string
     {
         return $this->item_id.'-'.$this->place_id.'-'.$this->item_shading_id.'-'.$this->production_batch_id.'-'.$this->date;
-    }
+    } */
 
     /**
      * Execute the job.

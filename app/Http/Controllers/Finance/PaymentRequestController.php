@@ -1054,6 +1054,8 @@ class PaymentRequestController extends Controller
 
                 if(in_array($query->status,['1','2','3','6'])){
 
+                    CustomHelper::removeApproval($query->getTable(),$query->id);
+
                     if(in_array($query->status,['2','3'])){
                        CustomHelper::removeJournal($query->getTable(),$query->id);
                     }

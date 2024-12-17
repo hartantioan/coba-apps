@@ -54,7 +54,7 @@
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                     <td>{{ $row->place->code }}</td>
-                    <td>{{ $row_detail->warehouse->code ?? '-' }}</td>
+                    <td>{{ $row_detail->warehouse->name ?? '-' }}</td>
                     <td>{{ $row->line->code }}</td>
                     <td>{{ $row->ballmill_no }}</td>
                     <td>{{ $row->note }}</td>

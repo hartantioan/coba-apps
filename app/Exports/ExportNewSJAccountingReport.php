@@ -77,7 +77,15 @@ class ExportNewSJAccountingReport implements FromCollection, WithTitle, WithHead
             SELECT
                 ROW_NUMBER() OVER() AS no,
                 modp.code,
-                modp.status AS status,
+                CASE
+                    WHEN modp.status = '1' THEN 'Menunggu'
+                    WHEN modp.status = '2' THEN 'Proses'
+                    WHEN modp.status = '3' THEN 'Selesai'
+                    WHEN modp.status = '4' THEN 'Ditolak'
+                    WHEN modp.status = '5' THEN 'Ditutup'
+                    WHEN modp.status = '6' THEN 'Direvisi'
+                    ELSE 'Invalid'
+                END AS status,
                 CASE
                     WHEN vu.id IS NOT NULL THEN vu.name
                     ELSE ''

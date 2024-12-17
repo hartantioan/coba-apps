@@ -332,7 +332,11 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        @if($data->isExport())
+                                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->total) }} Rupiah
+                                        @else
+                                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        @endif
                                     </td>
 
                                 </tr>
@@ -367,14 +371,25 @@
                                     <td align="right">Total</td>
                                     <td align="right" align="right">{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
-                                <tr class="break-row">
-                                    <td align="right">PPN</td>
-                                    <td align="right" align="right">{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td align="right">Grandtotal</td>
-                                    <td align="right" align="right">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
+                                @if($data->isExport())
+                                    <tr class="break-row">
+                                        <td align="right">PPN</td>
+                                        <td align="right" align="right">{{ number_format(0,2,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td align="right">Grandtotal</td>
+                                        <td align="right" align="right">{{ number_format($data->total,2,',','.') }}</td>
+                                    </tr>
+                                @else
+                                    <tr class="break-row">
+                                        <td align="right">PPN</td>
+                                        <td align="right" align="right">{{ number_format($data->tax,2,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td align="right">Grandtotal</td>
+                                        <td align="right" align="right">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    </tr>
+                                @endif
                             </table>
                         </div>
                         </div>

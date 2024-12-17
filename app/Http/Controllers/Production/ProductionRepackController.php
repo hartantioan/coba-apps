@@ -404,8 +404,8 @@ class ProductionRepackController extends Controller
                             }
                             $item_shading_id = $shading->id;
 
-                            $runningno = ProductionBatch::getLatestCodeFg($yearno);
-                            $newbatch = $request->arr_batch_no[$key].'/'.$runningno;
+                            /* $runningno = ProductionBatch::getLatestCodeFg($yearno); */
+                            $newbatch = $request->arr_batch_no[$key].'B';
 
                             $lineshiftgroup = explode('/',$request->arr_batch_no[$key])[1];
 

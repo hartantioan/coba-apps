@@ -1599,7 +1599,8 @@
             }
             let array = batch.split('/');
             let newbatch = targetUnit + array[0] + '/' + array[1];
-            $('#arr_batch_no' + id).val(newbatch);
+            /* $('#arr_batch_no' + id).val(newbatch); */
+            $('#arr_batch_no' + id).val(batch);
         }
     }
 

@@ -530,6 +530,8 @@ class ResetCogsNewByDate10 implements ShouldQueue, ShouldBeUnique
 
         $productionhandover = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('productionBatch',function($query)use($area_id,$item_shading_id,$production_batch_id){
+            $query->where('id',$production_batch_id)->where('item_shading_id',$item_shading_id)->where('area_id',$area_id);
         })->where('item_id',$item_id)->get();
 
         $arrHandover = [];
@@ -1050,7 +1052,9 @@ class ResetCogsNewByDate10 implements ShouldQueue, ShouldBeUnique
 
         $goodtransferout = InventoryTransferOutDetail::whereHas('inventoryTransferOut',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-        })->where('item_id',$item_id)->get();
+        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
+            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
+        })->get();
 
         foreach($goodtransferout as $row){
             $price = $row->item->priceNow($row->itemStock->place_id,$dateloop);
@@ -1095,7 +1099,9 @@ class ResetCogsNewByDate10 implements ShouldQueue, ShouldBeUnique
 
         $goodtransferin = InventoryTransferOutDetail::whereHas('inventoryTransferOut',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('inventoryTransferIn');
-        })->where('item_id',$item_id)->get();
+        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
+            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
+        })->get();
 
         foreach($goodtransferin as $row){
             $total = $row->total;
@@ -1478,11 +1484,11 @@ class ResetCogsNewByDate10 implements ShouldQueue, ShouldBeUnique
         }
       }
       CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
-      /* $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
+      $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
       if($itemstock){
           $itemstock->update([
               'qty'   => $itemstock->stockByDate(date('Y-m-d')),
           ]);
-      } */
+      }
     }
 }

@@ -96,13 +96,13 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             $price = 0;
             $customer = $row->goodScale->account->name;
             if($row->lookable->type_delivery != '1'){
-                $price = $row->total / ($row->qty == 0 ? 1 : $row->qty);
+                $price = $row->findProportionCost() / ($row->qty == 0 ? 1 : $row->qty);
                 $customer = $row->lookable->customer->name;
             }
 
             $arr[] = [
-                'no'                    => ($key+1),
-                'no_document'           => $row->goodScale->code,
+                'no'                     => ($key+1),
+                'no_document'            => $row->goodScale->code,
                 'status'                 => $row->goodScale->statusRaw(),
                 'voider'                 => $row->goodScale->voidUser()->exists() ? $row->goodScale->voidUser->name : '',
                 'tgl_void'               => $row->goodScale->voidUser()->exists() ? date('d/m/Y', strtotime($row->goodScale->void_date)) : '',
@@ -112,7 +112,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'ket_delete'             => $row->goodScale->deleteUser()->exists() ? $row->goodScale->delete_note : '',
                 'nik'                    => $row->goodScale->user->employee_no,
                 'user'                   => $row->goodScale->user->name,
-                'tgl_terima'            => date('d/m/Y', strtotime($row->goodScale->post_date)),
+                'tgl_terima'             => date('d/m/Y', strtotime($row->goodScale->post_date)),
                 'No. SO'                 => $row->lookable->getSO(),
                 'No. MOD'                 => $row->lookable->code,
                 'Customer'         => $customer,
@@ -125,7 +125,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Ekspedisi'             => $row->goodScale->account->name,
                 'Qty'            => $row->qty,
                 'Harga'             => $price,
-                'Total'             => $row->total,
+                'Total'             => $row->findProportionCost(),
                 'No. APIN'             => $list,
 
             ];

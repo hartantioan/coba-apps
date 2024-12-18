@@ -37,6 +37,15 @@ class GoodScaleDetail extends Model
         return $this->belongsTo('App\Models\GoodScale', 'good_scale_id', 'id');
     }
 
+    public function findProportionCost()
+    {
+        $cost = 0;
+        if($this->qty > 0 && $this->goodScale->qty_final > 0){
+            $cost = ($this->qty/$this->goodScale->qty_final)*$this->goodScale->totalCost();
+        }
+        return $cost;
+    }
+
     public function journalDetail(){
         return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
             $query->whereIn('status',['2','3']);

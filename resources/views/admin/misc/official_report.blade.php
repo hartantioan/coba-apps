@@ -219,7 +219,7 @@
                                                 <tr id="last-row-user">
                                                     <td colspan="2" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addUser()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Karyawan
+                                                            <i class="material-icons left">add</i> Tambah Approver
                                                         </a>
                                                     </td>
                                                 </tr>

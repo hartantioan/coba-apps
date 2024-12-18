@@ -61,15 +61,14 @@ class ExportFundRequestTransactionPage implements FromCollection, WithTitle, Wit
 
     public function collection()
     {
-       
+
         $data = FundRequest::where(function($query) {
             if($this->search) {
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhere('post_date', 'like', "%$this->search%")
-                        ->orWhere('due_date', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%")
-                        
+
                         ->orWhereHas('user',function($query){
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('employee_no','like',"%$this->search%");
@@ -100,7 +99,7 @@ class ExportFundRequestTransactionPage implements FromCollection, WithTitle, Wit
             }
 
             if(!$this->modedata){
-                
+
                 /*if(session('bo_position_id') == ''){
                     $query->where('user_id',session('bo_id'));
                 }else{
@@ -111,11 +110,11 @@ class ExportFundRequestTransactionPage implements FromCollection, WithTitle, Wit
                     });
                 }*/
                 $query->where('user_id',session('bo_id'));
-                
+
             }
         })
         ->get();
-       
+
 
         $arr = [];
 
@@ -153,12 +152,12 @@ class ExportFundRequestTransactionPage implements FromCollection, WithTitle, Wit
                     'ppn'           => $rowDetail->tax,
                     'pph'           => $rowDetail->wtax,
                     'grandtotal'    => $rowDetail->grandtotal,
-                 
-                    
+
+
                 ];
 
             }
-            
+
         }
 
         return collect($arr);

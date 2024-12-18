@@ -1422,6 +1422,38 @@
         });
     }
 
+    function simpleStructrueTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/simplestructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                makeTreeOrg(response.message,response.link);
+
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function countRow(){
         let total = 0;
 

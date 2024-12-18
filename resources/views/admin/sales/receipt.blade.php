@@ -37,9 +37,9 @@
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
-            
+
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -53,13 +53,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                      
+
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            
+
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
@@ -118,7 +118,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -164,7 +164,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -222,7 +222,7 @@
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                             Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                             <br>
-                                            
+
                                         </div>
                                         <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                            Clear
@@ -301,7 +301,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -363,7 +363,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -386,7 +386,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -403,7 +403,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -414,10 +414,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -472,7 +472,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -480,18 +480,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -499,16 +499,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -527,22 +527,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -574,13 +574,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -608,9 +608,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -618,7 +618,7 @@
         });
 
         window.table.search('{{ $code }}').draw();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -720,9 +720,9 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -732,9 +732,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -748,7 +748,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -864,7 +864,7 @@
             }
         });
     }
-    
+
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
@@ -873,7 +873,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -918,13 +918,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -954,11 +954,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -970,11 +970,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -996,8 +996,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1005,7 +1005,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1014,10 +1014,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1041,7 +1041,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1054,17 +1054,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1082,8 +1082,8 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     function viewStructureTree(id){
@@ -1091,7 +1091,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1104,10 +1104,42 @@
                 loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function simpleStructrueTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/simplestructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                makeTreeOrg(response.message,response.link);
+
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -1295,7 +1327,7 @@
                 });
             }
         });
-        
+
     }
 
     function rowDetail(data) {
@@ -1347,12 +1379,12 @@
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1384,7 +1416,7 @@
                                 $.each(response.error, function(field, errorMessage) {
                                     $('#' + field).addClass('error-input');
                                     $('#' + field).css('border', '1px solid red');
-                                    
+
                                 });
                                 swal({
                                     title: 'Ups! Validation',
@@ -1470,7 +1502,7 @@
                 `);
                 $('#post_date').val(response.post_date);
                 $('#note').val(response.note);
-                
+
                 setTimeout(function(){
                     if(response.details.length > 0){
                         $('#body-item').empty();
@@ -1497,7 +1529,7 @@
                         table_multi.draw();
                     }
                 }, 1000);
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1533,7 +1565,7 @@
                         loadingOpen('#main');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('#main');
@@ -1542,10 +1574,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function voidStatus(id){
@@ -1631,7 +1663,7 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
             qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",","."));
 
         if(qtylimit > 0){
@@ -1644,7 +1676,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1652,7 +1684,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -1677,27 +1709,27 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Customer',
                     element : document.querySelector('.step4'),
-                    intro : 'Silahkan pilih customer dimana kwitansi akan dibuatkan tanda terima.' 
+                    intro : 'Silahkan pilih customer dimana kwitansi akan dibuatkan tanda terima.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step5'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step6'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Total Invoice',
                     element : document.querySelector('.step7'),
-                    intro : 'Total tagihan setiap invoice yang dipilih dari tabel Dokumen Detail. (Auto)' 
+                    intro : 'Total tagihan setiap invoice yang dipilih dari tabel Dokumen Detail. (Auto)'
                 },
                 {
                     title : 'Dokumen Detail',
@@ -1707,12 +1739,12 @@
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step9'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -1726,7 +1758,7 @@
                 loadingOpen('#main');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('#main');
@@ -1797,6 +1829,6 @@
         var end_date = $('#finish_date').val();
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account=" + account + "&company=" + company  + "&end_date=" + end_date + "&start_date=" + start_date;
-       
+
     }
 </script>

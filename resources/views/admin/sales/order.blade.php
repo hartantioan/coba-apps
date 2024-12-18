@@ -30,9 +30,9 @@
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
-            
+
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -46,13 +46,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                      
+
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            
+
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
@@ -166,7 +166,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -189,19 +189,19 @@
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <a class='dropdown-trigger btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2' href='#' data-target='dropdown1'>
-                                                
+
                                                 <i class="material-icons hide-on-med-and-up">view_headline</i>
                                                 <span class="hide-on-small-onl">Export</span>
                                                 <i class="material-icons right">view_headline</i>
                                             </a>
-                                           
+
                                             <ul id='dropdown1' class='dropdown-content'>
                                                 <li><a href="javascript:void(0);" onclick="exportExcel();">
                                                     <i class="material-icons">view_headline</i>
                                                     <i class="material-icons hide-on-med-and-up">view_headline</i>Export
                                                     </a>
                                                 </li>
-                                                
+
                                                 @if (session('bo_id')==351 || session('bo_id')== 354 )
                                                     <li><a href="javascript:void(0);" onclick="exportExcelDetail1();">
                                                         <i class="material-icons">view_headline</i>
@@ -215,7 +215,7 @@
                                                         </a>
                                                     </li>
                                                 @endif
-                                                
+
                                             </ul>
                                             <table id="datatable_serverside">
                                                 <thead>
@@ -269,7 +269,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -312,7 +312,7 @@
                                         <input type="hidden" id="temp" name="temp">
                                         <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();clearDetail();"></select>
                                         <label class="active" for="account_id">{{ __('translations.customer') }}</label>
-                                        
+
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="select2 browser-default" id="billing_address" name="billing_address">
@@ -435,7 +435,7 @@
                                             <option value="2">FIFO</option>
                                         </select>
                                         <label class="active" for="dp_type">Tipe DP</label>
-                                    </div>                
+                                    </div>
                                     <div class="input-field col m3 s12 step22">
                                         <input id="top_internal" name="top_internal" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_internal">TOP Internal (hari)</label>
@@ -444,7 +444,7 @@
                                         <input id="top_customer" name="top_customer" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_customer">TOP Customer (hari)</label>
                                     </div>
-                                  
+
                                     <div class="input-field col m3 s12 step25">
                                         <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
@@ -553,7 +553,7 @@
                             <div class="input-field col m4 s12 step34">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        
+
                                         {{-- <tr>
                                             <td>Diskon</td>
                                             <td class="right-align"> --}}
@@ -610,7 +610,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -672,7 +672,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -695,7 +695,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -712,7 +712,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -723,10 +723,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -758,13 +758,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -791,16 +791,16 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -808,7 +808,7 @@
         });
 
         window.table.search('{{ $code }}').draw();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -817,7 +817,7 @@
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -850,8 +850,8 @@
                             </td>
                         </tr>
                     `);
-                    $('#table-item').animate( { 
-                        scrollLeft: '0' }, 
+                    $('#table-item').animate( {
+                        scrollLeft: '0' },
                     500);
                 }
                 M.updateTextFields();
@@ -871,9 +871,9 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -883,9 +883,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -899,7 +899,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -911,7 +911,7 @@
                 $('#temp').val('');
             }
         });
-        
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
@@ -923,8 +923,8 @@
                         </td>
                     </tr>
                 `);
-                $('#table-item').animate( { 
-                    scrollLeft: '0' }, 
+                $('#table-item').animate( {
+                    scrollLeft: '0' },
                 500);
             }
         });
@@ -1028,7 +1028,7 @@
             }else{
                 $('#billing_address').append(`
                     <option value="">--Data tidak ditemukan--</option>
-                `); 
+                `);
             }
             $('#phone').val($('#account_id').select2('data')[0].phone);
         }else{
@@ -1079,7 +1079,7 @@
             district = [];
         }
     }
-    
+
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
@@ -1088,7 +1088,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1133,13 +1133,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1169,11 +1169,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -1185,11 +1185,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1211,8 +1211,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1220,7 +1220,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1229,10 +1229,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1256,7 +1256,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1269,17 +1269,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1297,9 +1297,9 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
-    } 
+        });
+
+    }
 
     var defaultValuePpn = 0, defaultValuePph;
 
@@ -1325,7 +1325,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1338,7 +1338,7 @@
                 loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1350,7 +1350,39 @@
             }
         });
     }
-    
+
+    function simpleStructrueTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/simplestructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                makeTreeOrg(response.message,response.link);
+
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function getRowUnit(nil){
         if($("#arr_item" + nil).val()){
             $.ajax({
@@ -1389,13 +1421,13 @@
                     $('#rowDisc1' + nil).val(disc_1);
                     $('#rowDisc2' + nil).val(disc_2);
                     $('#rowDisc3' + nil).val(disc_3);
-                    
+
                     $.each(response.sell_units, function(i, value) {
                         $('#arr_unit' + nil).append(`
                             <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                         `);
                     });
-                    
+
                     if(response.price){
                         if($('#account_id').val() ){
                             $("#rowPriceList" + nil).val(
@@ -1468,7 +1500,7 @@
                         <td class="center-align">
                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                 <option value="` + selectedValue + `">` + selectedText + `</option>
-                                
+
                             </select>
                         </td>
                         <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
@@ -1511,7 +1543,7 @@
                         <td class="center">
                             <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                         </td>
-            
+
                         <td class="center">
                             <input name="arr_final_price[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
                         </td>
@@ -1535,7 +1567,7 @@
                     text: 'Harap Pilih Plant Terlebih dahulu.',
                     icon: 'error'
                 });
-            } 
+            }
         }else{
             swal({
                 title: '!',
@@ -1543,7 +1575,7 @@
                 icon: 'error'
             });
         }
-       
+
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1607,7 +1639,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -1615,7 +1647,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -1791,7 +1823,7 @@
                 });
             }
         });
-        
+
     }
 
     function rowDetail(data) {
@@ -1852,7 +1884,7 @@
                 formData.delete("arr_final_price[]");
                 formData.delete("arr_total[]");
                 formData.delete("arr_note[]");
-                
+
                 if($('select[name^="arr_place[]"]').length > 0){
                     $('select[name^="arr_place[]"]').each(function(index){
                         formData.append('arr_place[]',$(this).val());
@@ -1866,14 +1898,14 @@
                         formData.append('arr_price_list[]',$('input[name^="arr_price_list[]"]').eq(index).val());
                         formData.append('arr_price_delivery[]',$('input[name^="arr_price_delivery[]"]').eq(index).val());
                         formData.append('arr_price_type_bp[]',$('input[name^="arr_price_type_bp[]"]').eq(index).val());
-                       
+
                         formData.append('arr_tax[]',$('select[name^="arr_tax"]').eq(index).val());
                         formData.append('arr_tax_id[]',$('option:selected','select[name^="arr_tax"]').eq(index).data('id'));
                         formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
                         formData.append('arr_disc1[]',$('input[name^="arr_disc1"]').eq(index).val());
                         formData.append('arr_disc2[]',$('input[name^="arr_disc2"]').eq(index).val());
                         formData.append('arr_disc3[]',$('input[name^="arr_disc3"]').eq(index).val());
-                       
+
                         formData.append('arr_final_price[]',$('input[name^="arr_final_price"]').eq(index).val());
                         formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
@@ -1895,12 +1927,12 @@
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1932,7 +1964,7 @@
                                 $.each(response.error, function(field, errorMessage) {
                                     $('#' + field).addClass('error-input');
                                     $('#' + field).css('border', '1px solid red');
-                                    
+
                                 });
                                 swal({
                                     title: 'Ups! Validation',
@@ -2091,7 +2123,7 @@
                 $('#total_after_tax').val(response.total_after_tax);
                 $('#rounding').val(response.rounding);
                 $('#grandtotal').val(response.grandtotal);
-                
+
                 if(response.details.length > 0){
                     $('#last-row-item').remove();
                     $('.row_item').each(function(){
@@ -2161,7 +2193,7 @@
                                 <td class="center">
                                     <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                 </td>
-                                
+
                                 <td class="center">
                                     <input name="arr_final_price[]" class="browser-default" type="text" value="` + val.final_price + `" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
                                 </td>
@@ -2196,7 +2228,7 @@
                         $('#rowQtyUom' + count).trigger('keyup');
                     });
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -2232,7 +2264,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2241,10 +2273,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function voidStatus(id){
@@ -2338,10 +2370,10 @@
             );
             var qty = parseFloat($('#rowQtyUom' + id).val().replaceAll(".", "").replaceAll(",",".")),
             conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString()),
-            qtylimit = parseFloat($('#rowQtyUom' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
+            qtylimit = parseFloat($('#rowQtyUom' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")),
             price = pricenew,
-            disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+            disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")),
+            disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")),
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
 
             qtylimit = (qtylimit / conversion).toFixed(3);
@@ -2408,7 +2440,7 @@
         });
 
         total = subtotal;
-        
+
         tax = Math.floor(tax);
 
         total_after_tax = total + tax;
@@ -2431,7 +2463,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2439,7 +2471,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2464,37 +2496,37 @@
                 {
                     title : 'Customer',
                     element : document.querySelector('.step3'),
-                    intro : 'Customer adalah Partner Bisnis tipe penyedia pelanggan. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Customer adalah Partner Bisnis tipe penyedia pelanggan. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.'
                 },
                 {
                     title : 'Alamat penagihan',
                     element : document.querySelector('.step4'),
-                    intro : 'Silahkan pilih alamat penagihan yang diambil dari master data partner bisnis pada detail alamat penagihan.' 
+                    intro : 'Silahkan pilih alamat penagihan yang diambil dari master data partner bisnis pada detail alamat penagihan.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step5'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step7'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Tgl. Valid SO',
                     element : document.querySelector('.step8'),
-                    intro : 'Tanggal berlaku SO / Penawaran, set sesuai dengan masa berlaku yang diinginkan.' 
+                    intro : 'Tanggal berlaku SO / Penawaran, set sesuai dengan masa berlaku yang diinginkan.'
                 },
                 {
                     title : 'Proyek (Jika ada)',
                     element : document.querySelector('.step9'),
-                    intro : 'Silahkan pilih proyek ini jika penjualan ingin dihubungkan dengan data Proyek. Data proyek bisa ditambahkan pada form Master Data - Administrasi - Proyek.' 
+                    intro : 'Silahkan pilih proyek ini jika penjualan ingin dihubungkan dengan data Proyek. Data proyek bisa ditambahkan pada form Master Data - Administrasi - Proyek.'
                 },
                 {
                     title : 'No. Referensi',
                     element : document.querySelector('.step10'),
-                    intro : 'No referensi bisa diisikan dengan no dokumen PO dari customer atau dokumen terkait lainnya yang mendukung penjualan ini.' 
+                    intro : 'No referensi bisa diisikan dengan no dokumen PO dari customer atau dokumen terkait lainnya yang mendukung penjualan ini.'
                 },
                 {
                     title : 'Tipe Pengiriman',
@@ -2504,47 +2536,47 @@
                 {
                     title : 'Ekspedisi',
                     element : document.querySelector('.step12'),
-                    intro : 'Ekspedisi adalah pihak partner bisnis tipe pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Ekspedisi adalah pihak partner bisnis tipe pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.'
                 },
                 {
                     title : 'Tipe Transport',
                     element : document.querySelector('.step13'),
-                    intro : 'Tipe kendaraan yang digunakan dalam pengiriman barang nantinya.' 
+                    intro : 'Tipe kendaraan yang digunakan dalam pengiriman barang nantinya.'
                 },
                 {
                     title : 'Tgl. Kirim',
                     element : document.querySelector('.step14'),
-                    intro : 'Tanggal perkiraan pengiriman barang dari gudang.' 
+                    intro : 'Tanggal perkiraan pengiriman barang dari gudang.'
                 },
                 {
                     title : 'Outlet',
                     element : document.querySelector('.step15'),
-                    intro : 'Tempat tujuan barang akan dikirimkan dalam bentuk toko / supermarket / distributor.' 
+                    intro : 'Tempat tujuan barang akan dikirimkan dalam bentuk toko / supermarket / distributor.'
                 },
                 {
                     title : 'Alamat Tujuan',
                     element : document.querySelector('.step16'),
-                    intro : 'Alamat tujuan adalah alamat dimana barang ingin dikirimkan.' 
+                    intro : 'Alamat tujuan adalah alamat dimana barang ingin dikirimkan.'
                 },
                 {
                     title : 'Provinsi',
                     element : document.querySelector('.step17'),
-                    intro : 'Provinsi dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
+                    intro : 'Provinsi dimana barang ingin dikirimkan (berdasarkan alamat tujuan).'
                 },
                 {
                     title : 'Kota',
                     element : document.querySelector('.step18'),
-                    intro : 'Kota dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
+                    intro : 'Kota dimana barang ingin dikirimkan (berdasarkan alamat tujuan).'
                 },
                 {
                     title : 'Kecamatan',
                     element : document.querySelector('.step19'),
-                    intro : 'Kecamatan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
+                    intro : 'Kecamatan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).'
                 },
                 {
                     title : 'Tipe Pembayaran',
                     element : document.querySelector('.step21'),
-                    intro : 'Tipe pembayaran SO. Untuk Cash, maka TOP Internal dan TOP Customer akan menjadi 0. Untuk, tipe Credit, maka TOP Internal dan TOP Customer bisa diedit.' 
+                    intro : 'Tipe pembayaran SO. Untuk Cash, maka TOP Internal dan TOP Customer akan menjadi 0. Untuk, tipe Credit, maka TOP Internal dan TOP Customer bisa diedit.'
                 },
                 {
                     title : 'TOP (Term of Payment) Internal',
@@ -2559,7 +2591,7 @@
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step25'),
-                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.'
                 },
                 {
                     title : 'Konversi',
@@ -2574,42 +2606,42 @@
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step28'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : 'Sales',
                     element : document.querySelector('.step29'),
-                    intro : 'Inputan ini digunakan untuk mengatur sales terkait dengan penjualan. Data diambil dari Partner Bisnis tipe Karyawan / Pegawai.' 
+                    intro : 'Inputan ini digunakan untuk mengatur sales terkait dengan penjualan. Data diambil dari Partner Bisnis tipe Karyawan / Pegawai.'
                 },
                 {
                     title : 'Detail produk',
                     element : document.querySelector('.step30'),
-                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
+                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.'
                 },
                 {
                     title : 'Tambah Baris',
                     element : document.querySelector('.step31'),
-                    intro : 'Untuk menambahkan baris produk yang ingin diinput silahkan tekan tombol ini.' 
+                    intro : 'Untuk menambahkan baris produk yang ingin diinput silahkan tekan tombol ini.'
                 },
                 {
                     title : 'Keterangan Internal',
                     element : document.querySelector('.step32'),
-                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
+                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.'
                 },
                 {
                     title : 'Keterangan Eksternal',
                     element : document.querySelector('.step33'),
-                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
+                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.'
                 },
                 {
                     title : 'Informasi Total',
                     element : document.querySelector('.step34'),
-                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
+                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step35'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2728,7 +2760,7 @@
                         $('#total_after_tax').val(response.total_after_tax);
                         $('#rounding').val(response.rounding);
                         $('#grandtotal').val(response.grandtotal);
-                        
+
                         if(response.details.length > 0){
                             $('#last-row-item').remove();
                             $('.row_item').each(function(){
@@ -2798,7 +2830,7 @@
                                         <td class="center">
                                             <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                         </td>
-                                        
+
                                         <td class="center">
                                             <input name="arr_final_price[]" class="browser-default" type="text" value="` + val.final_price + `" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
                                         </td>
@@ -2833,7 +2865,7 @@
                                 $('#rowQtyUom' + count).trigger('keyup');
                             });
                         }
-                        
+
                         $('.modal-content').scrollTop(0);
                         $('#note').focus();
                         M.updateTextFields();
@@ -2862,7 +2894,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2939,7 +2971,7 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
     function exportExcelDetail1(){
         var search = table.search();
@@ -2957,7 +2989,7 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page_detail1?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
     function exportExcelDetail2(){
         var search = table.search();
@@ -2975,6 +3007,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page_detail2?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

@@ -48,11 +48,11 @@ class MarketingOrderHandoverReceiptController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Tanda Terima Kwitansi',
@@ -72,7 +72,7 @@ class MarketingOrderHandoverReceiptController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderHandoverReceipt::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -126,7 +126,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         $search = $request->input('search.value');
 
         $total_data = MarketingOrderHandoverReceipt::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = MarketingOrderHandoverReceipt::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -225,7 +225,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -263,8 +263,9 @@ class MarketingOrderHandoverReceiptController extends Controller
                         <a href="'.request()->segment(3).'/update_document/'.CustomHelper::encrypt($val->code).'?u='.CustomHelper::encrypt($val->account->employee_no).'&c='.CustomHelper::encrypt($val->account->name).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Update Status Dokumen" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -287,7 +288,7 @@ class MarketingOrderHandoverReceiptController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
@@ -327,7 +328,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $grandtotal += $mohr->grandtotal;
                     $arr_id[] = $mohr->id;
                 }
-                
+
                 if($request->temp){
                     $query = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -379,7 +380,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                         $query->grandtotal = $grandtotal;
 
                         $query->save();
-                        
+
                         foreach($query->marketingOrderHandoverReceiptDetail as $row){
                             $row->delete();
                         }
@@ -393,7 +394,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderHandoverReceipt::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MarketingOrderHandoverReceipt::create([
                         'code'			            =>  $newCode,
                         'user_id'		            => session('bo_id'),
@@ -406,9 +407,9 @@ class MarketingOrderHandoverReceiptController extends Controller
                         'grandtotal'                => $grandtotal,
                     ]);
                 }
-                
+
                 if($query) {
-                        
+
                     foreach($arr_id as $key => $row){
                         MarketingOrderHandoverReceiptDetail::create([
                             'marketing_order_handover_receipt_id'   => $query->id,
@@ -452,7 +453,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
 
         $arr = [];
-        
+
         foreach($po->marketingOrderHandoverReceiptDetail as $row){
             $arr[] = [
                 'code'              => $row->marketingOrderReceipt->code,
@@ -464,7 +465,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         }
 
         $po['details'] = $arr;
-        				
+
 		return response()->json($po);
     }
 
@@ -512,9 +513,9 @@ class MarketingOrderHandoverReceiptController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
-            </tr>  
+            </tr>
         ';
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
@@ -530,7 +531,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -538,7 +539,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -550,7 +551,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -573,14 +574,14 @@ class MarketingOrderHandoverReceiptController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $mod = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($mod){
             $data = [
                 'title'     => 'Tanda Terima Kwitansi',
@@ -595,13 +596,13 @@ class MarketingOrderHandoverReceiptController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($id))->first();
         $formattedDate = date('d/m/Y H:i:s');
-        
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -612,7 +613,7 @@ class MarketingOrderHandoverReceiptController extends Controller
             $result = $merger->merge();
 
               $document_po = PrintHelper::savePrint($result);
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -625,7 +626,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -637,7 +638,7 @@ class MarketingOrderHandoverReceiptController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = MarketingOrderHandoverReceipt::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -661,8 +662,8 @@ class MarketingOrderHandoverReceiptController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -690,7 +691,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -698,19 +699,19 @@ class MarketingOrderHandoverReceiptController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderHandoverReceipt::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual');
@@ -727,21 +728,21 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -750,7 +751,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -767,18 +768,18 @@ class MarketingOrderHandoverReceiptController extends Controller
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -791,7 +792,7 @@ class MarketingOrderHandoverReceiptController extends Controller
 
     public function voidStatus(Request $request){
         $query = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
             if(in_array($query->status,['4','5'])){
                 $response = [
@@ -810,13 +811,13 @@ class MarketingOrderHandoverReceiptController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-    
+
                 activity()
                     ->performedOn(new MarketingOrderHandoverReceipt())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the marketing order handover receipt data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Tanda Terima Kwitansi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -868,7 +869,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -911,7 +912,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         $query = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
-        
+
 
         if($query){
             $data_mo_delivery = [
@@ -922,7 +923,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_mo_delivery;
@@ -930,22 +931,80 @@ class MarketingOrderHandoverReceiptController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2; 
+            $data_link = $array2;
 
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function simpleStructrueTree(Request $request){
+        $query = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
+
+
+        if($query){
+            $data_mo_delivery = [
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
+                 ],
+                'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($query->code),
+            ];
+
+            $data_go_chart[]= $data_mo_delivery;
+            $result = TreeHelper::simpleTree($data_go_chart,$data_link,'data_id_hand_over_receipt',$query->id);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -989,7 +1048,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         try {
 
             $query = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->code))->whereIn('status',['2','3'])->first();
-                
+
             if($query) {
                 $query->update([
                     'status_tracking'   => '1',
@@ -1043,13 +1102,13 @@ class MarketingOrderHandoverReceiptController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MarketingOrderHandoverReceipt())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Marketing Order Handover Receipt data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1072,7 +1131,7 @@ class MarketingOrderHandoverReceiptController extends Controller
         $company = $request->company ? $request->company : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportTransactionPageMarketingOrderHandoverReceipt($search,$status,$account_id,$company,$end_date,$start_date), 'marketing_order_delivery_process_'.uniqid().'.xlsx');
     }
 }

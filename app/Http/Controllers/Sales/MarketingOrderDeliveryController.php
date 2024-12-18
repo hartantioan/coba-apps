@@ -294,6 +294,7 @@ class MarketingOrderDeliveryController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Edit Keterangan Internal & Eksternal" onclick="editNote(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">border_color</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat teal darken-4 accent-2 white-text btn-small" data-popup="tooltip" title="Revision" onclick="revision(`' . CustomHelper::encrypt($val->code) . '`)"><b>R</b></button>
 					'
@@ -847,7 +848,7 @@ class MarketingOrderDeliveryController extends Controller
                 'message' => 'Data berhasil diupdate.'
             ];
 
-            
+
         }else{
             $response = [
                 'status'  => 500,
@@ -1486,6 +1487,64 @@ class MarketingOrderDeliveryController extends Controller
         $data_go_chart[]= $data_mo_delivery;
         if($query){
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_delivery',$query->id);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link,
+            ];
+
+
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function simpleStructrueTree(Request $request){
+        $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
+        $data_mo_delivery = [
+            "name"=>$query->code,
+            "key" => $query->code,
+            "color"=>"lightblue",
+            'properties'=> [
+                ['name'=> "Tanggal :".$query->post_date],
+                ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
+             ],
+            'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($query->code),
+        ];
+        $data_go_chart[]= $data_mo_delivery;
+        if($query){
+            $result = TreeHelper::simpleTree($data_go_chart,$data_link,'data_id_mo_delivery',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

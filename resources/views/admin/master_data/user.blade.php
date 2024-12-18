@@ -946,9 +946,19 @@
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxView[]" class="reset-checkbox" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxView[]" class="reset-checkbox" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" onclick="showDataView(this);" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
+                                                            @if ($m->type == '1')
+                                                            <div class="switch">
+                                                                <label>
+                                                                    Tidak
+                                                                    <input type="checkbox" name="checkboxViewData[]" id="checkboxViewData{{ $m->id }}" value="{{ $m->id }}" disabled>
+                                                                    <span class="lever"></span>
+                                                                    Semua Data
+                                                                </label>
+                                                            </div>
+                                                            @endif
                                                         </td>
                                                         <td class="center">
                                                             <label>

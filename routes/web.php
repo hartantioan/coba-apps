@@ -252,6 +252,7 @@ use App\Http\Controllers\Setting\UserActivityController;
 
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
+use App\Http\Controllers\Misc\OfficialReportController;
 
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
@@ -342,7 +343,6 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::middleware('lock')->group(function () {
-            Route::get('dashboard', [DashboardController::class, 'index']);
 
             Route::get('application_update', [ChangeLogController::class, 'index_log_update']);
             Route::get('currency_get', [CurrencyController::class, 'currencyGet']);
@@ -383,6 +383,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
+                Route::get('employee_for_ba', [Select2Controller::class, 'employeeForBa']);
                 Route::get('broker', [Select2Controller::class, 'broker']);
                 Route::get('user', [Select2Controller::class, 'user']);
                 Route::get('supplier', [Select2Controller::class, 'supplier']);
@@ -515,6 +516,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('dashboard')->group(function () {
+                Route::get('/', [DashboardController::class, 'index']);
                 Route::post('change_period', [DashboardController::class, 'changePeriod']);
                 Route::post('get_in_attendance', [DashboardController::class, 'getInAttendance']);
                 Route::post('get_out_attendance', [DashboardController::class, 'getOutAttendance']);
@@ -523,6 +525,19 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('menu')->group(function () {
                 Route::get('/', [MenuIndexController::class, 'index']);
+            });
+
+            Route::prefix('official_report')->middleware('direct.access')->middleware('lockacc')->group(function () {
+                Route::get('/', [OfficialReportController::class, 'index'])->middleware('operation.access:official_report,view');
+                Route::get('datatable', [OfficialReportController::class, 'datatable']);
+                Route::get('row_detail', [OfficialReportController::class, 'rowDetail']);
+                Route::post('show', [OfficialReportController::class, 'show']);
+                Route::post('get_code', [OfficialReportController::class, 'getCode']);
+                Route::post('create', [OfficialReportController::class, 'create'])->middleware('operation.access:official_report,update');
+                Route::post('destroy', [OfficialReportController::class, 'destroy'])->middleware('operation.access:official_report,delete');
+                Route::post('void_status', [OfficialReportController::class, 'voidStatus'])->middleware('operation.access:official_report,status');
+                Route::get('approval/{id}', [OfficialReportController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::get('print_individual/{id}', [OfficialReportController::class, 'printIndividual'])->withoutMiddleware('direct.access');
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {

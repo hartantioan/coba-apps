@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use App\Jobs\ResetStock;
 use App\Models\AdjustRate;
+use App\Models\OfficialReport;
 use App\Models\HistoryEmailDocument;
 use App\Models\ApprovalMatrix;
 use App\Models\LockPeriod;
@@ -1063,6 +1064,15 @@ class CustomHelper {
 			if($acl){
 				$acl->account->update([
 					'limit_credit'	=> $acl->new_credit_limit,
+				]);
+			}
+
+		}elseif($table_name == 'official_reports'){
+
+			$or = OfficialReport::find($table_id);
+			if($or){
+				$or->update([
+					'status'	=> '3',
 				]);
 			}
 			

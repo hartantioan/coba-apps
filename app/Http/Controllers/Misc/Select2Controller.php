@@ -826,6 +826,35 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function employeeForBa(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%");
+                })
+                ->where(function($query)use($request){
+                    if($request->arr_user){
+                        $query->whereNotIn('id',$request->arr_user);
+                    }
+                })
+                ->where('status','1')
+                ->where('type','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text'          => $d->employee_no.' - '.$d->name.' Pos. '.($d->position()->exists() ? $d->position->name : 'N/A'),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function employeeForBrand(Request $request)
     {
         $response = [];

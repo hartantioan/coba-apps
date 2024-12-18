@@ -530,6 +530,8 @@ class ResetCogsNewByDate11 implements ShouldQueue
 
         $productionhandover = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('productionBatch',function($query)use($area_id,$item_shading_id,$production_batch_id){
+            $query->where('id',$production_batch_id)->where('item_shading_id',$item_shading_id)->where('area_id',$area_id);
         })->where('item_id',$item_id)->get();
 
         $arrHandover = [];

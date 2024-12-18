@@ -298,6 +298,8 @@ class MarketingOrderInvoiceController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-4 white-text btn-small" data-popup="tooltip" title="No Ppbj" onclick="showPjb(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">mode_edit</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
+
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
@@ -957,7 +959,7 @@ class MarketingOrderInvoiceController extends Controller
             }else{
                 $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual',$menuUser->mode);
             }
-            
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
 
@@ -1608,6 +1610,63 @@ class MarketingOrderInvoiceController extends Controller
             ];
             $data_go_chart[]=$data_mo_invoice;
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_invoice',$query->id);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+
+
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+        }else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
+
+    }
+    public function simpleStructrueTree(Request $request){
+        $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $data_go_chart = [];
+        $data_link = [];
+
+        if($query){
+            $data_mo_invoice=[
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
+                ],
+                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($query->code),
+            ];
+            $data_go_chart[]=$data_mo_invoice;
+            $result = TreeHelper::simpleTree($data_go_chart,$data_link,'data_id_mo_invoice',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

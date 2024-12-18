@@ -2118,6 +2118,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [GoodReceiptPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('view_journal/{id}', [GoodReceiptPOController::class, 'viewJournal'])->middleware('operation.access:good_receipt_po,journal');
                     Route::get('viewstructuretree', [GoodReceiptPOController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [GoodReceiptPOController::class, 'simpleStructrueTree']);
                     Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
                     Route::post('get_purchase_order_all', [GoodReceiptPOController::class, 'getPurchaseOrderAll']);
                     Route::post('remove_used_data', [GoodReceiptPOController::class, 'removeUsedData']);
@@ -2842,6 +2843,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done', [MarketingOrderController::class, 'done'])->middleware('operation.access:sales_order,update');
                     Route::post('print_by_range', [MarketingOrderController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderController::class, 'simpleStructrueTree']);
                     Route::get('export_from_page', [MarketingOrderController::class, 'exportFromTransactionPage']);
                     Route::get('export_from_page_detail1', [MarketingOrderController::class, 'exportFromTransactionPageDetail1']);
                     Route::get('export_from_page_detail2', [MarketingOrderController::class, 'exportFromTransactionPageDetail2']);
@@ -2863,6 +2865,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [MarketingOrderDownPaymentController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderDownPaymentController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderDownPaymentController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderDownPaymentController::class, 'simpleStructrueTree']);
                     Route::post('remove_used_data', [MarketingOrderDownPaymentController::class, 'removeUsedData']);
                     Route::get('export_from_page', [MarketingOrderDownPaymentController::class, 'exportFromTransactionPage']);
                     Route::post('send_used_data', [MarketingOrderDownPaymentController::class, 'sendUsedData'])->middleware('operation.access:sales_down_payment,update');
@@ -2887,6 +2890,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [MarketingOrderDeliveryController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderDeliveryController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderDeliveryController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderDeliveryController::class, 'simpleStructrueTree']);
+
                     Route::post('get_marketing_order', [MarketingOrderDeliveryController::class, 'getMarketingOrder']);
                     Route::post('remove_used_data', [MarketingOrderDeliveryController::class, 'removeUsedData']);
                     Route::post('create', [MarketingOrderDeliveryController::class, 'create'])->middleware('operation.access:marketing_order_delivery,update');
@@ -2923,6 +2928,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [MarketingOrderDeliveryProcessController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderDeliveryProcessController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderDeliveryProcessController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderDeliveryProcessController::class, 'simpleStructrueTree']);
+
                     Route::post('get_marketing_order_delivery', [MarketingOrderDeliveryProcessController::class, 'getMarketingOrderDelivery']);
                     Route::post('remove_used_data', [MarketingOrderDeliveryProcessController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderDeliveryProcessController::class, 'viewJournal'])->middleware('operation.access:delivery_order,journal');
@@ -2953,6 +2960,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range', [MarketingOrderReturnController::class, 'printByRange']);
                     Route::get('export_from_page', [MarketingOrderReturnController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree', [MarketingOrderReturnController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderReturnController::class, 'simpleStructrueTree']);
                     Route::post('remove_used_data', [MarketingOrderReturnController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderReturnController::class, 'viewJournal'])->middleware('operation.access:marketing_order_return,journal');
                     Route::post('create', [MarketingOrderReturnController::class, 'create'])->middleware('operation.access:marketing_order_return,update');
@@ -2975,6 +2983,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [MarketingOrderInvoiceController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderInvoiceController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderInvoiceController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderInvoiceController::class, 'simpleStructrueTree']);
                     Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
@@ -2999,6 +3008,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print', [MarketingOrderMemoController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderMemoController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderMemoController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingOrderMemoController::class, 'simpleStructrueTree']);
                     Route::get('export_from_page', [MarketingOrderMemoController::class, 'exportFromTransactionPage']);
                     Route::post('remove_used_data', [MarketingOrderMemoController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderMemoController::class, 'viewJournal'])->middleware('operation.access:marketing_order_memo,journal');
@@ -3023,6 +3033,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page', [MarketingHandoverInvoiceController::class, 'exportFromTransactionPage']);
                     Route::post('print_by_range', [MarketingHandoverInvoiceController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingHandoverInvoiceController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MarketingHandoverInvoiceController::class, 'simpleStructrueTree']);
                     Route::post('create', [MarketingHandoverInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_handover_invoice,update');
                     Route::get('approval/{id}', [MarketingHandoverInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}', [MarketingHandoverInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -3037,6 +3048,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail', [MarketingOrderReceiptController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderReceiptController::class, 'show']);
                     Route::post('get_code', [MarketingOrderReceiptController::class, 'getCode']);
+                    Route::get('simplestructuretree', [MarketingOrderReceiptController::class, 'simpleStructrueTree']);
 
                     Route::get('export_from_page', [MarketingOrderReceiptController::class, 'exportFromTransactionPage']);
                     Route::post('get_marketing_invoice', [MarketingOrderReceiptController::class, 'getMarketingInvoice']);
@@ -3056,6 +3068,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done', [MarketingOrderHandoverReceiptController::class, 'done'])->middleware('operation.access:marketing_order_handover_receipt,update');
                     Route::get('row_detail', [MarketingOrderHandoverReceiptController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderHandoverReceiptController::class, 'show']);
+                    Route::get('simplestructuretree', [MarketingOrderHandoverReceiptController::class, 'simpleStructrueTree']);
                     Route::post('get_code', [MarketingOrderHandoverReceiptController::class, 'getCode']);
                     Route::post('get_marketing_receipt', [MarketingOrderHandoverReceiptController::class, 'getMarketingReceipt']);
                     Route::post('print', [MarketingOrderHandoverReceiptController::class, 'print']);

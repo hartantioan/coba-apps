@@ -371,6 +371,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -1918,6 +1919,68 @@ class MarketingOrderDeliveryProcessController extends Controller
 
             $data_go_chart[]= $data_marketing_order_process;
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_delivery_process',$query->id,1);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2;
+
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+
+
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+        }else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
+    }
+
+    public function simpleStructrueTree(Request $request){
+        $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
+
+
+
+        $data_go_chart=[];
+        $data_link=[];
+
+        if($query){
+            $data_marketing_order_process = [
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    /* ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')] */
+                 ],
+                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($query->code),
+            ];
+
+            $data_go_chart[]= $data_marketing_order_process;
+            $result = TreeHelper::simpleTree($data_go_chart,$data_link,'data_id_mo_delivery_process',$query->id,1);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

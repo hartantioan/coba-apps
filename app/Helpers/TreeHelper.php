@@ -8412,8 +8412,7 @@ class TreeHelper {
 
         ];
         $data_link = filterDuplicatesSimple($data_link);
-        info($data_link);
-        info($data_go_chart);
+
         return [$data_go_chart, $data_link];
 
     }

@@ -1084,7 +1084,6 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                console.log(response);
                 makeTreeOrg(response.message,response.link);
 
                 $('#modal3').modal('open');

@@ -69,6 +69,11 @@
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcelTransport();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">Excel Jasa Kirim</span>
+                                                            <i class="material-icons right">view_list</i>
+                                                        </a>
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="whatPrinting();">
                                                             <i class="material-icons hide-on-med-and-up">picture_as_pdf</i>
                                                             <span class="hide-on-small-onl">PDF</span>
@@ -165,6 +170,19 @@
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
         window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&item_id=" + item_id;
+
+    }
+
+    function exportExcelTransport(){
+
+        var item_id = $('#item_id').val();
+        if (!item_id) {
+            alert("Item ID cannot be empty. Please select an item.");
+            return false;
+        }
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+        window.location = "{{ Request::url() }}/export_transport_service?start_date=" + start_date+"&end_date=" + end_date + "&item_id=" + item_id;
 
     }
 

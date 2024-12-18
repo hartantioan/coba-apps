@@ -70,13 +70,13 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 $finance_kadar_air = $row->water_content - $take_item_rule_percent;
             }
             if($finance_kadar_air > 0){
-                $finance_kg = ($finance_kadar_air*$row->qty_in) / 100;
+                $finance_kg = ($finance_kadar_air*$row->qty_balance) / 100;
             }
-            $total_bayar = $row->qty_in;
+            $total_bayar = $row->qty_balance;
             if($finance_kadar_air > 0){
-                $total_bayar = $total_bayar-$finance_kadar_air;
+                $total_bayar = $total_bayar-$finance_kg;
             }
-            $total_penerimaan = $row->qty_in - (1 - ($row->water_content/100));
+            $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
             $price = $row->purchaseOrderDetail->price;
             $finance_price = $price*$total_bayar;
 
@@ -94,7 +94,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 'NO SJ'=> $row->delivery_no,
                 'TGL MASUK'=> date('d/m/Y',strtotime($row->post_date)),
                 'NO. KENDARAAN' =>$row->vehicle_no,
-                'NETTO JEMBATAN TIMBANG' =>$row->qty_in,
+                'NETTO JEMBATAN TIMBANG' =>$row->qty_balance,
                 'HASIL QC' =>$row->water_content,
                 'STD POTONGAN QC' =>$take_item_rule_percent,
                 'FINANCE Kadar air' =>$finance_kadar_air,

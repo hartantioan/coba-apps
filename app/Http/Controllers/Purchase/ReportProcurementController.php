@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Helpers\CustomHelper;
 use App\Exports\ExportReportProcurement;
+use App\Exports\ExportTransportService;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -58,6 +59,14 @@ class ReportProcurementController extends Controller
 		return Excel::download(new ExportReportProcurement($start_date,$finish_date,$item_id), 'report_procurement_'.uniqid().'.xlsx');
     }
 
+    public function exportTransportService(Request $request){
+        $start_date = $request->start_date ? $request->start_date : '';
+        $finish_date = $request->end_date ? $request->end_date : '';
+        $item_id = $request->item_id ? $request->item_id : '';
+
+		return Excel::download(new ExportTransportService($start_date,$finish_date,$item_id), 'report_jasa_angkut_'.uniqid().'.xlsx');
+    }
+
     public function printIndividual(Request $request){
 
         $query_data = GoodScale::where('post_date', '>=',$request->start_date)
@@ -103,13 +112,13 @@ class ReportProcurementController extends Controller
                             $finance_kadar_air = $detail_gs->water_content - $take_item_rule_percent;
                         }
                         if($finance_kadar_air > 0){
-                            $finance_kg = ($finance_kadar_air*$detail_gs->qty_in) / 100;
+                            $finance_kg = ($finance_kadar_air*$detail_gs->qty_balance) / 100;
                         }
-                        $total_bayar = $detail_gs->qty_in;
+                        $total_bayar = $detail_gs->qty_balance;
                         if($finance_kadar_air > 0){
-                            $total_bayar = $total_bayar-$finance_kadar_air;
+                            $total_bayar = $total_bayar-$finance_kg;
                         }
-                        $total_penerimaan = $detail_gs->qty_in - (1 - ($detail_gs->water_content/100));
+                        $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
                         $price = $detail_gs->purchaseOrderDetail->price;
                         $finance_price = $price*$total_bayar;
 
@@ -127,7 +136,7 @@ class ReportProcurementController extends Controller
                             'NO SJ'=> $detail_gs->delivery_no,
                             'TGL MASUK'=> date('d/m/Y',strtotime($detail_gs->post_date)),
                             'NO. KENDARAAN' =>$detail_gs->vehicle_no,
-                            'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->qty_in,2,',','.'),
+                            'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->qty_balance,2,',','.'),
                             'HASIL QC' =>number_format($detail_gs->water_content,2,',','.'),
                             'STD POTONGAN QC' =>number_format($take_item_rule_percent,2,',','.'),
                             'FINANCE Kadar air' =>number_format($finance_kadar_air,2,',','.'),

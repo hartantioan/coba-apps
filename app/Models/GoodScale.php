@@ -466,6 +466,19 @@ class GoodScale extends Model
         return $has;
     }
 
+    public function totalCost(){
+        $total = 0;
+        if($this->hasRitase()){
+            $total += $this->goodScaleDetail()->first()->total;
+        }else{
+            foreach($this->goodScaleDetail as $row){
+                $total += $row->total;
+            }
+        }
+        
+        return $total;
+    }
+
     public function getReceiveDateSj(){
         $date = $this->post_date;
         foreach($this->goodScaleDetail as $key => $row){

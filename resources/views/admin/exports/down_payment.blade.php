@@ -8,8 +8,6 @@
             <th class="center-align">Nama Supplier</th>
             <th class="center-align">{{ __('translations.type') }}</th>
             <th class="center-align">{{ __('translations.note') }}</th>
-            <th class="center-align">Total RP</th>
-            <th class="center-align">Total FC</th>
             <th class="center-align">Sisa RP</th>
             <th class="center-align">Sisa FC</th>
             <th class="center-align">Based On</th>
@@ -28,8 +26,6 @@
                 <td>{{ $row['supplier_name'] }}</td>
                 <td>{{ $row['type'] }}</td>
                 <td>{{ $row['note'] }}</td>
-                <td class="right-align">{{ $row['total'] }}</td>
-                <td class="right-align">{{ $row['total_fc'] }}</td>
                 <td class="right-align">{{ $row['balance'] }}</td>
                 <td class="right-align">{{ $row['balance_fc'] }}</td>
                 <td class="right-align">{{ $row['references'] }}</td>
@@ -40,7 +36,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="15" align="center">
+                <td colspan="13" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

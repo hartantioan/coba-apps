@@ -95,7 +95,7 @@
                                                 </thead>
                                                 <tbody id="detail-result">
                                                     <tr>
-                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -175,7 +175,7 @@
                         `);
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="center-align" colspan="8">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="9">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                         setTimeout(function () {

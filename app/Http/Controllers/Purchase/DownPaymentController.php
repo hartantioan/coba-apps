@@ -193,7 +193,9 @@ class DownPaymentController extends Controller
             $currency_rate = $row->latest_currency;
             /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
             if($balance > 0){
-                info($balance * $currency_rate);
+                if($row->post_date >= '2024-10-01'){
+                    $balance_after_adjust = round($balance * $currency_rate,2);
+                }
                 $results[] = [
                     'code'          => $row->code,
                     'supplier_name' => $row->name,

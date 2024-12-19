@@ -211,7 +211,7 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             if($date >= '2024-11-30'){
-                $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
+                $currency_rate = $row->latest_currency_before > 0 ? $row->latest_currency_before : $row->currency_rate;
                 $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
                 $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2);

@@ -185,6 +185,7 @@ class DownPaymentController extends Controller
             $total_adjust_new_rule = 0;
             if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
                 $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
+                info($total_adjust_new_rule);
             }
             $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
             $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);

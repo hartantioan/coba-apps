@@ -379,7 +379,7 @@
                     </div>
 
                     <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row" style="position: fixed;bottom: 60px; left: 0px; right: 45px;">
+                    <div class="invoice-subtotal break-row" style="position: fixed;bottom: 80px; left: 0px; right: 45px;">
                         <div class="row">
                         <div class="column1">
                             <table style="width:100%">
@@ -436,3 +436,4 @@
 
     </body>
 </html>
+

@@ -196,7 +196,7 @@ class DownPaymentController extends Controller
                     'post_date'     => date('d/m/Y',strtotime(  $row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
-                    'balance'       => number_format($balance_after_adjust,2,',','.'),
+                    'balance'       => number_format(round($balance * $currency_rate,2),2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
                 $totalbalance += round($balance_after_adjust,2);

@@ -182,7 +182,6 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $new_currency = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             $total_adjust_new_rule = 0;
             if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
                 $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
@@ -194,9 +193,6 @@ class DownPaymentController extends Controller
             $currency_rate = $row->latest_currency;
             /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
             if($balance > 0){
-                if($row->post_date >= '2024-10-01'){
-                    $balance_after_adjust = round($balance * $new_currency,2);
-                }
                 $results[] = [
                     'code'          => $row->code,
                     'supplier_name' => $row->name,

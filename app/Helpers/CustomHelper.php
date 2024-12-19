@@ -1462,6 +1462,7 @@ class CustomHelper {
 								'lookable_id'	=> $table_id,
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
+								'note'			=> $row->lookable->code.' - '.$row->lookable->account->name,
 							]);
 
 							if($row->lookable->tax > 0){

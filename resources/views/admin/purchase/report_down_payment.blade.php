@@ -89,18 +89,13 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Jatuh Tempo</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Diskon</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dipakai</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa RP</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa FC</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail-result">
                                                     <tr>
-                                                        <td class="center-align" colspan="13">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -166,11 +161,6 @@
                                     <td>` + val.post_date + `</td>
                                     <td>` + val.due_date + `</td>
                                     <td>` + val.note + `</td>
-                                    <td class="right-align">` + val.subtotal + `</td>
-                                    <td class="right-align">` + val.discount + `</td>
-                                    <td class="right-align">` + val.total + `</td>
-                                    <td class="right-align">` + val.used + `</td>
-                                    <td class="right-align">` + val.memo + `</td>
                                     <td class="right-align">` + val.balance + `</td>
                                     <td class="right-align">` + val.balance_fc + `</td>
                                 </tr>
@@ -178,14 +168,14 @@
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="right-align" colspan="12">Total</td>
+                                <td class="right-align" colspan="7">Total</td>
                                 <td class="right-align">` + response.totalbalance + `</td>
                                 <td class="right-align"></td>
                             </tr>
                         `);
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="center-align" colspan="14">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="8">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                         setTimeout(function () {

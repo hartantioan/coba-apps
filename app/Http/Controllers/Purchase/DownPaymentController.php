@@ -104,6 +104,19 @@ class DownPaymentController extends Controller
                         AND ard.type = '1'
                 ),0) AS adjust_nominal_latest,
                 IFNULL((SELECT
+                    SUM(ROUND(ard.nominal,2))
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date4
+                        AND ar.post_date >= '2024-11-30'
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pdp.id
+                        AND ard.type = '1'
+                ),0) AS adjust_nominal_after_update,
+                IFNULL((SELECT
                     ar.currency_rate
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
@@ -216,7 +229,7 @@ class DownPaymentController extends Controller
                 if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
                     $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal_latest,2);
                 }
-                $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
+                $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2) + $row->adjust_nominal_after_update;
                 $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2) + $total_adjust_new_rule;
                 $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);

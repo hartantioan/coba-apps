@@ -389,7 +389,7 @@ class GoodReceipt extends Model
         $currency_rate = $this->journal()->exists() ? $this->journal->currency_rate : 1;
         if($this->post_date < '2024-11-12'){
             foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
-                $query->where('post_date','<=',$date)->orderBy('post_date');
+                $query->where('post_date','<=',$date)->where('post_date','<','2024-10-31')->orderBy('post_date');
             })->get() as $row){
                 $currency_rate = $row->adjustRate->currency_rate;
             }

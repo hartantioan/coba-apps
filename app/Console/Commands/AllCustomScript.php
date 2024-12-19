@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\MinusStockModReminder;
 use App\Models\ActivityLog;
 use App\Models\ApprovalMatrix;
 use App\Models\GoodIssueRequest;
@@ -135,5 +136,8 @@ class AllCustomScript extends Command
         #delete weight history 7 day
         $dateThreshold = Carbon::now()->subDays(7);
         WeightHistory::where('created_at', '<', $dateThreshold)->delete();
+
+        #run stock mod outstand
+        MinusStockModReminder::dispatch();
     }
 }

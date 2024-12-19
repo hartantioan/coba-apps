@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 use App\Exports\ExportTransactionPageOrderDelivery;
 use App\Http\Controllers\Controller;
+use App\Jobs\MinusStockModReminder;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
 use App\Models\IncomingPayment;
@@ -698,6 +699,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->updateGrandtotal();
                         CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
                         CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code.' Tahap 1',$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                        MinusStockModReminder::dispatch();
                         activity()
                             ->performedOn(new MarketingOrderDelivery())
                             ->causedBy(session('bo_id'))

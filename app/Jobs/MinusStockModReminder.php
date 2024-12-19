@@ -108,7 +108,8 @@ class MinusStockModReminder implements ShouldQueue
         }
         if(count($array) > 0){
             $message = implode(', ',$array);
-            WaBlas::kirim_wa('081330074432','Halo, bund. Terdapat qty stock yang minus ya berikut daftarnya: \n'.$message);
+            WaBlas::kirim_wa('081365590831','Halo, bund. Terdapat qty stock yang minus ya berikut daftarnya: \n'.$message.' \nIni adalah pesan otomatis jangan dibalas ya. Terima kasih');
+            WaBlas::kirim_wa('081330074432','Halo, bund. Terdapat qty stock yang minus ya berikut daftarnya: \n'.$message.' \nIni adalah pesan otomatis jangan dibalas ya. Terima kasih');
         }
     }
 }

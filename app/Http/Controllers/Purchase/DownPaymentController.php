@@ -91,6 +91,19 @@ class DownPaymentController extends Controller
                         )
                 ),0) AS adjust_nominal,
                 IFNULL((SELECT
+                    SUM(ROUND(ard.nominal,2))
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date3
+                        AND ar.post_date <= '2024-11-30'
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pdp.id
+                        AND ard.type = '1'
+                ),0) AS adjust_nominal_latest,
+                IFNULL((SELECT
                     ar.currency_rate
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
@@ -103,6 +116,20 @@ class DownPaymentController extends Controller
                     ORDER BY ar.id DESC
                     LIMIT 1
                 ),0) AS latest_currency,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date4
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pdp.id
+                        AND ar.post_date < '2024-11-30'
+                    ORDER BY ar.id DESC
+                    LIMIT 1
+                ),0) AS latest_currency_before,
                 IFNULL((SELECT
                     ar.reverse_date
                     FROM adjust_rate_details ard
@@ -181,17 +208,23 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $total_adjust_new_rule = 0;
-            if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
-                $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
+            if($date >= '2024-11-30'){
+                $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
+                $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
+                $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2);
+                $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
+            }else{
+                $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
+                $total_adjust_new_rule = 0;
+                if($row->latest_reverse_date >= '2024-11-01' && $row->post_date >= '2024-10-01'){
+                    $total_adjust_new_rule = round(($row->total_used / $row->grandtotal) * $row->adjust_nominal,2);
+                }
+                $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
+                $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2) + $total_adjust_new_rule;
+                $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             }
-            $total_received_after_adjust = round($row->grandtotal * $currency_rate, 2);
-            $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
-            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2) + $total_adjust_new_rule;
-            $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
-            $currency_rate = $row->latest_currency;
-            /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,

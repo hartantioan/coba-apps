@@ -460,7 +460,7 @@
                     
                 </div>
             </div>
-            @if($data->type == '1' && $data->document_status == '3' && $data->account->type == '1')
+            {{-- @if($data->type == '1' && $data->document_status == '3' && $data->account->type == '1') --}}
                 <div class="part2" style="margin-top:1%">
                     <table border="0" width="100%" style="font-size:1em" class="tb-header">
                         <tr>
@@ -493,9 +493,15 @@
                                                 <td width="25%">
                                                     Nama
                                                 </td>
+                                                @if($data->account->type == '1')
                                                 <td width="75%">
                                                     : {{ strtoupper($data->account->name) }}
                                                 </td>
+                                                @else
+                                                <td width="75%">
+                                                    : {{ strtoupper($data->user->name) }}
+                                                </td>
+                                                @endif
                                             </tr>
                                             <tr>
                                                 <td>
@@ -529,6 +535,16 @@
                                                     : {{ strtoupper(CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text))) }}
                                                 </td>
                                             </tr>
+                                            @if($data->account->type !== '1')
+                                            <tr>
+                                                <td>
+                                                    Dibayarkan ke
+                                                </td>
+                                                <td>
+                                                    : {{ $data->bank_account.' '.$data->no_account.' '.$data->name_account }}
+                                                </td>
+                                            </tr>
+                                            @endif
                                             <tr>
                                                 <td>
                                                     Keperluan
@@ -540,32 +556,42 @@
                                         </table>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="left-align" style="padding-left: 30px;">
+                                        Dana yang diterima tersebut hanya dipergunakan sesuai kebutuhan tercantum.<br>
+                                        Saya bertanggungjawab untuk melakukan Tutup Bon Sementara ini maksimal selama 2 minggu hari kalender sejak tanggal pencairan dana.
+                                    </td>
+                                </tr>
                             </table>
                             <div class="invoice-subtotal break-row">
                                 <table class="table-bot1" width="100%" border="0" style="margin-top:50px;">
                                     <tr>
-                                        <td class="center-align" width="50%">
+                                        @if($data->account->type == '1')
+                                        <td class="center-align" width="100%">
                                             Dibuat oleh,
                                             <br><br><br><br>
                                             (......................................)
                                         </td>
-                                        <td class="center-align">
+                                        @endif
+                                        @if($data->account->type !== '1')
+                                        <td class="center-align" width="100%">
                                             Diterima oleh,
                                             <br><br><br><br>
                                             (......................................)
                                         </td>
+                                        @endif
                                     </tr>
                                 </table>
                                 <p style="font-size:13px !important;">
                                     Note:
-                                    <br>&nbsp;&nbsp;&nbsp;Dana yang diterima hanya untuk dipergunakan sesuai keperluan tercantum
+                                    {{-- <br>&nbsp;&nbsp;&nbsp;Dana yang diterima hanya untuk dipergunakan sesuai keperluan tercantum --}}
                                     <br>&nbsp;&nbsp;&nbsp;Pelaku penggelapan dalam jabatan diancam pidana penjara maksimal 5 (lima) tahun sesuai Pasal 374 KUHP
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endif
+            {{-- @endif --}}
         </main>
     </body>
 </html>

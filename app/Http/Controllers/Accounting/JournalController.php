@@ -356,10 +356,10 @@ class JournalController extends Controller
                 $totalDebit = 0;
                 $totalCredit = 0;
                 foreach($request->arr_nominal_debit as $key => $row){
-                    $totalDebit += str_replace(',','.',str_replace('.','',$row));
+                    $totalDebit += round(str_replace(',','.',str_replace('.','',$row)),2);
                 }
                 foreach($request->arr_nominal_credit as $key => $row){
-                    $totalCredit += str_replace(',','.',str_replace('.','',$row));
+                    $totalCredit += round(str_replace(',','.',str_replace('.','',$row)),2);
                 }
 
                 if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){

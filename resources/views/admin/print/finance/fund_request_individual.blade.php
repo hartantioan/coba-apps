@@ -583,7 +583,6 @@
                                     </tr>
                                 </table>
                                 <p style="font-size:13px !important;">
-                                    Note:
                                     {{-- <br>&nbsp;&nbsp;&nbsp;Dana yang diterima hanya untuk dipergunakan sesuai keperluan tercantum --}}
                                     <br>&nbsp;&nbsp;&nbsp;Pelaku penggelapan dalam jabatan diancam pidana penjara maksimal 5 (lima) tahun sesuai Pasal 374 KUHP
                                 </p>

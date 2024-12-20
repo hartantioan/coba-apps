@@ -946,7 +946,7 @@
 
     $(function() {
 
-        $('#datatable_serverside').on('click', 'button', function(event) {
+        $('#datatable_serverside').on('click', 'button,a', function(event) {
             event.stopPropagation();
 
         });

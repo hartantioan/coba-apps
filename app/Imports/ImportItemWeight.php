@@ -53,7 +53,7 @@ class handleItemWeight implements   OnEachRow, WithHeadingRow
 
                     if(!$query_update){
                         $query = ItemWeightFg::create([
-                            'code'              => strtoupper(Str::random(15)),
+                            'code'              => $item_code,
                             'user_id'           => session('bo_id'),
                             'item_id'           => $item->id,
                             'gross_weight'           => $row['berat_gross'],
@@ -61,6 +61,7 @@ class handleItemWeight implements   OnEachRow, WithHeadingRow
                         ]);
                     }else{
                         $query_update->update([
+                            'code'                  => $item_code,
                             'user_id'               => session('bo_id'),
                             'gross_weight'          => $row['berat_gross'],
                             'netto_weight'          => $row['berat_netto'],

@@ -175,7 +175,8 @@ class ItemWeightController extends Controller
     public function show(Request $request){
         $dc = ItemWeightFg::find($request->id);
         $dc['item'] = $dc->item;
-
+        $dc['gross_weight'] = number_format($dc->gross_weight,2,',','.');
+        $dc['netto_weight'] = number_format($dc->netto_weight,2,',','.');
 		return response()->json($dc);
     }
 

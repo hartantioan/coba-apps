@@ -539,48 +539,13 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#code').val(response.code);
-                $('#name').val(response.name);
-                $('#valid_from').val(response.valid_from);
-                $('#valid_to').val(response.valid_to);
-                $('#tonnage').val(response.tonnage);
-                $('#ritage').val(response.ritage);
-                $('#qty_tonnage').val(response.qty_tonnage);
-                $('#transportation_id').val(response.transportation_id).formSelect();
+                $('#gross_weight').val(response.gross_weight);
+
+                $('#netto_weight').val(response.netto_weight);
                 $('#item_id').empty().append(`
-                    <option value="` + response.item_id + `">` + response.account_name + `</option>
+                    <option value="` + response.item.id + `">` + response.item.code+ response.item.name + `</option>
                 `);
-                $('#from_city_id').empty().append(`
-                    <option value="` + response.from_city_id + `">` + response.from_city_name + `</option>
-                `);
-                $('#to_city_id').empty().append(`
-                    <option value="` + response.to_city_id + `">` + response.to_city_name + `</option>
-                `);
-
-                $('#from_subdistrict_id').empty();
-                $.each(response.from_subdistrict_list, function(i, value) {
-                    $('#from_subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                    `);
-                });
-
-                $('#to_subdistrict_id').empty();
-                $.each(response.to_subdistrict_list, function(i, value) {
-                    $('#to_subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                    `);
-                });
-
-                $('#from_subdistrict_id').val(response.from_subdistrict_id).trigger('change');
-                $('#to_subdistrict_id').val(response.to_subdistrict_id).trigger('change');
-
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
                 $('.modal-content').scrollTop(0);
-                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {

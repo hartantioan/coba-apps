@@ -536,7 +536,9 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function purchaseOrderDetail()
     {
-        return $this->hasOne('App\Models\PurchaseOrderDetail');
+        return $this->hasOne('App\Models\PurchaseOrderDetail')->whereHas('purchaseOrder',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function getArrStatusTracking(){

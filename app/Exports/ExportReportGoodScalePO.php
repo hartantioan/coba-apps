@@ -49,6 +49,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
         'Harga/Kg',
         'Total',
         'No. APIN',
+        'Total detail',
     ];
 
 
@@ -119,9 +120,9 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                     $cost = $row->total;
                 }
             }
-            if($po_total < $cost){
-                $cost = $po_total;
-            }
+            // if($po_total < $cost){
+            //     $cost = $po_total;
+            // }
             $arr[] = [
                 'no'                     => ($key+1),
                 'no_document'            => $row->goodScale->code,
@@ -149,6 +150,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Harga'             => $price,
                 'Total'             => $cost,
                 'No. APIN'             => $list,
+                'totaldetail'             => $po_total,
 
             ];
 

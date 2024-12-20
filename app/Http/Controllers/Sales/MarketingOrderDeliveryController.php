@@ -448,7 +448,7 @@ class MarketingOrderDeliveryController extends Controller
                         $item[$value] = 0;
                     }
                     $quantity = str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
-                    $item[$value] += (float)$quantity;
+                    $item[$value] += round($quantity,3);
                 }
                 $error = [];
                 foreach($item as $key => $value) {

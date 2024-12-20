@@ -56,14 +56,17 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
     public function collection()
     {
         $query_data = GoodScaleDetail::whereHas('goodScale',function($query){
-            if($this->start_date && $this->finish_date) {
-                $query->whereDate('post_date', '>=', $this->start_date)
-                    ->whereDate('post_date', '<=', $this->finish_date);
-            } else if($this->start_date) {
-                $query->whereDate('post_date','>=', $this->start_date);
-            } else if($this->finish_date) {
-                $query->whereDate('post_date','<=', $this->finish_date);
-            }
+            $query->whereHas('journal',function($query){
+                if($this->start_date && $this->finish_date) {
+                    $query->whereDate('post_date', '>=', $this->start_date)
+                        ->whereDate('post_date', '<=', $this->finish_date);
+                } else if($this->start_date) {
+                    $query->whereDate('post_date','>=', $this->start_date);
+                } else if($this->finish_date) {
+                    $query->whereDate('post_date','<=', $this->finish_date);
+                }
+            });
+
 
             if($this->status){
                 $status = explode(',',$this->status);

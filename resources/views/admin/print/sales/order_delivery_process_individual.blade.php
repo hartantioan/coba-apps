@@ -150,7 +150,7 @@
                     </td>
                     <td width="33%" align="center">
                         <h5 style="margin-top:30px;"><br></h5>
-                        <h5 style="margin-top:0px;margin-left:-15px;">{{ $data->code }}</h5>
+                        <h4 style="margin-top:0px;margin-left:-15px;">{{ $data->code }}</h4>
                         <div style="margin-top:-10px">
 
                             <span style="font-size:10px;margin-left:-15px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>

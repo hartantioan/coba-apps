@@ -413,7 +413,7 @@
                         <table style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
                             <tr>
                                 <td></td>
-                                <td class="right-align" style="padding-right:15px" >Total</td>
+                                <td class="right-align" style="padding-right:15px" >Total DPP</td>
                                 <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="31.5%">{{ $data->currency->code.'.'.number_format($data->total,2,',','.') }}</td>
                             </tr class="break-row">
                             <tr class="break-row">
@@ -421,6 +421,14 @@
                                 <td class="right-align" style="padding-right:15px">PPN</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->tax,2,',','.') }}</td>
                             </tr>
+                            @php
+                                $total_dpp_ppn = $data->total + $data->tax;
+                            @endphp
+                            <tr>
+                                <td></td>
+                                <td class="right-align" style="padding-right:15px" >DPP + PPN</td>
+                                <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="31.5%">{{ $data->currency->code.'.'.number_format($total_dpp_ppn,2,',','.') }}</td>
+                            </tr class="break-row">
                             <tr class="break-row">
                                 <td class="right-align">PPh(%): {{ $uniquePphString }}</td>
                                 <td class="right-align" style="padding-right:15px">PPh</td>

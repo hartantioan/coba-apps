@@ -171,7 +171,7 @@
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
-                    <table border="0" width="100%" style="padding-top: 45px;margin-left:-20px;font-size:8px !important">
+                    <table border="0" width="100%" style="padding-top: 45px;margin-left:-20px;font-size:9px !important">
                         <tr>
                             <td width="50%" class="left-align">
                                 <table border="0" width="100%" style="border-spacing: 0;">

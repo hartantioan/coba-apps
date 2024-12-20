@@ -448,12 +448,13 @@ class MarketingOrderDeliveryController extends Controller
                         $item[$value] = 0;
                     }
                     $quantity = str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
-                    $item[$value] += round($quantity,3);
+                    $conversion = str_replace(',', '.', str_replace('.', '', $request->arr_conversion[$key]));
+                    $item[$value] += round($quantity * $conversion,3);
                 }
                 $error = [];
                 foreach($item as $key => $value) {
                     $item = Item::where('id', $key)->first();
-                    $stock = $item->getStockAll();
+                    $stock = round($item->getStockAll(),3);
 
                     if ($stock < $value) {
                         $error[]=$item->name;

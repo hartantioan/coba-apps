@@ -95,11 +95,23 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
 
             $price = 0;
             $customer = $row->goodScale->account->name;
+            $december16 = strtotime("2024-12-16 00:00:00");
             if($row->lookable->type_delivery != '1'){
-                $price = $row->findProportionCost() / ($row->qty == 0 ? 1 : $row->qty);
+                if (strtotime($row->goodScale->post_date) > $december16) {
+                    $cost = $row->findProportionCost();
+                }else{
+                    $cost = $row->total;
+                }
+                $price = $cost / ($row->qty == 0 ? 1 : $row->qty);
                 $customer = $row->lookable->customer->name;
-            }
+            }else{
+                if (strtotime($row->goodScale->post_date) > $december16) {
 
+                    $cost = $row->findProportionCost();
+                }else{
+                    $cost = $row->total;
+                }
+            }
             $arr[] = [
                 'no'                     => ($key+1),
                 'no_document'            => $row->goodScale->code,
@@ -125,7 +137,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Ekspedisi'             => $row->goodScale->account->name,
                 'Qty'            => $row->qty,
                 'Harga'             => $price,
-                'Total'             => $row->findProportionCost(),
+                'Total'             => $cost,
                 'No. APIN'             => $list,
 
             ];

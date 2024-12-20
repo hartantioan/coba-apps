@@ -1815,8 +1815,14 @@ class MarketingOrderInvoiceController extends Controller
         $invoice = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->temp_pjb_invoice))->first();
         if($invoice){
             $invoice->update([
-                'no_pjb'=>$request->no_pjb,
+                'no_pjb'=>  $request->no_pjb,
+                'note'  =>  $request->note_pjb,
             ]);
+            if($invoice->journal()->exists()){
+                $invoice->journal->update([
+                    'note'  => $invoice->code.' - '.$request->note_pjb
+                ]);
+            }
             $response = [
                 'status'  => 200,
                 'message' => 'Data Ppbj Berhasil Disimpan.'

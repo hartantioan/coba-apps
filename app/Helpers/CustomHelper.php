@@ -4156,7 +4156,7 @@ class CustomHelper {
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->code.' - '.$data->note,
 				'status'		=> '3'
 			]);
 

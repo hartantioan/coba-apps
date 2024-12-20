@@ -507,12 +507,16 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m12 s12">
+                            <div class="input-field col m4 s12">
 
                                 <input type="hidden" id="temp_pjb_invoice" name="temp_pjb_invoice">
                                 <input id="no_pjb" name="no_pjb" type="text" >
 
-                                <label class="" for="no_pjb">No Ppbj</label>
+                                <label class="active" for="no_pjb">No Ppbj</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <textarea id="note_pjb" name="note_pjb" placeholder="Catatan / Keterangan" rows="10"></textarea>
+                                <label class="" for="note_pjb">Keterangan Invoice</label>
                             </div>
                         </div>
                     </div>
@@ -988,9 +992,11 @@
 
             },
             onOpenEnd: function(modal, trigger) {
+                M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_pjb')[0].reset();
+                M.updateTextFields();
             }
         });
 
@@ -2688,6 +2694,7 @@
                 $('#modal_update_pjb').modal('open');
                 $('#temp_pjb_invoice').val(id);
                 $('#no_pjb').val(response.no_pjb);
+                $('#note_pjb').val(response.note);
 
                 M.updateTextFields();
             },

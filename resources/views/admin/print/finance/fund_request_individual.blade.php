@@ -460,7 +460,7 @@
                     
                 </div>
             </div>
-            {{-- @if($data->type == '1' && $data->document_status == '3' && $data->account->type == '1') --}}
+            @if($data->type == '1' && $data->document_status == '3')
                 <div class="part2" style="margin-top:1%">
                     <table border="0" width="100%" style="font-size:1em" class="tb-header">
                         <tr>
@@ -590,7 +590,7 @@
                         </div>
                     </div>
                 </div>
-            {{-- @endif --}}
+            @endif
         </main>
     </body>
 </html>

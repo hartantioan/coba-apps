@@ -536,7 +536,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function purchaseOrderDetail()
     {
-        return $this->hasMany('App\Models\PurchaseOrderDetail');
+        return $this->hasOne('App\Models\PurchaseOrderDetail');
     }
 
     public function getArrStatusTracking(){
@@ -949,7 +949,7 @@ class MarketingOrderDeliveryProcess extends Model
                                             'detailable_type'=> $row->getTable(),
                                             'detailable_id'	=> $row->id,
                                         ]);
-    
+
                                         JournalDetail::create([
                                             'journal_id'	=> $query->id,
                                             'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,

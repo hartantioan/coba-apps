@@ -49,6 +49,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
         'Harga/Kg',
         'Total',
         'No. APIN',
+        'Total detail',
     ];
 
 
@@ -81,17 +82,24 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
         ->get();
         $arr = [];
         foreach($query_data as $key=>$row){
+            $po_total = 0;
             if($row->goodScale->type == '1' || $row->goodScale->type =='3'){
                 $no_sj = $row->goodScale->delivery_no ?? '-';
             }else{
                 $no_sj = $row->lookable->marketingOrderDeliveryProcess->code ?? '-';
+
+
             }
             $po_code = '-';
             $list = '';
             if($row->goodScale->purchaseOrder()->exists()){
                 $po_code =$row->goodScale->purchaseOrder->code;
                 $list = $row->goodScale->purchaseOrder->getInvoice();
+                $subtotal = $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->subtotal * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate;
+                $discount = $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->discountHeader() * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate;
+                $po_total = $subtotal-$discount;
             }
+
 
             $price = 0;
             $customer = $row->goodScale->account->name;
@@ -111,6 +119,9 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 }else{
                     $cost = $row->total;
                 }
+            }
+            if($po_total < $cost){
+                $cost = $po_total;
             }
             $arr[] = [
                 'no'                     => ($key+1),
@@ -139,6 +150,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Harga'             => $price,
                 'Total'             => $cost,
                 'No. APIN'             => $list,
+                'totaldetail'             => $po_total,
 
             ];
 

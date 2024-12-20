@@ -362,7 +362,7 @@ class JournalController extends Controller
                     $totalCredit += round(str_replace(',','.',str_replace('.','',$row)),2);
                 }
 
-                if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
+                if(round($totalDebit - $totalCredit,2) > 0 || round($totalDebit - $totalCredit,2) < 0){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))

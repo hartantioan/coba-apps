@@ -230,9 +230,7 @@
                                                 <tfoot>
                                                     <tr>
                                                         <td colspan="7" class="center-align">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','0')" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Bahan
-                                                            </a>
+                                                            
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -258,6 +256,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect cyan waves-light mr-1" onclick="addDetail('items','0')">Bahan <i class="material-icons right">add</i></button>
         <button class="btn waves-effect green waves-light mr-1 submit" onclick="addAlternative();">Tambah Alternatif <i class="material-icons right">playlist_add</i></button>
         <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>

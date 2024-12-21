@@ -61,6 +61,8 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
         $arr = [];
 
+        $total = 0;
+        
         foreach($query_data as $key => $row){
             if($this->start_date && $this->end_date) {
                 $periode = "DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= '$this->end_date'";
@@ -147,7 +149,9 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 $total_credit += round($rowcredit->nominal,2);
             }
 
-            $ending_total  = $balance + $total_debit - $total_credit;
+            $ending_total = round($balance + $total_debit - $total_credit,2);
+
+            $total += $ending_total;
 
             $arr[] = [
                 'id'            => ($key + 1),
@@ -160,6 +164,17 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 'ending_total'  => number_format($ending_total, 2, ',', '.'),
             ];
         }
+
+        $arr[] = [
+            'id'            => '',
+            'code'          => '',
+            'name'          => '',
+            'company'       => '',
+            'balance'       => '',
+            'ending_debit'  => '',
+            'ending_credit' => 'TOTAL',
+            'ending_total'  => number_format($total, 2, ',', '.'),
+        ];
 
         activity()
             ->performedOn(new Coa())

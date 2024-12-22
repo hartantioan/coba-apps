@@ -1563,13 +1563,14 @@ class PurchaseInvoiceController extends Controller
                     <div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="9">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item / Biaya</th>
                                 <th class="center-align">Keterangan 1</th>
                                 <th class="center-align">Keterangan 2</th>
+                                <th class="center-align">Referensi</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPh</th>
@@ -1591,6 +1592,7 @@ class PurchaseInvoiceController extends Controller
                     <td class="center-align">'.$row->getCode().'</td>
                     <td class="">'.$row->note.'</td>
                     <td class="">'.$row->note2.'</td>
+                    <td>'.$row->getHeaderCode().'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
@@ -1598,7 +1600,7 @@ class PurchaseInvoiceController extends Controller
                 </tr>';
             }
             $string .= '<tr>
-                    <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                    <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"> Total </td>
                     <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
                     <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
                     <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpph, 2, ',', '.') . '</td>
@@ -1607,7 +1609,7 @@ class PurchaseInvoiceController extends Controller
             ';
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="6">Data detail tidak ditemukan.</td>
+                <td class="center-align" colspan="7">Data detail tidak ditemukan.</td>
             </tr>';
         }
 

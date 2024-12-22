@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 class DeliveryScanController extends Controller
 {

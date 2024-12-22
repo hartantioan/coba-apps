@@ -116,7 +116,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
             $balance_credit = $datacreditbefore[0]->total;
 
-            $balance = $balance_debit - $balance_credit;
+            $balance = round($balance_debit,2) - round($balance_credit,2);
 
             $total_debit = 0;
             $total_credit = 0;

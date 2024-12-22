@@ -131,7 +131,8 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                     jd.coa_id = :coa_id 
                     AND jd.deleted_at IS NULL
                     AND j.deleted_at IS NULL
-                    j.post_date >= :date1 AND j.post_date <= :date2
+                    AND j.post_date >= :date1 
+                    AND j.post_date <= :date2
                     AND jd.type = '1'
                     AND j.status IN ('2','3')
             ", array(
@@ -150,7 +151,8 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                     jd.coa_id = :coa_id 
                     AND jd.deleted_at IS NULL
                     AND j.deleted_at IS NULL
-                    j.post_date >= :date1 AND j.post_date <= :date2
+                    AND j.post_date >= :date1 
+                    AND j.post_date <= :date2
                     AND jd.type = '2'
                     AND j.status IN ('2','3')
             ", array(

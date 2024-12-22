@@ -485,6 +485,8 @@ class ProductionFgReceiveController extends Controller
                 $arrItem = [];
                 $arrQty = [];
                 $passedBatchCode = true;
+                $arrItemCheckId = [];
+                $arrItemCheckQty = [];
 
                 if($request->arr_production_batch_id){
                     foreach($request->arr_production_batch_id as $key => $row){
@@ -495,6 +497,7 @@ class ProductionFgReceiveController extends Controller
                             $index = array_search($row,$arrBatch);
                             $arrBatchQty[$index] += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
                         }
+                        
                     }
                 }
 
@@ -522,30 +525,40 @@ class ProductionFgReceiveController extends Controller
                             $passedBatchCode = false;
                         }
 
-                        $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
-                            $query->where('item_id',$row)->orderByDesc('created_at');
-                        })->whereNotNull('is_default')->first();
+                        if(!in_array($row,$arrItemCheckId)){
+                            $arrItemCheckId[] = $row;
+                            $arrItemCheckQty[] = round(str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
+                        }else{
+                            $index = array_search($row,$arrItemCheckId);
+                            $arrItemCheckQty[$index] += round(str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
+                        }
+                    }
+                }
 
-                        if($bomAlternative){
-                            foreach($bomAlternative->bomDetail()->where('lookable_type','items')->get() as $rowbom){
+                foreach($arrItemCheckId as $key => $row){
+                    $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                        $query->where('item_id',$row)->orderByDesc('created_at');
+                    })->whereNotNull('is_default')->first();
+
+                    if($bomAlternative){
+                        foreach($bomAlternative->bomDetail()->where('lookable_type','items')->get() as $rowbom){
+                            if(!in_array($rowbom->lookable_id,$arrItem)){
+                                $arrItem[] = $rowbom->lookable_id;
+                                $arrQty[] = round($rowbom->qty * ($arrItemCheckQty[$key] / $rowbom->bom->qty_output),3);
+                            }else{
+                                $index = array_search($rowbom->lookable_id,$arrItem);
+                                $arrQty[$index] += round($rowbom->qty * ($arrItemCheckQty[$key] / $rowbom->bom->qty_output),3);
+                            }
+                        }
+
+                        if($bomAlternative->bom->bomStandard()->exists()){
+                            foreach($bomAlternative->bom->bomStandard->bomStandardDetail()->where('lookable_type','items')->get() as $rowbom){
                                 if(!in_array($rowbom->lookable_id,$arrItem)){
                                     $arrItem[] = $rowbom->lookable_id;
-                                    $arrQty[] = round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
+                                    $arrQty[] = round($rowbom->qty * $arrItemCheckQty[$key],3);
                                 }else{
                                     $index = array_search($rowbom->lookable_id,$arrItem);
-                                    $arrQty[$index] += round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
-                                }
-                            }
-
-                            if($bomAlternative->bom->bomStandard()->exists()){
-                                foreach($bomAlternative->bom->bomStandard->bomStandardDetail()->where('lookable_type','items')->get() as $rowbom){
-                                    if(!in_array($rowbom->lookable_id,$arrItem)){
-                                        $arrItem[] = $rowbom->lookable_id;
-                                        $arrQty[] = round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
-                                    }else{
-                                        $index = array_search($rowbom->lookable_id,$arrItem);
-                                        $arrQty[$index] += round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
-                                    }
+                                    $arrQty[$index] += round($rowbom->qty * $arrItemCheckQty[$key],3);
                                 }
                             }
                         }
@@ -711,48 +724,7 @@ class ProductionFgReceiveController extends Controller
 
                     $qtyReject = $totalBatch - $totalQty;
 
-                    $totalCostAll = $totalCost;
-
                     foreach($request->arr_qty_uom as $key => $row){
-                        /* $rowtotalbatch = round(round(str_replace(',','.',str_replace('.','',$row)) / $totalQty,3) * $totalCost,2);
-                        $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
-                        $rowtotalmaterial = 0;
-                        $bom_id = NULL;
-
-                        $bomAlternative = BomAlternative::whereHas('bom',function($query)use($request,$key){
-                            $query->where('item_id',$request->arr_item_id[$key])->orderByDesc('created_at');
-                        })->whereNotNull('is_default')->first();
-
-                        if($bomAlternative){
-                            foreach($bomAlternative->bomDetail as $rowbom){
-                                if($rowbom->lookable_type == 'items'){
-                                    $item = Item::find($rowbom->lookable_id);
-                                    if($item){
-                                        $price = $item->priceNowProduction($request->place_id,$request->post_date);
-                                        $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $price,2);
-                                    }
-                                }elseif($rowbom->lookable_type == 'resources'){
-                                    $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
-                                }
-                            }
-                            $bom_id = $bomAlternative->bom_id;
-                            if($bomAlternative->bom->bomStandard()->exists()){
-                                foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
-                                    if($rowbom->lookable_type == 'items'){
-                                        $item = Item::find($rowbom->lookable_id);
-                                        if($item){
-                                            $price = $item->priceNowProduction($request->place_id,$request->post_date);
-                                            $rowtotalmaterial += round(round($rowbom->qty * str_replace(',','.',str_replace('.','',$row)),3) * $price,2);
-                                        }
-                                    }elseif($rowbom->lookable_type == 'resources'){
-                                        $rowtotalmaterial += round(round($rowbom->qty * str_replace(',','.',str_replace('.','',$row)),3) * $rowbom->nominal,2);
-                                    }
-                                }
-                            }
-                        }
-
-                        $rowtotal = $rowtotalbatch + $rowtotalmaterial; */
-
                         $pfrd = ProductionFgReceiveDetail::create([
                             'production_fg_receive_id'  => $query->id,
                             'item_id'                   => $request->arr_item_id[$key],
@@ -765,9 +737,6 @@ class ProductionFgReceiveController extends Controller
                             'conversion'                => str_replace(',','.',str_replace('.','',$request->arr_qty_convert[$key])),
                             'pallet_id'                 => $request->arr_pallet_id[$key],
                             'grade_id'                  => $request->arr_grade_id[$key],
-                            /* 'total_batch'               => $rowtotalbatch,
-                            'total_material'            => $rowtotalmaterial,
-                            'total'                     => $rowtotal, */
                             'total_batch'               => 0,
                             'total_material'            => 0,
                             'total'                     => 0,

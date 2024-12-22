@@ -64,7 +64,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
         $total = 0;
         
         foreach($query_data as $key => $row){
-            if($this->start_date && $this->end_date) {
+            /* if($this->start_date && $this->end_date) {
                 $periode = "DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= '$this->end_date'";
             } else if($this->start_date) {
                 $periode = "DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= CURDATE()";
@@ -72,7 +72,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 $periode = "DATE(post_date) >= CURDATE() AND DATE(post_date) <= '$this->end_date'";
             } else {
                 $periode = "";
-            }
+            } */
             $balance_debit = 0;
             $balance_credit = 0;
 
@@ -116,38 +116,51 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
             $balance_credit = $datacreditbefore[0]->total;
 
-            $balance = round($balance_debit,2) - round($balance_credit,2);
+            $balance = $balance_debit - $balance_credit;
 
             $total_debit = 0;
             $total_credit = 0;
 
-            $ending_debit  = $row->journalDebit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode)
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
-                        }
-                    });
-            })->get();
+            $ending_debit  = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    j.post_date >= :date1 AND j.post_date <= :date2
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $row->id,
+                'date1'     => $this->start_date,
+                'date2'     => $this->start_date,
+            ));
             
-            $ending_credit = $row->journalCredit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode)
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
-                        }
-                    });
-            })->get();
+            $ending_credit  = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    j.post_date >= :date1 AND j.post_date <= :date2
+                    AND jd.type = '2'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $row->id,
+                'date1'     => $this->start_date,
+                'date2'     => $this->start_date,
+            ));
 
-            foreach($ending_debit as $rowdebit){
-                $total_debit += round($rowdebit->nominal,2);
-            }
-
-            foreach($ending_credit as $rowcredit){
-                $total_credit += round($rowcredit->nominal,2);
-            }
+            $total_debit = $ending_debit[0]->total;
+            $total_credit = $ending_credit[0]->total;
 
             $ending_total = round($balance + $total_debit - $total_credit,2);
 

@@ -201,124 +201,132 @@ class DeliveryScanController extends Controller
     }
 
     public function create(Request $request){
-        $query = MarketingOrderDeliveryProcess::find($request->temp);
-        if($query){
-            $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$request->temp)
-            ->whereIn('status',values: ['2'])->get();
+        DB::beginTransaction();
+        try {
+            $query = MarketingOrderDeliveryProcess::find($request->temp);
+            if($query){
+                $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$request->temp)
+                ->whereIn('status',values: ['2'])->get();
 
-            if(count($query_track) > 0){
+                if(count($query_track) > 0){
 
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Gagal Simpan , Dokumen telah di scan pada '. date('d/m/Y H:i:s', strtotime($query_track->first()->created_at))
-                ];
-                return response()->json($response);
-            }
-
-            if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Dokumen belum memiliki Surat Jalan'
-                ];
-                return response()->json($response);
-            }
-
-            if($query->status == '2'){
-
-                $delivery_scan = DeliveryScan::create([
-                    'user_id'		            => session('bo_id'),
-                    'lookable_type'             => 'marketing_order_delivery_processes',
-                    'lookable_id'               => $query->id,
-                    'post_date'                 => now(),
-                ]);
-                if($delivery_scan){
-                    MarketingOrderDeliveryProcessTrack::create([
-                        'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
-                        'marketing_order_delivery_process_id'   => $request->temp,
-                        'status'                                => '2',
-                    ]);
-                    $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($querys) use($query) {
-                        $querys->whereHas('goodScaleDetail', function($querys) use($query) {
-                            $querys->where('lookable_type','marketing_order_deliveries')
-                            ->where('lookable_id',$query->marketingOrderDelivery->id);
-                        });
-                    })->first();
-                    if($truckQueueDetail){
-                        $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
-                        $header_queue->update([
-                            'status'=>'6',
-                        ]);
-                    }
-
-                    activity()
-                        ->performedOn(new MarketingOrderDeliveryProcess())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Update sent journal document DO.');
-
-                    $query->createJournalSentDocument();
                     $response = [
-                        'status'    => 200,
-                        'message'   => 'Data Sukses Discan  dan Disimpan.',
+                        'status'  => 500,
+                        'message' => 'Gagal Simpan , Dokumen telah di scan pada '. date('d/m/Y H:i:s', strtotime($query_track->first()->created_at))
                     ];
+                    return response()->json($response);
+                }
+
+                if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Dokumen belum memiliki Surat Jalan'
+                    ];
+                    return response()->json($response);
+                }
+
+                if($query->status == '2'){
+
+                    $delivery_scan = DeliveryScan::create([
+                        'user_id'		            => session('bo_id'),
+                        'lookable_type'             => 'marketing_order_delivery_processes',
+                        'lookable_id'               => $query->id,
+                        'post_date'                 => now(),
+                    ]);
+                    if($delivery_scan){
+                        MarketingOrderDeliveryProcessTrack::create([
+                            'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                            'marketing_order_delivery_process_id'   => $request->temp,
+                            'status'                                => '2',
+                        ]);
+                        $truckQueueDetail = TruckQueueDetail::whereHas('goodScale', function($querys) use($query) {
+                            $querys->whereHas('goodScaleDetail', function($querys) use($query) {
+                                $querys->where('lookable_type','marketing_order_deliveries')
+                                ->where('lookable_id',$query->marketingOrderDelivery->id);
+                            });
+                        })->first();
+                        if($truckQueueDetail){
+                            $header_queue = TruckQueue::find($truckQueueDetail->truck_queue_id);
+                            $header_queue->update([
+                                'status'=>'6',
+                            ]);
+                        }
+
+                        activity()
+                            ->performedOn(new MarketingOrderDeliveryProcess())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Update sent journal document DO.');
+
+                        $query->createJournalSentDocument();
+                        $response = [
+                            'status'    => 200,
+                            'message'   => 'Data Sukses Discan  dan Disimpan.',
+                        ];
+                    }else{
+                        $response = [
+                            'status'  => 500,
+                            'message' => 'Data failed to save.'
+                        ];
+                    }
+                    return response()->json($response);
                 }else{
                     $response = [
                         'status'  => 500,
-                        'message' => 'Data failed to save.'
+                        'message' => 'Status Dokumen Harus Dalam status Proses'
                     ];
-                }
-                return response()->json($response);
-            }else{
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Status Dokumen Harus Dalam status Proses'
-                ];
 
-            }
-        }else{
-            $query = TruckQueue::where('code_barcode',$request->temp)->latest()->first();
-            if($query){
-                if($query->status == '6'){
-                    $response = [
-                        'status'    => 500,
-                        'message'   => 'Antrian sudah keluar Pabrik',
-                    ];
-                }else{
-                    if($query->truckQueueDetail->goodScale()->exists()){
-                        foreach($query->truckQueueDetail->goodScale->goodScaleDetail as $row_detail_gs ){
-                            if($row_detail_gs->lookable->marketingOrderDeliveryProcess()->exists()){
-                                $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$row_detail_gs->lookable->marketingOrderDeliveryProcess->id)->where('status','2')->first();
-                                if(!$ceksent){
-                                    MarketingOrderDeliveryProcessTrack::create([
-                                        'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
-                                        'marketing_order_delivery_process_id'   => $row_detail_gs->lookable->marketingOrderDeliveryProcess->id,
-                                        'status'                                => '2',
-                                    ]);
-                                    $row_detail_gs->lookable->marketingOrderDeliveryProcess->createJournalSentDocument();
+                }
+            }else{
+                $query = TruckQueue::where('code_barcode',$request->temp)->latest()->first();
+                if($query){
+                    if($query->status == '6'){
+                        $response = [
+                            'status'    => 500,
+                            'message'   => 'Antrian sudah keluar Pabrik',
+                        ];
+                    }else{
+                        if($query->truckQueueDetail->goodScale()->exists()){
+                            foreach($query->truckQueueDetail->goodScale->goodScaleDetail as $row_detail_gs ){
+                                if($row_detail_gs->lookable->marketingOrderDeliveryProcess()->exists()){
+                                    $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$row_detail_gs->lookable->marketingOrderDeliveryProcess->id)->where('status','2')->first();
+                                    if(!$ceksent){
+                                        MarketingOrderDeliveryProcessTrack::create([
+                                            'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                                            'marketing_order_delivery_process_id'   => $row_detail_gs->lookable->marketingOrderDeliveryProcess->id,
+                                            'status'                                => '2',
+                                        ]);
+                                        $row_detail_gs->lookable->marketingOrderDeliveryProcess->createJournalSentDocument();
+                                    }
                                 }
                             }
                         }
+                        $query->update([
+                            'status'=>'6',
+                        ]);
+                        if($query){
+                            $response = [
+                                'status'    => 200,
+                                'message'   => 'Data successfully saved.',
+                            ];
+                        }
                     }
-                    $query->update([
-                        'status'=>'6',
-                    ]);
-                    if($query){
-                        $response = [
-                            'status'    => 200,
-                            'message'   => 'Data successfully saved.',
-                        ];
-                    }
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data tidak ditemukan'
+                    ];
                 }
-            }else{
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data tidak ditemukan'
-                ];
+
+
             }
 
-
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
         }
 
         return response()->json($response);
     }
+    
 }

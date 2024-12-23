@@ -650,7 +650,7 @@
                     $('#status').prop( "checked", false);
                 }
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
-                $('#group_outlet_id').empty().append(`<option value="` + response.group_outlet_id + `">` + response.group_outlet_name + `</option>`);
+                $('#group_outlet_id').empty().append(`<option value="` + response.group_outlet_id + `">` + response.outlet_group_name + `</option>`);
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);

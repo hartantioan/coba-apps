@@ -140,6 +140,16 @@ class TaxSeries extends Model
                         }
                     }
                 }
+                if(!$tempNo){
+                    foreach($data as $row){
+                        for($i=intval($row->start_no);$i<=intval($row->end_no);$i++){
+                            if(!in_array(strval($i),$list)){
+                                $tempNo = $i;
+                                break 2;
+                            }
+                        }
+                    }
+                }
                 if($tempNo){
                     $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$branch.'.'.$year.'.'.$newcurrent;

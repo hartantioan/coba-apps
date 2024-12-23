@@ -491,7 +491,7 @@
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         Note : Harga Ongkir dan Harga Grup BP tidak mempengaruhi harga jual.
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="width:3500px;" id="table-detail">
+                                            <table class="bordered" style="width:3600px;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Termasuk PPN</th>
@@ -504,6 +504,7 @@
                                                         <th class="center">Harga Ongkir</th>
                                                         <th class="center">Harga Grup BP</th>
                                                         <th class="center">Harga Dasar</th>
+                                                        <th class="center">Harga Nett</th>
                                                         <th class="center">Qty Jual</th>
                                                         <th class="center">Satuan Jual</th>
                                                         <th class="center">
@@ -524,7 +525,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="19">
+                                                        <td colspan="20">
                                                             Silahkan tambahkan baris ...
                                                         </td>
                                                     </tr>
@@ -845,7 +846,7 @@
                 if($('.row_item').length == 0 && $('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="22">
+                            <td colspan="20">
                                 Silahkan tambahkan baris ...
                             </td>
                         </tr>
@@ -918,7 +919,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="22">
+                        <td colspan="20">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -999,7 +1000,7 @@
     function clearDetail(){
         $('#body-item').empty().append(`
             <tr id="last-row-item">
-                <td colspan="22">
+                <td colspan="20">
                     Silahkan tambahkan baris ...
                 </td>
             </tr>
@@ -1517,6 +1518,9 @@
                         </td>
                         <td class="center">
                             <input name="arr_price_list[]" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                        </td>
+                        <td class="right-align">
+                            <b id="tempPrice` + count + `">0,00</b>
                         </td>
                         <td>
                             <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
@@ -2364,8 +2368,20 @@
     function countRow(id){
         if($('#arr_unit' + id).val()){
             let pricelist = parseFloat($('#rowPriceList' + id).val().replaceAll(".", "").replaceAll(",",".")), pricenew = 0;
-            pricenew = pricelist;
+            if($('#arr_tax' + id).val() !== '0'){
+                let percent_tax = parseFloat($('#arr_tax' + id).val());
+                if($('#arr_is_include_tax' + id).is(':checked')){
+                    pricenew = (pricelist / (1 + (percent_tax / 100))).toFixed(2);
+                }else{
+                    pricenew = pricelist;
+                }
+            }else{
+                pricenew = pricelist;
+            }
             $('#rowPrice' + id).val(
+                (pricenew >= 0 ? '' : '-') + formatRupiahIni(parseFloat(pricenew).toFixed(2).toString().replace('.',','))
+            );
+            $('#tempPrice' + id).text(
                 (pricenew >= 0 ? '' : '-') + formatRupiahIni(parseFloat(pricenew).toFixed(2).toString().replace('.',','))
             );
             var qty = parseFloat($('#rowQtyUom' + id).val().replaceAll(".", "").replaceAll(",",".")),
@@ -2397,9 +2413,6 @@
 
             if($('#arr_tax' + id).val() !== '0'){
                 let percent_tax = parseFloat($('#arr_tax' + id).val());
-                if($('#arr_is_include_tax' + id).is(':checked')){
-                    rowtotal = rowtotal / (1 + (percent_tax / 100));
-                }
                 rowtax = rowtotal * (percent_tax / 100);
             }
 

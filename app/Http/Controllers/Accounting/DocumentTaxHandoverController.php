@@ -90,7 +90,14 @@ class DocumentTaxHandoverController extends Controller
         $query_data = DocumentTaxHandover::where(function($query) use ($search, $request ) {
                         $query->where(function($query) use ($search) {
                             $query->where('code', 'like', "%$search%")
-                                ->orWhere('post_date', 'like', "%$search%");
+                                ->orWhere('post_date', 'like', "%$search%")
+                                ->orWhereHas('documentTaxHandoverDetail',function($query) use ($search, $request ){
+                                    $query->whereHas('documentTax',function($query) use ($search, $request ){
+                                        $query->where('transaction_code', 'like', "%$search%")
+                                            ->orWhere('code', 'like', "%$search%")
+                                            ->orWhere('npwp_number', 'like', "%$search%");
+                                    });
+                                });
                         });
                     
                         if($request->post_date) {
@@ -113,7 +120,14 @@ class DocumentTaxHandoverController extends Controller
         $total_filtered = DocumentTaxHandover::where(function($query) use ($search, $request ) {
                 $query->where(function($query) use ($search) {
                     $query->where('code', 'like', "%$search%")
-                        ->orWhere('post_date', 'like', "%$search%");
+                        ->orWhere('post_date', 'like', "%$search%")
+                        ->orWhereHas('documentTaxHandoverDetail',function($query) use ($search, $request ){
+                            $query->whereHas('documentTax',function($query) use ($search, $request ){
+                                $query->where('transaction_code', 'like', "%$search%")
+                                    ->orWhere('code', 'like', "%$search%")
+                                    ->orWhere('npwp_number', 'like', "%$search%");
+                            });
+                        });
                 });
             
                 if($request->post_date) {

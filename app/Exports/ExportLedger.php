@@ -138,7 +138,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             ", array(
                 'coa_id'    => $row->id,
                 'date1'     => $this->start_date,
-                'date2'     => $this->start_date,
+                'date2'     => $this->end_date,
             ));
             
             $ending_credit  = DB::select("
@@ -158,7 +158,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             ", array(
                 'coa_id'    => $row->id,
                 'date1'     => $this->start_date,
-                'date2'     => $this->start_date,
+                'date2'     => $this->end_date,
             ));
 
             $total_debit = $ending_debit[0]->total;

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportLedger;
 use App\Jobs\LedgerExportJob;
+use Illuminate\Support\Facades\DB;
 
 class LedgerController extends Controller
 {
@@ -105,34 +106,50 @@ class LedgerController extends Controller
                 $balance = $balance_debit - $balance_credit;
                 $total_debit = 0;
                 $total_credit = 0;
-                $ending_debit = $val->journalDebit()->whereHas('journal',function($query)use($periode,$request){
-                    $query->whereRaw($periode)
-                        ->where(function($query)use($request){
-                            if($request->is_closing_journal){
-                                $query->where('lookable_type','!=','closing_journals')
-                                    ->orWhereNull('lookable_type');
-                            }
-                        });
-                })->get();
-                $ending_credit = $val->journalCredit()->whereHas('journal',function($query)use($periode,$request){
-                    $query->whereRaw($periode)
-                        ->where(function($query)use($request){
-                            if($request->is_closing_journal){
-                                $query->where('lookable_type','!=','closing_journals')
-                                    ->orWhereNull('lookable_type');
-                            }
-                        });
-                })->get();
+                $ending_debit  = DB::select("
+                    SELECT 
+                        IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                    FROM journal_details jd
+                    JOIN journals j
+                        ON jd.journal_id = j.id
+                    WHERE 
+                        jd.coa_id = :coa_id 
+                        AND jd.deleted_at IS NULL
+                        AND j.deleted_at IS NULL
+                        AND j.post_date >= :date1 
+                        AND j.post_date <= :date2
+                        AND jd.type = '1'
+                        AND j.status IN ('2','3')
+                ", array(
+                    'coa_id'    => $val->id,
+                    'date1'     => $request->start_date,
+                    'date2'     => $request->finish_date,
+                ));
+                
+                $ending_credit  = DB::select("
+                    SELECT 
+                        IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                    FROM journal_details jd
+                    JOIN journals j
+                        ON jd.journal_id = j.id
+                    WHERE 
+                        jd.coa_id = :coa_id 
+                        AND jd.deleted_at IS NULL
+                        AND j.deleted_at IS NULL
+                        AND j.post_date >= :date1 
+                        AND j.post_date <= :date2
+                        AND jd.type = '2'
+                        AND j.status IN ('2','3')
+                ", array(
+                    'coa_id'    => $val->id,
+                    'date1'     => $request->start_date,
+                    'date2'     => $request->finish_date,
+                ));
 
-                foreach($ending_debit as $rowdebit){
-                    $total_debit += round($rowdebit->nominal,2);
-                }
+                $total_debit = $ending_debit[0]->total;
+                $total_credit = $ending_credit[0]->total;
 
-                foreach($ending_credit as $rowcredit){
-                    $total_credit += round($rowcredit->nominal,2);
-                }
-
-                $ending_total  = $balance + $total_debit - $total_credit;
+                $ending_total = round($balance + $total_debit - $total_credit,2);
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',

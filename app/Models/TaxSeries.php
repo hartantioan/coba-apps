@@ -130,16 +130,6 @@ class TaxSeries extends Model
                         $year = $row['year'];
                     }
                 }
-                if(!$passed){
-                    foreach($arrNo as $row){
-                        if($row['start_no'] - $lastData > 0){
-                            $tempNo = $row['start_no'];
-                            $branch = $row['branch_code'];
-                            $year = $row['year'];
-                            break;
-                        }
-                    }
-                }
                 if(!$tempNo){
                     foreach($data as $row){
                         for($i=intval($row->start_no);$i<=intval($row->end_no);$i++){
@@ -149,6 +139,16 @@ class TaxSeries extends Model
                                 $year = $row->year;
                                 break 2;
                             }
+                        }
+                    }
+                }
+                if(!$passed){
+                    foreach($arrNo as $row){
+                        if($row['start_no'] - $lastData > 0){
+                            $tempNo = $row['start_no'];
+                            $branch = $row['branch_code'];
+                            $year = $row['year'];
+                            break;
                         }
                     }
                 }

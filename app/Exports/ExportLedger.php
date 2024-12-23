@@ -62,6 +62,8 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
         $arr = [];
 
         $total = 0;
+
+        $textClosing = $this->closing_journal ? "AND (j.lookable_type <> 'closing_journals' OR j.lookable_type IS NULL)" : "";
         
         foreach($query_data as $key => $row){
             /* if($this->start_date && $this->end_date) {
@@ -135,6 +137,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                     AND j.post_date <= :date2
                     AND jd.type = '1'
                     AND j.status IN ('2','3')
+                    $textClosing
             ", array(
                 'coa_id'    => $row->id,
                 'date1'     => $this->start_date,
@@ -155,6 +158,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                     AND j.post_date <= :date2
                     AND jd.type = '2'
                     AND j.status IN ('2','3')
+                    $textClosing
             ", array(
                 'coa_id'    => $row->id,
                 'date1'     => $this->start_date,

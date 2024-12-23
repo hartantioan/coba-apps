@@ -2172,6 +2172,9 @@
                                 <td class="center">
                                     <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
                                 </td>
+                                <td class="right-align">
+                                    <b id="tempPrice` + count + `">` + val.price + `</b>
+                                </td>
                                 <td>
                                     <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
                                 </td>
@@ -2817,6 +2820,9 @@
                                         </td>
                                         <td class="center">
                                             <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                                        </td>
+                                        <td class="right-align">
+                                            <b id="tempPrice` + count + `">` + val.price + `</b>
                                         </td>
                                         <td>
                                             <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>

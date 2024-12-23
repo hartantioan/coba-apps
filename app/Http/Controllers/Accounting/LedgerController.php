@@ -83,6 +83,9 @@ class LedgerController extends Controller
                 ->count();
 
         $response['data'] = [];
+
+        $textClosing = $request->is_closing_journal ? "AND (j.lookable_type <> 'closing_journals' OR j.lookable_type IS NULL)" : "";
+
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
@@ -120,6 +123,7 @@ class LedgerController extends Controller
                         AND j.post_date <= :date2
                         AND jd.type = '1'
                         AND j.status IN ('2','3')
+                        $textClosing
                 ", array(
                     'coa_id'    => $val->id,
                     'date1'     => $request->start_date,
@@ -140,6 +144,7 @@ class LedgerController extends Controller
                         AND j.post_date <= :date2
                         AND jd.type = '2'
                         AND j.status IN ('2','3')
+                        $textClosing
                 ", array(
                     'coa_id'    => $val->id,
                     'date1'     => $request->start_date,

@@ -423,24 +423,27 @@ class MarketingOrderDelivery extends Model
                 }
             }
 
-            $listChanges[] = '*'.$row->item->name.' dari '.CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDetail->itemUnit->unit->code.' ke '.CustomHelper::formatConditionalQty($newQty).' '.$row->marketingOrderDetail->itemUnit->unit->code.'*';
+            if($newQty > 0){
+                $listChanges[] = '*'.$row->item->name.' dari '.CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDetail->itemUnit->unit->code.' ke '.CustomHelper::formatConditionalQty($newQty).' '.$row->marketingOrderDetail->itemUnit->unit->code.'*';
 
-            $newmodd = MarketingOrderDeliveryDetail::create([
-                'marketing_order_delivery_id'   => $this->id,
-                'marketing_order_detail_id'     => $marketing_order_detail_id,
-                'item_id'                       => $row->item_id,
-                'qty'                           => $newQty,
-                'note'                          => implode(', ',$arrShading),
-                'place_id'                      => $row->place_id,
-            ]);
-            foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
-                $modpd->update([
-                    'marketing_order_delivery_detail_id'    => $newmodd->id,
+                $newmodd = MarketingOrderDeliveryDetail::create([
+                    'marketing_order_delivery_id'   => $this->id,
+                    'marketing_order_detail_id'     => $marketing_order_detail_id,
+                    'item_id'                       => $row->item_id,
+                    'qty'                           => $newQty,
+                    'note'                          => implode(', ',$arrShading),
+                    'place_id'                      => $row->place_id,
                 ]);
+                foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
+                    $modpd->update([
+                        'marketing_order_delivery_detail_id'    => $newmodd->id,
+                    ]);
+                }
+                if(!in_array($row->marketingOrderDetail->marketingOrder->id,$arrMo)){
+                    $arrMo[] = $row->marketingOrderDetail->marketingOrder->id;
+                }
             }
-            if(!in_array($row->marketingOrderDetail->marketingOrder->id,$arrMo)){
-                $arrMo[] = $row->marketingOrderDetail->marketingOrder->id;
-            }
+            
             $row->delete();
         }
         foreach($arrMo as $rowmo){

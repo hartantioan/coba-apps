@@ -88,7 +88,7 @@ class DocumentTaxHandoverController extends Controller
         $total_data = DocumentTaxHandover::count();
         
         $query_data = DocumentTaxHandover::where(function($query) use ($search, $request ) {
-                        $query->where(function($query) use ($search) {
+                        $query->where(function($query) use ($search, $request ) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('post_date', 'like', "%$search%")
                                 ->orWhereHas('documentTaxHandoverDetail',function($query) use ($search, $request ){
@@ -118,7 +118,7 @@ class DocumentTaxHandoverController extends Controller
         
 
         $total_filtered = DocumentTaxHandover::where(function($query) use ($search, $request ) {
-                $query->where(function($query) use ($search) {
+                $query->where(function($query) use ($search, $request ) {
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('post_date', 'like', "%$search%")
                         ->orWhereHas('documentTaxHandoverDetail',function($query) use ($search, $request ){

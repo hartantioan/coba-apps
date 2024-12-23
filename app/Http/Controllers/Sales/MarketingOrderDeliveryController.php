@@ -271,6 +271,7 @@ class MarketingOrderDeliveryController extends Controller
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->note_internal,
                     $val->note_external,
+                    $val->getSO(),
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :

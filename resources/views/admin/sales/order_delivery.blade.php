@@ -170,6 +170,7 @@
                                                         <th>Tgl.Kirim</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
+                                                        <th>Sales Order</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -1749,6 +1750,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
+                { name: 'so', searchable: false, orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

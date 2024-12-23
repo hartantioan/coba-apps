@@ -145,6 +145,8 @@ class TaxSeries extends Model
                         for($i=intval($row->start_no);$i<=intval($row->end_no);$i++){
                             if(!in_array(strval($i),$list)){
                                 $tempNo = $i;
+                                $branch = $row->branch_code;
+                                $year = $row->year;
                                 break 2;
                             }
                         }

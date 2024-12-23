@@ -69,11 +69,11 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
                         ->get();
 
                     foreach ($ItemCogsShadingIn as $inawal) {
-                        $rp_in += $inawal->total_in;
+                        $rp_in += round($inawal->total_in,2);
                     }
 
                     foreach ($ItemCogsShadingOut as $inOut) {
-                        $rp_out += $inOut->total_out;
+                        $rp_out += round($inOut->total_out,2);
                     }
 
                     $total = round($ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'), 3);

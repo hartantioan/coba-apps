@@ -34,7 +34,7 @@ class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements Wit
 
     public function bindValue(Cell $cell, $value)
     {
-        if (is_numeric($value)) {
+        if (in_array($cell->getColumn(), ['H']) && $cell->getRow() > 1) {
             $cell->setValueExplicit($value, DataType::TYPE_STRING);
 
             return true;

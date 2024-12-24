@@ -32,18 +32,6 @@ class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements Wit
         $this->end_date = $end_date ? $end_date : '';
     }
 
-    public function bindValue(Cell $cell, $value)
-    {
-        if (in_array($cell->getColumn(), ['H']) && $cell->getRow() > 1) {
-            $cell->setValueExplicit('0'.$value, DataType::TYPE_STRING);
-
-            return true;
-        }
-
-        // else return default behavior
-        return parent::bindValue($cell, $value);
-    }
-
     public function collection()
     {
         $ardp = MarketingOrderDownPayment::whereIn('status', ['2', '3'])
@@ -211,5 +199,16 @@ class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements Wit
     public function startCell(): string
     {
         return 'A1';
+    }
+    public function bindValue(Cell $cell, $value)
+    {
+        if (in_array($cell->getColumn(), ['H']) && $cell->getRow() > 1) {
+            $cell->setValueExplicit('0'.$value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        // else return default behavior
+        return parent::bindValue($cell, $value);
     }
 }

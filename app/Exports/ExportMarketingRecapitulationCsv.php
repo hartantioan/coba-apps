@@ -13,8 +13,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, ShouldAutoSize
+class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithTitle, ShouldAutoSize, WithCustomValueBinder
 {
     /**
      * @return \Illuminate\Support\Collection

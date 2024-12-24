@@ -93,12 +93,12 @@ class MarketingOrderInvoice extends Model
 
         if ($this->account->type_body==3)
         {
-            $npwp='="'.substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+            $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
 
         }
         else
         {
-            $npwp='="'.str_replace('.','',str_replace('-','',$this->userData->npwp));
+            $npwp=str_replace('.','',str_replace('-','',$this->userData->npwp));
         }
 
         return $npwp;

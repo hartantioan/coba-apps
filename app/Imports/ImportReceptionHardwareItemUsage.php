@@ -79,9 +79,14 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                 if($user->position()->exists()){
                     $divisi = $user->position->division->name;
                 }
+                if (is_numeric($row['tanggal'])) {
+                    $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal'] - 25569) * 86400);
+                } else {
+                    $dateTime1 = DateTime::createFromFormat('d/m/Y', $row['tanggal']);
+                }
 
-                $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');
+
                 if($this->error ==null){
                     $query = ReceptionHardwareItemsUsage::create([
                         'code' => ReceptionHardwareItemsUsage::generateCode(),

@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithTitle, ShouldAutoSize, WithCustomValueBinder
+class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithCustomValueBinder
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -186,15 +186,5 @@ class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\St
         }
 
         return collect($arr);
-    }
-
-    public function title(): string
-    {
-        return 'Format Csv Pajak';
-    }
-
-    public function startCell(): string
-    {
-        return 'A1';
     }
 }

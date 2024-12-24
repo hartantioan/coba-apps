@@ -13,9 +13,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithCustomValueBinder
+class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements FromCollection
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -191,5 +193,17 @@ class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\St
     public function startCell(): string
     {
         return 'A1';
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if ($cell->getColumn() == 'H') {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        // else return default behavior
+        return parent::bindValue($cell, $value);
     }
 }

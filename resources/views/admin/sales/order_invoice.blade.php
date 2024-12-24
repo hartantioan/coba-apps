@@ -54,10 +54,15 @@
 
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }} Invoice</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
 
+                        <a class="btn btn-small waves-effect green waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printDataProforma();">
+                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }} Proforma</span>
+                            <i class="material-icons right">local_printshop</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -2117,6 +2122,43 @@
         });
         $.ajax({
             url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            complete: function() {
+
+                loadingClose('#main');
+            },
+            success: function(response) {
+                window.open(response.message, '_blank');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    }
+
+    function printDataProforma(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+        });
+        $.ajax({
+            url: '{{ Request::url() }}/print_proforma',
             type: 'POST',
             dataType: 'JSON',
             data: {

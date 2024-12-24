@@ -983,11 +983,11 @@ class MarketingOrderInvoiceController extends Controller
 
         if($pr){
             if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
-                $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full_after_3',$menuUser->mode);
+                $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_3',$menuUser->mode);
             }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
-                $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18',$menuUser->mode);
+                $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18',$menuUser->mode);
             }else{
-                $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_full',$menuUser->mode);
+                $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full',$menuUser->mode);
             }
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1022,10 +1022,68 @@ class MarketingOrderInvoiceController extends Controller
                 $pr = MarketingOrderInvoice::where('code',$row)->first();
 
                 if($pr){
-                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
-                        $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
+                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_3');
+                    }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                     }else{
-                        $pdf = PrintHelper::print($pr,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual');
+                    }
+                    $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $content = $pdf->download()->getOriginalContent();
+                    $temp_pdf[]=$content;
+                }
+            }
+
+            $merger = new Merger();
+
+            foreach ($temp_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+            $result = $merger->merge();
+
+            $document_po = PrintHelper::savePrint($result);
+
+            $response =[
+                'status'=>200,
+                'message'  =>$document_po
+            ];
+        }
+
+
+		return response()->json($response);
+    }
+
+    public function printProforma(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key => $row){
+                $pr = MarketingOrderInvoice::where('code',$row)->first();
+
+                if($pr){
+                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_3');
+                    }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18');
+                    }else{
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full');
                     }
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
@@ -1104,9 +1162,9 @@ class MarketingOrderInvoiceController extends Controller
                         $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             if(date('Y-m-d',strtotime($query->created_at)) >= '2024-11-18'){
-                                $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
+                                $pdf = PrintHelper::print($query,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                             }else{
-                                $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');
+                                $pdf = PrintHelper::print($query,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual');
                             }
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
@@ -1162,9 +1220,9 @@ class MarketingOrderInvoiceController extends Controller
                         $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             if(date('Y-m-d',strtotime($query->created_at)) >= '2024-11-18'){
-                                $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
+                                $pdf = PrintHelper::print($query,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
                             }else{
-                                $pdf = PrintHelper::print($query,'Print Pengembalian DO','a5','landscape','admin.print.sales.order_invoice_individual');
+                                $pdf = PrintHelper::print($query,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual');
                             }
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));

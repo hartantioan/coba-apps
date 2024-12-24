@@ -71,7 +71,7 @@ class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\St
             $year = date('Y', strtotime($row->post_date));
             $newdate = date('d/n/Y', strtotime($row->post_date));
             $arr[] = [
-                '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->account->userDataDefault()->title . ';' . $row->account->userDataDefault()->address . ';' . round($row->total, 0) . ';' . round($row->tax, 0) . ';0;;1;' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $row->code . ';;'
+                '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . strval($row->getNpwp()) . ';' . $row->account->userDataDefault()->title . ';' . $row->account->userDataDefault()->address . ';' . round($row->total, 0) . ';' . round($row->tax, 0) . ';0;;1;' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $row->code . ';;'
             ];
             $arr[] = [
                 '1'     => 'OF;1;' . $row->note . ';' . round($row->total, 2) . ';1.00;' . round($row->total, 2) . ';0;' . round($row->total, 2) . ';' . round($row->tax, 2) . ';0;0;;;;;;;;;;',
@@ -92,11 +92,11 @@ class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\St
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
+                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . strval($row->getNpwp()) . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal * ($row->taxMaster->percentage / 100)) . ';0;' . $freeAreaTax . ';2;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
+                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . strval($row->getNpwp()) . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal * ($row->taxMaster->percentage / 100)) . ';0;' . $freeAreaTax . ';2;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
             }
             $balance = floor($row->tax);

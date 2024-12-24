@@ -14,11 +14,8 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
 
-class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements FromCollection, WithCustomValueBinder
+class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithTitle, ShouldAutoSize, WithCustomValueBinder
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -191,15 +188,13 @@ class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements Fro
         return collect($arr);
     }
 
-    public function bindValue(Cell $cell, $value)
+    public function title(): string
     {
-        if (is_string($value)) {
-            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+        return 'Format Csv Pajak';
+    }
 
-            return true;
-        }
-
-        // else return default behavior
-        return parent::bindValue($cell, $value);
+    public function startCell(): string
+    {
+        return 'A1';
     }
 }

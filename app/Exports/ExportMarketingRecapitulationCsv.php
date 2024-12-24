@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithTitle, ShouldAutoSize
+class ExportMarketingRecapitulationCsv /* extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder */ implements FromCollection, WithTitle, ShouldAutoSize
 {
     /**
      * @return \Illuminate\Support\Collection

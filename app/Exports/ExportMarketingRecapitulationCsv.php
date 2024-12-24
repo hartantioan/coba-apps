@@ -14,8 +14,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements WithCustomValueBinder, FromCollection, WithTitle, ShouldAutoSize
+class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements WithCustomValueBinder, FromCollection, WithTitle, ShouldAutoSize
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -27,6 +30,18 @@ class ExportMarketingRecapitulationCsv extends \PhpOffice\PhpSpreadsheet\Cell\St
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->end_date = $end_date ? $end_date : '';
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_numeric($value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        // else return default behavior
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()

@@ -16,8 +16,9 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements FromCollection
+class ExportMarketingRecapitulationCsv extends DefaultValueBinder implements FromCollection, WithCustomValueBinder
 {
     /**
      * @return \Illuminate\Support\Collection

@@ -3424,11 +3424,15 @@ class Select2Controller extends Controller {
             foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
-                /* if($row->marketingOrderDetail->tax_id > 0){
-                    if($row->marketingOrderDetail->is_include_tax == '1'){
-                        $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
+                if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
+
+                }else{
+                    if($row->marketingOrderDetail->tax_id > 0){
+                        if($row->marketingOrderDetail->is_include_tax == '1'){
+                            $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
+                        }
                     }
-                } */
+                }
                 $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                 $grandtotal = $total + $tax;
                 $arrDetail[] = [

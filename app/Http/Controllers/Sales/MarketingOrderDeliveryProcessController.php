@@ -1715,7 +1715,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($tempStatus,haystack: ['2','3'])){
+                if(in_array($tempStatus,['2','3'])){
                     if($query->journal()->exists()){
                         foreach($query->journal as $journal){
                             $journal->journalDetail()->delete();

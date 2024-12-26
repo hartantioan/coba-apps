@@ -55,11 +55,28 @@ class MarketingOrderInvoiceDetail extends Model
         return $discount;
     }
 
-    public function priceBeforeTax(){
+    public function priceBeforeTax(): mixed{
         $price = $this->priceBeforeDiscount();
-        if($this->is_include_tax == '1'){
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            if(date('Y-m-d',strtotime($this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                //do nothing
+            }else{
+                if($this->is_include_tax == '1'){
+                    $price = $price / ((100 + $this->percent_tax) / 100);
+                }
+            }
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            if(date('Y-m-d',strtotime($this->lookable->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                //do nothing
+            }else{
+                if($this->is_include_tax == '1'){
+                    $price = $price / ((100 + $this->percent_tax) / 100);
+                }
+            }
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
             $price = $price / ((100 + $this->percent_tax) / 100);
         }
+        
         return $price;
     }
 

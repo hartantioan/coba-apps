@@ -2686,35 +2686,34 @@ class TreeHelper {
                     $query_mo_delivery_process = MarketingOrderDeliveryProcess::find($id_mo_delivery_process);
 
                     if($query_mo_delivery_process->purchaseOrderDetail()->exists()){
-                        if($index < 2 || $urutan <=-6){
+                        foreach($query_mo_delivery_process->purchaseOrderDetail as $row_po_detail){
                             $properties = [
-                                ['name'=> "Tanggal :".$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->post_date],
+                                ['name'=> "Tanggal :".$row_po_detail->purchaseOrder->post_date],
                             ];
 
                             if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_po_detail->purchaseOrder->grandtotal,2,',','.')]
                                 ;
                             }
                             $po_tempura=[
-                                "name"=>$$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                "key" =>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
+                                "name"=>$row_po_detail->purchaseOrder->code,
+                                "key" =>$row_po_detail->purchaseOrder->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po_detail->purchaseOrder->code),
                             ];
-                            if($putaran == 0 || $urutan <= -6){
-                                $data_go_chart[]=$po_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_mo_delivery_process->code,
-                                    'to'=>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                    'string_link'=>$query_mo_delivery_process->code.$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                ];
+                            $data_go_chart[]=$po_tempura;
+                            $data_link[]=[
+                                'from'=>$query_mo_delivery_process->code,
+                                'to'=>$row_po_detail->purchaseOrder->code,
+                                'string_link'=>$query_mo_delivery_process->code.$row_po_detail->purchaseOrder->code,
+                            ];
 
-                                if(!in_array($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
-                                    $data_id_po[] = $query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id;
-                                    $added = true;
-                                }
+                            if(!in_array($row_po_detail->purchaseOrder->id, $data_id_po)){
+                                $data_id_po[] =$row_po_detail->purchaseOrder->id;
+                                $added = true;
                             }
                         }
+
                     }
 
                     if($query_mo_delivery_process->marketingOrderInvoice()->exists()){
@@ -11076,35 +11075,34 @@ class TreeHelper {
                     $query_mo_delivery_process = MarketingOrderDeliveryProcess::find($id_mo_delivery_process);
 
                     if($query_mo_delivery_process->purchaseOrderDetail()->exists()){
-                        if($index < 2 || $urutan <=-6){
+                        foreach($query_mo_delivery_process->purchaseOrderDetail as $row_po_detail){
                             $properties = [
-                                ['name'=> "Tanggal :".$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->post_date],
+                                ['name'=> "Tanggal :".$row_po_detail->purchaseOrder->post_date],
                             ];
 
                             if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_po_detail->purchaseOrder->grandtotal,2,',','.')]
                                 ;
                             }
                             $po_tempura=[
-                                "name"=>$$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                "key" =>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
+                                "name"=>$row_po_detail->purchaseOrder->code,
+                                "key" =>$row_po_detail->purchaseOrder->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po_detail->purchaseOrder->code),
                             ];
-                            if($putaran == 0 || $urutan <= -6){
-                                $data_go_chart[]=$po_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_mo_delivery_process->code,
-                                    'to'=>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                    'string_link'=>$query_mo_delivery_process->code.$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                ];
+                            $data_go_chart[]=$po_tempura;
+                            $data_link[]=[
+                                'from'=>$query_mo_delivery_process->code,
+                                'to'=>$row_po_detail->purchaseOrder->code,
+                                'string_link'=>$query_mo_delivery_process->code.$row_po_detail->purchaseOrder->code,
+                            ];
 
-                                if(!in_array($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
-                                    $data_id_po[] = $query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id;
-                                    $added = true;
-                                }
+                            if(!in_array($row_po_detail->purchaseOrder->id, $data_id_po)){
+                                $data_id_po[] =$row_po_detail->purchaseOrder->id;
+                                $added = true;
                             }
                         }
+
                     }
 
                     if($query_mo_delivery_process->marketingOrderInvoice()->exists()){

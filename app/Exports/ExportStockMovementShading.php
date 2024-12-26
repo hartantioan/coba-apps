@@ -103,7 +103,6 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     $query->whereDate('date','<=', $this->finish_date);
                 }
                 if($this->item) {
-                    info($this->item);
                     $query->whereHas('item',function($query){
                         $query->where('id',$this->item);
                         // $query->whereHas('parentFg',function($query) {

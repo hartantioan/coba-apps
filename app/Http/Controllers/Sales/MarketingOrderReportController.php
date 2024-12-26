@@ -92,7 +92,8 @@ class MarketingOrderReportController extends Controller
     }
 
     public function exportCsv(Request $request){
-		return Excel::download(new ExportMarketingRecapitulationCsv2($request->start_date,$request->end_date), 'sales_csv_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		/* return Excel::download(new ExportMarketingRecapitulationCsv2($request->start_date,$request->end_date), 'sales_csv_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX); */
+        return Excel::download(new ExportMarketingRecapitulationCsv($request->start_date,$request->end_date), 'sales_csv_'.uniqid().'.csv', \Maatwebsite\Excel\Excel::CSV);
         /* $namefile = 'sales_csv_'.uniqid().'.xlsx';
         Excel::store(new ExportMarketingRecapitulationCsv2($request->start_date,$request->end_date), $namefile,'public', \Maatwebsite\Excel\Excel::XLSX);
         $import = Excel::toArray(new SalesCsvImport,storage_path('app/public/' . $namefile));

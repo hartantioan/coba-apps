@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ExportMarketingRecapitulationCsv2 implements FromCollection, WithColumnFormatting
+class ExportMarketingRecapitulationCsv2 extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -390,10 +390,10 @@ class ExportMarketingRecapitulationCsv2 implements FromCollection, WithColumnFor
         ];
     } */
 
-    public function columnFormats(): array
+    /* public function columnFormats(): array
     {
         return [
             'H' => \PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT,
         ];
-    }
+    } */
 }

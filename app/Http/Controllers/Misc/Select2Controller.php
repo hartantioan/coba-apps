@@ -3004,7 +3004,6 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $itemtarget = Item::find($request->item_id);
-        info($itemtarget);
         $data = IssueGlaze::where(function($query) use($request){
             $query->where('note','like',"%$request->search%")
                 ->orWhere('code','like',"%$request->search%")

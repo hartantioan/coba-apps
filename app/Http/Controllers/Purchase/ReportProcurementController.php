@@ -175,7 +175,6 @@ class ReportProcurementController extends Controller
                     $absoluteFilePath = storage_path('app/' . $filePath);
                     $document_po = asset(Storage::url($filePath));
                     $pdfFileName = "Report_Procurement_Account_$k.pdf";
-                    info($absoluteFilePath);
                     $zip->addFromString($pdfFileName,$content);
                 }
                 $zip->close();

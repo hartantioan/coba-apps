@@ -2700,18 +2700,16 @@ class TreeHelper {
                             'properties'=>$properties,
                             'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code),
                         ];
-                        if($putaran == 0 || $urutan <= -6){
-                            $data_go_chart[]=$po_tempura;
-                            $data_link[]=[
-                                'from'=>$query_mo_delivery_process->code,
-                                'to'=>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                                'string_link'=>$query_mo_delivery_process->code.$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
-                            ];
+                        $data_go_chart[]=$po_tempura;
+                        $data_link[]=[
+                            'from'=>$query_mo_delivery_process->code,
+                            'to'=>$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
+                            'string_link'=>$query_mo_delivery_process->code.$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->code,
+                        ];
 
-                            if(!in_array($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
-                                $data_id_po[] = $query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id;
-                                $added = true;
-                            }
+                        if(!in_array($query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
+                            $data_id_po[] = $query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->id;
+                            $added = true;
                         }
                     }
 

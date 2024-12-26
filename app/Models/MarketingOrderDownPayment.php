@@ -70,7 +70,7 @@ class MarketingOrderDownPayment extends Model
 
         if ($this->account->type_body==3)
         {
-            $npwp=substr(str_replace('.','',str_replace('-','',$this->account->userDataDefault()->npwp)),1);
+            $npwp=str_replace('.','',str_replace('-','',$this->account->userDataDefault()->npwp));
 
         }
         else

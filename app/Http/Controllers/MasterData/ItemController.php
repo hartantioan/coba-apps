@@ -176,6 +176,15 @@ class ItemController extends Controller
                     $query->where('status', $request->status);
                 }
 
+                if($request->adaUnit == 1){
+                    $query->whereDoesntHave('itemUnit');
+                }
+
+                if($request->adaShading == 1){
+                    $query->where('is_sales_item', true)
+                    ->whereDoesntHave('itemShading');
+                }
+
                 if($request->type){
                     $query->where(function($query) use ($request){
                         foreach($request->type as $row){

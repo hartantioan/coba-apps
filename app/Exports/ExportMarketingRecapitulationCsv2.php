@@ -381,14 +381,14 @@ class ExportMarketingRecapitulationCsv2 extends \PhpOffice\PhpSpreadsheet\Cell\S
         return collect($arr);
     }
 
-    /* public function getCsvSettings(): array
+    public function getCsvSettings(): array
     {
         return [
             'delimiter' => ';',  // You can set a different delimiter here if needed
             'enclosure' => '"',  // Enclosure for text values
             'escape' => '\\',    // Escape character for CSV
         ];
-    } */
+    }
 
     public function columnFormats(): array
     {

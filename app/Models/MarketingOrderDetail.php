@@ -96,7 +96,11 @@ class MarketingOrderDetail extends Model
     public function priceBeforeDiscWTax(){
         $pricebeforedisc = 0;
         if($this->is_include_tax == '1'){
-            $pricebeforedisc = $this->price / (($this->percent_tax  + 100) / 100);
+            if(date('Y-m-d',strtotime($this->created_at)) < '2024-12-24'){
+                $pricebeforedisc = $this->price / (($this->percent_tax  + 100) / 100);
+            }else{
+                $pricebeforedisc = $this->price;
+            }
         }else{
             $pricebeforedisc = $this->price;
         }

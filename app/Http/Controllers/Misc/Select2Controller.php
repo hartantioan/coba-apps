@@ -3424,11 +3424,11 @@ class Select2Controller extends Controller {
             foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
-                if($row->marketingOrderDetail->tax_id > 0){
+                /* if($row->marketingOrderDetail->tax_id > 0){
                     if($row->marketingOrderDetail->is_include_tax == '1'){
                         $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
                     }
-                }
+                } */
                 $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                 $grandtotal = $total + $tax;
                 $arrDetail[] = [
@@ -3480,6 +3480,49 @@ class Select2Controller extends Controller {
                 'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
                 'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
                 'note'              => $d->getNote(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderDeliveryProcessRetur(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        $data = MarketingOrderDeliveryProcess::where(function($query) use($search,$account_id){
+            $query->where(function($query) use ($search){
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('note_internal','like',"%$search%")
+                    ->orWhere('note_external','like',"%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+            })
+            ->where(function($query) use ($account_id){
+                if($account_id){
+                    $query->whereHas('marketingOrderDelivery',function($query) use($account_id){
+                        $query->where('customer_id',$account_id);
+                    });
+                }
+            });
+        })
+        ->whereHas('marketingOrderInvoice',function($query) use ($search){
+            $query->where('code', 'like', "%$search%")
+                ->whereDoesntHave('incomingPaymentDetail');
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   	        => $d->id,
+                'text' 	        => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name.' - NO INVOICE : '.$d->marketingOrderInvoice->code,
+                'account_id'    => $d->marketingOrderDelivery->customer_id,
+                'account_name'  => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
             ];
         }
 

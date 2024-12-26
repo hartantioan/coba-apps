@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ExportMarketingRecapitulationCsv2 extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection
+class ExportMarketingRecapitulationCsv2 extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromCollection, WithCustomValueBinder
 {
     /**
      * @return \Illuminate\Support\Collection

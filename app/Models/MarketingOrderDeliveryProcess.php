@@ -266,7 +266,7 @@ class MarketingOrderDeliveryProcess extends Model
     }
 
     public function getNote() {
-        $text = 'BASED ON SALES ORDER '.$this->getSalesOrderCode().'. BASEN ON MARKETING ORDER DELIVERY '.$this->marketingOrderDelivery->code.'. BASED ON DELIVERY ORDER '.$this->code.'.';
+        $text = 'BASED ON SALES ORDER '.$this->getSalesOrderCode().'. BASED ON MARKETING ORDER DELIVERY '.$this->marketingOrderDelivery->code.'. BASED ON DELIVERY ORDER '.$this->code.'.';
         return $text;
     }
 

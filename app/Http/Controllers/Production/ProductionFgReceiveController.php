@@ -223,7 +223,7 @@ class ProductionFgReceiveController extends Controller
             $query->where('production_order_detail_id',$request->production_order_detail_id)->where('status','2')->where('line_id',$request->line_id);
         })
         ->whereDoesntHave('productionFgReceiveDetail')
-        ->where(column: function($query)use($request){
+        ->where(function($query)use($request){
             if($request->batch_used){
                 $query->whereNotIn('pallet_no',$request->batch_used);
             }

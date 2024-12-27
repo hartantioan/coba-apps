@@ -34,11 +34,15 @@ class OperationAccess
             $request->attributes->set('minDate', $minDate);
             $request->attributes->set('maxDate', $maxDate);
             if(isset($request->post_date)){
-                if($request->post_date < $minDate || $request->post_date > $maxDate){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/Y',strtotime($minDate)).' atau lebih dari '.date('d/m/Y',strtotime($maxDate)).'.',
-                    ]);
+                if($url == 'marketing_order_delivery' && isset($request->temp) && $request->temp){
+
+                }else{
+                    if($request->post_date < $minDate || $request->post_date > $maxDate){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/Y',strtotime($minDate)).' atau lebih dari '.date('d/m/Y',strtotime($maxDate)).'.',
+                        ]);
+                    }
                 }
             }
             if($access->menu->is_maintenance){

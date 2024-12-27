@@ -336,7 +336,7 @@ class OfficialReportController extends Controller
                 if($request->temp){
                     $query = OfficialReport::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
+                    /* $approved = false;
                     $revised = false;
 
                     if($query->approval()){
@@ -356,9 +356,9 @@ class OfficialReportController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Production Issue telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Berita acara telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
+                    } */
 
                     if(in_array($query->status,['1','6'])){
 

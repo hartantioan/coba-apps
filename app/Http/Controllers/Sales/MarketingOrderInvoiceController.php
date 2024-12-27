@@ -1336,7 +1336,7 @@ class MarketingOrderInvoiceController extends Controller
         $po['total'] = number_format($po->total,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
         $po['downpayment'] = number_format($po->downpayment,2,',','.');
-        $po['rounding'] = number_format($po->rounding,2,',','.');
+        $po['rounding'] = CustomHelper::formatConditionalQty($po->rounding);
         $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
         $po['user_datas'] = $po->account->getBillingAddress();

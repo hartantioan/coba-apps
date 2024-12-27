@@ -2503,7 +2503,6 @@
                 $('#total').val(response.total);
                 $('#grandtotal').val(response.grandtotal);
                 $('#downpayment').val(response.downpayment);
-                $('#rounding').val(response.rounding);
                 $('#tax_no').val(response.tax_no);
                 $('#type').val(response.type).formSelect();
                 $('#marketing_order_delivery_process_id').empty();
@@ -2513,6 +2512,7 @@
                     `);
                 }
                 $('#invoice_type').val(response.invoice_type).trigger('change');
+                $('#rounding').val(response.rounding);
 
                 $('#user_data_id').empty();
                 if(response.user_datas.length > 0){
@@ -2974,7 +2974,6 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        console.log(total);
         if(total > 0){
             $('#textTax').show();
             getTaxSeries();

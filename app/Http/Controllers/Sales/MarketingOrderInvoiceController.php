@@ -105,6 +105,7 @@ class MarketingOrderInvoiceController extends Controller
             'note',
             'subtotal',
             'downpayment',
+            'rounding',
             'total',
             'tax',
             'grandtotal',
@@ -271,6 +272,7 @@ class MarketingOrderInvoiceController extends Controller
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->downpayment,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
@@ -484,11 +486,12 @@ class MarketingOrderInvoiceController extends Controller
                         $query->tax_id = $request->tempTaxId ?? NULL;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
+                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->tax_no = $request->tax_no;
+                        $query->tax_no = $request->tax_no && str_replace(',','.',str_replace('.','',$request->total)) > 0 ? $request->tax_no : NULL;
                         $query->note = $request->note;
 
                         $query->save();
@@ -536,11 +539,12 @@ class MarketingOrderInvoiceController extends Controller
                         'tax_id'                        => $request->tempTaxId ?? NULL,
                         'subtotal'                      => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'downpayment'                   => str_replace(',','.',str_replace('.','',$request->downpayment)),
+                        'rounding'                      => str_replace(',','.',str_replace('.','',$request->rounding)),
                         'total'                         => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
-                        'tax_no'                        => $request->tax_no ? $taxno : NULL,
+                        'tax_no'                        => $request->tax_no && str_replace(',','.',str_replace('.','',$request->total)) > 0 ? $taxno : NULL,
                         'note'                          => $request->note,
 
                     ]);
@@ -1332,6 +1336,7 @@ class MarketingOrderInvoiceController extends Controller
         $po['total'] = number_format($po->total,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
         $po['downpayment'] = number_format($po->downpayment,2,',','.');
+        $po['rounding'] = number_format($po->rounding,2,',','.');
         $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
         $po['user_datas'] = $po->account->getBillingAddress();

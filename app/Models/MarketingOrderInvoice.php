@@ -34,6 +34,7 @@ class MarketingOrderInvoice extends Model
         'note',
         'subtotal',
         'downpayment',
+        'rounding',
         'total',
         'tax',
         'grandtotal',

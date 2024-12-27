@@ -159,33 +159,7 @@ class CustomHelper {
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
-		/* ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
-		self::accumulateCogs($date,$company_id,$place_id,$item_id); */
 		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
-
-		/* $old_data = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->orderByDesc('date')->orderByDesc('id')->first();
-		
-		ItemCogs::create([
-			'lookable_type'		    => $lookable_type,
-			'lookable_id'		    => $lookable_id,
-			'detailable_type'	    => $detail_type,
-			'detailable_id'		    => $detail_id,
-			'company_id'		   	=> $company_id,
-			'place_id'			    => $place_id,
-			'warehouse_id'		    => $warehouse_id,
-			'item_id'			    => $item_id,
-			'qty_in'			    => $type == 'IN' ? $qty : NULL,
-			'price_in'			    => $type == 'IN' ? round($total / $qty,5) : NULL,
-			'total_in'			    => $type == 'IN' ? $total : NULL,
-			'qty_out'			    => $type == 'OUT' ? $qty : NULL,
-			'price_out'			    => $type == 'OUT' ? round($total / $qty,5) : NULL,
-			'total_out'			    => $type == 'OUT' ? $total : NULL,
-			'qty_final'			    => $qty_final,
-			'price_final'		    => round($total_final / $qty_final,5),
-			'total_final'		    => $total_final,
-			'date'				    => $date,
-			'type'				    => $type
-		]); */
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
@@ -4189,6 +4163,22 @@ class CustomHelper {
 				CustomHelper::removeDeposit($moi->account_id,$moi->downpayment);
 			}
 
+			if($moi->rounding > 0 || $moi->rounding < 0){
+				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$moi->company_id)->first();
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding->id,
+					'account_id'	=> $coarounding->bp_journal ? ($moi->account_id ? $moi->account_id : NULL) : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> $moi->rounding > 0 ? '2' : '1',
+					'nominal'		=> floatval(abs($moi->rounding)),
+					'nominal_fc'	=> floatval(abs($moi->rounding)),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'note'			=> 'PEMBULATAN'
+				]);
+			}
+
 			if($moi->tax > 0){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
@@ -4411,8 +4401,6 @@ class CustomHelper {
 			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$mom->company_id)->first();
 			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$mom->company_id)->first();
 			$coapotonganpenjualan = Coa::where('code','400.02.01.01.01')->where('company_id',$mom->company_id)->first();
-			// $coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$mom->company_id)->first();// tdk usa
-			// $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$mom->company_id)->first();// tdk usa
 
             $total = round($mom->total * $mom->currency_rate,2);
             $tax = round($mom->tax * $mom->currency_rate,2);
@@ -4453,150 +4441,120 @@ class CustomHelper {
 
             }
 
+			if($mom->memo_type == '2'){
+				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$mom->company_id)->first();
+				$coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$mom->company_id)->first();
+				foreach($mom->marketingOrderMemoDetail as $row){
+					if($row->lookable_type == 'marketing_order_delivery_process_details'){
+						$hpp = round(($row->lookable->total / ($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion)) * $row->qty,2);
 
-/*
-			$totalDebit = 0;
-			$totalCredit = 0;
-			$balance = 0;
+						if($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->where('status','2')->count() > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+								'place_id'		=> $row->itemStock->place_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $hpp,
+								'nominal_fc'    => $hpp,
+								'note'          => $row->lookable->marketingOrderDeliveryProcess->code,
+								'note2'         => $row->lookable->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+								'lookable_type'	=> $mom->getTable(),
+								'lookable_id'	=> $mom->id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
 
-			foreach($mom->marketingOrderMemoDetail as $row){
-				if($row->lookable_type == 'marketing_order_invoice_details'){
+							/* if($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->where('status','3')->count() == 0){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'account_id'	=> $coabdp->bp_journal ? $mom->account_id : NULL,
+									'coa_id'		=> $coabdp->id,
+									'place_id'		=> $row->itemStock->place_id,
+									'item_id'		=> $row->itemStock->item_id,
+									'warehouse_id'	=> $row->itemStock->warehouse_id,
+									'type'			=> '2',
+									'nominal'		=> $hpp,
+									'nominal_fc'    => $hpp,
+									'note'          => $row->lookable->marketingOrderDeliveryProcess->code,
+									'note2'         => $row->lookable->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+									'lookable_type'	=> $mom->getTable(),
+									'lookable_id'	=> $mom->id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
+								]);
+							} */
+				
+							CustomHelper::sendCogs($mom->getTable(),
+								$mom->id,
+								$row->itemStock->place->company_id,
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								$hpp,
+								'IN',
+								$mom->post_date,
+								$row->itemStock->area_id,
+								$row->itemStock->item_shading_id,
+								$row->itemStock->production_batch_id,
+								$row->getTable(),
+								$row->id,
+							);
+				
+							CustomHelper::sendStock(
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								'IN',
+								$row->itemStock->area_id,
+								$row->itemStock->item_shading_id,
+								$row->itemStock->production_batch_id,
+							);
+						}
 
-					$total = round($row->total * $row->lookable->lookable->marketingOrderDelivery->marketingOrder->currency_rate,2);
-					$tax = round($row->tax * $row->lookable->lookable->marketingOrderDelivery->marketingOrder->currency_rate,2);
+						if($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->where('status','3')->count() > 0){
+							/* JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'account_id'	=> $coabdp->bp_journal ? $mom->account_id : NULL,
+								'coa_id'		=> $coabdp->id,
+								'place_id'		=> $row->itemStock->place_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $hpp,
+								'nominal_fc'	=> $hpp,
+								'note'          => $row->lookable->marketingOrderDeliveryProcess->code,
+								'note2'         => $row->lookable->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+								'lookable_type'	=> $mom->getTable(),
+								'lookable_id'	=> $mom->id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]); */
 
-					if($total > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coapotonganpenjualan->id,
-							'account_id'	=> $coapotonganpenjualan->bp_journal ? $mom->account_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $total,
-						]);
-						$totalDebit += $total;
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'account_id'	=> $coahpp->bp_journal ? $mom->account_id : NULL,
+								'coa_id'		=> $coahpp->id,
+								'place_id'		=> $row->itemStock->place_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '2',
+								'nominal'		=> $hpp,
+								'nominal_fc'	=> $hpp,
+								'note'          => $row->lookable->marketingOrderDeliveryProcess->code,
+								'note2'         => $row->lookable->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+								'lookable_type'	=> $mom->getTable(),
+								'lookable_id'	=> $mom->id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+						}
 					}
-
-					if($tax > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->lookable->lookable->marketingOrderDetail->taxId->coa_sale_id,
-							'account_id'	=> $row->lookable->lookable->marketingOrderDetail->taxId->coaSale->bp_journal ? $mom->account_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $tax,
-							'note'			=> 'No Seri Pajak : '.$mom->tax_no,
-						]);
-						$totalDebit += $tax;
-					}
-
-					if($row->grandtotal > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coapiutang->id,
-							'account_id'	=> $coapiutang->bp_journal ? $mom->account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->grandtotal * $row->lookable->lookable->marketingOrderDelivery->marketingOrder->currency_rate,
-						]);
-						$totalCredit += $row->grandtotal * $row->lookable->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
-					}
-
-					// if($totalDebit !== $totalCredit){
-					// 	$balance = $totalDebit - $totalCredit;
-
-					// 	JournalDetail::create([
-					// 		'journal_id'	=> $query->id,
-					// 		'coa_id'		=> $coarounding->id,
-					// 		'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
-					// 		'type'			=> $balance > 0 ? '2' : '1',
-					// 		'nominal'		=> -1 * $balance,
-					// 	]);
-					// }
-
-					// if($mom->type == '2'){
-					// 	$hpp = $row->lookable->lookable->getPriceHpp() * $row->qty;
-
-					// 	JournalDetail::create([
-					// 		'journal_id'	=> $query->id,
-					// 		'account_id'	=> $mom->account_id,
-					// 		'coa_id'		=> $row->lookable->lookable->itemStock->item->itemGroup->coa_id,
-					// 		'place_id'		=> $row->lookable->lookable->place_id,
-					// 		'item_id'		=> $row->lookable->lookable->item_id,
-					// 		'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
-					// 		'type'			=> '1',
-					// 		'nominal'		=> $hpp,
-					// 	]);
-
-					// 	JournalDetail::create([
-					// 		'journal_id'	=> $query->id,
-					// 		'account_id'	=> $coahpp->bp_journal ? $mom->account_id : NULL,
-					// 		'coa_id'		=> $coahpp->id,
-					// 		'place_id'		=> $row->lookable->lookable->place_id,
-					// 		'item_id'		=> $row->lookable->lookable->item_id,
-					// 		'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
-					// 		'type'			=> '2',
-					// 		'nominal'		=> $hpp,
-					// 	]);
-
-					// 	self::sendCogs($table_name,
-					// 		$mom->id,
-					// 		$row->lookable->lookable->place->company_id,
-					// 		$row->lookable->lookable->place_id,
-					// 		$row->lookable->lookable->warehouse_id,
-					// 		$row->lookable->lookable->item_id,
-					// 		$row->qty * $row->lookable->lookable->item->sell_convert,
-					// 		$hpp,
-					// 		'IN',
-					// 		$mom->post_date,
-					// 		$row->lookable->lookable->area_id,
-					// 		NULL,
-					// 		NULL,
-					// 	);
-
-					// 	self::sendStock(
-					// 		$row->lookable->lookable->place_id,
-					// 		$row->lookable->lookable->warehouse_id,
-					// 		$row->lookable->lookable->item_id,
-					// 		$row->qty * $row->lookable->lookable->item->sell_convert,
-					// 		'IN',
-					// 		$row->lookable->lookable->area_id,
-					// 		NULL,
-					// 		NULL,
-					// 	);
-					// }
 				}
-
-				CustomHelper::removeCountLimitCredit($mom->account_id,$row->grandtotal);
-			} */
-/*
-			if($mom->type == '3'){
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coapotonganpenjualan->id,
-					'account_id'	=> $coapotonganpenjualan->bp_journal ? $mom->account_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $mom->total,
-				]);
-
-				if($mom->tax > 0){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $mom->taxMaster->coa_sale_id,
-						'account_id'	=> $mom->taxMaster->coaSale->bp_journal ? $mom->account_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $mom->tax,
-					]);
-				}
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coapiutang->id,
-					'account_id'	=> $coapiutang->bp_journal ? $account_id : NULL,
-					'type'			=> '2',
-					'nominal'		=> $mom->grandtotal,
-				]);
-
-				CustomHelper::removeCountLimitCredit($mom->account_id,$mom->grandtotal);
-			} */
+			}
 
 		}elseif($table_name == 'purchase_invoices'){
 			#self::removeJournal($table_name,$table_id);

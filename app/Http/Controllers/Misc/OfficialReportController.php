@@ -363,28 +363,28 @@ class OfficialReportController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         $query->user_id = session('bo_id');
-                        $query->company_id = $request->company_id;
+                        /* $query->company_id = $request->company_id;
                         $query->account_id = $request->account_id;
                         $query->post_date = $request->post_date;
                         $query->incident_date = $request->incident_date;
                         $query->place_id = $request->place_id;
-                        $query->source_document = $request->source_document;
+                        $query->source_document = $request->source_document; */
                         $query->target_document = $request->target_document;
-                        $query->chronology = $request->chronology;
+                        /* $query->chronology = $request->chronology;
                         $query->action = $request->action;
                         $query->note = $request->note;
-                        $query->status = '1';
+                        $query->status = '1'; */
 
                         $query->save();
 
-                        foreach($query->officialReportDetail as $row){
+                        /* foreach($query->officialReportDetail as $row){
                             $row->deleteFile();
                             $row->delete();
                         }
 
                         $query->officialReportApprover()->delete();
 
-                        CustomHelper::removeApproval($query->getTable(),$query->id);
+                        CustomHelper::removeApproval($query->getTable(),$query->id); */
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -413,144 +413,153 @@ class OfficialReportController extends Controller
                 }
                 
                 if($query) {
-                    if($request->file('file')){
-                        foreach($request->file('file') as $key => $file)
-                        {
-                            $arrFile[] = $file->store('public/official_reports');
-                        }
-                    }
 
-                    if(count($arrFile) > 0){
-                        foreach($arrFile as $row){
-                            OfficialReportDetail::create([
-                                'official_report_id'    => $query->id,
-                                'document'              => $row,
-                            ]);
+                    if(!$request->temp){
+                        if($request->file('file')){
+                            foreach($request->file('file') as $key => $file)
+                            {
+                                $arrFile[] = $file->store('public/official_reports');
+                            }
                         }
-                    }
-
-                    if($request->arr_user){
-                        $tempArrayStage = [];
-                        $countApprover = 0;
-                        foreach($request->arr_user as $rowuser){
-                            $approvalStage = ApprovalStage::where('code','like',"BA-%")->where('status','1')->where('level',1)->whereHas('approvalStageDetail',function($query)use($rowuser,$request){
-                                $query->where('user_id',intval($rowuser));
-                            })->get();
-                            if(count($approvalStage) > 0){
-                                foreach($approvalStage as $rowstage){
-                                    $has = false;
-                                    foreach($rowstage->approvalStageDetail as $rowstagedetail){
-                                        if(!in_array($rowstagedetail->user_id,$request->arr_user)){
-                                            $has = true;
+    
+                        if(count($arrFile) > 0){
+                            foreach($arrFile as $row){
+                                OfficialReportDetail::create([
+                                    'official_report_id'    => $query->id,
+                                    'document'              => $row,
+                                ]);
+                            }
+                        }
+    
+                        if($request->arr_user){
+                            $tempArrayStage = [];
+                            $countApprover = 0;
+                            foreach($request->arr_user as $rowuser){
+                                $approvalStage = ApprovalStage::where('code','like',"BA-%")->where('status','1')->where('level',1)->whereHas('approvalStageDetail',function($query)use($rowuser,$request){
+                                    $query->where('user_id',intval($rowuser));
+                                })->get();
+                                if(count($approvalStage) > 0){
+                                    foreach($approvalStage as $rowstage){
+                                        $has = false;
+                                        foreach($rowstage->approvalStageDetail as $rowstagedetail){
+                                            if(!in_array($rowstagedetail->user_id,$request->arr_user)){
+                                                $has = true;
+                                            }
+                                        }
+                                        if(!$has){
+                                            $tempArrayStage[] = $rowstage->id;
                                         }
                                     }
-                                    if(!$has){
-                                        $tempArrayStage[] = $rowstage->id;
+                                }
+                                OfficialReportApprover::create([
+                                    'official_report_id'    => $query->id,
+                                    'user_id'               => $rowuser,
+                                ]);
+                                $countApprover++;
+                            }
+                            $id = self::filterArray($tempArrayStage,count($request->arr_user));
+                            $approvalTemplate = NULL;
+                            $passed = true;
+                            if($id > 0){
+                                $approvalTemplate = ApprovalTemplate::whereHas('approvalTemplateStage',function($query)use($id){
+                                    $query->where('approval_stage_id',$id);
+                                })->whereHas('approvalTemplateMenu',function($query){
+                                    $query->where('table_name','official_reports');
+                                })->where('status','1')->first();
+                                if(!$approvalTemplate){
+                                    $passed = false;
+                                }else{
+                                    $cekuser = $approvalTemplate->approvalTemplateOriginator()->where('user_id',session('bo_id'))->count();
+                                    if($cekuser == 0){
+                                        ApprovalTemplateOriginator::create([
+                                            'approval_template_id'      => $approvalTemplate->id,
+                                            'user_id'                   => session('bo_id'),
+                                        ]);
+                                    }
+                                }
+                            }else{
+                                $passed = false;
+                                $approvalStageKuy = ApprovalStage::create([
+                                    'code'			        => 'BA-'.Str::random(10),
+                                    'approval_id'			=> 1,
+                                    'level'                 => 1,
+                                    'status'                => '1',
+                                    'min_approve'           => $countApprover,
+                                    'min_reject'            => 1,
+                                ]);
+                                foreach($request->arr_user as $rowuser){
+                                    ApprovalStageDetail::create([
+                                        'approval_stage_id'     => $approvalStageKuy->id,
+                                        'user_id'               => $rowuser,
+                                    ]);
+                                }
+                                $id = $approvalStageKuy->id;
+                            }
+                            if(!$passed){
+                                $codename = 'BA-'.Str::random(10);
+                                $approvalTemplate = ApprovalTemplate::create([
+                                    'code'              => $codename,
+                                    'user_id'           => session('bo_id'),
+                                    'name'              => $codename,
+                                    'nominal_final'     => 0,
+                                    'status'            => '1',
+                                ]);
+                                ApprovalTemplateOriginator::create([
+                                    'approval_template_id'      => $approvalTemplate->id,
+                                    'user_id'                   => session('bo_id'),
+                                ]);
+                                ApprovalTemplateStage::create([
+                                    'approval_template_id'      => $approvalTemplate->id,
+                                    'approval_stage_id'         => $id,
+                                ]);
+                                ApprovalTemplateMenu::create([
+                                    'approval_template_id'      => $approvalTemplate->id,
+                                    'menu_id'                   => $menu->id,
+                                    'table_name'                => $menu->table_name,
+                                ]);
+                            }
+    
+                            $source = ApprovalSource::create([
+                                'code'			=> strtoupper(uniqid()),
+                                'user_id'		=> session('bo_id'),
+                                'date_request'	=> date('Y-m-d H:i:s'),
+                                'lookable_type'	=> $query->getTable(),
+                                'lookable_id'	=> $query->id,
+                                'note'			=> 'Approval Berita Acara '.$query->code,
+                            ]);
+    
+                            foreach($approvalTemplate->approvalTemplateStage as $rowTemplateStage){
+                                foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
+                                    ApprovalMatrix::create([
+                                        'code'							=> strtoupper(Str::random(30)),
+                                        'approval_template_stage_id'	=> $rowTemplateStage->id,
+                                        'approval_source_id'			=> $source->id,
+                                        'user_id'						=> $rowStageDetail->user_id,
+                                        'date_request'					=> date('Y-m-d H:i:s'),
+                                        'status'						=> '1'
+                                    ]);
+                                    if($rowStageDetail->user->phone == '085729547103'){
+                                        WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                        WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                     }
                                 }
                             }
-                            OfficialReportApprover::create([
-                                'official_report_id'    => $query->id,
-                                'user_id'               => $rowuser,
-                            ]);
-                            $countApprover++;
                         }
-                        $id = self::filterArray($tempArrayStage,count($request->arr_user));
-                        $approvalTemplate = NULL;
-                        $passed = true;
-                        if($id > 0){
-                            $approvalTemplate = ApprovalTemplate::whereHas('approvalTemplateStage',function($query)use($id){
-                                $query->where('approval_stage_id',$id);
-                            })->whereHas('approvalTemplateMenu',function($query){
-                                $query->where('table_name','official_reports');
-                            })->where('status','1')->first();
-                            if(!$approvalTemplate){
-                                $passed = false;
-                            }else{
-                                $cekuser = $approvalTemplate->approvalTemplateOriginator()->where('user_id',session('bo_id'))->count();
-                                if($cekuser == 0){
-                                    ApprovalTemplateOriginator::create([
-                                        'approval_template_id'      => $approvalTemplate->id,
-                                        'user_id'                   => session('bo_id'),
-                                    ]);
-                                }
-                            }
-                        }else{
-                            $passed = false;
-                            $approvalStageKuy = ApprovalStage::create([
-                                'code'			        => 'BA-'.Str::random(10),
-                                'approval_id'			=> 1,
-                                'level'                 => 1,
-                                'status'                => '1',
-                                'min_approve'           => $countApprover,
-                                'min_reject'            => 1,
-                            ]);
-                            foreach($request->arr_user as $rowuser){
-                                ApprovalStageDetail::create([
-                                    'approval_stage_id'     => $approvalStageKuy->id,
-                                    'user_id'               => $rowuser,
-                                ]);
-                            }
-                            $id = $approvalStageKuy->id;
-                        }
-                        if(!$passed){
-                            $codename = 'BA-'.Str::random(10);
-                            $approvalTemplate = ApprovalTemplate::create([
-                                'code'              => $codename,
-                                'user_id'           => session('bo_id'),
-                                'name'              => $codename,
-                                'nominal_final'     => 0,
-                                'status'            => '1',
-                            ]);
-                            ApprovalTemplateOriginator::create([
-                                'approval_template_id'      => $approvalTemplate->id,
-                                'user_id'                   => session('bo_id'),
-                            ]);
-                            ApprovalTemplateStage::create([
-                                'approval_template_id'      => $approvalTemplate->id,
-                                'approval_stage_id'         => $id,
-                            ]);
-                            ApprovalTemplateMenu::create([
-                                'approval_template_id'      => $approvalTemplate->id,
-                                'menu_id'                   => $menu->id,
-                                'table_name'                => $menu->table_name,
-                            ]);
-                        }
-
-                        $source = ApprovalSource::create([
-                            'code'			=> strtoupper(uniqid()),
-                            'user_id'		=> session('bo_id'),
-                            'date_request'	=> date('Y-m-d H:i:s'),
-                            'lookable_type'	=> $query->getTable(),
-                            'lookable_id'	=> $query->id,
-                            'note'			=> 'Approval Berita Acara '.$query->code,
-                        ]);
-
-                        foreach($approvalTemplate->approvalTemplateStage as $rowTemplateStage){
-                            foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
-                                ApprovalMatrix::create([
-                                    'code'							=> strtoupper(Str::random(30)),
-                                    'approval_template_stage_id'	=> $rowTemplateStage->id,
-                                    'approval_source_id'			=> $source->id,
-                                    'user_id'						=> $rowStageDetail->user_id,
-                                    'date_request'					=> date('Y-m-d H:i:s'),
-                                    'status'						=> '1'
-                                ]);
-                                if($rowStageDetail->user->phone == '085729547103'){
-									WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
-									WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
-								}
-                            }
-                        }
+    
+                        CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Berita Acara No. '.$query->code,$query->note,session('bo_id'));
+    
+                        activity()
+                            ->performedOn(new OfficialReport())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Add / edit official report.');
+                    }else{
+                        activity()
+                            ->performedOn(new OfficialReport())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Update official report.');
                     }
-
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Berita Acara No. '.$query->code,$query->note,session('bo_id'));
-
-                    activity()
-                        ->performedOn(new OfficialReport())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit official report.');
 
                     $response = [
                         'status'    => 200,

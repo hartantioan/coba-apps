@@ -186,6 +186,7 @@
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">{{ __('translations.subtotal') }}</th>
                                                         <th rowspan="2">Downpayment</th>
+                                                        <th rowspan="2">Pembulatan</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
@@ -463,6 +464,12 @@
                                             <td>Uang Muka (AR DP)</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr id="id-rounding">
+                                            <td>Pembulatan</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" style="text-align:right;width:100%;" onkeyup="formatRupiah(this);countAll();">
                                             </td>
                                         </tr>
                                         <tr>
@@ -1157,12 +1164,15 @@
                 </td>
             </tr>
         `);
+        $('#rounding').val('0,00');
         if($('#invoice_type').val() == '1'){
             $('.div-sj').removeClass('hide');
             $('#div-manual').addClass('hide');
+            $('#id-rounding').removeClass('hide');
         }else if($('#invoice_type').val() == '2'){
             $('.div-sj').addClass('hide');
             $('#div-manual').removeClass('hide');
+            $('#id-rounding').addClass('hide');
         }
     }
 
@@ -2101,6 +2111,7 @@
                 { name: 'note', className: '' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'downpayment', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
@@ -2492,6 +2503,7 @@
                 $('#total').val(response.total);
                 $('#grandtotal').val(response.grandtotal);
                 $('#downpayment').val(response.downpayment);
+                $('#rounding').val(response.rounding);
                 $('#tax_no').val(response.tax_no);
                 $('#type').val(response.type).formSelect();
                 $('#marketing_order_delivery_process_id').empty();
@@ -2926,7 +2938,7 @@
     }
 
     function countAll(){
-        let total = 0, tax = 0, subtotal = 0, grandtotal = 0, downpayment = 0, percentTax = parseFloat($('#tempTaxPercent').val());
+        let total = 0, tax = 0, subtotal = 0, grandtotal = 0, downpayment = 0, percentTax = parseFloat($('#tempTaxPercent').val()), rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
 
         $('input[name^="arr_total[]"]').each(function(index){
             subtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -2936,7 +2948,7 @@
             downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        total = subtotal - downpayment;
+        total = subtotal - downpayment + rounding;
 
         tax = Math.floor(total * (percentTax / 100));
 
@@ -2962,7 +2974,8 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        if(subtotal > 0){
+        console.log(total);
+        if(total > 0){
             $('#textTax').show();
             getTaxSeries();
         }else{

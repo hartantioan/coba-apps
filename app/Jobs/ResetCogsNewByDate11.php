@@ -1541,7 +1541,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
       $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
       if($itemstock){
           $itemstock->update([
-              'qty'   => $itemstock->stockByDateStart($date,date('Y-m-d')),
+              $itemstock->stockByDate(date('Y-m-d')),
           ]);
       }
     }

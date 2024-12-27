@@ -54,6 +54,21 @@ class ItemStock extends Model
         return $qty;
     }
 
+    public function stockByDateStart($datestart,$dateend){
+        $qty = 0;
+        $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('area_id',$this->area_id)->where('date','>=',$datestart)->where('date','<=',$dateend)->orderBy('date')->orderBy('id')->get();
+        $cogstart = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('area_id',$this->area_id)->where('date','<',$datestart)->orderByDesc('date')->orderByDesc('id')->first();
+        $qty += $cogstart ? round($cogstart->qty_final,3) : 0;
+        foreach($cogs as $row){
+            if($row->type == 'IN'){
+                $qty += round($row->qty_in,3);
+            }elseif($row->type == 'OUT'){
+                $qty -= round($row->qty_out,3);
+            }
+        }
+        return $qty;
+    }
+
     public function productionBatch(){
         return $this->belongsTo('App\Models\ProductionBatch', 'production_batch_id', 'id')->withTrashed();
     }

@@ -45,6 +45,7 @@ use App\Models\IssueGlazeDetail;
 use App\Models\ReceiveGlaze;
 use App\Models\ReceiveGlazeDetail;
 use App\Models\PurchaseMemo;
+use App\Models\MarketingOrderMemoDetail;
 use Carbon\CarbonPeriod;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -820,6 +821,54 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
             $totalBefore = $total_final;
         }
 
+        $memo = MarketingOrderMemoDetail::whereHas('marketingOrderMemo',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
+            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
+        })->get();
+
+        foreach($memo as $row){
+            $total = round(($row->lookable->total / ($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion)) * $row->qty,2);
+            $qty = $row->qty;
+            $price = round($total / $qty,5);
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([   
+                'lookable_type'       => $row->marketingOrderMemo->getTable(),
+                'lookable_id'         => $row->marketingOrderMemo->id,
+                'detailable_type'     => $row->getTable(),
+                'detailable_id'       => $row->id,
+                'company_id'          => $row->marketingOrderMemo->company_id,
+                'place_id'            => $row->itemStock->place_id,
+                'warehouse_id'        => $row->itemStock->warehouse_id,
+                'item_id'             => $row->itemStock->item_id,
+                'qty_in'              => $qty,
+                'price_in'            => $price,
+                'total_in'            => $total,
+                'qty_final'           => $qty_final,
+                'price_final'         => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'         => $total_final,
+                'date'                => $dateloop,
+                'type'                => 'IN',
+                'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+                'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+                'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+            ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => $total,
+                    'nominal'     => $total,
+                ]);
+            }
+            if($row->productionBatch()->exists()){
+                $row->productionBatch->update([
+                    'total' => $total,
+                ]);
+            }
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
         $goodissue = GoodIssueDetail::whereHas('goodIssue',function($query)use($dateloop,$item_id){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
@@ -1486,13 +1535,18 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
             ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+            if($row->marketingOrderMemoDetail()->exists()){
+                foreach($row->marketingOrderMemoDetail as $rowmemo){
+                    self::dispatch($rowmemo->marketingOrderMemo->post_date,$rowmemo->marketingOrderMemo->company_id,$rowmemo->itemStock->place_id,$rowmemo->itemStock->item_id,$rowmemo->itemStock->area_id,$rowmemo->itemStock->item_shading_id,$rowmemo->itemStock->production_batch_id,$end_date);
+                }
+            }
         }
       }
       CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
       $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
       if($itemstock){
           $itemstock->update([
-              'qty'   => $itemstock->stockByDate(date('Y-m-d')),
+              'qty'   => $itemstock->stockByDateStart($date,date('Y-m-d')),
           ]);
       }
     }

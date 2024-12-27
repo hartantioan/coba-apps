@@ -149,7 +149,8 @@
                                                         <th>{{ __('translations.customer') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>{{ __('translations.type') }}</th>
+                                                        <th>Tipe Memo</th>
+                                                        <th>Tipe Pembayaran</th>
                                                         <th>Dokumen</th>
                                                         <th>No.Seri Pajak</th>
                                                         <th>{{ __('translations.note') }}</th>
@@ -208,11 +209,18 @@
                                         <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
+                                        <select class="form-control" id="memo_type" name="memo_type" onchange="showHideQty();">
+                                            <option value="1">Nominal</option>
+                                            <option value="2">Qty Barang</option>
+                                        </select>
+                                        <label class="" for="memo_type">Tipe Memo</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="type" name="type">
                                             <option value="1">DP</option>
                                             <option value="2">Credit</option>
                                         </select>
-                                        <label class="" for="type">{{ __('translations.type') }}</label>
+                                        <label class="" for="type">Tipe Pembayaran</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="company_id" name="company_id">
@@ -270,42 +278,86 @@
                             </div>
                             <div class="col s12">
                                 <fieldset>
-                                    <fieldset>
-                                        <legend>2. Pajak</legend>
-                                        <div class="input-field col m3 s12 step11">
-                                            <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
-                                                <option value="010">010</option>
-                                            </select>
-                                            <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
-                                        </div>
-                                        <div class="input-field col m3 s12 step11">
-                                            <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
-                                                <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                                @foreach ($tax as $row)
-                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label class="active" for="tax_id">PPN</label>
-                                        </div>
-                                        <div class="input-field col m3 s12 step12">
-                                            <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
-                                                <option value="0">--Tidak--</option>
-                                                <option value="1">--Ya--</option>
-                                            </select>
-                                            <label class="active" for="is_include_tax">Termasuk PPN</label>
-                                        </div>
-                                        <div class="input-field col m3 s12 step13">
-                                            <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
-                                            <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
-                                        </div>
-                                    </fieldset>
+                                    <legend>2. Pajak</legend>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
+                                            <option value="010">010</option>
+                                        </select>
+                                        <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                            <option value="0.00000" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="tax_id">PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
+                                            <option value="0">--Tidak--</option>
+                                            <option value="1">--Ya--</option>
+                                        </select>
+                                        <label class="active" for="is_include_tax">Termasuk PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step13">
+                                        <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                    </div>
                                 </fieldset>
                             </div>
-                            <div class="input-field col m4 s12 step12">
-
-                            </div>
-                            <div class="input-field col m2 s12">
-
+                            <div class="col s12 hide" id="detail-qty">
+                                <fieldset style="min-width: 100%;overflow:auto;">
+                                    <legend>3. Detail Dokumen Terpakai</legend>
+                                    <div class="row">
+                                        <div class="input-field col m4 step10">
+                                            <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id" onchange="changeAccount();"></select>
+                                            <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
+                                        </div>
+                                        <div class="col m1 s12 pt-1">
+                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getDeliveryProcess();" href="javascript:void(0);">
+                                                <i class="material-icons">add</i>
+                                            </a>
+                                        </div>
+                                        <div class="col m7 s12">
+                                            <p>
+                                                Untuk tipe Memo : QTY BARANG, maka anda bisa mengambil data dari Surat Jalan dan silahkan pilih batch item mana yang ingin dikembalikan. 1 Memo hanya untuk 1 tipe pajak / prosentase pajak saja. Untuk item Palet akan kembali menjadi item Box, sedangkan item Box akan menjadi item Box. Sedangkan curah tidak diakomodir.
+                                            </p>
+                                        </div>
+                                    </div> 
+                                    <div class="col m12 s12 step11" style="min-width:2500px !important;" id="table-item">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" id="table-detail">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Hapus</th>
+                                                        <th class="center">Dokumen</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Item</th>
+                                                        <th class="center">Shading</th>
+                                                        <th class="center">Batch</th>
+                                                        <th class="center">Qty Retur</th>
+                                                        <th class="center">Satuan</th>
+                                                        <th class="center">Qty Jual</th>
+                                                        <th class="center">Satuan Jual</th>
+                                                        <th class="center">Total</th>
+                                                        <th class="center">PPN</th>
+                                                        <th class="center">Grandtotal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item">
+                                                    <tr id="last-row-item">
+                                                        <td colspan="14">
+                                                            Silahkan tambahkan Surat Jalan untuk Tipe Qty
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </fieldset>
                             </div>
                             <div class="input-field col m6 s12 step13">
                                 <table width="100%" class="bordered">
@@ -313,7 +365,7 @@
                                         <tr>
                                             <td width="50%">Subtotal</td>
                                             <td width="50%" class="right-align">
-                                                <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;border-bottom:none;" readonly>
+                                                <input id="subtotal" name="subtotal" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
                                         {{-- <tr>
@@ -487,6 +539,43 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal7" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Item Stock Terpakai pada Surat Jalan Terpilih</h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <div id="datatable_buttons_db"></div>
+                        <i class="right">Pilih salah satu item batch dari SJ terpilih.</i>
+                        <table id="table_db" class="display" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center">No.Dokumen</th>
+                                    <th class="center">Tgl.Post</th>
+                                    <th class="center">Kode Item</th>
+                                    <th class="center">Nama Item</th>
+                                    <th class="center">Shading</th>
+                                    <th class="center">Batch</th>
+                                    <th class="center">Qty Terkirim</th>
+                                    <th class="center">Qty Kembali</th>
+                                    <th class="center">Qty Available</th>
+                                    <th class="center">Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail-db"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocument();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -716,6 +805,9 @@
             activeSelect2.classList.remove('tab-active');
         }
     });
+
+    var stockUsed = [];
+
     $(function() {
         $("#table-detail th").resizable({
             minWidth: 100,
@@ -775,8 +867,8 @@
                 }else{
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="11">
-                                Silahkan tambahkan AR Invoice
+                            <td colspan="14">
+                                Silahkan tambahkan Surat Jalan untuk Tipe Qty
                             </td>
                         </tr>
                     `);
@@ -787,6 +879,8 @@
                 };
                 $('.row-mandiri').hide();
                 countAll();
+                stockUsed = [];
+                showHideQty();
             }
         });
 
@@ -851,10 +945,63 @@
             }
         });
 
+        $('#modal7').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi_db = $('#table_db').on('init.dt', function() {
+
+                    }).DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 100,
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_db_wrapper > .dt-buttons').appendTo('#datatable_buttons_db');
+                $('select[name="table_db_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-db').empty();
+
+                $('#table_db').DataTable().clear().destroy();
+            }
+        });
+
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa") }}');
 
-        $('#marketing_order_invoice_id').select2({
+        $('#marketing_order_delivery_process_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -862,7 +1009,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/marketing_order_invoice") }}',
+                url: '{{ url("admin/select2/marketing_order_delivery_process_retur") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
@@ -889,8 +1036,12 @@
         });
 
         $('#body-item').on('click', '.delete-data-item', function() {
+            var codeToRemove = $(this).closest('tr').data('id');
             $(this).closest('tr').remove();
-            countAll();
+            stockUsed = stockUsed.filter(function(code) {
+                return code !== codeToRemove;
+            });
+            countRowAll();
             if($('.row_item').length == 0){
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -902,14 +1053,24 @@
         });
     });
 
+    function showHideQty(){
+        if($('#memo_type').val() == '1'){
+            $("#detail-qty").addClass('hide');
+            $('#nominal').attr('disabled',false);
+        }else if($('#memo_type').val() == '2'){
+            $("#detail-qty").removeClass('hide');
+            $('#nominal').attr('disabled',true);
+        }
+    }
+
     function resetItem(){
         if($('.data-used').length > 0){
             $('.data-used').trigger('click');
         }
         $('#body-item').empty().append(`
             <tr id="last-row-item">
-                <td colspan="11">
-                    Silahkan tambahkan AR Invoice
+                <td colspan="14">
+                    Silahkan tambahkan Surat Jalan untuk Tipe Qty
                 </td>
             </tr>
         `);
@@ -924,120 +1085,97 @@
         }
     }
 
-    function getMarketingInvoice(){
-        if($('#type').val() !== '3'){
-            if($('#marketing_order_invoice_id').val()){
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
+    function changeAccount(){
+        if(!$('#account_id').val() && $('#marketing_order_delivery_process_id').val()){
+            let datakuy = $('#marketing_order_delivery_process_id').select2('data')[0];
+            $('#account_id').append(`
+                <option value="` + datakuy.account_id + `">` + datakuy.account_name + `</option>
+            `);
+        }
+    }
 
-                let datakuy = $('#marketing_order_invoice_id').select2('data')[0];
-
-                $.ajax({
-                    url: '{{ Request::url() }}/send_used_data',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: $('#marketing_order_invoice_id').val(),
-                        type: datakuy.type,
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-
-                        if(response.status == 500){
-                            swal({
-                                title: 'Ups!',
-                                text: response.message,
-                                icon: 'warning'
-                            });
-                        }else{
-                            if($('#last-row-item').length > 0){
-                                $('#last-row-item').remove();
-                            }
-
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + datakuy.code + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_invoice_id').val() + `')">close</i>
-                                </div>
+    function getDeliveryProcess(){
+        if($('#marketing_order_delivery_process_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_delivery_process',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    marketing_order_delivery_process_id: $('#marketing_order_delivery_process_id').val(),
+                    stock_used: stockUsed,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    $('#modal7').modal('open');
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-db').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.document_code + `
+                                    </td>
+                                    <td>
+                                        ` + val.document_date + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td>
+                                        ` + val.shading + `
+                                    </td>
+                                    <td>
+                                        ` + val.batch + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_sent + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_retur + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_available + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                </tr>
                             `);
-
-                            $.each(datakuy.details, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-item').append(`
-                                    <tr class="row_item" data-id="` + $('#marketing_order_invoice_id').val() + `">
-                                        <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
-                                        <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
-                                        <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
-                                        <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
-                                        <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
-                                        <td>
-                                            ` + val.code + `
-                                        </td>
-                                        <td>
-                                            ` + val.tax_no + `
-                                        </td>
-                                        <td class="center">
-                                            ` + datakuy.post_date + `
-                                        </td>
-                                        <td>
-                                            <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
-                                        </td>
-                                        <td>
-                                            ` + val.name + `
-                                        </td>
-                                        <td>
-                                            <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" style="text-align:right;" ` + ($('#type').val() == '1' ? 'readonly' : '') + `>
-                                        </td>
-                                        <td class="center">
-                                            <span>` + val.unit + `</span>
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_tax[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
-                                        </td>
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-
-                            $('#marketing_order_invoice_id').empty();
-
-                            countAll();
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        });
+                        $('#marketing_order_delivery_process_id').empty();
+                    }else{
                         swal({
                             title: 'Ups!',
-                            text: 'Check your internet connection.',
+                            text: 'Data tidak ditemukan',
                             icon: 'error'
                         });
                     }
-                });
-            }
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }else{
-            $('#marketing_order_invoice_id').empty();
             swal({
                 title: 'Ups!',
-                text: 'Mohon maaf, tipe mandiri tidak dapat menambahkan AR Invoice.',
-                icon: 'warning'
+                text: 'Silahkan pilih Surat Jalan.',
+                icon: 'error'
             });
         }
     }
@@ -1413,8 +1551,8 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="11">
-                                Silahkan tambahkan AR Invoice
+                            <td colspan="14">
+                                Silahkan tambahkan Surat Jalan untuk Tipe Qty
                             </td>
                         </tr>
                     `);
@@ -1510,6 +1648,7 @@
                 { name: 'account_id', className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
+                { name: 'memo_type', className: '' },
                 { name: 'type', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'tax_no', className: '' },
@@ -1517,7 +1656,7 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1586,6 +1725,171 @@
             }
         });
 	}
+
+    function addGrandtotalFromQty(){
+        if($('.row_item').length > 0){
+            $('input[name^="arr_tax_id[]"]').each(function(index){
+                
+            });
+        }
+    }
+
+    function applyDocument(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Silahkan cek data terlebih dahulu.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_id = [], passed = true;
+                $.map(table_multi_db.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                });
+                if(arr_id.length > 0){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_sj_detail',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_id: arr_id,
+                            stock_used: stockUsed,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+
+                            if(response.status == 500){
+                                swal({
+                                    title: 'Ups!',
+                                    text: response.message,
+                                    icon: 'warning'
+                                });
+                                if(response.errors){
+                                    $.each(response.errors, function(i, val) {
+                                        M.toast({
+                                            html: val
+                                        });
+                                    });
+                                }
+                            }else{
+                                if(response.details.length > 0){
+                                    let passedTax = true;
+                                    if($('.row_item').length > 0){
+                                        $.each(response.details, function(i, val) {
+                                            let tax_id = val.tax_id;
+                                            $('input[name^="arr_tax_id[]"]').each(function(index){
+                                                if(String($(this).val()) !== String(tax_id)){
+                                                    passedTax = false;
+                                                }
+                                            });
+                                        });
+                                    }
+                                    if(!passedTax){
+                                        M.toast({
+                                            html: 'Pajak tidak sama dengan data yang sudah ditarik. 1 Memo hanya bisa memiliki satu jenis pajak saja.'
+                                        });
+                                    }else{
+                                        if($('.row_item').length == 0){
+                                            $('#body-item').empty();
+                                        }
+                                        $.each(response.details, function(i, val) {
+                                            let count = makeid(10);
+
+                                            let no = $('.row_item').length + 1;
+
+                                            $('#body-item').append(`
+                                                <tr class="row_item" data-id="` + val.id + `">
+                                                    <input type="hidden" name="arr_id[]" value="` + val.id + `">
+                                                    <input type="hidden" name="arr_is_include_tax[]" value="` + val.is_include_tax + `">
+                                                    <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `">
+                                                    <input type="hidden" name="arr_tax_id[]" value="` + val.tax_id + `">
+                                                    <input type="hidden" name="arr_conversion[]" id="arr_conversion` + count + `" value="` + val.conversion + `">
+                                                    <td class="center-align">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        ` + val.document_code + `
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + val.document_date + `
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note[]" type="text" value="" placeholder="Keterangan disini...">
+                                                    </td>
+                                                    <td>
+                                                        ` + val.item_code + ` - ` + val.item_name + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.shading + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.batch + `
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_available + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty_available + `" style="text-align:right;">
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + val.unit + `
+                                                    </td>
+                                                    <td class="right-align" id="arr_qty_sell` + count + `">
+                                                        0,000
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + val.sell_unit + `
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + val.total + `" readonly style="text-align:right;border-bottom:none;" data-total="` + val.total + `">
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input name="arr_tax[]" id="arr_tax` + count + `" type="text" value="` + val.tax + `" readonly style="text-align:right;border-bottom:none;" data-tax="` + val.tax + `">
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input name="arr_grandtotal[]" id="arr_grandtotal` + count + `" type="text" value="` + val.grandtotal + `" readonly style="text-align:right;border-bottom:none;" data-grandtotal="` + val.grandtotal + `">
+                                                    </td>
+                                                </tr>
+                                            `);
+                                            stockUsed.push(val.id);
+                                            $('#tax_id').val(val.percent_tax);
+                                            $('#arr_qty' + count).trigger('keyup');
+                                        });
+                                    }
+                                    /* $('.modal-content').scrollTop($("#body-item").offset().top); */
+                                }
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                    $('#modal7').modal('close');
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan pilih minimal 1 baris.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
+    }
 
     function save(){
 		swal({
@@ -1782,6 +2086,7 @@
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
+                $('#memo_type').val(response.memo_type).formSelect().trigger('change');
                 $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
@@ -1790,9 +2095,75 @@
                 $('#is_include_tax').val(response.is_include_tax);
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
-
                 $('#nominal').val(response.subtotal);
 
+                if(response.details.length > 0){
+                    if($('.row_item').length == 0){
+                        $('#body-item').empty();
+                    }
+                    $.each(response.details, function(i, val) {
+                        let count = makeid(10);
+
+                        let no = $('.row_item').length + 1;
+
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + val.id + `">
+                                <input type="hidden" name="arr_id[]" value="` + val.id + `">
+                                <input type="hidden" name="arr_is_include_tax[]" value="` + val.is_include_tax + `">
+                                <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `">
+                                <input type="hidden" name="arr_tax_id[]" value="` + val.tax_id + `">
+                                <input type="hidden" name="arr_conversion[]" id="arr_conversion` + count + `" value="` + val.conversion + `">
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                                <td>
+                                    ` + val.document_code + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.document_date + `
+                                </td>
+                                <td>
+                                    <input name="arr_note[]" type="text" value="" placeholder="Keterangan disini..." value="` + val.note + `">
+                                </td>
+                                <td>
+                                    ` + val.item_code + ` - ` + val.item_name + `
+                                </td>
+                                <td>
+                                    ` + val.shading + `
+                                </td>
+                                <td>
+                                    ` + val.batch + `
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty_available + `" style="text-align:right;">
+                                </td>
+                                <td class="center-align">
+                                    ` + val.unit + `
+                                </td>
+                                <td class="right-align" id="arr_qty_sell` + count + `">
+                                    0,000
+                                </td>
+                                <td class="center-align">
+                                    ` + val.sell_unit + `
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + val.total_edit + `" readonly style="text-align:right;border-bottom:none;" data-total="` + val.total + `">
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_tax[]" id="arr_tax` + count + `" type="text" value="` + val.tax_edit + `" readonly style="text-align:right;border-bottom:none;" data-tax="` + val.tax + `">
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_grandtotal[]" id="arr_grandtotal` + count + `" type="text" value="` + val.grandtotal_edit + `" readonly style="text-align:right;border-bottom:none;" data-grandtotal="` + val.grandtotal + `">
+                                </td>
+                            </tr>
+                        `);
+                        stockUsed.push(val.id);
+                        $('#tax_id').val(val.percent_tax);
+                        $('#arr_qty' + count).trigger('keyup');
+                    });
+                }
 
                 $('#note').val(response.note);
                 $('#grandtotal').val(response.grandtotal);
@@ -1929,22 +2300,54 @@
         });
     }
 
+    function countRowAll(){
+        let totalAll = 0, taxAll = 0, grandtotalAll = 0;
+        $('input[name^="arr_total[]"]').each(function(index){
+            totalAll += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            taxAll += parseFloat($('input[name^="arr_tax[]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            /* grandtotalAll += parseFloat($('input[name^="arr_grandtotal[]').eq(index).val().replaceAll(".", "").replaceAll(",",".")); */
+        });
+        taxAll = Math.floor(taxAll);
+        grandtotalAll = parseFloat(totalAll + taxAll);
+        $('#nominal').val(
+            (totalAll >= 0 ? '' : '-') + formatRupiahIni(totalAll.toFixed(2).toString().replace('.',','))
+        );
+        $('#subtotal').val(
+            (totalAll >= 0 ? '' : '-') + formatRupiahIni(totalAll.toFixed(2).toString().replace('.',','))
+        );
+        $('#tax').val(
+            (taxAll >= 0 ? '' : '-') + formatRupiahIni(taxAll.toString().replace('.',','))
+        );
+        $('#grandtotal').val(
+            (grandtotalAll >= 0 ? '' : '-') + formatRupiahIni(grandtotalAll.toFixed(2).toString().replace('.',','))
+        );
+    }
+
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
-            qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+        var qty = parseFloat($('#arr_qty' + id).val().replaceAll(".", "").replaceAll(",",".")),
+            qtylimit = parseFloat($('#arr_qty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")),
+            qtyconversion = parseFloat($('#arr_conversion' + id).val().replaceAll(".", "").replaceAll(",",".")),
+            qtysell = 0;
 
         if(qtylimit > 0){
             if(qty > qtylimit){
                 qty = qtylimit;
-                $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+                $('#arr_qty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
             }
         }
-
+        qtysell = qty / qtyconversion;
+        $('#arr_qty_sell' + id).text(formatRupiahIni(qtysell.toFixed(2).toString().replace('.',',')));
         let bobot = qty / qtylimit;
-        let grandtotal = parseFloat($('#arr_grandtotal' + id).data('nominal').toString().replaceAll(".", "").replaceAll(",","."));
+        let grandtotal = parseFloat($('#arr_grandtotal' + id).data('grandtotal').toString().replaceAll(".", "").replaceAll(",","."));
+        let total = parseFloat($('#arr_total' + id).data('total').toString().replaceAll(".", "").replaceAll(",","."));
+        let tax = parseFloat($('#arr_tax' + id).data('tax').toString().replaceAll(".", "").replaceAll(",","."));
         let newgrandtotal = grandtotal * bobot;
+        let newtotal = total * bobot;
+        let newtax = tax * bobot;
         $('#arr_grandtotal' + id).val(formatRupiahIni(newgrandtotal.toFixed(2).toString().replace('.',',')));
-        countAll();
+        $('#arr_total' + id).val(formatRupiahIni(newtotal.toFixed(2).toString().replace('.',',')));
+        $('#arr_tax' + id).val(formatRupiahIni(newtax.toFixed(2).toString().replace('.',',')));
+        countRowAll();
     }
 
     var printService = new WebSocketPrinter({
@@ -1993,7 +2396,9 @@
     }
 
     function countAll(){
+        if($('#memo_type').val() == '1'){
 
+        }
         let nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
 
         subtotal = nominal;

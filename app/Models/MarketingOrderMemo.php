@@ -23,6 +23,7 @@ class MarketingOrderMemo extends Model
         'post_date',
         'note',
         'type',
+        'memo_type',
         'status',
         'document',
         'tax_no',
@@ -135,6 +136,16 @@ class MarketingOrderMemo extends Model
         $type = match ($this->type) {
             '1' => 'DP',
             '2' => 'Credit',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function memoType(){
+        $type = match ($this->memo_type) {
+            '1' => 'Nominal',
+            '2' => 'Qty',
             default => 'Invalid',
         };
 

@@ -3023,6 +3023,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [MarketingOrderMemoController::class, 'getCode']);
                     Route::post('get_tax_series', [MarketingOrderMemoController::class, 'getTaxSeries']);
                     Route::post('get_delivery_process', [MarketingOrderMemoController::class, 'getDeliveryProcess']);
+                    Route::post('get_sj_detail', [MarketingOrderMemoController::class, 'getSjDetail']);
                     Route::post('print', [MarketingOrderMemoController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderMemoController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MarketingOrderMemoController::class, 'viewStructureTree']);

@@ -18,7 +18,9 @@ class MarketingOrderMemoDetail extends Model
         'marketing_order_memo_id',
         'lookable_type',
         'lookable_id',
+        'item_stock_id',
         'qty',
+        'qty_sell',
         'is_include_tax',
         'percent_tax',
         'tax_id',
@@ -43,6 +45,11 @@ class MarketingOrderMemoDetail extends Model
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
     }
 
+    public function itemStock()
+    {
+        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
+    }
+
     public function marketingOrderMemo()
     {
         return $this->belongsTo('App\Models\MarketingOrderMemo', 'marketing_order_memo_id', 'id')->withTrashed();
@@ -50,6 +57,16 @@ class MarketingOrderMemoDetail extends Model
     
     public function lookable(){
         return $this->morphTo();
+    }
+
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function productionBatch(){
+        return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function getCode(){
@@ -60,6 +77,8 @@ class MarketingOrderMemoDetail extends Model
             $code = $this->lookable->marketingOrderInvoice->code;
         }elseif($this->lookable_type == 'coas'){
             $code = $this->lookable->code.' - '.$this->lookable->name;
+        }elseif($this->lookable_type == 'marketing_order_delivery_process_details'){
+            $code = $this->lookable->marketingOrderDeliveryProcess->code.' - '.$this->lookable->marketingOrderDeliveryProcess->marketingOrderInvoice->code;
         }
 
         return $code;

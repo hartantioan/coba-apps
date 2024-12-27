@@ -241,30 +241,29 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dokumen</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                    <th align="center"> {{ __('translations.no') }}.</th>
+                                    <th align="center">Item Retur</th>
+                                    <th align="center">Qty</th>
+                                    <th align="center">Satuan</th>
+                                    <th align="center">Batch</th>
+                                    <th align="center">Shading</th>
+                                    <th align="center"> {{ __('translations.total') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->marketingOrderMemoDetail as $key => $row)
                                 <tr>
                                     <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                    <td align="center">{{ $row->getCode() }}</td>
-                                    <td align="">{{ $row->lookable->lookable->item->name }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
+                                    <td align="center">{{ ($row->itemStock()->exists() ? $row->itemStock->item->code.' - '.$row->itemStock->item->name : '') }}</td>
+                                    <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                    <td align="center">{{ ($row->itemStock()->exists() ? $row->itemStock->item->uomUnit->code : '') }}</td>
+                                    <td class="">{{ ($row->itemStock()->exists() ? $row->itemStock->productionBatch->code : '') }}</td>
+                                    <td class="">{{ ($row->itemStock()->exists() ? $row->itemStock->itemShading->code : '') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="2">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="4">Dokumen: {{ $row->getCode() }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

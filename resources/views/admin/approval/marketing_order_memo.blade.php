@@ -204,9 +204,14 @@
                     <tr>
                         <th class="center-align"> {{ __('translations.no') }}.</th>
                         <th class="center-align"> {{ __('translations.document') }}</th>
-                        <th class="center-align"> {{ __('translations.item') }}</th>
-                        <th class="center-align"> {{ __('translations.qty') }}</th>
-                        <th class="center-align"> {{ __('translations.unit') }}</th>
+                        <th class="center-align">Item SJ</th>
+                        <th class="center-align">Item Retur</th>
+                        <th class="center-align">Qty</th>
+                        <th class="center-align">Satuan</th>
+                        <th class="center-align">Qty Jual</th>
+                        <th class="center-align">Satuan Jual</th>
+                        <th class="center-align">Batch</th>
+                        <th class="center-align">Shading</th>
                         <th class="center-align"> {{ __('translations.total') }}</th>
                         <th class="center-align"> {{ __('translations.tax') }}</th>
                         <th class="center-align"> {{ __('translations.grandtotal') }}</th>
@@ -217,20 +222,25 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->getCode() }}</td>
-                        <td class="">{{ $row->lookable->lookable->item->name }}</td>
-                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name }}</td>
+                        <td class="center-align">{{ ($row->itemStock()->exists() ? $row->itemStock->item->code.' - '.$row->itemStock->item->name : '') }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                        <td class="center-align">{{ ($row->itemStock()->exists() ? $row->itemStock->item->uomUnit->code : '') }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_sell) }}</td>
+                        <td class="center-align">{{ $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
+                        <td class="">{{ ($row->itemStock()->exists() ? $row->itemStock->productionBatch->code : '') }}</td>
+                        <td class="">{{ ($row->itemStock()->exists() ? $row->itemStock->itemShading->code : '') }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="7"> {{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="12"> {{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
                     
                     @endforeach
                     <tr>
-                        <td colspan="5" rowspan="8">
+                        <td colspan="10" rowspan="8">
                             <div class="mt-3">
                                 {{ __('translations.note') }} : {{ $data->note }}
                             </div>
@@ -253,7 +263,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="5"> {{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}</i></th>
+                        <th colspan="10"> {{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

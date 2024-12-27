@@ -4,21 +4,13 @@ namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
-use App\Models\IncomingPayment;
-use App\Models\MarketingOrder;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\MarketingOrderDelivery;
-use App\Models\MarketingOrderDeliveryDetail;
-use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
-use App\Models\MarketingOrderHandoverInvoice;
-use App\Models\MarketingOrderHandoverReceipt;
 use App\Models\MarketingOrderInvoice;
-use App\Models\MarketingOrderInvoiceDetail;
 use App\Models\MarketingOrderMemo;
-use App\Models\MarketingOrderReceipt;
-use App\Models\MarketingOrderReturn;
 use App\Models\MarketingOrderMemoDetail;
+use App\Models\MarketingOrderDeliveryProcessDetail;
+use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\Place;
 use App\Models\Menu;
 use App\Models\MenuUser;
@@ -42,6 +34,11 @@ use Illuminate\Support\Facades\Process;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Str;
 use App\Models\UsedData;
+use App\Models\Item;
+use App\Models\ItemShading;
+use App\Models\ProductionBatch;
+use App\Models\ItemStock;
+
 class MarketingOrderMemoController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -71,7 +68,7 @@ class MarketingOrderMemoController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -97,6 +94,7 @@ class MarketingOrderMemoController extends Controller
             'account_id',
             'company_id',
             'post_date',
+            'memo_type',
             'type',
             'document',
             'tax_no',
@@ -231,8 +229,9 @@ class MarketingOrderMemoController extends Controller
                     $val->account->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->memoType(),
                     $val->type(),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->tax_no,
                     $val->note,
                     number_format($val->total,2,',','.'),
@@ -314,45 +313,197 @@ class MarketingOrderMemoController extends Controller
         ]);
     }
 
+    public function getDeliveryProcess(Request $request){
+
+        $data = MarketingOrderDeliveryProcessDetail::where('marketing_order_delivery_process_id',$request->marketing_order_delivery_process_id)->where(column: function($query)use($request){
+            if($request->stock_used){
+                $query->whereNotIn('id',$request->stock_used);
+            }
+        })->whereHas('itemStock',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereHas('pallet',function($query){
+                    $query->where('box_conversion','>',0);
+                });
+            });
+        })->get();
+
+        $result = [];
+
+        if(count($data) > 0){
+            foreach($data as $row){
+                $retur = $row->qtyRetur();
+                $balance = round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3) - $retur;
+                $result[] = [
+                    'id'            => $row->id,
+                    'item_code'     => $row->itemStock->item->code,
+                    'item_name'     => $row->itemStock->item->name,
+                    'document_code' => $row->marketingOrderDeliveryProcess->code.' - '.$row->marketingOrderDeliveryProcess->marketingOrderInvoice->code,
+                    'document_date' => date('d/m/Y',strtotime($row->marketingOrderDeliveryProcess->post_date)),
+                    'shading'       => $row->itemStock->itemShading->code,
+                    'batch'         => $row->itemStock->productionBatch->code,
+                    'qty_sent'      => CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)),
+                    'qty_retur'     => CustomHelper::formatConditionalQty(round($retur,3)),
+                    'qty_available' => CustomHelper::formatConditionalQty(round($balance,3)),
+                    'unit'          => $row->itemStock->item->uomUnit->code,
+                ];
+            }
+
+            return response()->json([
+                'status'    => 200,
+                'details'   => $result,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.',
+                'details'   => $result,
+            ]);
+        }
+    }
+
+    public function getSjDetail(Request $request){
+
+        $data = MarketingOrderDeliveryProcessDetail::where(function($query)use($request){
+            if($request->stock_used){
+                $query->whereNotIn('id',$request->stock_used);
+            }
+        })->whereHas('marketingOrderDeliveryProcess',function($query){
+            $query->whereHas('marketingOrderInvoice',function($query){
+                $query->whereDoesntHave('incomingPaymentDetail');
+            });
+        })->whereIn('id',$request->arr_id)->whereHas('itemStock',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereHas('pallet',function($query){
+                    $query->where('box_conversion','>',0);
+                });
+            });
+        })->get();
+
+        $result = [];
+
+        if(count($data) > 0){
+            foreach($data as $row){
+                $retur = $row->qtyRetur();
+                $balance = round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3) - $retur;
+                $result[] = [
+                    'id'             => $row->id,
+                    'item_code'      => $row->itemStock->item->code,
+                    'item_name'      => $row->itemStock->item->name,
+                    'shading'        => $row->itemStock->itemShading->code,
+                    'batch'          => $row->itemStock->productionBatch->code,
+                    'qty_sent'       => CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)),
+                    'qty_retur'      => CustomHelper::formatConditionalQty(round($retur,3)),
+                    'qty_available'  => CustomHelper::formatConditionalQty(round($balance,3)),
+                    'unit'           => $row->itemStock->item->uomUnit->code,
+                    'sell_unit'      => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                    'is_include_tax' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
+                    'percent_tax'    => $row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                    'tax_id'         => $row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id ?? '',
+                    'total'          => CustomHelper::formatConditionalQty($row->getTotal()),
+                    'tax'            => CustomHelper::formatConditionalQty($row->getTax()),
+                    'grandtotal'     => CustomHelper::formatConditionalQty($row->getGrandtotal()),
+                    'conversion'     => CustomHelper::formatConditionalQty($row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                    'document_code'  => $row->marketingOrderDeliveryProcess->code.' - '.$row->marketingOrderDeliveryProcess->marketingOrderInvoice->code,
+                    'document_date'  => date('d/m/Y',strtotime($row->marketingORderDeliveryProcess->post_date)),
+                ];
+            }
+
+            return response()->json([
+                'status'    => 200,
+                'details'   => $result,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.'
+            ]);
+        }
+    }
+
     public function create(Request $request){
-
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
-           /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_down_payments,code',
-			 */'account_id' 				=> 'required',
-			'type'                      => 'required',
-            'company_id'                => 'required',
-            'post_date'                 => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'subtotal'                  => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-            'note'                      => $request->arr_id ? '' : 'required',
-		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
-			'account_id.required' 				=> 'Customer tidak boleh kosong.',
-			'type.required'                     => 'Tipe tidak boleh kosong',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
-            'tax.required'                      => 'PPN tidak boleh kosong.',
-            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
-            'note.required'                     => 'Keterangan tidak boleh kosong.'
-		]);
-
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
-            if($request->temp){
-                DB::beginTransaction();
-                try {
+        DB::beginTransaction();
+        try {
+            if($request->memo_type == '1'){
+                $validation = Validator::make($request->all(), [
+                    'code'          => 'required',
+                    'code_place_id' => 'required',
+                    'account_id'    => 'required',
+                    'memo_type'     => 'required',
+                    'type'          => 'required',
+                    'company_id'    => 'required',
+                    'post_date'     => 'required',
+                    'currency_id'   => 'required',
+                    'currency_rate' => 'required',
+                    'subtotal'      => 'required',
+                    'tax'           => 'required',
+                    'grandtotal'    => 'required',
+                    'note'          => 'required',
+                ], [
+                    'code.required' 	                => 'Kode tidak boleh kosong.',
+                    'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                    'account_id.required' 				=> 'Customer tidak boleh kosong.',
+                    'memo_type.required'                => 'Tipe memo tidak boleh kosong',
+                    'type.required'                     => 'Tipe pembayaran tidak boleh kosong',
+                    'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+                    'post_date.required'                => 'Tgl post tidak boleh kosong.',
+                    'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                    'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
+                    'tax.required'                      => 'PPN tidak boleh kosong.',
+                    'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
+                    'note.required'                     => 'Keterangan tidak boleh kosong.'
+                ]);
+            }elseif($request->memo_type == '2'){
+                $validation = Validator::make($request->all(), [
+                    'code'               => 'required',
+                    'code_place_id'      => 'required',
+                    'account_id'         => 'required',
+                    'memo_type'          => 'required',
+                    'type'               => 'required',
+                    'tax_no'             => 'required',
+                    'company_id'         => 'required',
+                    'post_date'          => 'required',
+                    'currency_id'        => 'required',
+                    'currency_rate'      => 'required',
+                    'subtotal'           => 'required',
+                    'tax'                => 'required',
+                    'grandtotal'         => 'required',
+                    'note'               => 'required',
+                    'arr_id'             => 'required',
+                    'arr_is_include_tax' => 'required',
+                    'arr_percent_tax'    => 'required',
+                    'arr_tax_id'         => 'required',
+                    'arr_conversion'     => 'required',
+                    'arr_note'           => 'required',
+                    'arr_qty'            => 'required',
+                ], [
+                    'code.required'               => 'Kode tidak boleh kosong.',
+                    'code_place_id.required'      => 'Plant Tidak boleh kosong',
+                    'account_id.required'         => 'Customer tidak boleh kosong.',
+                    'memo_type.required'          => 'Tipe memo tidak boleh kosong',
+                    'type.required'               => 'Tipe pembayaran tidak boleh kosong',
+                    'company_id.required'         => 'Perusahaan tidak boleh kosong.',
+                    'post_date.required'          => 'Tgl post tidak boleh kosong.',
+                    'currency_id.required'        => 'Mata uang tidak boleh kosong.',
+                    'subtotal.required'           => 'Subtotal tidak boleh kosong.',
+                    'tax.required'                => 'PPN tidak boleh kosong.',
+                    'grandtotal.required'         => 'Grandtotal tidak boleh kosong.',
+                    'note.required'               => 'Keterangan tidak boleh kosong.',
+                    'arr_id.required'             => 'Id detail item boleh kosong.',
+                    'arr_is_include_tax.required' => 'Termasuk/tidak ppn boleh kosong.',
+                    'arr_percent_tax.required'    => 'Persentase ppn tidak boleh kosong.',
+                    'arr_tax_id.required'         => 'Pajak tidak boleh kosong.',
+                    'arr_conversion.required'     => 'Konversi tidak boleh kosong.',
+                    'arr_note.required'           => 'Keterangan tidak boleh kosong.',
+                    'arr_qty.required'            => 'Qty tidak boleh kosong.',
+                ]);
+            }
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+                if($request->temp){
                     $query = MarketingOrderMemo::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -405,6 +556,7 @@ class MarketingOrderMemoController extends Controller
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->type = $request->type;
+                        $query->memo_type = $request->memo_type;
                         $query->company_id = $request->company_id;
                         $query->tax_id = $request->tax_id > 0 ? $request->tax_id : NULL;
                         $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
@@ -426,19 +578,14 @@ class MarketingOrderMemoController extends Controller
                         $query->status = '1';
 
                         $query->save();
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
+                    
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderMemo::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -459,6 +606,7 @@ class MarketingOrderMemoController extends Controller
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
+                        'memo_type'                 => $request->memo_type,
                         'type'	                    => $request->type,
                         'company_id'                => $request->company_id,
                         'tax_id'                    => $request->tax_id > 0 ? $request->tax_id : NULL,
@@ -480,36 +628,128 @@ class MarketingOrderMemoController extends Controller
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'status'                    => '1'
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
 
-			if($query) {
-                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
-                CustomHelper::sendApproval('marketing_order_memos',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_order_memos',$query->id,'Pengajuan AR MEMO No. '.$query->code,$query->note,session('bo_id'));
+                if($query) {
+                    if($request->memo_type == '2'){
+                        if($request->arr_id){
+                            foreach($request->arr_id as $key => $row){
+                                $momd = MarketingOrderMemoDetail::create([
+                                    'marketing_order_memo_id'       => $query->id,
+                                    'lookable_type'                 => 'marketing_order_delivery_process_details',
+                                    'lookable_id'                   => $row,
+                                    'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                    'qty_sell'                      => round(floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) / floatval(str_replace(',','.',str_replace('.','',$request->arr_conversion[$key]))),5),
+                                    'is_include_tax'                => $request->arr_is_include_tax[$key],
+                                    'percent_tax'                   => floatval($request->arr_percent_tax[$key]),
+                                    'tax_id'                        => $request->arr_tax_id[$key] ?? NULL,
+                                    'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                    'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                    'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                    'note'                          => $request->arr_note[$key],
+                                ]);
 
-                activity()
-                    ->performedOn(new MarketingOrderDownPayment())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit sales order down payment.');
+                                $modpd = MarketingOrderDeliveryProcessDetail::find($row);
+                                if($modpd){
+                                    $item = $modpd->itemStock->item;
+                                    $total = round(($modpd->total / ($modpd->qty * $modpd->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion)) * $momd->qty,2);
+                                    $cekShading = NULL;
+                                    $productionBatch = NULL;
+                                    $place_id = $modpd->itemStock->place_id;
+                                    $warehouse_id = $modpd->itemStock->warehouse_id;
+                                    $area_id = $modpd->itemStock->area_id;
+                                    if($modpd->itemStock->item->pallet->box_conversion > 1){
+                                        $itemBox = Item::where('status','1')->where('type_id',$item->type_id)->where('size_id',$item->size_id)->where('variety_id',$item->variety_id)->where('pattern_id',$item->pattern_id)->whereHas('pallet',function($query){
+                                            $query->where('box_conversion',1);
+                                        })->where('grade_id',$item->grade_id)->where('brand_id',$item->brand_id)->first();
+                                        if($itemBox){
+                                            $cekShading = ItemShading::where('item_id',$itemBox->id)->where('code',$modpd->itemStock->itemShading->code)->first();
+                                            if(!$cekShading){
+                                                $cekShading = ItemShading::create([
+                                                    'item_id'   => $itemBox->id,
+                                                    'code'      => $modpd->itemStock->itemShading->code,
+                                                ]);
+                                            }
+                                            $productionBatch = ProductionBatch::create([
+                                                'code'              => $modpd->itemStock->productionBatch->code.'R',
+                                                'item_id'           => $itemBox->id,
+                                                'place_id'          => $modpd->itemStock->place_id,
+                                                'warehouse_id'      => $modpd->itemStock->warehouse_id,
+                                                'area_id'           => $modpd->itemStock->area_id,
+                                                'item_shading_id'   => $cekShading->id,
+                                                'lookable_type'     => $momd->getTable(),
+                                                'lookable_id'       => $momd->id,
+                                                'qty'               => $momd->qty,
+                                                'qty_real'          => $momd->qty,
+                                                'total'             => $total,
+                                            ]);
+                                        }
+                                    }else{
+                                        $itemStock = $modpd->itemStock;
+                                        $cekShading = $itemStock->itemShading;
+                                        $productionBatch = ProductionBatch::create([
+                                            'code'              => $modpd->itemStock->productionBatch->code.'R',
+                                            'item_id'           => $itemStock->item->id,
+                                            'place_id'          => $itemStock->place_id,
+                                            'warehouse_id'      => $itemStock->warehouse_id,
+                                            'area_id'           => $itemStock->area_id,
+                                            'item_shading_id'   => $itemStock->item_shading_id,
+                                            'lookable_type'     => $momd->getTable(),
+                                            'lookable_id'       => $momd->id,
+                                            'qty'               => $momd->qty,
+                                            'qty_real'          => $momd->qty,
+                                            'total'             => $total,
+                                        ]);
+                                    }
+                                    
+                                    if($productionBatch){
+                                        $itemStockNew = ItemStock::create([
+                                            'place_id'            => $place_id,
+                                            'warehouse_id'        => $warehouse_id,
+                                            'area_id'             => $area_id,
+                                            'item_id'             => $productionBatch->item_id,
+                                            'item_shading_id'     => $productionBatch->item_shading_id,
+                                            'production_batch_id' => $productionBatch->id,
+                                            'qty'                 => $productionBatch->qty_real,
+                                        ]);
 
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+                                        if($itemStockNew){
+                                            $momd->update([
+                                                'item_stock_id' => $itemStockNew->id,
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-		}
+                    CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR MEMO No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new MarketingOrderMemo())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit sales order memo.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 
 		return response()->json($response);
     }
@@ -525,7 +765,53 @@ class MarketingOrderMemoController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
-        $string = '<div class="col s12 mt-3"><table style="min-width:100%;">
+
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div>
+        <div class="col s12"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="14">Daftar Item & Surat Jalan</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Surat Jalan</th>
+                                <th class="center-align">Item SJ</th>
+                                <th class="center-align">Item Kembali</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Qty Jual</th>
+                                <th class="center-align">Satuan Jual</th>
+                                <th class="center-align">Batch</th>
+                                <th class="center-align">Shading</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->marketingOrderMemoDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDeliveryProcess->code.' - '.$row->lookable->marketingOrderDeliveryProcess->marketingOrderInvoice->code.'</td>
+                <td class="center-align">'.$row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name.'</td>
+                <td class="center-align">'.($row->itemStock()->exists() ? $row->itemStock->item->code.' - '.$row->itemStock->item->name : '').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.($row->itemStock()->exists() ? $row->itemStock->item->uomUnit->code : '').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_sell).'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code.'</td>
+                <td class="">'.($row->itemStock()->exists() ? $row->itemStock->productionBatch->code : '').'</td>
+                <td class="">'.($row->itemStock()->exists() ? $row->itemStock->itemShading->code : '').'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-3"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align">Nominal</th>
@@ -901,6 +1187,40 @@ class MarketingOrderMemoController extends Controller
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
         $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
 
+        $arr = [];
+
+        foreach($po->marketingOrderMemoDetail as $row){
+            $retur = $row->lookable->qtyRetur();
+            $balance = round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3) - $retur;
+            $arr[] = [
+                'id'              => $row->lookable_id,
+                'item_code'       => $row->lookable->itemStock->item->code,
+                'item_name'       => $row->lookable->itemStock->item->name,
+                'shading'         => $row->lookable->itemStock->itemShading->code,
+                'batch'           => $row->lookable->itemStock->productionBatch->code,
+                'qty_sent'        => CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)),
+                'qty_retur'       => CustomHelper::formatConditionalQty(round($retur,3)),
+                'qty_available'   => CustomHelper::formatConditionalQty(round($balance,3)),
+                'unit'            => $row->lookable->itemStock->item->uomUnit->code,
+                'sell_unit'       => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                'is_include_tax'  => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
+                'percent_tax'     => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                'tax_id'          => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id ?? '',
+                'total'           => CustomHelper::formatConditionalQty($row->lookable->getTotal()),
+                'tax'             => CustomHelper::formatConditionalQty($row->lookable->getTax()),
+                'grandtotal'      => CustomHelper::formatConditionalQty($row->lookable->getGrandtotal()),
+                'total_edit'      => CustomHelper::formatConditionalQty($row->total),
+                'tax_edit'        => CustomHelper::formatConditionalQty($row->tax),
+                'grandtotal_edit' => CustomHelper::formatConditionalQty($row->grandtotal),
+                'conversion'      => CustomHelper::formatConditionalQty($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                'document_code'   => $row->lookable->marketingOrderDeliveryProcess->code.' - '.$row->lookable->marketingOrderDeliveryProcess->marketingOrderInvoice->code,
+                'document_date'   => date('d/m/Y',strtotime($row->lookable->marketingORderDeliveryProcess->post_date)),
+                'note'            => $row->note,
+                'qty'             => CustomHelper::formatConditionalQty($row->qty),
+            ];
+        }
+
+        $po['details'] = $arr;
 
 		return response()->json($po);
     }
@@ -929,6 +1249,25 @@ class MarketingOrderMemoController extends Controller
                 ]);
             }
 
+            foreach($query->marketingOrderMemoDetail as $row){
+                if($row->productionBatch()->exists()){
+                    if($row->productionBatch->productionBatchUsage()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Salah satu item batch retur telah dipakai dalam transaksi.'
+                        ]);
+                    }
+                }
+                if($row->itemStock()->exists()){
+                    if(round($row->itemStock->qty,3) < 0){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Salah satu item batch retur memiliki qty dibawah 0.'
+                        ]);
+                    }
+                }
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -944,13 +1283,6 @@ class MarketingOrderMemoController extends Controller
                     CustomHelper::addCountLimitCredit($query->account_id,$query->grandtotal);
                 }
 
-                $newtaxno = '';
-                if($query->tax_no){
-                    $array = explode('.',$query->tax_no);
-                    $newarray = array_slice($array, 1);
-                    $newtaxno = '011.'.implode('.',$newarray);
-                }
-
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -958,6 +1290,21 @@ class MarketingOrderMemoController extends Controller
                     'void_date' => date('Y-m-d H:i:s'),
                     'tax_no'    => $newtaxno ?? NULL,
                 ]);
+
+                if($query->memo_type == '1'){
+                    $newtaxno = '';
+                    if($query->tax_no){
+                        $array = explode('.',$query->tax_no);
+                        $newarray = array_slice($array, 1);
+                        $newtaxno = '011.'.implode('.',$newarray);
+                    }
+                }else{
+                    foreach($query->marketingOrderMemoDetail as $row){
+                        $row->productionBatch()->delete();
+                        $row->itemStock()->delete();
+                    }
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
 
                 activity()
                     ->performedOn(new MarketingOrderMemo())

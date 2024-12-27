@@ -31,6 +31,17 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function marketingOrderMemoDetail(){
+        return $this->hasMany('App\Models\MarketingOrderMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderMemo',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function qtyRetur(){
+        $total = $this->marketingOrderMemoDetail()->sum('qty');
+        return $total;
+    }
+
     public function marketingOrderDeliveryProcess()
     {
         return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();
@@ -110,13 +121,13 @@ class MarketingOrderDeliveryProcessDetail extends Model
     }
 
     public function qtyReturn(){
-        return $this->marketingOrderReturnDetail()->sum('qty');
+        return $this->marketingOrderMemoDetail()->sum('qty');
     }
 
     public function getBalanceQtySentMinusReturn(){
         $total = $this->qty;
-        foreach($this->marketingOrderReturnDetail as $row){
-            $total -= $row->qty;
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total -= $row->qty_sell;
         }
 
         return $total;

@@ -77,7 +77,7 @@ class TaxSeries extends Model
     public static function getListCurrentTaxSeries($company_id,$year,$prefix){
         $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
         $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
-        $dataMemo = MarketingOrderMemo::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
+        $dataMemo = MarketingOrderMemo::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('memo_type','1')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
         $arr = [];
         foreach($dataInvoice as $row){
             if($row->tax_no && !in_array(substr($row->tax_no,11,8),$arr)){

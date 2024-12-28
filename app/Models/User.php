@@ -454,7 +454,7 @@ class User extends Authenticatable
             ROUND(
                 (
                     CASE
-                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(modetail.created_at 
+                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
                         THEN
                             (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                         ELSE

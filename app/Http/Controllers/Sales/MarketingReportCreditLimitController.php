@@ -63,10 +63,10 @@ class MarketingReportCreditLimitController extends Controller
           </thead><tbody><tr>';
 
     foreach ($query as $key => $row) {
-      $unsentModCredit = $row->grandtotalUnsentModCreditReport($row->id);
-      $unsentModDp = $row->grandtotalUnsentModDpReport($row->id);
-      $uninvoiceDoCredit = $row->grandtotalUninvoiceDoCreditReport($row->id);
-      $uninvoiceDoDp = $row->grandtotalUninvoiceDoDpReport($row->id);
+      $unsentModCredit = CustomHelper::grandtotalUnsentModCreditReport($row->id);
+      $unsentModDp = CustomHelper::grandtotalUnsentModDpReport($row->id);
+      $uninvoiceDoCredit = CustomHelper::grandtotalUninvoiceDoCreditReport($row->id);
+      $uninvoiceDoDp = CustomHelper::grandtotalUninvoiceDoDpReport($row->id);
       $balance = round($row->limit_credit - $unsentModCredit - $unsentModDp - $uninvoiceDoCredit - $uninvoiceDoDp,2);
       $html .= '<tr class="row_detail">
         <td class="center-align">'.($key + 1).'</td>

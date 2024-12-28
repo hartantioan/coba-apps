@@ -448,50 +448,6 @@ class User extends Authenticatable
         return $totalMod;
     }
 
-    public static function grandtotalUnsentModCreditReport($id){
-        $query = "
-                    SELECT SUM(
-            ROUND(
-                (
-                    CASE
-                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                        THEN
-                            (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                        ELSE
-                            modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                    END
-                )
-                +
-                CASE
-                    WHEN modtdelivery.tax_id > 0 THEN
-                        -- Use the same logic for total_case_1 here
-                        (
-                            CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                THEN
-                                    (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                ELSE
-                                    modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                            END
-                        ) * (modtdelivery.percent_tax / 100)
-                    ELSE
-                        0
-                END
-                , 2) * ((100 - mo.percent_dp) / 100)
-        ) AS totalMod
-        FROM marketing_orders mo
-        JOIN marketing_order_details modetail ON modetail.marketing_order_id = mo.id
-        JOIN marketing_order_delivery_details modeliverydetail ON modeliverydetail.marketing_order_detail_id = modetail.id
-        JOIN marketing_order_details modtdelivery ON modeliverydetail.marketing_order_detail_id = modtdelivery.id
-        JOIN marketing_order_deliveries moddelivery ON moddelivery.id = modeliverydetail.marketing_order_delivery_id
-        WHERE moddelivery.status = 2
-        AND mo.account_id = :account_id;
-        ";
-        $totalMod = DB::select($query, ['account_id' => $id]);
-        $totalModValue = $totalMod[0]->totalMod ?? 0;
-        return $totalModValue;
-    }
-
     public function grandtotalUnsentModCredit(){
         $query = "
                     SELECT SUM(
@@ -532,51 +488,6 @@ class User extends Authenticatable
         AND mo.account_id = :account_id;
         ";
         $totalMod = DB::select($query, ['account_id' => $this->id]);
-        $totalModValue = $totalMod[0]->totalMod ?? 0;
-        return $totalModValue;
-    }
-
-    public static function grandtotalUnsentModDpReport($id){
-        $query = "
-                    SELECT SUM(
-            ROUND(
-                (
-                    CASE
-                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                        THEN
-                            (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                        ELSE
-                            modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                    END
-                )
-                +
-                CASE
-                    WHEN modtdelivery.tax_id > 0 THEN
-                        -- Use the same logic for total_case_1 here
-                        (
-                            CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                THEN
-                                    (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                ELSE
-                                    modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                            END
-                        ) * (modtdelivery.percent_tax / 100)
-                    ELSE
-                        0
-                END
-                , 2) * ((100 - mo.percent_dp) / 100)
-        ) AS totalMod
-        FROM marketing_orders mo
-        JOIN marketing_order_details modetail ON modetail.marketing_order_id = mo.id
-        JOIN marketing_order_delivery_details modeliverydetail ON modeliverydetail.marketing_order_detail_id = modetail.id
-        JOIN marketing_order_details modtdelivery ON modeliverydetail.marketing_order_detail_id = modtdelivery.id
-        JOIN marketing_order_deliveries moddelivery ON moddelivery.id = modeliverydetail.marketing_order_delivery_id
-        WHERE moddelivery.status = 2
-        AND mo.account_id = :account_id
-        AND mo.percent_dp > 0;
-        ";
-        $totalMod = DB::select($query, ['account_id' => $id]);
         $totalModValue = $totalMod[0]->totalMod ?? 0;
         return $totalModValue;
     }
@@ -643,64 +554,6 @@ class User extends Authenticatable
         return $totalDo;
     }
 
-    public static function grandtotalUninvoiceDoCreditReport($id): mixed{
-        $query = "
-            SELECT
-                SUM(modified_grandtotal) AS totalMod
-            FROM (
-                SELECT
-                    ROUND(
-                        (
-                            CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                THEN
-                                    (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                ELSE
-                                    modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                            END
-                        )
-                        +
-                        CASE
-                            WHEN modtdelivery.tax_id > 0 THEN
-                                (
-                                    CASE
-                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                        THEN
-                                            (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                        ELSE
-                                            modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                                    END
-                                ) * (modtdelivery.percent_tax / 100)
-                            ELSE
-                                0
-                        END
-                        , 2) * ((100 - mo.percent_dp) / 100) AS modified_grandtotal
-                FROM marketing_orders mo
-                JOIN marketing_order_details modetail ON modetail.marketing_order_id = mo.id
-                JOIN marketing_order_delivery_details modeliverydetail ON modeliverydetail.marketing_order_detail_id = modetail.id
-                JOIN marketing_order_details modtdelivery ON modeliverydetail.marketing_order_detail_id = modtdelivery.id
-                JOIN marketing_order_deliveries moddelivery ON moddelivery.id = modeliverydetail.marketing_order_delivery_id
-                JOIN marketing_order_delivery_process_details modeliveryprocessdetail ON modeliveryprocessdetail.marketing_order_delivery_detail_id = modeliverydetail.id
-                JOIN marketing_order_delivery_processes modeliveryprocess ON modeliveryprocess.id = modeliveryprocessdetail.marketing_order_delivery_process_id
-                WHERE modeliveryprocess.status = 2
-                AND mo.account_id = :account_id
-                GROUP BY
-                    modetail.id,
-                    modeliverydetail.qty,
-                    modtdelivery.price_after_discount,
-                    modtdelivery.qty_conversion,
-                    modtdelivery.tax_id,
-                    modtdelivery.is_include_tax,
-                    modtdelivery.percent_tax,
-                    mo.percent_dp,
-                    mo.updated_at
-            ) AS grouped_orders;
-        ";
-        $totalMod = DB::select($query, ['account_id' => $id]);
-        $totalModValue = $totalMod[0]->totalMod ?? 0;
-        return $totalModValue;
-    }
-
     public function grandtotalUninvoiceDoCredit(){
         $query = "
             SELECT
@@ -755,65 +608,6 @@ class User extends Authenticatable
             ) AS grouped_orders;
         ";
         $totalMod = DB::select($query, ['account_id' => $this->id]);
-        $totalModValue = $totalMod[0]->totalMod ?? 0;
-        return $totalModValue;
-    }
-
-    public function grandtotalUninvoiceDoDpReport($id){
-        $query = "
-            SELECT
-                SUM(modified_grandtotal) AS totalMod
-            FROM (
-                SELECT
-                    ROUND(
-                        (
-                            CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                THEN
-                                    (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                ELSE
-                                    modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                            END
-                        )
-                        +
-                        CASE
-                            WHEN modtdelivery.tax_id > 0 THEN
-                                (
-                                    CASE
-                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
-                                        THEN
-                                            (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
-                                        ELSE
-                                            modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion
-                                    END
-                                ) * (modtdelivery.percent_tax / 100)
-                            ELSE
-                                0
-                        END
-                        , 2) * ((100 - mo.percent_dp) / 100) AS modified_grandtotal
-                FROM marketing_orders mo
-                JOIN marketing_order_details modetail ON modetail.marketing_order_id = mo.id
-                JOIN marketing_order_delivery_details modeliverydetail ON modeliverydetail.marketing_order_detail_id = modetail.id
-                JOIN marketing_order_details modtdelivery ON modeliverydetail.marketing_order_detail_id = modtdelivery.id
-                JOIN marketing_order_deliveries moddelivery ON moddelivery.id = modeliverydetail.marketing_order_delivery_id
-                JOIN marketing_order_delivery_process_details modeliveryprocessdetail ON modeliveryprocessdetail.marketing_order_delivery_detail_id = modeliverydetail.id
-                JOIN marketing_order_delivery_processes modeliveryprocess ON modeliveryprocess.id = modeliveryprocessdetail.marketing_order_delivery_process_id
-                WHERE modeliveryprocess.status = 2
-                AND mo.account_id = :account_id
-                AND mo.percent_dp > 0
-                GROUP BY
-                    modetail.id,
-                    modeliverydetail.qty,
-                    modtdelivery.price_after_discount,
-                    modtdelivery.qty_conversion,
-                    modtdelivery.tax_id,
-                    modtdelivery.is_include_tax,
-                    modtdelivery.percent_tax,
-                    mo.percent_dp,
-                    mo.updated_at
-            ) AS grouped_orders;
-        ";
-        $totalMod = DB::select($query, ['account_id' => $id]);
         $totalModValue = $totalMod[0]->totalMod ?? 0;
         return $totalModValue;
     }

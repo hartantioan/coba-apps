@@ -454,7 +454,7 @@ class User extends Authenticatable
             ROUND(
                 (
                     CASE
-                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                         THEN
                             (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                         ELSE
@@ -467,7 +467,7 @@ class User extends Authenticatable
                         -- Use the same logic for total_case_1 here
                         (
                             CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                 THEN
                                     (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                 ELSE
@@ -498,7 +498,7 @@ class User extends Authenticatable
             ROUND(
                 (
                     CASE
-                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                         THEN
                             (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                         ELSE
@@ -511,7 +511,7 @@ class User extends Authenticatable
                         -- Use the same logic for total_case_1 here
                         (
                             CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                 THEN
                                     (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                 ELSE
@@ -563,7 +563,7 @@ class User extends Authenticatable
                     ROUND(
                         (
                             CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                 THEN
                                     (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                 ELSE
@@ -575,7 +575,7 @@ class User extends Authenticatable
                             WHEN modtdelivery.tax_id > 0 THEN
                                 (
                                     CASE
-                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                         THEN
                                             (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                         ELSE
@@ -603,7 +603,8 @@ class User extends Authenticatable
                     modtdelivery.tax_id,
                     modtdelivery.is_include_tax,
                     modtdelivery.percent_tax,
-                    mo.percent_dp
+                    mo.percent_dp,
+                    mo.updated_at
             ) AS grouped_orders;
         ";
         $totalMod = DB::select($query, ['account_id' => $this->id]);
@@ -620,7 +621,7 @@ class User extends Authenticatable
                     ROUND(
                         (
                             CASE
-                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                 THEN
                                     (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                 ELSE
@@ -632,7 +633,7 @@ class User extends Authenticatable
                             WHEN modtdelivery.tax_id > 0 THEN
                                 (
                                     CASE
-                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1'
+                                        WHEN modtdelivery.tax_id > 0 AND modtdelivery.is_include_tax = '1' AND DATE(mo.updated_at) < '2024-12-24'
                                         THEN
                                             (modeliverydetail.qty * modtdelivery.price_after_discount * modtdelivery.qty_conversion) / (1 + (modtdelivery.percent_tax / 100))
                                         ELSE
@@ -661,7 +662,8 @@ class User extends Authenticatable
                     modtdelivery.tax_id,
                     modtdelivery.is_include_tax,
                     modtdelivery.percent_tax,
-                    mo.percent_dp
+                    mo.percent_dp,
+                    mo.updated_at
             ) AS grouped_orders;
         ";
         $totalMod = DB::select($query, ['account_id' => $this->id]);

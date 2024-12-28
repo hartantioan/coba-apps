@@ -63,7 +63,7 @@ class MarketingReportCreditLimitController extends Controller
           </thead><tbody><tr>';
     foreach ($query_data as $key => $row) {
       $unsentModCredit = $row->grandtotalUnsentModCredit();
-      $unsentModDp = $row->grandtotalUnsentModCredit();
+      $unsentModDp = $row->grandtotalUnsentModDp();
       $uninvoiceDoCredit = $row->grandtotalUninvoiceDoCredit();
       $uninvoiceDoDp = $row->grandtotalUninvoiceDoDp();
       $balance = round($row->limit_credit - $unsentModCredit - $unsentModDp - $uninvoiceDoCredit - $uninvoiceDoDp,2);

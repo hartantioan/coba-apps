@@ -78,7 +78,7 @@ class MarketingReportCreditLimitController extends Controller
         <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModDp). '</td>
         <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoDp). '</td>
         <td class="right-align">'.CustomHelper::formatConditionalQty($balance). '</td>
-      ';
+      </tr>';
     }
 
     $html .= '

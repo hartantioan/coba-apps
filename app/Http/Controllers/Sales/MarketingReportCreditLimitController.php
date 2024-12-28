@@ -67,7 +67,7 @@ class MarketingReportCreditLimitController extends Controller
       $unsentModDp = CustomHelper::grandtotalUnsentModDpReport($row->id);
       $uninvoiceDoCredit = CustomHelper::grandtotalUninvoiceDoCreditReport($row->id);
       $uninvoiceDoDp = CustomHelper::grandtotalUninvoiceDoDpReport($row->id);
-      $balance = round($row->limit_credit - $unsentModCredit - $unsentModDp - $uninvoiceDoCredit - $uninvoiceDoDp,2);
+      $balance = round($row->limit_credit - $row->count_limit_credit - $unsentModCredit - $unsentModDp - $uninvoiceDoCredit - $uninvoiceDoDp,2);
       $html .= '<tr class="row_detail">
         <td class="center-align">'.($key + 1).'</td>
         <td>'.$row->employee_no.'</td>
@@ -77,6 +77,7 @@ class MarketingReportCreditLimitController extends Controller
         <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoCredit). '</td>
         <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModDp). '</td>
         <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoDp). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($row->count_limit_credit). '</td>
         <td class="right-align">'.CustomHelper::formatConditionalQty($balance). '</td>
       </tr>';
     }

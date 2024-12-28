@@ -38,7 +38,7 @@ class MarketingReportCreditLimitController extends Controller
   public function filter(Request $request)
   {
 
-    $query_data = User::where('type','2')->where('status','1')->get();
+    $query = User::where('type','2')->where('status','1')->get();
 
     $html = '
         <div class="card-alert card red">
@@ -61,22 +61,23 @@ class MarketingReportCreditLimitController extends Controller
                 <th class="center-align">Sisa Limit</th>
             </tr>
           </thead><tbody><tr>';
-    foreach ($query_data as $key => $row) {
-      $unsentModCredit = $row->limit_credit;
+
+    foreach ($query as $key => $row) {
+      $unsentModCredit = $row->grandtotalUnsentModCredit();
       $unsentModDp = $row->grandtotalUnsentModDp();
       $uninvoiceDoCredit = $row->grandtotalUninvoiceDoCredit();
       $uninvoiceDoDp = $row->grandtotalUninvoiceDoDp();
       $balance = round($row->limit_credit - $unsentModCredit - $unsentModDp - $uninvoiceDoCredit - $uninvoiceDoDp,2);
       $html .= '<tr class="row_detail">
-      <td class="center-align">'.($key + 1).'</td>
-      <td>'.$row->employee_no.'</td>
-      <td>'.$row->name.'</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($row->limit_credit). '</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModCredit). '</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoCredit). '</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModDp). '</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoDp). '</td>
-      <td class="right-align">'.CustomHelper::formatConditionalQty($balance). '</td>
+        <td class="center-align">'.($key + 1).'</td>
+        <td>'.$row->employee_no.'</td>
+        <td>'.$row->name.'</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($row->limit_credit). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModCredit). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoCredit). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($unsentModDp). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($uninvoiceDoDp). '</td>
+        <td class="right-align">'.CustomHelper::formatConditionalQty($balance). '</td>
       ';
     }
 
@@ -88,7 +89,7 @@ class MarketingReportCreditLimitController extends Controller
 
     $response = [
       'status'            => 200,
-      'content'           => count($query_data) > 0 ? $html : '',
+      'content'           => count($query) > 0 ? $html : '',
     ];
 
     return response()->json($response);

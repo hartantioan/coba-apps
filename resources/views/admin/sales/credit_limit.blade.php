@@ -109,10 +109,6 @@
             url: '{{ Request::url() }}/filter',
             type: 'POST',
             dataType: 'JSON',
-            data: '',
-            contentType: false,
-            processData: false,
-            cache: true,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },

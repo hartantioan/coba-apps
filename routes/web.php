@@ -203,6 +203,7 @@ use App\Http\Controllers\Sales\ReportStockBrandController;
 use App\Http\Controllers\Sales\ReportSalesBrandController;
 use App\Http\Controllers\Sales\RecapSalesInvoiceDownPaymentController;
 use App\Http\Controllers\Sales\ReportProgressSalesOrderController;
+use App\Http\Controllers\Sales\MarketingReportCreditLimitController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -3303,6 +3304,12 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_sales_good_scale')->middleware('operation.access:report_sales_good_scale,view')->group(function () {
                         Route::get('/', [ReportSalesGoodScaleController::class, 'index']);
                         Route::get('export', [ReportSalesGoodScaleController::class, 'export']);
+                    });
+
+                    Route::prefix('report_sales_credit_limit')->middleware('operation.access:report_sales_credit_limit,view')->group(function () {
+                        Route::get('/', [MarketingReportCreditLimitController::class, 'index']);
+                        Route::get('export', [MarketingReportCreditLimitController::class, 'export']);
+                        Route::post('filter', [MarketingReportCreditLimitController::class, 'filter']);
                     });
                 });
             });

@@ -443,6 +443,27 @@ class MarketingOrderDeliveryController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
+                $passed2025 = true;
+                if($request->arr_modi){
+                    foreach($request->arr_modi as $key => $row){
+                        $mod = MarketingOrderDetail::find($row);
+                        if($mod){
+                            if($mod->marketingOrder->post_date < '2025-01-01'){
+                                if($request->post_date >= '2025-01-01'){
+                                    $passed2025 = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(!$passed2025){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, untuk SO tahun 2024, harus memakai post date MOD tahun 2024 juga.',
+                    ]);
+                }
+
                 $item = [];
                 foreach($request->arr_item as $key => $value) {
                     if (!isset($item[$value])) {

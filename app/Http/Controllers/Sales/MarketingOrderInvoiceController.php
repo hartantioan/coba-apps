@@ -423,6 +423,44 @@ class MarketingOrderInvoiceController extends Controller
                             'message' => 'Mohon maaf! Tanggal invoice tidak boleh kurang dari tanggal barang diterima customer.',
                         ]);
                     }
+                    $passed2025 = true;
+
+                    if($modp->receive_date < '2025-01-01'){
+                        if($request->post_date >= '2025-01-01'){
+                            $passed2025 = false;
+                        }
+                    }
+
+                    if(!$passed2025){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, untuk SJ tahun 2024, harus memakai tanggal invoice tahun 2024 juga.',
+                        ]);
+                    }
+                }
+
+                $percentTax = 0;
+                foreach($request->arr_lookable_id as $key => $row){
+                    if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
+                        $percentTax = $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax;
+                    }elseif($request->arr_lookable_type[$key] == 'marketing_order_delivery_details'){
+                        $percentTax = $rowdata->marketingOrderDetail->percent_tax;
+                    }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
+                        $rowdata = MarketingOrderDownPayment::find($row);
+                        $percentTax = $rowdata->percent_tax;
+                    }else{
+                        $taxId = Tax::find($request->arr_tax_id[$key]);
+                        if($taxId){
+                            $percentTax = $taxId->percentage;
+                        }
+                    }
+                }
+
+                if(round($percentTax) > 0 && round($percentTax) !== 12 && $request->post_date >= '2025-01-01'){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, untuk Invoice tahun 2025 ke atas, harus memakai PPN 12%.',
+                    ]);
                 }
 
                 if($request->temp){

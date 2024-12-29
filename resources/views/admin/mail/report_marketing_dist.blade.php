@@ -1,37 +1,37 @@
-
 <html>
 
 <head>
-<style>
-    table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        width: 70%;
-    }
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 70%;
+        }
 
-    td,
-    th {
-        border: 2px solid #dddddd;
-        padding: 8px;
-    }
+        td,
+        th {
+            border: 2px solid #dddddd;
+            padding: 8px;
+        }
 
-    tr:nth-child(even) {
-        background-color: #dddddd;
-    }
-</style>
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
 </head>
 
 <body>
-    <p><strong>SALES REPORT - GLOBAL</strong></p>
-    <table style='border:1px solid black;'>
+    <p><strong>1A SALES REPORT - ITEM</strong></p>
+    <table>
         <tr style="border:1px solid black;">
             <th style="font-size:12px;">Tipe</th>
-            <th style="font-size:12px;">SO Daily (M2)</th>
-            <th style="font-size:12px;">MOD Daily (M2)</th>
-            <th style="font-size:12px;">SJ Daily (M2)</th>
-            <th style="font-size:12px;">OS SO MTD (M2)</th>
-            <th style="font-size:12px;">OS MOD MTD (M2)</th>
-            <th style="font-size:12px;">SJ MTD (M2)</th>
+            <th style="font-size:12px;">SO Daily (DUS)</th>
+            <th style="font-size:12px;">MOD Daily (DUS)</th>
+            <th style="font-size:12px;">SJ Daily (DUS)</th>
+            <th style="font-size:12px;">OS SO MTD (DUS)</th>
+            <th style="font-size:12px;">OS MOD MTD (DUS)</th>
+            <th style="font-size:12px;">SJ MTD (DUS)</th>
+            <th style="font-size:12px;">ASP MTD (RP/M2)</th>
 
         </tr>
         @php
@@ -47,6 +47,7 @@
             <td style="font-size:12px;" align="right">{{number_format($row->sisaso,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
 
 
 
@@ -61,18 +62,18 @@
     <br>
     <br>
 
-    <p><strong>SALES REPORT - DETAIL</strong></p>
+    <p><strong>1B - SALES REPORT (HOUSE BRAND) - REGION</strong></p>
 
     <table>
-        <tr>
-            <th style="font-size:12px;">Tipe</th>
-            <th style="font-size:12px;">SO Daily (M2)</th>
-            <th style="font-size:12px;">MOD Daily (M2)</th>
-            <th style="font-size:12px;">SJ Daily (M2)</th>
-            <th style="font-size:12px;">OS SO MTD (M2)</th>
-            <th style="font-size:12px;">OS MOD MTD (M2)</th>
-            <th style="font-size:12px;">SJ MTD (M2)</th>
-
+    <tr style="border:1px solid black;">
+            <th style="font-size:12px;">PRO</th>
+            <th style="font-size:12px;">SO Daily (DUS)</th>
+            <th style="font-size:12px;">MOD Daily (DUS)</th>
+            <th style="font-size:12px;">SJ Daily (DUS)</th>
+            <th style="font-size:12px;">OS SO MTD (DUS)</th>
+            <th style="font-size:12px;">OS MOD MTD (DUS)</th>
+            <th style="font-size:12px;">SJ MTD (DUS)</th>
+            <th style="font-size:12px;">ASP MTD (RP/M2)</th>
         </tr>
         @php
         $i=0;
@@ -80,13 +81,15 @@
         @foreach ($data2 as $row)
 
         <tr>
-            <td style="font-size:12px;" align="left">{{$row->name}}</td>
+            <td style="font-size:12px;" align="left">{{$row->tipe}}</td>
+            
             <td style="font-size:12px;" align="right">{{number_format($row->qtyso,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->qtymod,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->qtysj,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->sisaso,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
 
 
 
@@ -100,93 +103,6 @@
     </table>
     <br>
     <br>
-
-
-
-    @php
-
-    $kota=[];
-
-    foreach($data6 as $row)
-    {
-    if (!in_array($row->kota, $kota)) {
-    $kota[] = $row->kota;
-    }
-    }
-
-    sort($kota);
-
-    $ossoht = [];
-    $ossogl = [];
-    $osmodht = [];
-    $osmodgl = [];
-    $sjht = [];
-    $sjgl = [];
-
-    foreach ($data6 as $row){
-    if ($row->tipe=='HT')
-    {
-    $ossoht[$row->kota]=$row->sisaso;
-    $osmodht[$row->kota]=$row->sisamod;
-    $sjht[$row->kota]=$row->sj;
-
-    }
-    if ($row->tipe=='GLAZED')
-    {
-    $ossogl[$row->kota]=$row->sisaso;
-    $osmodgl[$row->kota]=$row->sisamod;
-    $sjgl[$row->kota]=$row->sj;
-    }
-    }
-
-    @endphp
-
-    <p><strong>SALES REPORT - PROVINCE</strong></p>
-
-    <table>
-        <tr>
-            <th style="font-size:12px;">PROVINCE</th>
-            <th style="font-size:12px;" colspan="2">OS SO</th>
-            <th style="font-size:12px;" colspan="2">OS MOD</th>
-            <th style="font-size:12px;" colspan="2">SJ</th>
-        </tr>
-        <tr>
-            <th style="font-size:12px;"></th>
-            <th style="font-size:12px;">HT</th>
-            <th style="font-size:12px;">GP</th>
-            <th style="font-size:12px;">HT</th>
-            <th style="font-size:12px;">GP</th>
-            <th style="font-size:12px;">HT</th>
-            <th style="font-size:12px;">GP</th>
-
-        </tr>
-
-        @foreach ($kota as $row)
-        @if ($ossoht[$row]==0 and $ossogl[$row]==0 and $osmodht[$row]==0 and $osmodgl[$row]==0 and $sjht[$row]==0 and $sjgl[$row]==0)
-
-        @else
-
-        <tr>
-            <td style="font-size:12px;" align="left">{{$row}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($ossoht[$row],0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($ossogl[$row],0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($osmodht[$row],0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($osmodgl[$row],0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($sjht[$row],0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($sjgl[$row],0,",",".")}}</td>
-
-
-
-
-
-        </tr>
-        @endif
-
-        @endforeach
-    </table>
-    <br>
-    <br>
-
 
 
 
@@ -211,6 +127,8 @@
     $osmodgl = [];
     $sjht = [];
     $sjgl = [];
+    $aspht = [];
+    $aspgl = [];
 
     foreach ($data3 as $row){
     if ($row->tipe=='HT')
@@ -218,6 +136,7 @@
     $ossoht[$row->cust]=$row->sisaso;
     $osmodht[$row->cust]=$row->sisamod;
     $sjht[$row->cust]=$row->sj;
+    $aspht[$row->cust]=$row->asp;
 
     }
     if ($row->tipe=='GLAZED')
@@ -225,22 +144,26 @@
     $ossogl[$row->cust]=$row->sisaso;
     $osmodgl[$row->cust]=$row->sisamod;
     $sjgl[$row->cust]=$row->sj;
+    $aspgl[$row->cust]=$row->asp;
     }
     }
 
     @endphp
 
-    <p><strong>SALES REPORT - KEY ACCOUNT</strong></p>
+    <p><strong>1C - SALES REPORT - KEY ACCOUNT</strong></p>
 
     <table>
         <tr>
             <th style="font-size:12px;">DISTRIBUTOR</th>
-            <th style="font-size:12px;" colspan="2">OS SO</th>
-            <th style="font-size:12px;" colspan="2">OS MOD</th>
-            <th style="font-size:12px;" colspan="2">SJ</th>
+            <th style="font-size:12px;" colspan="2">OS SO (DUS)</th>
+            <th style="font-size:12px;" colspan="2">OS MOD (DUS)</th>
+            <th style="font-size:12px;" colspan="2">MTD SJ (DUS)</th>
+            <th style="font-size:12px;" colspan="2">ASP MTD MONTHLY (RP/M2)</th>
         </tr>
         <tr>
             <th style="font-size:12px;"></th>
+            <th style="font-size:12px;">HT</th>
+            <th style="font-size:12px;">GP</th>
             <th style="font-size:12px;">HT</th>
             <th style="font-size:12px;">GP</th>
             <th style="font-size:12px;">HT</th>
@@ -263,6 +186,8 @@
             <td style="font-size:12px;" align="right">{{number_format($osmodgl[$row],0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($sjht[$row],0,",",".")}}</td>
             <td style="font-size:12px;" align="right">{{number_format($sjgl[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($aspht[$row],0,",",".")}}</td>
+            <td style="font-size:12px;" align="right">{{number_format($aspgl[$row],0,",",".")}}</td>
 
 
 
@@ -277,42 +202,40 @@
     <br>
 
 
-    <p><strong>INVENTORY STOCK - GLOBAL</strong></p>
+    <strong> 2A - INVENTORY STOCK - GLOBAL
+        <table>
+            <tr>
+                <th style="font-size:12px;">Tipe</th>
+                <th style="font-size:12px;">PHP (DUS)</th>
+                <th style="font-size:12px;">SALES (DUS)</th>
+                <th style="font-size:12px;">END STOCK (DUS)</th>
+                <th style="font-size:12px;">SALES VS STOCK (days)</th>
 
+            </tr>
 
-    <table>
-        <tr>
-            <th style="font-size:12px;">Tipe</th>
-            <th style="font-size:12px;">PHP (M2)</th>
-            <th style="font-size:12px;">SALES (M2)</th>
-            <th style="font-size:12px;">END STOCK (M2)</th>
-            <th style="font-size:12px;">SALES VS STOCK (M2)</th>
+            @foreach ($data4 as $row)
 
-        </tr>
+            <tr>
+                @if ($row->name=='TOTAL')
+                <td style="font-size:12px;" align="left"><strong>{{$row->name}}</td>
+                <td style="font-size:12px;" align="right"><strong>{{number_format($row->php,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right"><strong>{{number_format($row->sales,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right"><strong>{{number_format($row->stock,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right"><strong>{{number_format($row->life,0,",",".")}}</td>
+                @else
+                <td style="font-size:12px;" align="left">{{$row->name}}</td>
+                <td style="font-size:12px;" align="right">{{number_format($row->php,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right">{{number_format($row->sales,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right">{{number_format($row->stock,0,",",".")}}</td>
+                <td style="font-size:12px;" align="right">{{number_format($row->life,0,",",".")}}</td>
+                @endif
 
-        @foreach ($data4 as $row)
+            </tr>
 
-        <tr>
-            @if ($row->name=='TOTAL')
-            <td style="font-size:12px;" align="left"><strong>{{$row->name}}</td>
-            <td style="font-size:12px;" align="right"><strong>{{number_format($row->php,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right"><strong>{{number_format($row->sales,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right"><strong>{{number_format($row->stock,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right"><strong>{{number_format($row->life,0,",",".")}}</td>
-            @else
-            <td style="font-size:12px;" align="left">{{$row->name}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($row->php,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($row->sales,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($row->stock,0,",",".")}}</td>
-            <td style="font-size:12px;" align="right">{{number_format($row->life,0,",",".")}}</td>
-            @endif
-
-        </tr>
-
-        @endforeach
-    </table>
-    <br>
-    <br>
+            @endforeach
+        </table>
+        <br>
+        <br>
 
 
 

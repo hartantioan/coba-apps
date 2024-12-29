@@ -59,28 +59,26 @@
         <br>
         <br>
 
-        <strong> 1B - SALES REPORT -BRAND
+        <strong> 1D - SALES REPORT - REGION
             <br><br>
-
             <table>
                 <tr>
-                    <th style="font-size:12px;">Tipe</th>
-                    <th style="font-size:12px;">SO Daily (DUS)</th>
-                    <th style="font-size:12px;">MOD Daily (DUS)</th>
-                    <th style="font-size:12px;">SJ Daily (DUS)</th>
+                    <th style="font-size:12px;">AREA</th>
+                    <th style="font-size:12px;">SO DAILY (DUS)</th>
+                    <th style="font-size:12px;">MOD DAILY (DUS)</th>
+                    <th style="font-size:12px;">SJ DAILY (DUS)</th>
                     <th style="font-size:12px;">OS SO MTD (DUS)</th>
                     <th style="font-size:12px;">OS MOD MTD (DUS)</th>
                     <th style="font-size:12px;">SJ MTD (DUS)</th>
                     <th style="font-size:12px;">ASP MTD (RP/M2)</th>
-
                 </tr>
                 @php
                 $i=0;
                 @endphp
-                @foreach ($data2 as $row)
+                @foreach ($data7 as $row)
 
                 <tr>
-                    <td style="font-size:12px;" align="left">{{$row->name}}</td>
+                    <td style="font-size:12px;" align="left">{{$row->tipe}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtyso,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtymod,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtysj,0,",",".")}}</td>
@@ -88,11 +86,6 @@
                     <td style="font-size:12px;" align="right">{{number_format($row->sisamod,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->sjm,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->asp,0,",",".")}}</td>
-
-
-
-
-
                 </tr>
                 @php
                 $i++;
@@ -243,9 +236,9 @@
                 $m2ht[$row->brand] = $row->m2;
                 $paletht[$row->brand] = $row->palet;
                 $boxht[$row->brand] = $row->box;
-              
+
                 } else {
-                    $phpgp[$row->brand] = $row->php;
+                $phpgp[$row->brand] = $row->php;
                 $m2gp[$row->brand] = $row->m2;
                 $paletgp[$row->brand] = $row->palet;
                 $boxgp[$row->brand] = $row->box;

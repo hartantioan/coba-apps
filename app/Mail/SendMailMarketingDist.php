@@ -16,8 +16,9 @@ class SendMailMarketingDist extends Mailable
     protected $data4;
     protected $data5;
     protected $data6;
+    protected $data7;
     
-    public function __construct($data, $data2,$data3,$data4,$data5,$data6)
+    public function __construct($data, $data2,$data3,$data4,$data5,$data6,$data7)
     {
         $this->data = $data;
         $this->data2 = $data2;
@@ -25,6 +26,7 @@ class SendMailMarketingDist extends Mailable
         $this->data4 = $data4;
         $this->data5 = $data5;
         $this->data6 = $data6;
+        $this->data7 = $data7;
     }
 
     public function attachments(): array

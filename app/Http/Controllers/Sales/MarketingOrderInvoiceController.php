@@ -442,8 +442,10 @@ class MarketingOrderInvoiceController extends Controller
                 $percentTax = 0;
                 foreach($request->arr_lookable_id as $key => $row){
                     if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
+                        $rowdata = MarketingOrderDeliveryProcessDetail::find($row);
                         $percentTax = $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax;
                     }elseif($request->arr_lookable_type[$key] == 'marketing_order_delivery_details'){
+                        $rowdata = MarketingOrderDeliveryDetail::find($row);
                         $percentTax = $rowdata->marketingOrderDetail->percent_tax;
                     }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
                         $rowdata = MarketingOrderDownPayment::find($row);

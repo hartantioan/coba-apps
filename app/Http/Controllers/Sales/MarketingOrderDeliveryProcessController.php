@@ -504,7 +504,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
                 $mod = MarketingOrderDelivery::find($request->marketing_order_delivery_id);
 
-                $passed2025 = true;
+                /* $passed2025 = true;
                 if($mod->post_date < '2025-01-01'){
                     if($request->post_date >= '2025-01-01'){
                         $passed2025 = false;
@@ -516,7 +516,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk MOD tahun 2024, harus memakai post date SJ tahun 2024 juga.',
                     ]);
-                }
+                } */
 
                 if($request->user_driver_id){
                     $user_driver = $request->user_driver_id;
@@ -1505,7 +1505,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
         } else {
 
-            $passed2025 = true;
+            /* $passed2025 = true; */
 
             if($request->status_tracking == '5'){
                 return response()->json([
@@ -1544,19 +1544,19 @@ class MarketingOrderDeliveryProcessController extends Controller
                         ]);
                     }
                 }
-                if($data->post_date < '2025-01-01'){
+                /* if($data->post_date < '2025-01-01'){
                     if($request->receive_date >= '2025-01-01'){
                         $passed2025 = false;
                     }
-                }
+                } */
             }
 
-            if(!$passed2025){
+            /* if(!$passed2025){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf, untuk SJ tahun 2024, harus memakai tanggal update tahun 2024 juga.',
                 ]);
-            }
+            } */
 
             if($cek){
                 $cek->update([
@@ -1644,7 +1644,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             }
 
             if($data){
-                $passed2025 = true;
+                /* $passed2025 = true;
 
                 if($data->post_date < '2025-01-01'){
                     if($request->post_date_return >= '2025-01-01'){
@@ -1657,7 +1657,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk SJ tahun 2024, harus memakai tanggal kembali SJ tahun 2024 juga.',
                     ]);
-                }
+                } */
                 
                 if($request->has('document')) {
                     if($data->document){

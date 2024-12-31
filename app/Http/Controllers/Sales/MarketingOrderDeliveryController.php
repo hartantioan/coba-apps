@@ -443,7 +443,7 @@ class MarketingOrderDeliveryController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                $passed2025 = true;
+                /* $passed2025 = true;
                 if($request->arr_modi){
                     foreach($request->arr_modi as $key => $row){
                         $mod = MarketingOrderDetail::find($row);
@@ -462,7 +462,7 @@ class MarketingOrderDeliveryController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk SO tahun 2024, harus memakai post date MOD tahun 2024 juga.',
                     ]);
-                }
+                } */
 
                 $item = [];
                 foreach($request->arr_item as $key => $value) {

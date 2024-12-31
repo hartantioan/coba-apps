@@ -630,7 +630,7 @@ class MarketingOrderController extends Controller
                     }
                 }
 
-                $passed2025 = true;
+                /* $passed2025 = true;
 
                 foreach($request->arr_tax as $row){
                     if($request->post_date >= '2025-01-01'){
@@ -645,7 +645,7 @@ class MarketingOrderController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk SO tahun 2025 ke atas, harus memakai PPN 12%.',
                     ]);
-                }
+                } */
 
                 if(!$passedNettPrice){
                     return response()->json([

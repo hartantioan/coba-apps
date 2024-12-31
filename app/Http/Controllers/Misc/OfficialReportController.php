@@ -360,7 +360,7 @@ class OfficialReportController extends Controller
                         ]);
                     } */
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','3','6'])){
 
                         $query->user_id = session('bo_id');
                         /* $query->company_id = $request->company_id;

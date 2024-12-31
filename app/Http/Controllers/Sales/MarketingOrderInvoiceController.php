@@ -531,7 +531,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->tax_no = $request->tax_no && str_replace(',','.',str_replace('.','',$request->total)) > 0 ? $request->tax_no : NULL;
+                        $query->tax_no = $request->tax_no ? $request->tax_no : NULL;
                         $query->note = $request->note;
 
                         $query->save();
@@ -584,7 +584,7 @@ class MarketingOrderInvoiceController extends Controller
                         'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
-                        'tax_no'                        => $request->tax_no && str_replace(',','.',str_replace('.','',$request->total)) > 0 ? $taxno : NULL,
+                        'tax_no'                        => $request->tax_no ? $taxno : NULL,
                         'note'                          => $request->note,
 
                     ]);

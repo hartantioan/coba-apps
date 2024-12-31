@@ -329,7 +329,7 @@
                                         <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
                                             <option value="010">010</option>
                                             <option value="020">020</option>
-                                            <option value="030">030</option>
+                                            <option value="030">030</eoption>
                                             <option value="040">040</option>
                                             <option value="050">050</option>
                                             <option value="060">060</option>
@@ -2974,13 +2974,13 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        if(total > 0){
+        /* if(total > 0){ */
             $('#textTax').show();
             getTaxSeries();
-        }else{
+        /* }else{
             $('#textTax').hide();
             $('#tax_no').val('');
-        }
+        } */
     }
 
     function startIntro(){

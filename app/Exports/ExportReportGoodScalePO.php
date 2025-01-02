@@ -150,7 +150,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                 'Ekspedisi'             => $row->goodScale->account->name,
                 'Qty'            => $row->qty,
                 'Harga'             => $price,
-                'Total'             => $cost,
+                'Total'             => round($cost,2),
                 'No. APIN'             => $list,
 
             ];

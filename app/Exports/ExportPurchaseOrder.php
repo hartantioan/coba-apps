@@ -180,7 +180,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                         'disc3'             => $this->nominal ? $row->discount_3 * $row->purchaseOrder->currency_rate : '',
                         'subtotal'          => $this->nominal ? $subtotal : '',
                         'discount'          => $this->nominal ? $discount : '',
-                        'total'             => $this->nominal ? $total : '',
+                        'total'             => round($this->nominal,2) ? $total : '',
                         'based_on'          => $row->getReference(),
                     ];
                 }

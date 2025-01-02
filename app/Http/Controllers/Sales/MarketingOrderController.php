@@ -872,6 +872,7 @@ class MarketingOrderController extends Controller
 
             DB::commit();
         }catch(\Exception $e){
+            info($e->getMessage());
             DB::rollback();
         }
 

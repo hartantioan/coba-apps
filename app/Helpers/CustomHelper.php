@@ -4401,19 +4401,32 @@ class CustomHelper {
 			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$mom->company_id)->first();
 			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$mom->company_id)->first();
 			$coapotonganpenjualan = Coa::where('code','400.02.01.01.01')->where('company_id',$mom->company_id)->first();
+			$coareturpenjualan = Coa::where('code','400.03.01.01.01')->where('company_id',$mom->company_id)->first();
 
             $total = round($mom->total * $mom->currency_rate,2);
             $tax = round($mom->tax * $mom->currency_rate,2);
 
             if($total > 0){
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'coa_id'		=> $coapotonganpenjualan->id,
-                    'account_id'	=> $coapotonganpenjualan->bp_journal ? $mom->account_id : NULL,
-                    'type'			=> '1',
-                    'nominal'		=> $total,
-                    'nominal_fc'    => $mom->total,
-                ]);
+				if($mom->memo_type == '1'){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapotonganpenjualan->id,
+						'account_id'	=> $coapotonganpenjualan->bp_journal ? $mom->account_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $total,
+						'nominal_fc'    => $mom->total,
+					]);
+				}elseif($mom->memo_type == '2'){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coareturpenjualan->id,
+						'account_id'	=> $coareturpenjualan->bp_journal ? $mom->account_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $total,
+						'nominal_fc'    => $mom->total,
+					]);
+				}
+                
             }
 
             if($tax > 0){

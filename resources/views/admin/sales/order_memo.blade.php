@@ -289,7 +289,7 @@
                                         <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
                                             <option value="0.00000" data-id="0">-- Pilih ini jika non-PPN --</option>
                                             @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                         <label class="active" for="tax_id">PPN</label>
@@ -854,7 +854,7 @@
                     return 'You will lose all changes made since your last save';
                 };
                 if(!$('#temp').val()){
-
+                    showHideQty();
                 }
             },
             onCloseEnd: function(modal, trigger){
@@ -1054,12 +1054,24 @@
     });
 
     function showHideQty(){
+        $('#tax_id').val('0.00000');
+        $('#is_include_tax').val('0');
+        $('#tax_no').val('');
+        $('#body-item').empty().append(`
+            <tr id="last-row-item">
+                <td colspan="14">
+                    Silahkan tambahkan Surat Jalan untuk Tipe Qty
+                </td>
+            </tr>
+        `);
         if($('#memo_type').val() == '1'){
             $("#detail-qty").addClass('hide');
             $('#nominal').attr('disabled',false);
+            $('#tax_id,#is_include_tax,#tax_no').attr('disabled',true);
         }else if($('#memo_type').val() == '2'){
             $("#detail-qty").removeClass('hide');
             $('#nominal').attr('disabled',true);
+            $('#tax_id,#is_include_tax,#tax_no').attr('disabled',false);
         }
     }
 
@@ -1520,13 +1532,15 @@
 
     function changeDateMinimum(val){
         if(val){
-            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
-            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
-                if(newcode.length > 9){
-                    newcode = newcode.substring(0, 9);
+            if(!$('#temp').val()){
+                let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+                if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                    if(newcode.length > 9){
+                        newcode = newcode.substring(0, 9);
+                    }
                 }
+                $('#code').val(newcode);
             }
-            $('#code').val(newcode);
             $('#code_place_id').trigger('change');
         }
     }
@@ -1862,6 +1876,7 @@
                                             `);
                                             stockUsed.push(val.id);
                                             $('#tax_id').val(val.percent_tax);
+                                            $('#is_include_tax').val(val.is_include_tax);
                                             $('#arr_qty' + count).trigger('keyup');
                                         });
                                     }

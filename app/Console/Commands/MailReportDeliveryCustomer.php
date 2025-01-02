@@ -31,7 +31,7 @@ class MailReportDeliveryCustomer extends Command
     public function handle()
     {
         //$recipient = ['edp@superior.co.id','marisa@superiorporcelain.co.id'];
-        
+
         $data = [];
 
         $date = date('d');
@@ -44,19 +44,19 @@ class MailReportDeliveryCustomer extends Command
 
         $customer = ['1140', '1141'];
         //manual
-       // $tanggal1 = '2024-10-01';
+        // $tanggal1 = '2024-10-01';
         //$tanggal2 = '2024-10-31';
 
         //kirim setiap tanggal 2
         foreach ($customer as $row) {
             if ($date == '02') {
-                if ($row=='1140')
-                {
-                    $recipient = ['edp@superior.co.id','marisa@superiorporcelain.co.id','diah.christian@abp.co.id','weni.anugrah@abp-jatim.co.id','tan.oesiung@abp-jatim.co.id'];
+                if ($row == '1140') {
+                    $recipient = ['edp@superior.co.id', 'marisa@superiorporcelain.co.id', 'diah.christian@abp.co.id', 'weni.anugrah@abp-jatim.co.id', 'tan.oesiung@abp-jatim.co.id'];
+                   // $recipient = ['edp@superior.co.id'];
                 }
-                if ($row=='1141')
-                {
-                    $recipient = ['edp@superior.co.id','marisa@superiorporcelain.co.id','santika.bela@rima.co.id','hani.susanti@rima-jatim.co.id','tan.oesiung@abp-jatim.co.id'];
+                if ($row == '1141') {
+                    $recipient = ['edp@superior.co.id', 'marisa@superiorporcelain.co.id', 'santika.bela@rima.co.id', 'hani.susanti@rima-jatim.co.id', 'tan.oesiung@abp-jatim.co.id'];
+                   // $recipient = ['edp@superior.co.id'];
                 }
                 Excel::store(new ExportDeliveryCustomer($tanggal1, $tanggal2, $row), 'public/auto_email/delivery_report.xlsx', 'local');
                 Mail::to($recipient)->send(new SendMailDeliveryCustomer());

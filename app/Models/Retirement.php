@@ -108,6 +108,7 @@ class Retirement extends Model
         $query = Retirement::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
+            ->orderByDesc('code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();

@@ -155,6 +155,7 @@ class CloseBill extends Model
         $query = CloseBill::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
+            ->orderByDesc('code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();

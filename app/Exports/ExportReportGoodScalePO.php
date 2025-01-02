@@ -108,7 +108,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             $december16 = strtotime("2024-12-16 00:00:00");
             if($row->lookable->type_delivery != '1'){
                 if (strtotime($row->goodScale->post_date) > $december16) {
-                    $cost = $row->findProportionCost();
+                    $cost = $row->total;
                 }else{
                     $cost = $row->total;
                 }

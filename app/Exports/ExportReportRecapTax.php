@@ -115,13 +115,13 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         if ($freeAreaTax) {
                             $hscode = ' ' . $row_detail->getHSCode();
                         }
-
+                        
                         if ($row_detail->is_include_tax == 1) {
                             $percentTax = ($row_detail->getMarketingOrder->percent_tax + 100) / 100;
                         }
 
                         //  $price_satuan = $row_detail->getMarketingOrder->priceWTax();
-                        $price_satuan = round($row_detail->getMarketingOrder->price / $percentTax, 7);
+                        $price_satuan = round($row_detail->priceBeforeTax(), 7);
                         $jumlah_barang = $row_detail->getQtyM2();
 
                         $dpp_discount_detail = $row_detail->getMarketingOrder->price / $percentTax - $row_detail->getMarketingOrder->price_after_discount / $percentTax;

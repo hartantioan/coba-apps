@@ -370,12 +370,12 @@ class MarketingOrderDownPaymentController extends Controller
                 ]);
             } */
 
-            if(round($request->percent_tax) > 0 && round($request->percent_tax) !== 12 && $request->post_date >= '2025-01-01'){
+            /* if(round($request->percent_tax) > 0 && round($request->percent_tax) !== 12 && $request->post_date >= '2025-01-01'){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf, untuk ARDP tahun 2025 ke atas, harus memakai PPN 12%.',
                 ]);
-            }
+            } */
 
 			if($request->temp){
                 DB::beginTransaction();

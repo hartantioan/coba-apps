@@ -154,7 +154,7 @@ class MarketingBarcodeScanController extends Controller
         $query = MarketingOrderDeliveryProcess::find($mop->id);
         if($query){
 
-            $percentTax = 0;
+            /* $percentTax = 0;
 
             foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row){
                 $percentTax = $row->marketingOrderDetail->percent_tax;
@@ -165,7 +165,7 @@ class MarketingBarcodeScanController extends Controller
                     'status'  => 500,
                     'message' => 'Mohon maaf, untuk SJ kembali tahun 2025 ke atas, harus memakai PPN 12%.',
                 ]);
-            }
+            } */
 
             $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$mop->id)
             ->whereIn('status',values: ['5'])->get();

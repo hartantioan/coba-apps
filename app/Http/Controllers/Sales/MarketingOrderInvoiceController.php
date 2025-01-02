@@ -423,7 +423,7 @@ class MarketingOrderInvoiceController extends Controller
                             'message' => 'Mohon maaf! Tanggal invoice tidak boleh kurang dari tanggal barang diterima customer.',
                         ]);
                     }
-                    $passed2025 = true;
+                    /* $passed2025 = true;
 
                     if($modp->receive_date < '2025-01-01'){
                         if($request->post_date >= '2025-01-01'){
@@ -436,10 +436,10 @@ class MarketingOrderInvoiceController extends Controller
                             'status'  => 500,
                             'message' => 'Mohon maaf, untuk SJ tahun 2024, harus memakai tanggal invoice tahun 2024 juga.',
                         ]);
-                    }
+                    } */
                 }
 
-                $percentTax = 0;
+                /* $percentTax = 0;
                 foreach($request->arr_lookable_id as $key => $row){
                     if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
                         $rowdata = MarketingOrderDeliveryProcessDetail::find($row);
@@ -463,7 +463,7 @@ class MarketingOrderInvoiceController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk Invoice tahun 2025 ke atas, harus memakai PPN 12%.',
                     ]);
-                }
+                } */
 
                 if($request->temp){
 

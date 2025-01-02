@@ -41,7 +41,7 @@ class GoodScaleDetail extends Model
     {
         $cost = 0;
         if($this->qty > 0 && $this->goodScale->qty_final > 0){
-            $cost = ($this->qty/$this->goodScale->qty_final)*$this->goodScale->totalCost();
+            $cost = round(($this->qty/$this->goodScale->qty_final),3)*$this->goodScale->totalCost();
         }
         return $cost;
     }

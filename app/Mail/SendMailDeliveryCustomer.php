@@ -27,8 +27,8 @@ class SendMailDeliveryCustomer extends Mailable
 
 
         return $this->from('porcelain@superiorporcelain.co.id')
-            //->subject('Laporan Delivery ' . $month . ' '.$year)
-            ->subject('Laporan Delivery Desember 2024')
+            ->subject('Laporan Delivery ' . $month . ' '.$year)
+            //->subject('Laporan Delivery Desember 2024')
             ->view('admin.mail.report_delivery_customer')
 
             ->attach(

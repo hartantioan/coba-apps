@@ -1548,13 +1548,15 @@
 
     function changeDateMinimum(val){
         if(val){
-            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
-            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
-                if(newcode.length > 9){
-                    newcode = newcode.substring(0, 9);
+            if(!$('#temp').val()){
+                let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+                if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                    if(newcode.length > 9){
+                        newcode = newcode.substring(0, 9);
+                    }
                 }
+                $('#code').val(newcode);
             }
-            $('#code').val(newcode);
             $('#code_place_id').trigger('change');
         }
     }

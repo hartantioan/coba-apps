@@ -1100,6 +1100,7 @@ class PurchaseOrderController extends Controller
 
             DB::commit();
         }catch(\Exception $e){
+            info($e->getMessage());
             DB::rollback();
         }
         return response()->json($response);

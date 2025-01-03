@@ -22,7 +22,7 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
         $this->status = $status ? $status : '';
         $this->account_id = $account_id ? $account_id : '';
         $this->company = $company ? $company : '';
-        
+
     }
 
     private $headings = [
@@ -89,17 +89,16 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
                 $groupIds = explode(',', $this->account_id);
                 $query->whereIn('account_id',$groupIds);
             }
-            
+
             if($this->company){
                 $query->where('company_id',$this->company);
             }
         })
-        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->get();
 
         $arr=[];
         foreach($query_data as $key => $row){
-            
+
             $arr[] = [
                 'no'                => ($key + 1),
                 'kode'              => $row->code,
@@ -124,10 +123,10 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
                 'grandtotal'         => $row->grandtotal,
                 'status'            => $row->statusRaw(),
             ];
-        
-            
+
+
         }
-        
+
         return collect($arr);
     }
 

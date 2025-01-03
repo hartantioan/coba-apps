@@ -121,15 +121,9 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     }
                 }
 
-                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {
-                    $price = $rowdetail->priceBeforeTax();
-                    $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
-                    $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
-                } else {
-                    $price = $rowdetail->price;
-                    $totalBeforeTax = round($rowdetail->total, 2);
-                    $totalDiscountBeforeTax = 0;
-                }
+                $price = $rowdetail->priceBeforeTax();
+                $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
 
                 $arr[] = [
                     '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
@@ -160,15 +154,9 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     }
                 }
 
-                if (date('Y-m-d', strtotime($row->created_at)) >= '2024-11-18') {
-                    $price = $rowdetail->priceBeforeTax();
-                    $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
-                    $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
-                } else {
-                    $price = $rowdetail->price;
-                    $totalBeforeTax = round($rowdetail->total, 2);
-                    $totalDiscountBeforeTax = 0;
-                }
+                $price = $rowdetail->priceBeforeTax();
+                $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
 
                 $arr[] = [
                     '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',

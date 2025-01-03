@@ -43,6 +43,7 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
         'Perusahaan',
         'Jenis',
         'No Seri Pajak',
+        'Keterangan',
         'Total',
         'PPN',
         'Grandtotal',

@@ -584,13 +584,13 @@ class GoodReceiveController extends Controller
 
                         if($request->arr_batch_no[$key] && $itemStock){
                             if($itemStock->production_batch_id){
-                                $productionBatch = ProductionBatch::find($itemStock->production_batch_id);
+                                /* $productionBatch = ProductionBatch::find($itemStock->production_batch_id);
                                 if($productionBatch){
                                     $productionBatch->update([
                                         'qty_real'  => $productionBatch->qty_real + $grd->qty,
                                         'total'     => $productionBatch->total + $grd->total,
                                     ]);
-                                }
+                                } */
                             }
                         }else{
                             if($request->arr_batch_no[$key]){

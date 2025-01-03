@@ -1225,7 +1225,7 @@ class FundRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $lastSegment = $request->lastsegment;
-                    $menu = Menu::where('url', $lastSegment)->first();
+                    $menu = Menu::where('url', 'fund_request')->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     $fileUpload = '';
 

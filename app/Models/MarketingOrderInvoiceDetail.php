@@ -95,7 +95,7 @@ class MarketingOrderInvoiceDetail extends Model
                 }
             }
             if(!$newVersion){
-                $discount = round($discount / ((100 + $this->percent_tax) / 100),2);
+                $discount = $discount / ((100 + $this->percent_tax) / 100);
             }
         }
         return $discount;

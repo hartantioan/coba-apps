@@ -99,9 +99,8 @@
 
 <script>
     function exportExcel() {
-        /* var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export?date=" + date; */
-        alert('sabar ya masih cuti. 2025 segera diproses.');
+        var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export?date=" + date;
     }
 
     function filter() {

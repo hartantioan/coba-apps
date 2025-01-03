@@ -107,7 +107,7 @@ class MarketingOrderInvoiceDetail extends Model
     }
 
     public function totalBeforeTax(){
-        $total = $this->getQtyM2() * $this->priceBeforeTax();
+        $total = round($this->getQtyM2() * $this->priceBeforeTax(),2);
         return $total;
     }
 

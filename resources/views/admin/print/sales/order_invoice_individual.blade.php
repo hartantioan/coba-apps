@@ -304,7 +304,9 @@
                             </thead>
                             <tbody>
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
-
+                                @if($key > 0 && $key % 4 == 0)
+                                    <div style="page-break-before: always;margin-top:140px;"></div>
+                                @endif
                                 @php
                                     $boxQty = '';
                                     if($row->lookable->isPallet()){

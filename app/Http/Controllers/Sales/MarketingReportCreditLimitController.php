@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExportOutstandingMOD;
+use App\Exports\ExportReportCreditLimit;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
@@ -32,7 +33,7 @@ class MarketingReportCreditLimitController extends Controller
 
   public function export(Request $request)
   {
-    return Excel::download(new ExportOutstandingMOD(), 'outstanding_mod_' . uniqid() . '.xlsx');
+    return Excel::download(new ExportReportCreditLimit(), 'report_credit_limit_' . uniqid() . '.xlsx');
   }
 
   public function filter(Request $request)
@@ -83,7 +84,7 @@ class MarketingReportCreditLimitController extends Controller
     }
 
     $html .= '
-          
+
           </tbody></table>';
 
 

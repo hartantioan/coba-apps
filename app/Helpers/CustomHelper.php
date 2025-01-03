@@ -4415,6 +4415,7 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $total,
 						'nominal_fc'    => $mom->total,
+						'note'			=> $mom->getArinCode(),
 					]);
 				}elseif($mom->memo_type == '2'){
 					JournalDetail::create([
@@ -4424,6 +4425,7 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $total,
 						'nominal_fc'    => $mom->total,
+						'note'			=> $mom->getArinCode(),
 					]);
 				}
                 
@@ -4450,6 +4452,7 @@ class CustomHelper {
                     'type'			=> '2',
                     'nominal'		=> $mom->grandtotal * $mom->currency_rate,
                     'nominal_fc'    => $mom->grandtotal,
+					'note'			=> $mom->getArinCode(),
                 ]);
 
             }

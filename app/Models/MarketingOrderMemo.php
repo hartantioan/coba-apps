@@ -152,6 +152,16 @@ class MarketingOrderMemo extends Model
         return $type;
     }
 
+    public function getArinCode(){
+        $arr = [];
+        foreach($this->marketingOrderMemoDetail as $row){
+            if($row->lookable_type == 'marketing_order_delivery_process_details'){
+                $arr[] = $row->lookable->marketingOrderDeliveryProcess->marketingOrderInvoice->code;
+            }
+        }
+        return implode(',',$arr);
+    }
+
     public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {

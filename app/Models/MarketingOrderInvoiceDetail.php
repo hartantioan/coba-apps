@@ -83,7 +83,20 @@ class MarketingOrderInvoiceDetail extends Model
     public function discountBeforeTax(){
         $discount = $this->discount();
         if($discount > 0){
-            $discount = $discount / ((100 + $this->percent_tax) / 100);
+            $newVersion = false;
+            if ($this->lookable_type == 'marketing_order_delivery_details') {
+                if(date('Y-m-d',strtotime($this->lookable->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                    $newVersion = true;
+                }
+            }
+            if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+                if(date('Y-m-d',strtotime($this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                    $newVersion = true;
+                }
+            }
+            if(!$newVersion){
+                $discount = $discount / ((100 + $this->percent_tax) / 100);
+            }
         }
         return $discount;
     }

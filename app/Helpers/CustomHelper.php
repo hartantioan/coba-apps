@@ -4983,6 +4983,34 @@ class CustomHelper {
 				}
 			}
 
+			#start journal rounding
+			if($pi->rounding > 0 || $pi->rounding < 0){
+				if($adjustGrpo > 0){
+					$adjustGrpo += round($pi->rounding * $currency_rate,2);
+				}
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding->id,
+					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+					'type'			=> $pi->rounding > 0 ? '1' : '2',
+					'nominal'		=> abs($pi->rounding * $currency_rate),
+					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+					'type'			=> $pi->rounding > 0 ? '2' : '1',
+					'nominal'		=> abs($pi->rounding * $currency_rate),
+					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+			}
+
 			if($adjustGrpo > 0 && $pi->currency->type == '2'){
 				$balanceselisih = $adjustGrpo - round($pi->grandtotal * $pi->currency_rate,2);
 				if(round($balanceselisih,2) < 0 || round($balanceselisih,2) > 0){
@@ -5010,31 +5038,6 @@ class CustomHelper {
 						'note'			=> 'AUTO ADJUST SELISIH RUPIAH GRPO & APIN KURS ASING'
 					]);
 				}
-			}
-
-			#start journal rounding
-			if($pi->rounding > 0 || $pi->rounding < 0){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coarounding->id,
-					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
-					'type'			=> $pi->rounding > 0 ? '1' : '2',
-					'nominal'		=> abs($pi->rounding * $currency_rate),
-					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coahutangusaha->id,
-					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-					'type'			=> $pi->rounding > 0 ? '2' : '1',
-					'nominal'		=> abs($pi->rounding * $currency_rate),
-					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-				]);
 			}
 
 			#start journal down payment

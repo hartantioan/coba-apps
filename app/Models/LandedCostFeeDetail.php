@@ -50,7 +50,7 @@ class LandedCostFeeDetail extends Model
     }
 
     public function totalZeroFeeJournal(){
-        $has = false;
+        /* $has = false;
         $total = 0;
         if($this->journalDetail()->exists()){
             $total = 0;
@@ -63,7 +63,7 @@ class LandedCostFeeDetail extends Model
             $has = true;
         }
         
-        return $has;
+        return $has; */
     }
 
     public function purchaseInvoiceDetail()

@@ -58,7 +58,7 @@
             @endforeach
             <tr>
                 <td colspan="20">TOTAL</td>
-                <td>{{ $total }}</td>
+                <td>{{ number_format($total,2,',','.') }}</td>
                 <td></td>
             </tr>
         @endif

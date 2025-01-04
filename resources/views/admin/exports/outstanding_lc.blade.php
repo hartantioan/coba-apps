@@ -56,7 +56,11 @@
                     <td>{{ $row['grpo_no'] }}</td>
                 </tr>
             @endforeach
-
+            <tr>
+                <td colspan="20">TOTAL</td>
+                <td>{{ $total }}</td>
+                <td></td>
+            </tr>
         @endif
     </tbody>
 </table>

@@ -42,6 +42,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
         ->get();
 
         $array=[];
+        $total = 0;
         foreach($data as $row){
             $balance = $row->balanceInvoiceByDate($this->date);
             if($balance > 0 && !$row->landedCost->hasCancelDocumentByDate($this->date)){
@@ -77,6 +78,9 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
                     $entry["dibayar"] = number_format($row->totalInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');
                     $entry["sisa"] = number_format($balance * $row->landedCost->currency_rate,2,',','.');
                     $entry["grpo_no"] = $row->landedCost->getGoodReceiptNo();
+
+                    $total += round($balance * $row->landedCost->currency_rate,2);
+
                     $array[] = $entry;
                 }
             }
@@ -88,8 +92,8 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             ->log('Export outstanding Lc.');
 
         return view('admin.exports.outstanding_lc', [
-            'data' => $array,
-
+            'data'  => $array,
+            'total' => $total,
         ]);
     }
 }

@@ -49,6 +49,21 @@ class LandedCostFeeDetail extends Model
         return $has;
     }
 
+    public function totalZeroFeeJournal(){
+        $has = false;
+        if($this->journalDetail()->exists()){
+            $total = 0;
+            foreach($this->journalDetail as $row){
+                $total += $row->nominal;
+            }
+            if($total == 0){
+                $has = true;
+            }
+        }
+        
+        return $has;
+    }
+
     public function purchaseInvoiceDetail()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){

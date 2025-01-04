@@ -26,7 +26,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
     public function view(): View
     {
         $data = LandedCostFeeDetail::whereHas('landedCost',function($query){
-            $query->whereIn('status',['2','8'])
+            $query->whereIn('status',['2','3','8'])
                 ->where('post_date','<=',$this->date)/* 
                 ->whereHas('landedCostDetail',function($query){
                     $query->whereDoesntHave('landedCostDetailSelf');
@@ -46,7 +46,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
         foreach($data as $row){
             $balance = $row->balanceInvoiceByDate($this->date);
             if($balance > 0 && !$row->landedCost->hasCancelDocumentByDate($this->date)){
-                if(!$row->totalLandedCostFeeSelfByDate($this->date)){
+                if(!$row->totalLandedCostFeeSelfByDate($this->date) || !$row->totalZeroFeeJournal()){
                     $entry = [];
                     $entry["code"]=$row->landedCost->code;
                     $entry["post_date"] = date('d/m/Y',strtotime($row->landedCost->post_date));

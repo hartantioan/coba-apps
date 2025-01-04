@@ -3087,8 +3087,8 @@ class CustomHelper {
 								'note'			=> $dataother->landedCostFee->name,
 								'lookable_type'	=> $table_name,
 								'lookable_id'	=> $table_id,
-								'detailable_type'=> $rowfee->getTable(),
-								'detailable_id'	=> $rowfee->id,
+								'detailable_type'=> $dataother->getTable(),
+								'detailable_id'	=> $dataother->id,
 							]);
 							$totalfccost += $rowfc;
 						}else{

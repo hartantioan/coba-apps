@@ -56,7 +56,7 @@
             background-color:white !important;
             zoom:0.8;
         }
-        
+
         .modal {
             background-color:white !important;
         }
@@ -88,7 +88,7 @@
             overflow: visible !important;
             min-width:100% !important;
         }
-        
+
         .modal-content {
             visibility: visible !important;
             overflow: visible !important;
@@ -226,7 +226,7 @@
                     {{ __('translations.transport_type') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->transportation->name }}
+                    {{ $data->transportation->name ?? '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.sent_date') }}
@@ -319,7 +319,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="invoice-product-details mt-2" style="overflow:auto;">
             <table class="bordered">
                 <thead>
@@ -363,7 +363,7 @@
                         <td colspan="10">{{ __('translations.note') }}: {{ $row->note }}</td>
                         <td colspan="4">{{ __('translations.taken_from') }}: {{ $row->place->code }}</td>
                     </tr>
-                    
+
                     @endforeach
                     <tr>
                         <td colspan="10" rowspan="8">
@@ -404,7 +404,7 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    
+
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -416,25 +416,25 @@
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
                             @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                            <tr>    
+                            <tr>
                                 <td>
-                                        
-                                        
+
+
                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                            {{ $row->user->name }} 
+                                            {{ $row->user->name }}
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}
                                             @endif
                                             {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-').' Keterangan : '.$row->note }}</div>
                                         <div class="{{ $row->user->date_process ? '' : 'mt-2' }}"></div>
-                                        
+
                                 </td>
                             </tr>
                             @endforeach
                         @endforeach
                     @endif
-                
-            </table>   
+
+            </table>
         </div>
     </div>
 </div>

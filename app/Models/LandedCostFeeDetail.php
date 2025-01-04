@@ -51,14 +51,16 @@ class LandedCostFeeDetail extends Model
 
     public function totalZeroFeeJournal(){
         $has = false;
+        $total = 0;
         if($this->journalDetail()->exists()){
             $total = 0;
             foreach($this->journalDetail as $row){
                 $total += $row->nominal;
             }
-            if($total == 0){
-                $has = true;
-            }
+        }
+
+        if($total == 0){
+            $has = true;
         }
         
         return $has;

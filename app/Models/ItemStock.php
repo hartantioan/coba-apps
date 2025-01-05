@@ -125,7 +125,7 @@ class ItemStock extends Model
         $balance = $this->qty;
         
         $modp = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
-            $query->where('status','2');
+            $query->whereIn('status',['1','2','3']);
         })
         ->where('item_stock_id',$this->id)
         ->get();

@@ -3498,11 +3498,7 @@ class Select2Controller extends Controller {
             $query->where(function($query) use ($search){
                 $query->where('code', 'like', "%$search%")
                     ->orWhere('note_internal','like',"%$search%")
-                    ->orWhere('note_external','like',"%$search%")
-                    ->orWhereHas('user',function($query) use ($search){
-                        $query->where('name','like',"%$search%")
-                            ->orWhere('employee_no','like',"%$search%");
-                    });
+                    ->orWhere('note_external','like',"%$search%");
             });
             if($account_id){
                 $query->whereHas('marketingOrderDelivery',function($query) use($account_id){

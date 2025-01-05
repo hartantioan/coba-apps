@@ -695,6 +695,24 @@ class LandedCostController extends Controller
                     ]);
                 } */
 
+                if($request->arr_lookable_type){
+                    if(!$request->temp){
+                        foreach($request->arr_lookable_type as $key => $row){
+                            if($row == 'landed_cost_details'){
+                                $cek = LandedCostDetail::where('lookable_id',$request->arr_lookable_id[$key])->where('lookable_type',$row)->whereHas('landedCost',function($query){
+                                    $query->whereIn('status',['2','3','8']);
+                                })->count();
+                                if($cek > 0){
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'LC sudah ditarik menjadi LC lainnya.'
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if($request->temp){
 
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();

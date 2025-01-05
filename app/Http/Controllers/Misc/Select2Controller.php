@@ -3503,14 +3503,12 @@ class Select2Controller extends Controller {
                         $query->where('name','like',"%$search%")
                             ->orWhere('employee_no','like',"%$search%");
                     });
-            })
-            ->where(function($query) use ($account_id){
-                if($account_id){
-                    $query->whereHas('marketingOrderDelivery',function($query) use($account_id){
-                        $query->where('customer_id',$account_id);
-                    });
-                }
             });
+            if($account_id){
+                $query->whereHas('marketingOrderDelivery',function($query) use($account_id){
+                    $query->where('customer_id',$account_id);
+                });
+            }
         })
         ->whereHas('marketingOrderInvoice',function($query) use ($search){
             $query->where('code', 'like', "%$search%")

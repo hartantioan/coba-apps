@@ -50,20 +50,15 @@ class LandedCostFeeDetail extends Model
     }
 
     public function totalZeroFeeJournal(){
-        /* $has = false;
+        $has = false;
         $total = 0;
-        if($this->journalDetail()->exists()){
-            $total = 0;
-            foreach($this->journalDetail as $row){
-                $total += $row->nominal;
-            }
+        if($this->landedCost->journal()->exists()){
+            $total += $this->landedCost->journal->journalDetail()->where('type','2')->sum('total');
         }
-
         if($total == 0){
             $has = true;
         }
-        
-        return $has; */
+        return $has;
     }
 
     public function purchaseInvoiceDetail()

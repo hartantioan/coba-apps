@@ -3498,7 +3498,13 @@ class Select2Controller extends Controller {
             $query->where(function($query) use ($search){
                 $query->where('code', 'like', "%$search%")
                     ->orWhere('note_internal','like',"%$search%")
-                    ->orWhere('note_external','like',"%$search%");
+                    ->orWhere('note_external','like',"%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    })->orWhereHas('marketingOrderInvoice',function($query) use ($search){
+                        $query->where('code', 'like', "%$search%");
+                    });
             });
             if($account_id){
                 $query->whereHas('marketingOrderDelivery',function($query) use($account_id){
@@ -3507,8 +3513,7 @@ class Select2Controller extends Controller {
             }
         })
         ->whereHas('marketingOrderInvoice',function($query) use ($search){
-            $query->where('code', 'like', "%$search%")
-                ->whereDoesntHave('incomingPaymentDetail');
+            $query->whereDoesntHave('incomingPaymentDetail');
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

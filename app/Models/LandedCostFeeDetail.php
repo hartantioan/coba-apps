@@ -53,7 +53,7 @@ class LandedCostFeeDetail extends Model
         $has = false;
         $total = 0;
         if($this->landedCost->journal()->exists()){
-            $total += $this->landedCost->journal->journalDetail()->where('type','2')->sum('total');
+            $total += $this->landedCost->journal->journalDetail()->where('type','2')->sum('nominal');
         }
         if($total == 0){
             $has = true;

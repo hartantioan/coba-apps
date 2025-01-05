@@ -49,14 +49,17 @@ class LandedCostFeeDetail extends Model
         return $has;
     }
 
-    public function totalZeroFeeJournal(){
+    public function lcHasAnotherSameLc(){
         $has = false;
-        $total = 0;
-        if($this->landedCost->journal()->exists()){
-            $total += $this->landedCost->journal->journalDetail()->where('type','2')->sum('nominal');
-        }
-        if($total == 0){
-            $has = true;
+        foreach($this->landedCost->landedCostDetail as $row){
+            if($row->lookable_type == 'landed_cost_details'){
+                $cek = LandedCostDetail::where('lookable_id',$row->lookable_id)->where('lookable_type',$row->lookable_type)->where('landed_cost_id','!=',$this->landed_cost_id)->whereHas('landedCost',function($query){
+                    $query->where('post_date','<=',$this->landedCost->post_date);
+                })->count();
+                if($cek > 0){
+                    $has = true;
+                }
+            }
         }
         return $has;
     }

@@ -546,6 +546,7 @@ class IncomingPaymentController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-4 white-text btn-small" data-popup="tooltip" title="Edit Catatan" onclick="showNote(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">mode_edit</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -793,6 +794,59 @@ class IncomingPaymentController extends Controller
 		return response()->json($response);
     }
 
+    public function updateNote(Request $request){
+
+        if($request->temp_note){
+            $query = IncomingPayment::where('code',CustomHelper::decrypt($request->temp_note))->first();
+            $query->note = $request->note_header;
+            $query->save();
+
+            if($query->journal()->exists()){
+                $query->journal->update([
+                    'note'  => $request->note_header,
+                ]);
+            }
+
+            if($request->arr_id){
+                foreach($request->arr_id as $key => $row){
+                    $ipd = IncomingPaymentDetail::find($row);
+                    if($ipd){
+                        $ipd->update([
+                            'note'  => $request->arr_edit_note[$key],
+                        ]);
+                        if($ipd->journalDetail()->exists()){
+                            $ipd->journalDetail()->whereIn('coa_id',[28,145])->update([
+                                'note'  => $request->arr_edit_note[$key],
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            if($query) {
+
+                activity()
+                    ->performedOn(new IncomingPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Edit note incoming payment.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to save.'
+                ];
+            }
+
+        }
+
+		return response()->json($response);
+    }
+
     public function rowDetail(Request $request){
         $data   = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
@@ -970,6 +1024,7 @@ class IncomingPaymentController extends Controller
 
         foreach($ip->incomingPaymentDetail()->orderBy('id')->get() as $row){
             $arr[] = [
+                'id_detail'             => $row->id,
                 'type'                  => $row->lookable_type,
                 'coa_id'                => $row->lookable_type == 'coas' ? $row->lookable_id : $coareceivable,
                 'id'                    => $row->lookable_id,

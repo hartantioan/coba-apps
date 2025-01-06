@@ -431,6 +431,65 @@
     </div>
 </div>
 
+<div id="modal7" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Ppbj</h4>
+                <form class="row" id="form_note" onsubmit="return false;">
+                    <div class="col s12">
+
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="input-field col m4 s12">
+                                <input type="hidden" id="temp_note" name="temp_note">
+                                <input id="note_code" name="note_code" type="text" readonly>
+                                <label class="active" for="note_code">No IPYM</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <textarea id="note_header" class="materialize-textarea" name="note_header" placeholder="Catatan / Keterangan" rows="10"></textarea>
+                                <label class="" for="note_header">Keterangan Utama</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h6>Catatan Per Baris</h6>
+                                    <table class="bordered" id="table-detail-note">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Referensi</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">{{ __('translations.note') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-note">
+                                            <tr id="last-row-detail-note">
+                                                <td colspan="4">
+                                                    Data tidak ditemukan
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s12 mt-3">
+                        <button class="btn waves-effect waves-light right submit step18" onclick="saveNote();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -932,6 +991,29 @@
                     return null;
                 };
                 countAll();
+            }
+        });
+
+        $('#modal7').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#note_header').focus();
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_note')[0].reset();
+                $('#temp_note').val('');
+                M.updateTextFields();
+                $('#body-detail-note').empty().append(`
+                    <tr id="last-row-detail-note">
+                        <td colspan="4">
+                            Data tidak ditemukan
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -1902,9 +1984,100 @@
         });
     }
 
+    function saveNote(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali KETERANGAN DETAIL dan KETERANGAN HEADER!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_note')[0]);
+                $.ajax({
+                    url: '{{ Request::url() }}/update_note',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('#modal7');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal7');
+                        $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
+                        if(response.status == 200) {
+                            successNote();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
+
+                            });
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#modal7');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successNote(){
+        loadDataTable();
+        $('#modal7').modal('close');
     }
 
     function printPreview(code){
@@ -1921,6 +2094,75 @@
                 loadingClose('.modal-content');
                 $('#modal2').modal('open');
                 $('#show_print').html(data);
+            }
+        });
+    }
+
+    function showNote(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal7').modal('open');
+                $('#temp_note').val(id);
+                $('#note_code').val(response.code);
+                $('#note_header').val(response.note);
+
+                if(response.details.length > 0){
+                    $('.row_detail_note,#last-row-detail-note').remove();
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-detail-note').append(`
+                            <tr class="row_detail_note">
+                                <input type="hidden" name="arr_id[]" value="` + val.id_detail + `">
+                                <td>
+                                    ` + val.name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.post_date + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.subtotal + `
+                                </td>
+                                <td>
+                                    <input name="arr_edit_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ..." value="` + val.note + `">
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+
+                if(response.document){
+                    const baseUrl = '{{ URL::to("/") }}/storage/';
+                    const filePath = response.document.replace('public/', '');
+                    const fileUrl = baseUrl + filePath;
+                    displayFile(fileUrl);
+                }
+
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+                /* countAll(); */
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
         });
     }

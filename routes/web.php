@@ -3564,6 +3564,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree', [IncomingPaymentController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [IncomingPaymentController::class, 'removeUsedData']);
                     Route::post('create', [IncomingPaymentController::class, 'create'])->middleware('operation.access:incoming_payment,update');
+                    Route::post('update_note', [IncomingPaymentController::class, 'updateNote'])->middleware('operation.access:incoming_payment,update');
                     Route::post('void_status', [IncomingPaymentController::class, 'voidStatus'])->middleware('operation.access:incoming_payment,void');
                     Route::get('approval/{id}', [IncomingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [IncomingPaymentController::class, 'destroy'])->middleware('operation.access:incoming_payment,delete');

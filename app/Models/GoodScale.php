@@ -50,6 +50,7 @@ class GoodScale extends Model
         'residue',
         'purchase_order_detail_id',
         'item_id',
+        'qty_sj',
         'qty_in',
         'qty_out',
         'qty_balance',

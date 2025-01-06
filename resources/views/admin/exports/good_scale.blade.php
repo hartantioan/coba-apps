@@ -31,11 +31,12 @@
             <th>{{ __('translations.unit') }}</th>
             <th>{{ __('translations.plant') }}</th>
             <th>{{ __('translations.warehouse') }}</th>
-            <th>Qty.Bruto</th>
-            <th>Qty.Tara</th>
-            <th>Qty.Netto</th>
-            <th>Qty.QC</th>
-            <th>Qty.Final</th>
+            <th>Qty/Berat SJ</th>
+            <th>Qty/Berat Bruto</th>
+            <th>Qty/Berat Tara</th>
+            <th>Qty/Berat Netto</th>
+            <th>Qty/Berat QC</th>
+            <th>Qty/Berat Final</th>
             <th>Viscositas</th>
             <th>Residu</th>
             <th>Kadar Air</th>
@@ -91,6 +92,7 @@
                         No warehouse available
                     @endif
                 </td>
+                <td>{{ $row->qty_sj }}</td>
                 <td>{{ $row->qty_in }}</td>
                 <td>{{ $row->qty_out }}</td>
                 <td>{{ $row->qty_balance }}</td>

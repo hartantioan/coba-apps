@@ -201,12 +201,13 @@
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.warehouse') }}</th>
                                                         <th>{{ __('translations.item') }}</th>
-                                                        <th>Qty PO</th>
-                                                        <th>Qty Bruto</th>
-                                                        <th>Qty Tara</th>
-                                                        <th>Qty Netto</th>
-                                                        <th>Qty QC</th>
-                                                        <th>Qty Final</th>
+                                                        <th>Qty/Berat SJ</th>
+                                                        <th>Qty/Berat PO</th>
+                                                        <th>Qty/Berat Bruto</th>
+                                                        <th>Qty/Berat Tara</th>
+                                                        <th>Qty/Berat Netto</th>
+                                                        <th>Qty/Berat QC</th>
+                                                        <th>Qty/Berat Final</th>
                                                         <th>Kadar Air (%)</th>
                                                         <th>Viskositas (detik)</th>
                                                         <th>Residu (gr)</th>
@@ -300,12 +301,16 @@
                                 <label class="active" for="purchase_order_detail_id">Purchase Order</label>
                             </div>
                             <div class="input-field col m3 s12 hide-inputs">
+                                <input id="qty_sj" name="qty_sj" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <label class="active" for="qty_sj">Qty/Berat SJ</label>
+                            </div>
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                                <label class="active" for="qty_po">Qty PO</label>
+                                <label class="active" for="qty_po">Qty/Berat PO</label>
                             </div>
                             <div class="input-field col m2 s9">
                                 <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                                <label class="active" for="qty_in">Qty Bruto</label>
+                                <label class="active" for="qty_in">Qty/Berat Bruto</label>
                             </div>
                             <div class="input-field col m1 s12 center-align">
                                 <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" onclick="stopStart();" id="btn-stop-start"><i class="material-icons right icon-stop-start">stop</i></a>
@@ -313,7 +318,7 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                                <label class="active" for="qty_out">Qty Tara</label>
+                                <label class="active" for="qty_out">Qty/Berat Tara</label>
                             </div>
                             <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="item_unit_id" name="item_unit_id" required>
@@ -474,11 +479,11 @@
                                 <div id="qtyInUpdate" class="mt-2">
 
                                 </div>
-                                <label class="active" for="qtyInUpdate">Qty Bruto</label>
+                                <label class="active" for="qtyInUpdate">Qty/Berat Bruto</label>
                             </div>
                             <div class="input-field col m2 s12">
                                 <input id="qtyOutUpdate" class="data-input" name="qtyOutUpdate" type="text" onkeyup="formatRupiahNoMinus(this);count();" value="0,000">
-                                <label class="active" for="qtyOutUpdate">Qty Tara</label>
+                                <label class="active" for="qtyOutUpdate">Qty/Berat Tara</label>
                             </div>
                             <div class="input-field col m1 s12 center-align">
                                 <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" onclick="stopStartOut();"><i class="material-icons right icon-stop-start-out">stop</i></a>
@@ -486,7 +491,7 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="qtyBalanceUpdate" name="qtyBalanceUpdate" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                                <label class="active" for="qtyBalanceUpdate">Qty Netto</label>
+                                <label class="active" for="qtyBalanceUpdate">Qty/Berat Netto</label>
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
@@ -1495,6 +1500,7 @@
                 { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_sj', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_po', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_in', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_out', searchable: false, orderable: false, className: 'center-align' },

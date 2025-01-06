@@ -4458,8 +4458,7 @@ class CustomHelper {
                     'account_id'	=> $mom->taxMaster->coaSale->bp_journal ? $mom->account_id : NULL,
                     'type'			=> '1',
                     'nominal'		=> $tax,
-                    'note'			=> 'No Seri Pajak : '.$mom->tax_no,
-
+                    'note'			=> $mom->tax_no,
                     'nominal_fc'    => $mom->tax,
                 ]);
             }

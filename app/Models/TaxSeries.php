@@ -165,6 +165,11 @@ class TaxSeries extends Model
                         'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
                     ];
                 }
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan. Silahkan atur di Master Data - Akunting - Seri Pajak.'
+                ];
             }
         }else{
             $response = [

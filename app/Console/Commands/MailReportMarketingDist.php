@@ -37,17 +37,17 @@ class MailReportMarketingDist extends Command
         foreach ($brand as $merk) {
 
             if ($merk == 1) {
-                  $recipient = ['hunawan@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+              //    $recipient = ['hunawan@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
 
             if ($merk == 4) {
-                $recipient = ['adrianto@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+              //  $recipient = ['adrianto@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
 
             if ($merk == 13) {
-                $recipient = ['jimmy@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+           //     $recipient = ['jimmy@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
-           // $recipient = ['edp@superior.co.id'];
+            $recipient = ['edp@superior.co.id'];
 
             //  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 

@@ -129,6 +129,7 @@ class AppServiceProvider extends ServiceProvider
             'receive_glazes'                        => 'App\Models\ReceiveGlaze',
             'good_return_issue_details'             => 'App\Models\GoodReturnIssueDetail',
             'official_reports'                      => 'App\Models\OfficialReport',
+            'mitra_marketing_orders'                => 'App\Models\MitraMarketingOrder',
         ]);
     }
 }

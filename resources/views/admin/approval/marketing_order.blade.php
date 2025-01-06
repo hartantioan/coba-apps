@@ -331,6 +331,7 @@
                         <th class="center-align">{{ __('translations.qty') }} Stok</th>
                         <th class="center-align">{{ __('translations.unit') }} Stok</th>
                         <th class="center-align">{{ __('translations.price') }}</th>
+                        <th class="center-align">PPN</th>
                         <th class="center-align">Incl/Excl.PPN</th>
                         <th class="center-align">{{ __('translations.disc') }}.1 (%)</th>
                         <th class="center-align">{{ __('translations.disc') }}.2 (%)</th>
@@ -349,6 +350,7 @@
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_uom) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->price) }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->percent_tax) }}</td>
                         <td class="center-align">{{ $row->isIncludeTaxEnglish() }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_1) }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_2) }}</td>
@@ -357,16 +359,16 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->total) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="14" class="red-text">Harga Per M2 : {{ CustomHelper::formatConditionalQty($row->pricePerMeter()) }} || HPP + Margin Segment : {{ CustomHelper::formatConditionalQty($row->price_nett) }}</td>
+                        <td colspan="15" class="red-text">Harga Per M2 : {{ CustomHelper::formatConditionalQty($row->pricePerMeter()) }} || HPP + Margin Segment : {{ CustomHelper::formatConditionalQty($row->price_nett) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="11">{{ __('translations.note') }}: {{ $row->note }}</td>
                         <td colspan="4">{{ __('translations.taken_from') }}: {{ $row->place->code }}</td>
                     </tr>
 
                     @endforeach
                     <tr>
-                        <td colspan="10" rowspan="8">
+                        <td colspan="11" rowspan="8">
                             {{ __('translations.bank_account') }} :
                             {!! $data->company->banks() !!}
                             <div class="mt-3">
@@ -392,7 +394,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="12">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="15">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

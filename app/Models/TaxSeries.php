@@ -166,9 +166,11 @@ class TaxSeries extends Model
                     ];
                 }
             }else{
+                $newcurrent = str_pad($data[0]->start_no, 8, 0, STR_PAD_LEFT);
+                $no = $prefix.'.'.$data[0]->branch_code.'.'.$data[0]->year.'.'.$newcurrent;
                 $response = [
-                    'status'  => 500,
-                    'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan. Silahkan atur di Master Data - Akunting - Seri Pajak.'
+                    'status'    => 200,
+                    'no'        => $no,
                 ];
             }
         }else{

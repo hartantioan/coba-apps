@@ -566,7 +566,7 @@ class MailReportMarketingDist extends Command
             $query = DB::select("
   SELECT a.name,a.cust,
 					 ifnull(e.sisaso,0) AS sisaso, ifnull(f.osmod,0) AS sisamod, ifnull(g.qtysjm,0) AS sjm, ifnull(h.asp,0) AS asp
-					FROM (SELECT a.name,b.name AS cust from types a cross JOIN (SELECT a.name from users a INNER JOIN groups b ON a.group_id=b.id WHERE a.brand_id=1 )b )a 
+					FROM (SELECT a.name,b.name AS cust from types a cross JOIN (SELECT a.name from users a INNER JOIN groups b ON a.group_id=b.id  )b )a 
           
 					LEFT JOIN (
 					SELECT e.name AS tipe, f.name AS dist, sum((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso

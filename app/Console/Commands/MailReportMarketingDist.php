@@ -37,17 +37,17 @@ class MailReportMarketingDist extends Command
         foreach ($brand as $merk) {
 
             if ($merk == 1) {
-               //   $recipient = ['hunawan@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+                  $recipient = ['hunawan@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
 
             if ($merk == 4) {
-              //   $recipient = ['adrianto@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+                $recipient = ['adrianto@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
 
             if ($merk == 13) {
-             //    $recipient = ['jimmy@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+                $recipient = ['jimmy@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
             }
-            $recipient = ['edp@superior.co.id'];
+           // $recipient = ['edp@superior.co.id'];
 
             //  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 
@@ -566,7 +566,7 @@ class MailReportMarketingDist extends Command
             $query = DB::select("
   SELECT a.name,a.cust,
 					 ifnull(e.sisaso,0) AS sisaso, ifnull(f.osmod,0) AS sisamod, ifnull(g.qtysjm,0) AS sjm, ifnull(h.asp,0) AS asp
-					FROM (SELECT a.name,b.name AS cust from types a cross JOIN (SELECT a.name from users a INNER JOIN groups b ON a.group_id=b.id WHERE a.brand_id=1 AND b.`name`='DISTRIBUTOR')b )a 
+					FROM (SELECT a.name,b.name AS cust from types a cross JOIN (SELECT a.name from users a INNER JOIN groups b ON a.group_id=b.id WHERE a.brand_id=1 )b )a 
           
 					LEFT JOIN (
 					SELECT e.name AS tipe, f.name AS dist, sum((b.qty*b.qty_conversion) - c.sokepakai) AS sisaso
@@ -583,7 +583,7 @@ class MailReportMarketingDist extends Command
 					LEFT JOIN groups g ON g.id=f.group_id
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL
 					AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d') and d.brand_id=" . $merk . "
-					AND g.`name`='DISTRIBUTOR'
+					
 					GROUP BY e.name, f.name
 					)e ON e.tipe=a.name AND e.dist=a.cust
 					LEFT JOIN
@@ -597,7 +597,7 @@ class MailReportMarketingDist extends Command
 						LEFT JOIN users g ON g.id=a.customer_id
 					LEFT JOIN groups h ON h.id=g.group_id
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d') and e.brand_id=" . $merk . "
-					AND d.id IS NULL 	AND h.`name`='DISTRIBUTOR'
+					AND d.id IS NULL 	
 					GROUP BY f.name, g.name
 					)f ON f.tipe=a.name AND f.dist=a.cust
 					LEFT JOIN (
@@ -612,7 +612,7 @@ class MailReportMarketingDist extends Command
 						LEFT JOIN users g ON g.id=mo.account_id
 					LEFT JOIN groups h ON h.id=g.group_id
 					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d') and c.brand_id=" . $merk . "
-               	AND h.`name`='DISTRIBUTOR'
+              
 					GROUP BY d.name,g.name
 					)g ON g.tipe=a.name AND g.dist=a.cust
                     LEFT JOIN (

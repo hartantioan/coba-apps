@@ -191,7 +191,16 @@ class MarketingOrderInvoiceDetail extends Model
         }
     }
 
-
+    public function getItemType()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->item->type->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->marketingOrderDetail->item->type->name;
+        } else {
+            return '';
+        }
+    }
 
     public function getDownPayment()
     {

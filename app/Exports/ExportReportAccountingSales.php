@@ -176,7 +176,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'Alamat NPWP' =>  $row->marketingOrderInvoice->userData->address,
                     'itemcode' => $row->getItemCode() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->code ?? '',
                     'itemname' => $row->getItem() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->name ?? '',
-                    'type' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->type->name ?? '',
+                    'type' =>  $row->getItemType(),
                     'brand' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->brand->name ?? '',
                     'cat_brand' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->brand->type() ?? '',
                     'warna' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->pattern->name ?? '',

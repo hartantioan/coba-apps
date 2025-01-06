@@ -599,6 +599,13 @@ class UserController extends Controller
                 }
             } */
 
+            if(substr($request->name,0,2) == 'PT'){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Nama PT harus dibelakang.'
+                ]);
+            }
+
             $passed = true;
 
             if($request->arr_bank){

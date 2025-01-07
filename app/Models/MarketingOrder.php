@@ -49,6 +49,7 @@ class MarketingOrder extends Model
         'phone',
         'sales_id',
         'broker_id',
+        'broker_branch_code',
         'currency_id',
         'currency_rate',
         'percent_dp',

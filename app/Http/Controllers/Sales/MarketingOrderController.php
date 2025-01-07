@@ -411,6 +411,7 @@ class MarketingOrderController extends Controller
                     $val->phone,
                     $val->sales->name,
                     $val->broker()->exists() ? $val->broker->name : '-',
+                    $val->broker_branch_code,
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
                     number_format($val->percent_dp,2,',','.'),

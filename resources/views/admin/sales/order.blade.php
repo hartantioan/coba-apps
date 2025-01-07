@@ -249,6 +249,7 @@
                                                         <th>Telepon</th>
                                                         <th>Sales</th>
                                                         <th>Broker</th>
+                                                        <th>Cabang Broker</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>{{ __('translations.conversion') }}</th>
                                                         <th>% DP</th>
@@ -1779,6 +1780,7 @@
                 { name: 'phone', className: '' },
                 { name: 'sales_id', className: '' },
                 { name: 'broker_id', className: '' },
+                { name: 'broker_branch_code', className: '' },
                 { name: 'currency_id', className: '' },
                 { name: 'currency_rate', className: 'right-align' },
                 { name: 'percent_dp', className: 'center-align' },

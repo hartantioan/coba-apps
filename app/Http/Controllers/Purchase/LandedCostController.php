@@ -119,7 +119,7 @@ class LandedCostController extends Controller
                 $query->whereHas('goodReceiptDetail',function($query){
                     $query->whereDoesntHave('landedCostDetail');
                 })->orWhere('status_lc','!=','2');
-            })->get();
+            })->where('total','>',0)->get();
 
             foreach($datagr as $row){
                 if(!$row->used()->exists()){

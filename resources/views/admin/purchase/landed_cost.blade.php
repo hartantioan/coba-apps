@@ -2318,6 +2318,21 @@
                     }
                 });
 
+                if($('input[name^="arr_total"]').length > 0){
+                    let totalall = 0;
+                    $('input[name^="arr_total"]').each(function(){
+                        totalall += parseFloat($(this).val());
+                    });
+                    if(totalall <= 0){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Total item tidak boleh 0.',
+                            icon: 'error'
+                        });
+                        return false;
+                    }
+                }
+
                 if(passed){
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');

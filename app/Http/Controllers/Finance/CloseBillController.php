@@ -523,7 +523,7 @@ class CloseBillController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->personalCloseBill->code.'</td>
-                    <td class="center-align">'.$row->personalCloseBill->user->employee_no.' - '.$row->personalCloseBill->user->name.'</td>
+                    <td class="center-align">'.$row->personalCloseBill->account->employee_no.' - '.$row->personalCloseBill->account->name.'</td>
                     <td class="center-align">'.date('d/m/Y',strtotime($row->personalCloseBill->post_date)).'</td>
                     <td class="">'.$row->note.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>

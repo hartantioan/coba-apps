@@ -2070,7 +2070,7 @@
             });
 
             $('input[name^="arr_total"]').each(function(index){
-                let totalrow = (parseFloat($(this).val()) / totalall) * total;
+                let totalrow = totalall > 0 ? (parseFloat($(this).val()) / totalall) * total : 0;
                 console.log(totalrow);
                 $('input[name^="arr_price"]:eq(' + index + ')').val(
                     (totalrow >= 0 ? '' : '-') + formatRupiahIni(totalrow.toFixed(2).toString().replace('.',','))

@@ -104,7 +104,7 @@ class ProductionBatch extends Model
             $total -= round($row->qty * $this->price(),2);
             $qtyused += $row->qty;
         }
-        if(($qty - ($qtyused + $qtycheck)) <= 0){
+        if(round($qty - ($qtyused + $qtycheck),3) <= 0){
             $totalnew = $total;
         }else{
             $totalnew = round($qtycheck * $this->price(),2);

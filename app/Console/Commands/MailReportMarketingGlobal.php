@@ -40,8 +40,8 @@ class MailReportMarketingGlobal extends Command
 	 */
 	public function handle()
 	{
-		$recipient = ['henrianto@superior.co.id', 'hendra@superior.co.id', 'andrew@superior.co.id', 'haidong@superiorporcelain.co.id', 'billylaw@superior.co.id', 'eunike@superior.co.id'];
-		//$recipient = ['edp@superior.co.id'];
+		//$recipient = ['henrianto@superior.co.id', 'hendra@superior.co.id', 'andrew@superior.co.id', 'haidong@superiorporcelain.co.id', 'billylaw@superior.co.id', 'eunike@superior.co.id'];
+		$recipient = ['edp@superior.co.id'];
 		//  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 
 		// foreach ($akun as $pangsit) {
@@ -904,7 +904,9 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN marketing_orders g ON g.id=f.marketing_order_id AND g.deleted_at IS NULL AND g.void_date IS null
 					LEFT JOIN regions r ON r.id=g.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+					left join items c on c.id=e.item_id
+					left join brands h on h.id=c.brand_id
+					WHERE h.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
               	 GROUP BY r.category_region");
 		foreach ($query as $row) {
 			if ($row->area==1)
@@ -925,8 +927,12 @@ class MailReportMarketingGlobal extends Command
 					FROM (SELECT sale_area,category_region  FROM regions WHERE length(CODE)=2 and deleted_at IS null)a LEFT JOIN (
 					SELECT r.sale_area AS area, coalesce(SUM(b.qty*b.qty_conversion),0) AS qtySO FROM marketing_orders a
 					LEFT JOIN marketing_order_details b ON a.id=b.marketing_order_id and b.deleted_at is null
-				   LEFT JOIN regions r ON r.id=a.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+						LEFT JOIN user_datas ud ON ud.id=a.account_id
+				   LEFT JOIN regions r ON r.id=ud.province_id
+				   LEFT JOIN items c ON c.id=b.item_id
+					
+					LEFT JOIN brands f ON f.id=c.brand_id
+					WHERE f.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY r.sale_area)b ON a.sale_area=b.area
                LEFT JOIN (
                SELECT r.sale_area AS area, coalesce(SUM(b.qty*e.qty_conversion),0) AS qtyMOD
@@ -934,8 +940,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_delivery_details b ON a.id=b.marketing_order_delivery_id
 					LEFT JOIN marketing_order_details e ON e.id=b.marketing_order_detail_id and e.deleted_at is null
 					LEFT JOIN marketing_orders f ON f.id=e.marketing_order_id AND f.deleted_at IS NULL AND f.void_date IS null
-					LEFT JOIN regions r ON r.id=f.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+					LEFT JOIN user_datas ud ON ud.id=f.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items c ON c.id=b.item_id
+				
+					LEFT JOIN brands g ON g.id=c.brand_id
+					WHERE g.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY r.sale_area
 					)c ON c.area = a.sale_area
 					LEFT JOIN (
@@ -945,8 +955,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
 					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN marketing_orders g ON g.id=f.marketing_order_id AND g.deleted_at IS NULL AND g.void_date IS null
-					LEFT JOIN regions r ON r.id=g.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+					LEFT JOIN user_datas ud ON ud.id=g.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items c ON c.id=e.item_id
+				
+					LEFT JOIN brands h ON h.id=c.brand_id
+					WHERE h.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
                GROUP BY r.sale_area
 					)d ON d.area=a.sale_area
 					LEFT JOIN (
@@ -958,8 +972,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
 					WHERE a.void_date IS NULL AND a.deleted_at IS NULL GROUP BY c.id
 					)c ON c.id=b.id
-					LEFT JOIN regions r ON r.id=a.province_id
-					WHERE a.void_date IS NULL AND a.deleted_at IS NULL
+						LEFT JOIN user_datas ud ON ud.id=a.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items d ON d.id=b.item_id
+				
+					LEFT JOIN brands f ON f.id=d.brand_id
+					WHERE f.type=1 and a.void_date IS NULL AND a.deleted_at IS NULL
 					AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
 					   GROUP BY r.sale_area
 					)e ON e.area=a.sale_area
@@ -970,8 +988,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_details c ON c.id=b.marketing_order_detail_id and c.deleted_at is null
 					LEFT JOIN marketing_order_delivery_process_details d ON d.marketing_order_delivery_detail_id=b.id and d.deleted_at is null
 					LEFT JOIN marketing_orders g ON g.id=c.marketing_order_id AND g.deleted_at IS NULL AND g.void_date IS null
-					LEFT JOIN regions r ON r.id=g.province_id
-					WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+						LEFT JOIN user_datas ud ON ud.id=g.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items e ON e.id=b.item_id
+					
+					LEFT JOIN brands h ON g.id=e.brand_id
+					WHERE h.type=1 and a.void_date IS NULL AND a.deleted_at IS NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
 					AND d.id IS null
 				 GROUP BY r.sale_area
 					)f ON f.area=a.sale_area
@@ -982,8 +1004,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
 					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN marketing_orders g ON g.id=f.marketing_order_id AND g.deleted_at IS NULL AND g.void_date IS null
-					LEFT JOIN regions r ON r.id=g.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+						LEFT JOIN user_datas ud ON ud.id=g.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items c ON c.id=e.item_id
+					
+					LEFT JOIN brands h ON g.id=c.brand_id
+					WHERE h.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
                	 GROUP BY r.sale_area
 					)g ON g.area=a.sale_area
 					LEFT JOIN (
@@ -994,8 +1020,12 @@ class MailReportMarketingGlobal extends Command
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
 					LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
 					LEFT JOIN marketing_orders g ON g.id=f.marketing_order_id AND g.deleted_at IS NULL AND g.void_date IS null
-					LEFT JOIN regions r ON r.id=g.province_id
-					WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+					LEFT JOIN user_datas ud ON ud.id=g.account_id
+					LEFT JOIN regions r ON r.id=ud.province_id
+					LEFT JOIN items c ON c.id=e.item_id
+					
+					LEFT JOIN brands h ON g.id=c.brand_id
+					WHERE h.type=1 and a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01') AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
               	 GROUP BY r.sale_area
 					)h ON h.area=a.sale_area ORDER BY category_region,sale_area");
 

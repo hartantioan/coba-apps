@@ -1218,6 +1218,7 @@ class PersonalCloseBillController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">No.Dokumen</th>
+                                <th class="center-align">Mitra Bisnis</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Nominal</th>
                             </tr>
@@ -1227,6 +1228,7 @@ class PersonalCloseBillController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->fundRequest->code.'</td>
+                <td class="center-align">'.$row->fundRequest->account->name.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
             </tr>';
@@ -1236,7 +1238,7 @@ class PersonalCloseBillController extends Controller
         $string .= '</tbody>
                         <tfoot>
                             <tr>
-                                <th class="right-align" colspan="3">Total</th>
+                                <th class="right-align" colspan="4">Total</th>
                                 <th class="right-align">'.number_format($totalDocument,2,',','.').'</th>
                             </tr>
                         </tfoot>

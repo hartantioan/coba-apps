@@ -1199,6 +1199,15 @@ document.addEventListener('focusin', function (event) {
 
     function getMarketingOrderDelivery(){
         $('#temp,#tempSwitch,#has_void_do').val('');
+        $('#body-item').empty().append(`
+            <tr id="last-row-item">
+                <td colspan="6">
+                    Silahkan pilih Jadwal Kirim...
+                </td>
+            </tr>
+        `);
+
+        arrStock = [];
         if($('#marketing_order_delivery_id').val()){
             $.ajax({
                 url: '{{ Request::url() }}/get_marketing_order_delivery',

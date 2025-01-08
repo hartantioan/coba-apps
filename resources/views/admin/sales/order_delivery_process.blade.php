@@ -1206,7 +1206,6 @@ document.addEventListener('focusin', function (event) {
                 </td>
             </tr>
         `);
-
         arrStock = [];
         if($('#marketing_order_delivery_id').val()){
             $.ajax({

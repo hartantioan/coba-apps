@@ -1047,7 +1047,7 @@
             <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#province_id').val()){
-            city = $('#province_id').select2('data')[0].cities;=
+            city = $('#province_id').select2('data')[0].cities;
             $.each(city, function(i, val) {
                 $('#city_id').append(`
                     <option value="` + val.id + `">` + val.name + `</option>

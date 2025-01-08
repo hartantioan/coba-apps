@@ -59,11 +59,11 @@
         <br>
         <br>
 
-        <strong> 1D - SALES REPORT - REGION
+        <strong> 1D - SALES REPORT - BRAND
             <br><br>
             <table>
                 <tr>
-                    <th style="font-size:12px;">AREA</th>
+                    <th style="font-size:12px;">PROVINCE</th>
                     <th style="font-size:12px;">SO DAILY (DUS)</th>
                     <th style="font-size:12px;">MOD DAILY (DUS)</th>
                     <th style="font-size:12px;">SJ DAILY (DUS)</th>
@@ -75,10 +75,10 @@
                 @php
                 $i=0;
                 @endphp
-                @foreach ($data7 as $row)
+                @foreach ($data2 as $row)
 
                 <tr>
-                    <td style="font-size:12px;" align="left">{{$row->tipe}}</td>
+                    <td style="font-size:12px;" align="left">{{$row->name}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtyso,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtymod,0,",",".")}}</td>
                     <td style="font-size:12px;" align="right">{{number_format($row->qtysj,0,",",".")}}</td>

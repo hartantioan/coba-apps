@@ -161,6 +161,7 @@ use App\Http\Controllers\Production\ProductionOrderController;
 use App\Http\Controllers\Production\ProductionIssueReceiveController;
 
 use App\Http\Controllers\Sales\MarketingOrderController;
+use App\Http\Controllers\Sales\ComplaintSalesController;
 use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
 use App\Http\Controllers\Sales\MarketingBarcodeScanController;
@@ -2869,6 +2870,31 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [MarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderController::class, 'voidStatus'])->middleware('operation.access:sales_order,void');
                     Route::post('destroy', [MarketingOrderController::class, 'destroy'])->middleware('operation.access:sales_order,delete');
+                });
+
+                Route::prefix('complaint_sales')->middleware(['operation.access:complaint_sales,view', 'lockacc'])->group(function () {
+                    Route::get('/', [ComplaintSalesController::class, 'index']);
+                    Route::get('datatable', [ComplaintSalesController::class, 'datatable']);
+                    Route::get('row_detail', [ComplaintSalesController::class, 'rowDetail']);
+                    Route::post('show', [ComplaintSalesController::class, 'show']);
+                    Route::post('done', [ComplaintSalesController::class, 'done'])->middleware('operation.access:complaint_sales,update');
+                    Route::post('get_items', [ComplaintSalesController::class, 'getItems']);
+                    Route::post('get_code', [ComplaintSalesController::class, 'getCode']);
+                    Route::post('get_mod_sj', [ComplaintSalesController::class, 'getModSj']);
+                    Route::post('print', [ComplaintSalesController::class, 'print']);
+                    Route::post('print_by_range', [ComplaintSalesController::class, 'printByRange']);
+                    Route::get('export_from_page', [ComplaintSalesController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [ComplaintSalesController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [ComplaintSalesController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [ComplaintSalesController::class, 'getDetails']);
+                    Route::post('remove_used_data', [ComplaintSalesController::class, 'removeUsedData']);
+                    Route::post('create', [ComplaintSalesController::class, 'create'])->middleware('operation.access:complaint_sales,update');
+                    Route::post('create_done', [ComplaintSalesController::class, 'createDone'])->middleware('operation.access:complaint_sales,update');
+                    Route::get('approval/{id}', [ComplaintSalesController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [ComplaintSalesController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [ComplaintSalesController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ComplaintSalesController::class, 'voidStatus'])->middleware('operation.access:complaint_sales,void');
+                    Route::post('destroy', [ComplaintSalesController::class, 'destroy'])->middleware('operation.access:complaint_sales,delete');
                 });
 
                 Route::prefix('sales_down_payment')->middleware(['operation.access:sales_down_payment,view', 'lockacc'])->group(function () {

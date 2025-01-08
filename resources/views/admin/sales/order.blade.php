@@ -1047,7 +1047,7 @@
             <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#province_id').val()){
-            city = $('#province_id').select2('data')[0].cities;
+            city = $('#province_id').select2('data')[0].cities;=
             $.each(city, function(i, val) {
                 $('#city_id').append(`
                     <option value="` + val.id + `">` + val.name + `</option>
@@ -1065,14 +1065,13 @@
         `);
         if($('#city_id').val()){
             let index = -1;
-
             $.each(city, function(i, val) {
                 if(val.id == $('#city_id').val()){
                     index = i;
                 }
             });
 
-            $.each(city[index].district, function(i, value) {
+            $.each(city[index].districts, function(i, value) {
                 $('#district_id').append(`
                     <option value="` + value.id + `">` + value.name + `</option>
                 `);

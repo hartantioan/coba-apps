@@ -138,13 +138,27 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
+        $data = DB::select("SELECT * FROM regions WHERE name LIKE ? AND CHAR_LENGTH(code) = ?", ["%$search%", 5]);
+        // $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
 
         foreach($data as $d) {
+            $data_sub = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+            ", ["$d->code%"]);
+            $arr_sub = [];
+            foreach($data_sub as $row){
+                $arr_sub[] = [
+                    'id'    => $row->id,
+                    'code'  => $row->code,
+                    'name'  => $row->name,
+                ];
+            }
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
-                'subdistrict'   => $d->getDistrict(),
+                'subdistrict'   => $arr_sub,
             ];
         }
 
@@ -172,8 +186,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 13")->get();
-
+        $data = DB::select("SELECT * FROM regions WHERE name LIKE ? AND CHAR_LENGTH(code) = ?", ["%$search%", 13]);
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
@@ -188,14 +201,49 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->whereRaw("LENGTH(code) = 2")->get();
+        // $data = Region::where('name', 'like', "%$search%")->whereRaw("LENGTH(code) = 2")->get();
+        $regions = DB::select("
+            SELECT id, code, name
+            FROM regions
+            WHERE name LIKE ? AND CHAR_LENGTH(code) = ?
+        ", ["%$search%", 2]);
 
-        foreach($data as $d) {
+        foreach ($regions as $region) {
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$region->code%"]);
+
+            foreach ($cities as $city) {
+                $subdistricts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
+                ", ["$city->code%"]);
+
+                $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$city->code%"]);
+
+                $cityData = [
+                    'id'            => $city->id,
+                    'code'          => $city->code,
+                    'name'          => $city->name,
+                    'districts'     => $districts,
+                    'subdistricts'  => $subdistricts,
+                ];
+
+                $region->cities[] = $cityData;
+            }
+
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
-                'cities'        => $d->getCity(),
+                'id'            => $region->id,
+                'text'          => $region->code . ' - ' . $region->name,
+                'code'          => $region->code,
+                'cities'        => $region->cities,
             ];
         }
 

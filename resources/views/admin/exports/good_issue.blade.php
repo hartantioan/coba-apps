@@ -69,7 +69,7 @@
                 <td>{{ $rowdetail->note2 }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->coa->code.' - '.$rowdetail->inventoryCoa->coa->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-') }}</td>
-                <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-' }}</td>
+                <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code }}</td>
                 <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->line()->exists() ? $rowdetail->line->code : '-' }}</td>
@@ -80,8 +80,8 @@
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ $rowdetail->qty_return }}</td>
                 <td>{{ $nominal ? $rowdetail->total : '-' }}</td>
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>        
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->user->name : '-' }}</td>        
+                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>
+                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->user->name : '-' }}</td>
             </tr>
             @php
                 $no++;

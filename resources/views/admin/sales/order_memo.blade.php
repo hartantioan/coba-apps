@@ -2176,7 +2176,7 @@
                         `);
                         stockUsed.push(val.id);
                         $('#tax_id').val(val.percent_tax);
-                        $('#arr_qty' + count).trigger('keyup');
+                        /* $('#arr_qty' + count).trigger('keyup'); */
                     });
                 }
 

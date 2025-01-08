@@ -150,6 +150,15 @@ class MarketingOrderOutstandingMODController extends Controller
                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  
             GROUP BY d.name,k.code
             UNION ALL
+            SELECT d.name,k.code, coalesce(SUM(b.qty),0) AS GR
+            FROM marketing_order_memos a
+            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+            LEFT JOIN items d ON d.id=c.item_id
+            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  
+            GROUP BY d.name,k.code
+            UNION ALL
             SELECT d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI
             FROM good_issues a
             LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null

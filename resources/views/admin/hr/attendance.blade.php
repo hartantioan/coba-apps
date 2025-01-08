@@ -98,14 +98,14 @@
     }
     figure.effect-dexter {
         background: -webkit-linear-gradient(top, rgba(37,141,200,1) 0%, rgba(104,60,19,1) 100%);
-        background: linear-gradient(to bottom, rgba(37,141,200,1) 0%,rgba(104,60,19,1) 100%); 
+        background: linear-gradient(to bottom, rgba(37,141,200,1) 0%,rgba(104,60,19,1) 100%);
     }
 
     figure.effect-dexter img {
         -webkit-transition: opacity 0.35s;
         transition: opacity 0.35s;
     }
-    
+
     figure.effect-dexter:hover img {
         opacity: 0.4;
     }
@@ -257,7 +257,7 @@
                                                        <div class="card-content green lighten-1 white-text" style="height: 8rem">
                                                             <p class=" white-text"  style="margin: 0.8rem 0 0.6rem 0;font-weight: 600;">{{$row->name}}</p>
                                                             <p>{{$row->ip_address}}</p>
-                                                            
+
                                                         </div>
                                                        <div class="card-action green">
                                                             <div class="row">
@@ -273,8 +273,8 @@
                                                  </div>
                                                 @endif
                                             @endforeach
-                                            
-                                            
+
+
                                          </div>
                                     </div>
                                 </div>
@@ -299,10 +299,11 @@
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.date') }}</th>
                                                         <th>{{ __('translations.type') }}</th>
+                                                        <th>Foto</th>
                                                         <th>{{ __('translations.location') }}</th>
                                                         <th>Longitude</th>
                                                         <th>Latitude</th>
-            
+
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -312,7 +313,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -369,13 +370,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -408,25 +409,25 @@
             if (!$(this).hasClass('clicked')) {
 
             $(this).addClass('clicked');
-           
+
             clickedFigures.push(this);
             } else {
             $(this).removeClass('clicked');
-          
+
             clickedFigures.splice(clickedFigures.indexOf(this), 1);
             }
         });
     });
     $(function() {
         loadDataTable();
-        
+
 
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -480,13 +481,14 @@
                 { name: 'employee_no', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'verify_type', className: 'center-align' },
+                { name: 'img', className: 'center-align' },
                 { name: 'location', className: 'center-align' },
                 { name: 'latitude', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'longitude', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -496,9 +498,9 @@
 
     function save(){
 		console.log(selectedIP);
-        
+
         /* var formData = new FormData($('#form_data')[0]); */
-        
+
         $.ajax({
             url: '{{ Request::url() }}/syncron',
             type: 'POST',
@@ -507,7 +509,7 @@
                 id_machines: selectedMachines
             }),
             contentType: 'application/json',
-            dataType: 'json', 
+            dataType: 'json',
             processData: false,
             cache: true,
             headers: {
@@ -530,7 +532,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',

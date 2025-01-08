@@ -43,8 +43,32 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col m12 s12 l8">
+                            <div class="card">
+
+                                <div class="card-content row" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+
+                                    <div style="text-align: center;">
+                                        <video id="video" width="100%" height="auto" style="border: 1px solid gray;"></video>
+                                    </div>
+
+                                    <div id="sourceSelectPanel" style="display:none">
+                                        <label for="sourceSelect">Change video source:</label>
+                                        <select id="sourceSelect" style="max-width:400px" class="browser-default">
+                                        </select>
+                                    </div>
+
+                                    <div style="margin-top: 10px; text-align: center;">
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" id="startButton">Start</a>
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" id="resetButton">Reset</a>
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn"  id="captureButton">Capture Image</a>
+                                        <div id="imageContainer"></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
                             <div class="card">
                                 <div class="card-content">
                                     <div id="map" style="height: 400px;"></div>
@@ -64,9 +88,83 @@
 
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
+<script src="{{ url('app-assets/js/custom/camera_scan.js') }}"></script>
 <!-- END: Page Main-->
 <script>
+
+    window.addEventListener('load', function () {
+        let selectedDeviceId;
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+
+        codeReader.listVideoInputDevices()
+        .then((videoInputDevices) => {
+            const sourceSelect = document.getElementById('sourceSelect');
+            selectedDeviceId = videoInputDevices[0].deviceId;
+            if (videoInputDevices.length >= 1) {
+            videoInputDevices.forEach((element) => {
+                $('#sourceSelect').append(`<option value="${element.deviceId}">${element.label}</option>`);
+            });
+
+            sourceSelect.onchange = () => {
+                selectedDeviceId = sourceSelect.value;
+            };
+
+            const sourceSelectPanel = document.getElementById('sourceSelectPanel');
+            sourceSelectPanel.style.display = 'block';
+            }
+
+            document.getElementById('startButton').addEventListener('click', () => {
+            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                if (result) {
+                    document.getElementById('code_barcode').value = result.text;
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+
+                }
+            });
+
+            });
+
+            document.getElementById('resetButton').addEventListener('click', () => {
+                codeReader.reset();
+            });
+
+            document.getElementById('captureButton').addEventListener('click', () => {
+                const video = document.getElementById('video');
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Set canvas size to video dimensions
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                // Draw the current video frame onto the canvas
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert canvas to an image (base64 data URL)
+                const imageData = canvas.toDataURL('image/png');
+
+                // Create an img element to display the captured image
+                const img = document.createElement('img');
+                img.src = imageData;
+                img.alt = 'Captured Image';
+
+                // Append the captured image to the DOM (for example, inside a div with id 'imageContainer')
+                document.getElementById('imageContainer').appendChild(img);
+
+                // Optional: If you want to save the image, you can provide a download link
+                const link = document.createElement('a');
+                link.href = imageData;
+                link.download = 'captured_image.png';
+                link.textContent = 'Download Image';
+                document.getElementById('imageContainer').appendChild(link);
+            });
+
+        })
+        .catch((err) => {
+
+        });
+    });
     var lat,long,location_form;
    $(function() {
         const mymap = L.map('map').setView([0, 0], 13);
@@ -74,8 +172,8 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
         }).addTo(mymap);
-        
-       
+
+
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
@@ -88,7 +186,7 @@
                             url: 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=en',
                             type: 'GET',
                             beforeSend: function() {
-                                
+
                             },
                             data: {
 
@@ -107,8 +205,8 @@
                                 });
                             }
                         });
-                    
-                  
+
+
                     mymap.setView([latitude, longitude], 20);
 
                     const marker = L.marker([latitude, longitude]).addTo(mymap);
@@ -130,9 +228,9 @@
                             break;
                     }
                 },
-                { 
+                {
                     enableHighAccuracy: true,
-                    maximumAge: 0, 
+                    maximumAge: 0,
                     timeout: 10000
                 }
             );
@@ -156,16 +254,18 @@
     }, 1000);
 
     function save(){
+        var imageData = document.getElementById('imageContainer').querySelector('img')?.src;
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 location    : location_form,
                 latitude    : lat,
-                longitude   : long
+                longitude   : long,
+                img         : imageData,
             },
-           
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -179,15 +279,15 @@
                 if(response.status == 200) {
                     M.toast({
                         html: response.message,
-                     
+
                     });
                 } else if(response.status == 422) {
                     M.toast({
                         html: response.message,
-                     
+
                     });
 
-                    
+
                 } else {
                     M.toast({
                         html: response.message
@@ -205,5 +305,5 @@
             }
         });
     }
-   
+
 </script>

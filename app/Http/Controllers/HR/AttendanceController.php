@@ -21,7 +21,7 @@ class AttendanceController extends Controller
             $output = [];
             $exitCode = 0;
             $command = "node D:\absen_node\logCount.js " . $machine->ip_address.' '.$machine->id;
-            exec($command, $output, $exitCode);            
+            exec($command, $output, $exitCode);
         }
 
         $data = [
@@ -29,13 +29,13 @@ class AttendanceController extends Controller
             'content'       => 'admin.hr.attendance',
             'machine'       => AttendanceMachine::where('status','1')->get(),
         ];
-        
+
         $total_count = 0;
         foreach($data['machine'] as $row){
             $total_count+=$row->log_counts;
         }
         $data['total_count']=$total_count;
-        return view('admin.layouts.index', ['data' => $data]); 
+        return view('admin.layouts.index', ['data' => $data]);
     }
 
 
@@ -48,23 +48,23 @@ class AttendanceController extends Controller
         $ipAddressesComma = implode(',', $ipAddresses);
         $id_machineComma = implode(',', $id_machine);
         ProcessAttendanceJob::dispatch($ipAddressesComma, $id_machineComma);
- 
+
         $endTime = microtime(true);
         $executionTimeSec = ($endTime - $startTime); // Execution time in seconds
         $executionTimeMin = floor($executionTimeSec / 60); // Minutes
         $executionTimeSec %= 60;
         return response()->json([
-          
+
             'controllerExecutionTimeMin' => $executionTimeMin, // Controller execution time in minutes
             'controllerExecutionTimeSec' => $executionTimeSec,
             'status'=>'200']);
-        
+
     }
 
     public function checkJobStatus(Request $request,$jobId)
     {
         $job = Jobs::find($jobId); // Replace with the actual model representing your jobs table
-        
+
 
         if ($job->hasBeenProcessed()) {
             return response()->json(['status' => 'done']);
@@ -90,12 +90,12 @@ class AttendanceController extends Controller
     //         } else {
     //             $fail[] = $row_ip;
     //         }
-            
+
     //     }
     //     $ipAddressesSucc = implode(' ', $success);
     //     $ipAddressesFail = implode(' ', $fail);
     //     return response()->json(['success' => 'Berhasil mengambil data dari mesin dengan IP Address:'.$ipAddressesSucc, 'fail' => 'Gagal mengambil data dari mesin dengan ipAddress: '.$ipAddressesFail,'status'=>'200']);
-        
+
     // }
 
     public function datatable(Request $request){
@@ -105,6 +105,7 @@ class AttendanceController extends Controller
             'employee_no',
             'date',
             'verify_type',
+            'image',
             'location',
             'latitude',
             'longitude'
@@ -117,7 +118,7 @@ class AttendanceController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Attendances::count();
-        
+
         $query_data = Attendances::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -157,7 +158,7 @@ class AttendanceController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -165,6 +166,7 @@ class AttendanceController extends Controller
                     $val->user->name ?? $val->employee_no,
                     $val->date,
                     $val->verifyType(),
+                    $val->image ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->location,
                     $val->latitude,
                     $val->longitude,
@@ -216,7 +218,7 @@ class AttendanceController extends Controller
                 'status'    => 200,
                 'message'   => 'Import sukses!'
             ]);
-            
+
         } catch (ValidationException $e) {
             $failures = $e->failures();
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class Attendances extends Model
 {
@@ -14,7 +15,7 @@ class Attendances extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
 
-    protected $fillable = [    
+    protected $fillable = [
         'code',
         'employee_no',
         'attendance_machine_id',
@@ -24,6 +25,7 @@ class Attendances extends Model
         'latitude',
         'longitude',
         'revision_attendance_h_r_d_id',
+        'image',
     ];
 
     public function verifyType(){
@@ -39,6 +41,17 @@ class Attendances extends Model
         return $verify_type;
     }
 
+    public function attachment()
+    {
+        if($this->image !== NULL && Storage::exists($this->image)) {
+            $document_po = asset(Storage::url($this->image));
+        } else {
+            $document_po = asset('website/empty.png');
+        }
+
+        return $document_po;
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'revision_id', 'id');
@@ -48,7 +61,7 @@ class Attendances extends Model
     {
         return $this->belongsTo('App\Models\RevisionAttendanceHRD', 'employee_no', 'employee_no')->withTrashed();
     }
-    
+
     public function plant(){
         return $this->belongsTo('App\Models\Place','plant_id','id')->withTrashed();
     }

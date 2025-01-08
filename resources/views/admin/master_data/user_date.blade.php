@@ -88,7 +88,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -170,6 +170,7 @@
                                 <table class="bordered" id="table-menu">
                                     <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">
                                         <tr>
+                                            <th class="center">NIK</th>
                                             <th class="center">{{ __('translations.name') }}</th>
                                             <th class="center">{{ __('translations.plant') }}</th>
                                             <th class="center">Departemen</th>
@@ -184,6 +185,7 @@
                                     <tbody id="body-menu">
                                         @foreach($employees as $row)
                                             <tr>
+                                                <td>{{ $row->employee_no }}</td>
                                                 <td>{{ $row->name }}</td>
                                                 <td>{{ $row->place_id ? $row->place->code : '-' }}</td>
                                                 <td>{{ $row->department_id ? $row->department->name : '-' }}</td>
@@ -239,13 +241,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -260,13 +262,13 @@
     });
     $(function() {
         loadDataTable();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -282,9 +284,9 @@
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -355,11 +357,11 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -376,7 +378,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
-        
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -403,7 +405,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',

@@ -2140,7 +2140,7 @@
                                     ` + val.document_date + `
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" value="" placeholder="Keterangan disini..." value="` + val.note + `">
+                                    <input name="arr_note[]" type="text" placeholder="Keterangan disini..." value="` + val.note + `">
                                 </td>
                                 <td>
                                     ` + val.item_code + ` - ` + val.item_name + `

@@ -675,6 +675,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                             'message' => 'Dokumen DO/SJ telah dikirimkan, anda tidak bisa melakukan perubahan.'
                         ]);
                     } */
+                    if($request->marketing_order_delivery_id !== $query->marketing_order_delivery_id){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'MOD tidak sama.'
+                        ]);
+                    }
                     if(in_array($query->status,['1','2','6']) || $request->tempSwitch){
 
                         $query->user_id = session('bo_id');

@@ -1198,6 +1198,7 @@ document.addEventListener('focusin', function (event) {
     }
 
     function getMarketingOrderDelivery(){
+        $('#temp,#tempSwitch,#has_void_do').val('');
         if($('#marketing_order_delivery_id').val()){
             $.ajax({
                 url: '{{ Request::url() }}/get_marketing_order_delivery',

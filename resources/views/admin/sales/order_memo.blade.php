@@ -2451,6 +2451,8 @@
                 $('#textTax').hide();
                 $('#tax_no').val('');
             }
+        }else{
+            
         }
     }
 

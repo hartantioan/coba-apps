@@ -592,6 +592,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                 }
 
                 if($request->temp){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, fitur ini sedang dalam perbaikan.'
+                    ]);
+
                     $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;

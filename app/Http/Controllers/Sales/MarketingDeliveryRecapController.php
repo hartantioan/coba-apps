@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Sales;
 use App\Exports\ExportMarketingDeliveryRecap;
 
 use App\Http\Controllers\Controller;
-
+use App\Jobs\ReportMarketingDeliveryRecapJob;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,7 +22,7 @@ class MarketingDeliveryRecapController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $data = [
@@ -33,13 +33,21 @@ class MarketingDeliveryRecapController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-  
     public function export(Request $request){
-        ob_end_clean();
-        ob_start();
-        $response = Excel::download(new ExportMarketingDeliveryRecap($request->start_date,$request->end_date), 'delivery_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-        return $response;
-    }
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $user_id = session('bo_id');
 
-   
+        ReportMarketingDeliveryRecapJob::dispatch($start_date, $end_date,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+    }
+    // public function export(Request $request){
+    //     ob_end_clean();
+    //     ob_start();
+    //     $response = Excel::download(new ExportMarketingDeliveryRecap($request->start_date,$request->end_date), 'delivery_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    //     return $response;
+    // }
+
+
 }

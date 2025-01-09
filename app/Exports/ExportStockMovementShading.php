@@ -151,7 +151,41 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
         $previousId = null;
         $array_last_item = [];
         $array_first_item = [];
-        foreach($query_data as $row){
+        $first_qty = 0;
+        $qty_final = 0;
+        if($this->shading_id ||$this->batch_id ){
+            $query_for_shading = ItemCogs::where(function($query) {
+                $query->where('date', '<', $this->start_date);
+
+                if($this->plant != 'all'){
+                    $query->whereHas('place',function($query) {
+                        $query->where('id',$this->plant);
+                    });
+                }
+                if($this->shading_id) {
+                    $query->where('item_shading_id',$this->shading_id);
+                }
+                if($this->batch_id) {
+                    $query->where('production_batch_id',$this->batch_id);
+                }
+                if($this->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query) {
+                        $query->where('id',$this->warehouse);
+                    });
+                }
+            })
+            ->orderBy('date', 'desc') // Order by 'date' column in descending order
+            ->orderBy('id', 'desc')
+            ->get();
+            $qty_total_shading = 0;
+            foreach($query_for_shading as $row_cum_bef){
+                $qty_total_shading += $row_cum_bef->qty_in;
+                $qty_total_shading -= $row_cum_bef->qty_out;
+            }
+            $first_qty = $query_for_shading ? $qty_total_shading : 0;
+            $cum_qty += $first_qty;
+        }
+        foreach($query_data as $key=>$row){
 
             if($row->type=='IN'){
                 $cum_qty=$row->qty_in;
@@ -161,10 +195,21 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                 $cum_val=$row->total_out * -1;
             }
 
+            if($this->shading_id || $this->batch_id) {
+                if($key == 0){
+
+                    $qty_final += $cum_qty+$first_qty;
+                }else{
+                    $qty_final += $cum_qty;
+                }
+            }else{
+                $qty_final =$row->qty_final;
+            }
+
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
-                'requester'    => $this->type == 'final' ? '-' : $row->getRequester(),
+                'thiser'    => $this->type == 'final' ? '-' : $row->getthiser(),
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,
@@ -178,7 +223,7 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                 'qty' => $perlu == 0 ? '-' : $cum_qty,
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => $row->qty_final,
+                'cum_qty' => $qty_final,
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
@@ -204,10 +249,46 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                 ->orderBy('id','desc')
                 ->first();
 
+                if($this->shading_id|| $this->batch_id) {
+                    $query_for_shading = ItemCogs::where(function($query) use ($row) {
+                        $query->where('item_id',$row->item_id)
+                        ->where('date', '<', $row->date);
+
+                        if($this->plant != 'all'){
+                            $query->whereHas('place',function($query) {
+                                $query->where('id',$this->plant);
+                            });
+                        }
+
+                        if($this->batch_id) {
+                            $query->where('production_batch_id',$this->batch_id);
+                        }
+                        if($this->shading_id) {
+                            $query->where('item_shading_id',$this->shading_id);
+                        }
+                        if($this->warehouse != 'all'){
+                            $query->whereHas('warehouse',function($query) {
+                                $query->where('id',$this->warehouse);
+                            });
+                        }
+                    })
+                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                    ->orderBy('id', 'desc')
+                    ->get();
+                    $qty_total_shading = 0;
+                    foreach($query_for_shading as $row_cum_bef){
+                        $qty_total_shading += $row_cum_bef->qty_in;
+                        $qty_total_shading -= $row_cum_bef->qty_out;
+                    }
+                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($qty_total_shading) : 0;
+                }else{
+                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0;
+                }
+
                 $array_last_item[] = [
                     'perlu'        => 1,
                     'item_id'      => $row->item->id,
-                    'requester'    => '-',
+                    'thiser'    => '-',
                     'id'           => $query_first->id ?? null,
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
@@ -217,7 +298,7 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                     'shading'      => $row->itemShading->code ?? '-',
                     'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? $query_first->qty_final : 0,
+                    'last_qty'     => $last_qty,
                 ];
 
 
@@ -334,7 +415,7 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     $array_first_item[] = [
                         'perlu'        => 1,
                         'item_id'      => $row_tidak_ada->item->id,
-                        'requester'    => '-',
+                        'thiser'    => '-',
                         'id'           => $row_tidak_ada->id,
                         'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,

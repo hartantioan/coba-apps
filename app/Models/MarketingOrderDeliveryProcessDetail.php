@@ -54,7 +54,7 @@ class MarketingOrderDeliveryProcessDetail extends Model
     public function getTotal(){
         $total = $this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
         if($this->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id > 0 && $this->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == '1' && date('Y-m-d',strtotime($this->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) < '2024-12-24'){
-            $total = $total / (1 + ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100));
+            $total = round($total / (1 + ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100)),2);
         }
         return $total;
     }
@@ -62,13 +62,13 @@ class MarketingOrderDeliveryProcessDetail extends Model
     public function getTax(){
         $tax = 0;
         if($this->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id > 0){
-            $tax = $this->getTotal() * ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100);
+            $tax = round($this->getTotal() * ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100),2);
         }
         return $tax;
     }
 
     public function getGrandtotal(){
-        $grandtotal = $this->getTotal() + $this->getTax();
+        $grandtotal = round($this->getTotal() + $this->getTax(),2);
         return $grandtotal;
     }
 

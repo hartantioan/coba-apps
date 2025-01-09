@@ -53,6 +53,9 @@ class MarketingOrderDeliveryProcessDetail extends Model
 
     public function getTotal(){
         $total = $this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
+        if($this->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id > 0 && $this->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == '1' && date('Y-m-d',strtotime($this->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) < '2024-12-24'){
+            $total = $total / (1 + ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100));
+        }
         return $total;
     }
 

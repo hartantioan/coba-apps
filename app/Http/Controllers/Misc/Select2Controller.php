@@ -216,6 +216,11 @@ class Select2Controller extends Controller {
             ", ["$region->code%"]);
 
             foreach ($cities as $city) {
+                $subdistricts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
+                ", ["$city->code%"]);
 
                 $districts = DB::select("
                     SELECT id, code, name
@@ -223,38 +228,12 @@ class Select2Controller extends Controller {
                     WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
                 ", ["$city->code%"]);
 
-                $arrDistrict = [];
-
-                foreach($districts as $row){
-                    $arrSubdistrict = [];
-
-                    $subdistricts = DB::select("
-                        SELECT id, code, name
-                        FROM regions
-                        WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
-                    ", ["$row->code%"]);
-
-                    foreach($subdistricts as $row){
-                        $arrSubdistrict[] = [
-                            'id'    => $row->id,
-                            'code'  => $row->code,
-                            'name'  => $row->name,
-                        ];
-                    }
-
-                    $arrDistrict[] = [
-                        'id'            => $row->id,
-                        'code'          => $row->code,
-                        'name'          => $row->name,
-                        'subdistrict'   => $arrSubdistrict,
-                    ];
-                }
-
                 $cityData = [
                     'id'            => $city->id,
                     'code'          => $city->code,
                     'name'          => $city->name,
-                    'district'      => $arrDistrict,
+                    'districts'     => $districts,
+                    'subdistricts'  => $subdistricts,
                 ];
 
                 $region->cities[] = $cityData;

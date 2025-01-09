@@ -181,7 +181,7 @@ class ReportStockMovementPerShadingController extends Controller
         $array_first_item = [];
         $first_qty = 0;
         $qty_final = 0;
-        if($request->shading_id){
+        if($request->shading_id ||$request->batch_id ){
             $query_for_shading = ItemCogs::where(function($query) use ( $request) {
                 $query->where('date', '<', $request->start_date);
 
@@ -192,6 +192,9 @@ class ReportStockMovementPerShadingController extends Controller
                 }
                 if($request->shading_id) {
                     $query->where('item_shading_id',$request->shading_id);
+                }
+                if($request->batch_id) {
+                    $query->where('production_batch_id',$request->batch_id);
                 }
                 if($request->warehouse != 'all'){
                     $query->whereHas('warehouse',function($query) use($request){
@@ -220,7 +223,7 @@ class ReportStockMovementPerShadingController extends Controller
                 $cum_val=$row->total_out * -1;
             }
 
-            if($request->shading_id) {
+            if($request->shading_id || $request->batch_id) {
                 if($key == 0){
 
                     $qty_final += $cum_qty+$first_qty;
@@ -276,7 +279,7 @@ class ReportStockMovementPerShadingController extends Controller
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->orderBy('id', 'desc')
                 ->first();
-                if($request->shading_id) {
+                if($request->shading_id|| $request->batch_id) {
                     $query_for_shading = ItemCogs::where(function($query) use ( $request,$row) {
                         $query->where('item_id',$row->item_id)
                         ->where('date', '<', $row->date);
@@ -285,6 +288,10 @@ class ReportStockMovementPerShadingController extends Controller
                             $query->whereHas('place',function($query) use($request){
                                 $query->where('id',$request->plant);
                             });
+                        }
+
+                        if($request->batch_id) {
+                            $query->where('production_batch_id',$request->batch_id);
                         }
                         if($request->shading_id) {
                             $query->where('item_shading_id',$request->shading_id);

@@ -2884,7 +2884,7 @@
                                     `);
                                 });
                                 $('#arr_unit' + count).val(val.item_unit_id);
-                                $('#rowQtyUom' + count).trigger('keyup');
+                                /* $('#rowQtyUom' + count).trigger('keyup'); */
                             });
                         }
 

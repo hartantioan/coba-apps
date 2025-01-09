@@ -62,7 +62,7 @@ class ExportReportAccountingSummaryStock implements FromCollection, WithTitle, W
         $query = DB::select("
                SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade,
 	case when br.type='1' then 'HB' ELSE 'OEM' end AS 'kategori',a.shading,coalesce(b.initialstock,0) AS INITIAL,coalesce(b.totalinitial,0) AS totalinitial,COALESCE(c.receivefg,0) AS receivefg,COALESCE(c.totalreceivefg,0) AS totalreceivefg,
-            COALESCE(d.repackout,0) AS repackout, COALESCE(d.totalrepackout,0) AS totalrepackout, COALESCE(e.repackin,0) AS repackin, COALESCE(e.totalrepackin,0) AS totalrepackin,COALESCE(f.gr,0) AS gr, COALESCE(f.totalgr,0) AS totalgr, COALESCE(g.gi,0) AS gi,
+            COALESCE(d.repackout,0) AS repackout, COALESCE(d.totalrepackout,0) AS totalrepackout, COALESCE(e.repackin,0) AS repackin, COALESCE(e.totalrepackin,0) AS totalrepackin,COALESCE(f.gr,0) AS gr, COALESCE(f.totalgr,0) AS totalgr,COALESCE(j.rm,0) AS rm, COALESCE(g.gi,0) AS gi,
             COALESCE(g.totalgi,0) AS totalgi,
             COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,  COALESCE(h.totalsjbelumbarcode,0) AS totalsjbelumbarcode,
              coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
@@ -140,6 +140,16 @@ class ExportReportAccountingSummaryStock implements FromCollection, WithTitle, W
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
+                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RM, coalesce(SUM(e.total),0) AS total
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN marketing_order_delivery_process_details e ON e.id = b.lookable_id and b.lookable_type = 'marketing_order_delivery_process_details' and e.deleted_at is null
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $this->start_date . "'
+                            GROUP BY d.code,d.name,k.code
+                            UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI, coalesce(SUM(b.total)*-1,0) AS total
                             FROM good_issues a
                             LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
@@ -197,6 +207,17 @@ class ExportReportAccountingSummaryStock implements FromCollection, WithTitle, W
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )f ON f.code=a.code AND f.shading=a.shading
+                                LEFT JOIN (
+                                    SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0) AS RM,coalesce(SUM(b.total),0) AS totalrm
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN marketing_order_delivery_process_details e ON e.id = b.lookable_id and b.lookable_type = 'marketing_order_delivery_process_details' and e.deleted_at is null
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $this->start_date . "' AND a.post_date<='" . $this->finish_date . "'
+                            GROUP BY d.code,d.name,k.code
+                                )j ON j.code=a.code AND j.shading=a.shading
                                 LEFT JOIN (
                                 SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS GI,coalesce(SUM(b.total)*-1,0) AS totalgi
                             FROM good_issues a

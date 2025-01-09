@@ -228,12 +228,31 @@ class Select2Controller extends Controller {
                     WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
                 ", ["$city->code%"]);
 
+                $arrDistrict = [];
+                $arrSubdistrict = [];
+
+                foreach($districts as $row){
+                    $arrDistrict[] = [
+                        'id'    => $row->id,
+                        'code'  => $row->code,
+                        'name'  => $row->name,
+                    ];
+                }
+
+                foreach($subdistricts as $row){
+                    $arrSubdistrict[] = [
+                        'id'    => $row->id,
+                        'code'  => $row->code,
+                        'name'  => $row->name,
+                    ];
+                }
+
                 $cityData = [
                     'id'            => $city->id,
                     'code'          => $city->code,
                     'name'          => $city->name,
-                    'districts'     => $districts,
-                    'subdistricts'  => $subdistricts,
+                    'districts'     => $arrDistrict,
+                    'subdistricts'  => $arrSubdistrict,
                 ];
 
                 $region->cities[] = $cityData;

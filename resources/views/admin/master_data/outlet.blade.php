@@ -312,7 +312,6 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    console.log(response);
                     if(response.status === 200) {
                         successImport();
                         M.toast({
@@ -331,7 +330,6 @@
                 },
                 error: function(response) {
                     loadingClose('.modal-content');
-                    console.log(response);
                     if(response.status === 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
@@ -360,7 +358,6 @@
                     }else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        console.log(response);
                         let errorMessage = response.status === 400 ? 
                             `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;

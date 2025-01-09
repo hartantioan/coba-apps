@@ -257,7 +257,6 @@ class Select2Controller extends Controller {
                     'code'          => $city->code,
                     'name'          => $city->name,
                     'district'      => $arrDistrict,
-                    'subdistrict'   => $arrSubdistrict,
                 ];
 
                 $region->cities[] = $cityData;

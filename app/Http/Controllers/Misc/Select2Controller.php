@@ -4671,7 +4671,7 @@ class Select2Controller extends Controller {
                     $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                     $total = $price * $row->getBalanceQtySentMinusReturn();
                     if($row->marketingOrderDetail->tax_id > 0){
-                        if($row->marketingOrderDetail->is_include_tax == '1'){
+                        if($row->marketingOrderDetail->is_include_tax == '1' && date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) < '2024-12-24'){
                             $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
                         }
                     }

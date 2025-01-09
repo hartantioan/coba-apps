@@ -265,6 +265,14 @@ class MarketingOrderDeliveryProcess extends Model
         return implode(', ',$arr);
     }
 
+    public function getGrandtotalSalesOrder(){
+        $gt = 0;
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            $gt += $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->grandtotal;
+        }
+        return $gt;
+    }
+
     public function getNote() {
         $text = 'BASED ON SALES ORDER '.$this->getSalesOrderCode().'. BASED ON MARKETING ORDER DELIVERY '.$this->marketingOrderDelivery->code.'. BASED ON DELIVERY ORDER '.$this->code.'.';
         return $text;

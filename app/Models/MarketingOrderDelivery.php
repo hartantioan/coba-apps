@@ -60,6 +60,14 @@ class MarketingOrderDelivery extends Model
         return $place_id;
     }
 
+    public function getPlaceCode(){
+        $place_id = '-';
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $place_id = $row->place->code;
+        }
+        return $place_id;
+    }
+
     public function getMaxBillingAddress(){
         $data = 0;
         foreach($this->marketingOrderDeliveryDetail()->orderBy('id')->get() as $row){
@@ -443,7 +451,7 @@ class MarketingOrderDelivery extends Model
                     $arrMo[] = $row->marketingOrderDetail->marketingOrder->id;
                 }
             }
-            
+
             $row->delete();
         }
         foreach($arrMo as $rowmo){

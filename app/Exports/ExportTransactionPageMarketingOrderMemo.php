@@ -28,7 +28,7 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
     private $headings = [
         'No',
         'Kode',
-        'Pengguna',
+        'Status',
         'Voider',
         'Tgl Void',
         'Ket Void',
@@ -38,16 +38,18 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
         'Doner',
         'Tgl Done',
         'Ket Done',
+        'Pengguna',
         'Tgl Posting',
         'Pelanggan',
         'Perusahaan',
-        'Jenis',
+        'Tipe Memo',
         'No Seri Pajak',
+        'No SJ',
+        'No ARIN',
         'Keterangan',
         'Total',
         'PPN',
         'Grandtotal',
-        'Status',
     ];
 
     public function collection()
@@ -103,7 +105,7 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
             $arr[] = [
                 'no'            => ($key + 1),
                 'kode'          => $row->code,
-                'petugas'       => $row->user->name,
+                'status'        => $row->statusRaw(),
                 'voider'        => $row->voidUser()->exists() ? $row->voidUser->name : '',
                 'tgl_void'      => $row->voidUser()->exists() ? $row->void_date : '',
                 'ket_void'      => $row->voidUser()->exists() ? $row->void_note : '',
@@ -113,16 +115,18 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
                 'doner'         => ($row->status == 3 && is_null($row->done_id)) ? 'sistem' : (($row->status == 3 && !is_null($row->done_id)) ? $row->doneUser->name : null),
                 'tgl_done'      => $row->doneUser()->exists() ? $row->done_date : '',
                 'ket_done'      => $row->doneUser()->exists() ? $row->done_note : '',
+                'petugas'       => $row->user->name,
                 'tgl_posting'   => date('d/m/Y',strtotime($row->post_date)),
                 'pelanggan'     => $row->account->name,
                 'perusahaan'    => $row->company->name,
-                'jenis'         => $row->type(),
+                'jenis'         => $row->memoType(),
                 'no_seri_pajak' => $row->tax_no,
+                'no_sj'         => $row->getSJCode(),
+                'no_arin'       => $row->getArinCode(),
                 'catatan'       => $row->note,
                 'total'         => $row->total,
                 'ppn'           => $row->tax,
                 'grandtotal'    => $row->grandtotal,
-                'status'        => $row->statusRaw(),
             ];
 
 

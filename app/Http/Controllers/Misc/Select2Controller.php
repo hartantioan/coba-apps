@@ -232,7 +232,7 @@ class Select2Controller extends Controller {
                         SELECT id, code, name
                         FROM regions
                         WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
-                    ", ["$row->code%"]);
+                    ", ["$city->code%"]);
 
                     foreach($subdistricts as $row){
                         $arrSubdistrict[] = [
@@ -249,8 +249,6 @@ class Select2Controller extends Controller {
                         'subdistrict'   => $arrSubdistrict,
                     ];
                 }
-
-                
 
                 $cityData = [
                     'id'            => $city->id,

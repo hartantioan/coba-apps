@@ -263,8 +263,10 @@ class OutletController extends Controller
     public function show(Request $request){
         $unit = Outlet::find($request->id);
         $unit['province_name'] = $unit->province->name;
-        $unit['cities'] = $unit->province->getCity();
         $unit['outlet_group_name'] = $unit->outletGroup()->exists() ? $unit->outletGroup->name : '';
+        $unit['city_name'] = $unit->city->name;
+        $unit['district_name'] = $unit->district->name;
+        $unit['subdistrict_name'] = $unit->subdistrict->name;
         				
 		return response()->json($unit);
     }

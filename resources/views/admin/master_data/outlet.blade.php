@@ -396,13 +396,87 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 $('#previewUrl').html();
-                $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
-                    <option value="">--{{ __('translations.select') }}--</option>
-                `);
+                $('#province_id,#subdistrict_id,#district_id,#city_id').empty();
             }
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
+
+        $('#city_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/city_by_province_id") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        province: $('#province_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#district_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/district_by_city_id") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        city: $('#city_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#subdistrict_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/subdistrict_by_district_id") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        district: $('#district_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#group_outlet_id', '{{ url("admin/select2/group_outlet") }}');
     });
 
@@ -413,75 +487,15 @@
 
 
     function getCity(){
-        $('#city_id,#subdistrict_id,#district_id').empty().append(`
-            <option value="">--{{ __('translations.select') }}--</option>
-        `);
-        if($('#province_id').val()){
-            city = $('#province_id').select2('data')[0].cities;
-            $.each(city, function(i, val) {
-                $('#city_id').append(`
-                    <option value="` + val.id + `">` + val.name + `</option>
-                `);
-            });
-        }else{
-            city = [];
-            district = [];
-            subdistrict = [];
-        }
+        $('#city_id,#subdistrict_id,#district_id').empty();
     }
 
     function getDistrict(){
-        $('#subdistrict_id,#district_id').empty().append(`
-            <option value="">--{{ __('translations.select') }}--</option>
-        `);
-        if($('#city_id').val()){
-            let index = -1;
-
-            $.each(city, function(i, val) {
-                if(val.id == $('#city_id').val()){
-                    index = i;
-                }
-            });
-
-            $.each(city[index].district, function(i, value) {
-                $('#district_id').append(`
-                    <option value="` + value.id + `" data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                `);
-            });
-        }else{
-            district = [];
-            subdistrict = [];
-        }
+        $('#subdistrict_id,#district_id').empty();
     }
 
     function getSubdistrict(){
-        $('#subdistrict_id').empty().append(`
-            <option value="">--{{ __('translations.select') }}--</option>
-        `);
-        if($('#district_id').val()){
-            
-            let index = -1;
-
-            $.each(city, function(i, val) {
-                if(val.id == $('#city_id').val()){
-                    index = i;
-                }
-            });
-
-            $.each(city[index].district, function(i, value) {
-                if(value.id == $('#district_id').val()){
-                    subdistrict = value.subdistrict;
-                }
-            });
-
-            $.each(subdistrict, function(i, value) {
-                $('#subdistrict_id').append(`
-                    <option value="` + value.id + `">` + value.name + `</option>
-                `);
-            });
-        }else{
-            subdistrict = [];
-        }
+        $('#subdistrict_id').empty();
     }
 
     function loadDataTable() {
@@ -648,38 +662,10 @@
                 }
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
                 $('#group_outlet_id').empty().append(`<option value="` + response.outlet_group_id + `">` + response.outlet_group_name + `</option>`);
-                $('#subdistrict_id,#district_id,#city_id').empty().append(`
-                    <option value="">--{{ __('translations.select') }}--</option>
-                `);
-                $.each(response.cities, function(i, val) {
-                    $('#city_id').append(`
-                        <option value="` + val.id + `">` + val.name + `</option>
-                    `);
-                });
-                $('#city_id').val(response.city_id).formSelect();
-                let index = -1;
-                $.each(response.cities, function(i, val) {
-                    if(val.id == response.city_id){
-                        index = i;
-                    }
-                });
-                if(index >= 0){
-                    $.each(response.cities[index].district, function(i, value) {
-                        let selected = '';
-                        $('#district_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                        `);
-                        if(value.id == response.district_id){
-                            subdistrict = value.subdistrict;
-                        }
-                    });
-
-                    $.each(subdistrict, function(i, value) {
-                        $('#subdistrict_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
-                        `);
-                    });
-                }
+                $('#subdistrict_id,#district_id,#city_id').empty();
+                $('#city_id').empty().append(`<option value="` + response.city_id + `">` + response.city_name + `</option>`);
+                $('#district_id').empty().append(`<option value="` + response.district_id + `">` + response.district_name + `</option>`);
+                $('#subdistrict_id').empty().append(`<option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>`);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

@@ -26,7 +26,7 @@
                 <td>{{ $row->type->code ?? '-' }}</td>
                 <td>{{ $row->deliveryType() ?? '-'}}</td>
                 <td>{{ $row->grade->code ?? '-'}}</td>
-                <td>{{ $row->place->code.' - '.$val->place->name}}</td>
+                <td>{{ $row->place->code.' - '.$row->place->name}}</td>
                 <td>{{ $row->discount}}</td>
                 <td>{{ $row->sell_price}}</td>
                 <td>{{ $row->price}}</td>

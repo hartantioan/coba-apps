@@ -3280,7 +3280,7 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('report_marketing_delivery_order')->middleware('operation.access:report_marketing_delivery_order,view')->group(function () {
                         Route::get('/', [MarketingDeliveryRecapController::class, 'index']);
-                        Route::get('export', [MarketingDeliveryRecapController::class, 'export']);
+                        Route::post('export', [MarketingDeliveryRecapController::class, 'export']);
                     });
 
                     Route::prefix('report_marketing_invoice')->middleware('operation.access:report_marketing_invoice,view')->group(function () {

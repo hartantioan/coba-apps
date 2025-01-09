@@ -2413,45 +2413,44 @@
 
     function countAll(){
         if($('#memo_type').val() == '1'){
+            let nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
 
-        }
-        let nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
+            subtotal = nominal;
 
-        subtotal = nominal;
-
-        if(percent_tax > 0){
-            if($('#is_include_tax').val() == '1'){
-                subtotal = Math.floor((subtotal / (1 + (percent_tax / 100))));
+            if(percent_tax > 0){
+                if($('#is_include_tax').val() == '1'){
+                    subtotal = Math.floor((subtotal / (1 + (percent_tax / 100))));
+                }
+                tax = Math.floor(subtotal * (percent_tax / 100));
             }
-            tax = Math.floor(subtotal * (percent_tax / 100));
-        }
 
-        if(tax > 0 && $('#is_include_tax').val() == '1'){
-            subtotal = nominal - tax;
-        }
-
-        grandtotal = subtotal + tax;
-
-        $('#subtotal').val(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
-        );
-
-        $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
-        );
-
-        $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
-        );
-
-        if(tax > 0){
-            $('#textTax').show();
-            if(!$('#tax_no').val()){
-                getTaxSeries();
+            if(tax > 0 && $('#is_include_tax').val() == '1'){
+                subtotal = nominal - tax;
             }
-        }else{
-            $('#textTax').hide();
-            $('#tax_no').val('');
+
+            grandtotal = subtotal + tax;
+
+            $('#subtotal').val(
+                (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
+            );
+
+            $('#tax').val(
+                (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+            );
+
+            $('#grandtotal').val(
+                (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+            );
+
+            if(tax > 0){
+                $('#textTax').show();
+                if(!$('#tax_no').val()){
+                    getTaxSeries();
+                }
+            }else{
+                $('#textTax').hide();
+                $('#tax_no').val('');
+            }
         }
     }
 

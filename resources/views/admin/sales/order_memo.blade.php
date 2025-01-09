@@ -1828,6 +1828,7 @@
                                                     <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `">
                                                     <input type="hidden" name="arr_tax_id[]" value="` + val.tax_id + `">
                                                     <input type="hidden" name="arr_conversion[]" id="arr_conversion` + count + `" value="` + val.conversion + `">
+                                                    <input type="hidden" name="arr_new[]" id="arr_new` + count + `" value="` + val.is_new + `">
                                                     <td class="center-align">
                                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                             <i class="material-icons">delete</i>

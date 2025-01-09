@@ -405,6 +405,7 @@ class MarketingOrderMemoController extends Controller
                     'conversion'     => CustomHelper::formatConditionalQty($row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
                     'document_code'  => $row->marketingOrderDeliveryProcess->code.' - '.$row->marketingOrderDeliveryProcess->marketingOrderInvoice->code,
                     'document_date'  => date('d/m/Y',strtotime($row->marketingORderDeliveryProcess->post_date)),
+                    'is_new'         => date('Y-m-d',strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) >= '2024-12-24' ? '1' : '0',
                 ];
             }
 

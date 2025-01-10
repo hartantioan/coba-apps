@@ -281,7 +281,7 @@ class MarketingOrderDeliveryProcess extends Model
     public function totalQty(){
         $total = 0;
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            $total += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+            $total += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3);
         }
         return $total;
     }

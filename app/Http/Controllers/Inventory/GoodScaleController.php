@@ -1571,7 +1571,7 @@ class GoodScaleController extends Controller
                                 }
                             }
                         }
-                        CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
+                        /* CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id); */
                     }
 
                     activity()

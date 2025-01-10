@@ -55,6 +55,7 @@ class ReportInventorySummaryStockFGController extends Controller
         $totalrepackout = 0.000;
         $totalrepackin = 0.000;
         $totalgr = 0.000;
+        $totalmo = 0.000;
         $totalgi = 0.000;
         $totalqtysjbelumbarcode = 0.000;
         $totalendstockblmbarcode = 0.000;
@@ -64,11 +65,11 @@ class ReportInventorySummaryStockFGController extends Controller
         $query = DB::select("
               SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade,
 	case when br.type='1' then 'HB' ELSE 'OEM' end AS 'kategori',a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
-            COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(g.gi,0) AS gi,
+            COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(ff.rm,0) AS mo,COALESCE(g.gi,0) AS gi,
             COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,  
-             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
+             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.rm,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
             COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode,
-            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
+            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.rm,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
             SELECT  distinct a.code,a.name,a.shading FROM (
                     SELECT d.code,d.name,k.code AS shading
                         FROM production_handovers a
@@ -138,6 +139,15 @@ class ReportInventorySummaryStockFGController extends Controller
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
+                              SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RM
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $start_date . "'
+                            GROUP BY d.code,d.name,k.code
+                            UNION ALL
                             SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0)*-1 AS GI
                             FROM good_issues a
                             LEFT JOIN good_issue_details b ON a.id=b.good_issue_id and b.deleted_at is null
@@ -195,6 +205,17 @@ class ReportInventorySummaryStockFGController extends Controller
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $start_date . "' AND a.post_date<='" . $finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )f ON f.code=a.code AND f.shading=a.shading
+                                LEFT JOIN (
+                                  SELECT d.code,d.name,k.code as shading, coalesce(SUM(b.qty),0) AS RM
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $start_date . "' AND a.post_date<='" . $finish_date . "'
+                            GROUP BY d.code,d.name,k.code
+                            
+                                )ff ON ff.code=a.code AND ff.shading=a.shading
                                 LEFT JOIN (
                                 SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS GI
                             FROM good_issues a
@@ -269,7 +290,7 @@ class ReportInventorySummaryStockFGController extends Controller
         foreach ($query as $key => $row) {
 
             $html .= '<tr class="row_detail"><td class="center-align">' . ($key + 1) . '</td><td>' . $row->code . '</td><td>' . $row->name . '</td><td>' . $row->jenis . '</td><td>' . $row->brand   . '</td><td>' . $row->motif   . '</td><td>' . $row->grade   . '</td><td>' . $row->kategori   . '</td><td>' . $row->shading   . '</td>
-            <td class="right-align">' . round($row->initial, 3)   . '</td><td class="right-align">' . round($row->receivefg, 3)   . '</td><td class="right-align">' . round($row->repackout, 3)   . '</td><td class="right-align">' . round($row->repackin, 3)   . '</td><td class="right-align">' . round($row->gr, 3)   . '</td><td class="right-align">' . round($row->gi, 3)   . '</td><td class="right-align">' . round($row->qtysjbelumbarcode, 3)   . '</td>
+            <td class="right-align">' . round($row->initial, 3)   . '</td><td class="right-align">' . round($row->receivefg, 3)   . '</td><td class="right-align">' . round($row->repackout, 3)   . '</td><td class="right-align">' . round($row->repackin, 3)   . '</td><td class="right-align">' . round($row->gr, 3)   . '</td><td class="right-align">' . round($row->mo, 3)   . '</td><td class="right-align">' . round($row->gi, 3)   . '</td><td class="right-align">' . round($row->qtysjbelumbarcode, 3)   . '</td>
             <td class="right-align">' . round($row->endstockblmbarcode, 3)   . '</td><td class="right-align">' . round($row->qtysjsudahbarcode, 3)   . '</td><td class="right-align">' . round($row->endstock, 3)   . '</td>
             </tr>';
 
@@ -278,6 +299,7 @@ class ReportInventorySummaryStockFGController extends Controller
             $totalrepackout += round($row->repackout, 3);
             $totalrepackin += round($row->repackin, 3);
             $totalgr += round($row->gr, 3);
+            $totalmo += round($row->mo, 3);
             $totalgi += round($row->gi, 3);
             $totalqtysjbelumbarcode += round($row->qtysjbelumbarcode, 3);
             $totalendstockblmbarcode += round($row->endstockblmbarcode, 3);
@@ -289,6 +311,7 @@ class ReportInventorySummaryStockFGController extends Controller
         <td class="right-align">' . round($totalrepackout, 3)   . '</td>
         <td class="right-align">' . round($totalrepackin, 3)   . '</td>
         <td class="right-align">' . round($totalgr, 3)   . '</td>
+        <td class="right-align">' . round($totalmo, 3)   . '</td>
         <td class="right-align">' . round($totalgi, 3)   . '</td>
         <td class="right-align">' . round($totalqtysjbelumbarcode, 3)   . '</td>
         <td class="right-align">' . round($totalendstockblmbarcode, 3)   . '</td>

@@ -982,7 +982,7 @@ class GoodScaleController extends Controller
                     }
                 }
 
-                foreach($gs->goodScaleDetail as $key => $row){
+                foreach($gs->goodScaleDetail as $row){
                     if($row->lookable_type == 'marketing_order_deliveries'){
                         if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                             $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
@@ -1555,22 +1555,12 @@ class GoodScaleController extends Controller
                             }
                         }
 
-                        $tempQtyFinal = $qty_final;
-                        $tempCost = $totalCost;
-                        foreach($gs->goodScaleDetail as $key => $row){
+                        foreach($gs->goodScaleDetail as $row){
                             if($row->lookable_type == 'marketing_order_deliveries'){
                                 if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                                     $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
                                     $qty = round($qty_final * $bobot,2);
                                     $total = round($totalCost * $bobot,2);
-                                    $tempQtyFinal -= $qty;
-                                    $tempCost -= $total;
-                                    if($key == (count($gs->goodScaleDetail) - 1)){
-                                        if($tempQtyFinal > 0 && $tempCost > 0){
-                                            $qty += $tempQtyFinal;
-                                            $total += $tempCost;
-                                        }
-                                    }
                                     $row->lookable->marketingOrderDeliveryProcess->update([
                                         'weight_netto' => $qty,
                                     ]);
@@ -1581,7 +1571,7 @@ class GoodScaleController extends Controller
                                 }
                             }
                         }
-                        /* CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id); */
+                        CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
                     }
 
                     activity()

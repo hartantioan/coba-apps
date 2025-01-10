@@ -76,7 +76,7 @@ class MarketingOrderInvoiceDetail extends Model
         }else if ($this->lookable_type == '' || $this->lookable_type == null ){
             $price = $price / ((100 + $this->percent_tax) / 100);
         }
-        
+
         return $price;
     }
 
@@ -144,6 +144,61 @@ class MarketingOrderInvoiceDetail extends Model
             return $this->lookable->itemStock->item->name;
         } else if ($this->lookable_type == 'marketing_order_delivery_details') {
             return $this->lookable->item->name;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
+    public function getItemBrand()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->brand->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->brand->name;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
+    public function getItemBrandCategory()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->brand->type();
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->brand->type();
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
+    public function getItemColor()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->pattern->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->pattern->name;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
+    public function getQualityCategory()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->grade->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->grade->name;
+        }else if ($this->lookable_type == '' || $this->lookable_type == null ){
+            return '';
+        }
+    }
+
+    public function getItemColorCategory()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->itemStock->item->variety->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->item->variety->name;
         }else if ($this->lookable_type == '' || $this->lookable_type == null ){
             return '';
         }

@@ -1531,7 +1531,7 @@
                             </select>
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
+                            <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                 <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                 @foreach ($tax as $row)
                                     <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>

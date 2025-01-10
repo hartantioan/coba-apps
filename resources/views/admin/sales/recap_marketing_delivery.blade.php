@@ -85,47 +85,40 @@
 </div>
 
 <script>
-    // function exportExcel(){
-    //     var start_date = $('#start_date').val(), end_date = $('#end_date').val();
-    //     window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
-    // }
 
     function exportExcel(){
-    var end_date = $('#end_date').val();
-    var start_date = $('#start_date').val();
-    $.ajax({
-        url: '{{ Request::url() }}/export',
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-            end_date : end_date,
-            start_date : start_date,
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        beforeSend: function() {
-            loadingOpen('#main-display');
-        },
-        success: function(response) {
-            loadingClose('#main-display');
-            M.toast({
-                html: response.message
-            });
-        },
-        error: function() {
-            $('#main-display').scrollTop(0);
-            loadingClose('#main-display');
-            swal({
-                title: 'Ups!',
-                text: 'Check your internet connection.',
-                icon: 'error'
-            });
-        }
-    });
-
-    // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
-
+        var end_date = $('#end_date').val();
+        var start_date = $('#start_date').val();
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                end_date : end_date,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
 

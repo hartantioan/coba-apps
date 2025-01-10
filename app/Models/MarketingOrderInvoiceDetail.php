@@ -202,6 +202,17 @@ class MarketingOrderInvoiceDetail extends Model
         }
     }
 
+    public function getItemCategoryColor()
+    {
+        if ($this->lookable_type == 'marketing_order_delivery_process_details') {
+            return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->item->variety->name;
+        } else if ($this->lookable_type == 'marketing_order_delivery_details') {
+            return $this->lookable->marketingOrderDetail->item->variety->name;
+        } else {
+            return '';
+        }
+    }
+
     public function getDownPayment()
     {
         $bobot = $this->total / $this->marketingOrderInvoice->total;

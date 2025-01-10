@@ -2617,35 +2617,35 @@ class TreeHelper {
                     $finished_data_id_mo_receipt[]=$id_mo_receipt;
                     $query_mo_receipt = MarketingOrderReceipt::find($id_mo_receipt);
 
-                    if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
-                        foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
-                            $properties =[
-                                ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
-                                ];
+                    // if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
+                    //     foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
+                    //         $properties =[
+                    //             ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
+                    //             ];
 
-                            if (!$hide_nominal) {
-                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mohr=[
-                                "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                'properties'=> $properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
-                            ];
-                            $data_go_chart[]=$mohr;
-                            $data_link[]=[
-                                'from'=>$query_mo_receipt->code,
-                                'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                            ];
+                    //         if (!$hide_nominal) {
+                    //             $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
+                    //             ;
+                    //         }
+                    //         $mohr=[
+                    //             "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             'properties'=> $properties,
+                    //             'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
+                    //         ];
+                    //         $data_go_chart[]=$mohr;
+                    //         $data_link[]=[
+                    //             'from'=>$query_mo_receipt->code,
+                    //             'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //         ];
 
-                            if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
-                                $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
-                                $added = true;
-                            }
-                        }
-                    }
+                    //         if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
+                    //             $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
+                    //             $added = true;
+                    //         }
+                    //     }
+                    // }
 
                     foreach($query_mo_receipt->marketingOrderReceiptDetail as $row_mo_receipt_detail){
                         if($row_mo_receipt_detail->marketingOrderInvoice()){
@@ -2801,128 +2801,128 @@ class TreeHelper {
             }
 
             //marketing handover receipt
-            foreach($data_id_hand_over_receipt as $row_handover_id){
-                if(!in_array($row_handover_id, $finished_data_id_handover)){
-                    $finished_data_id_handover[]=$row_handover_id;
-                    $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
-                    foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
-                        // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
-                        //     $properties = [
-                        //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                        //     ];
+            // foreach($data_id_hand_over_receipt as $row_handover_id){
+            //     if(!in_array($row_handover_id, $finished_data_id_handover)){
+            //         $finished_data_id_handover[]=$row_handover_id;
+            //         $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
+            //         foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
+            //             // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
+            //             //     $properties = [
+            //             //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+            //             //     ];
 
-                        //     if (!$hide_nominal) {
-                        //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                        //         ;
-                        //     }
-                        //     $mo_invoice_tempura=[
-                        //         "name"=>$row_mo_h_receipt_detail->lookable->code,
-                        //         "key" => $row_mo_h_receipt_detail->lookable->code,
-                        //         'properties'=>$properties,
-                        //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
-                        //     ];
-                        //     $data_go_chart[]=$mo_invoice_tempura;
-                        //     $data_link[]=[
-                        //         'from'=>$query_handover_receipt->code,
-                        //         'to'=>$row_mo_h_receipt_detail->lookable->code,
-                        //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
-                        //     ];
-                        //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
-                        //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
-                        //         $added = true;
-                        //     }
-                        // }
-                        if($row_mo_h_receipt_detail->marketingOrderReceipt()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
-                            ];
+            //             //     if (!$hide_nominal) {
+            //             //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+            //             //         ;
+            //             //     }
+            //             //     $mo_invoice_tempura=[
+            //             //         "name"=>$row_mo_h_receipt_detail->lookable->code,
+            //             //         "key" => $row_mo_h_receipt_detail->lookable->code,
+            //             //         'properties'=>$properties,
+            //             //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+            //             //     ];
+            //             //     $data_go_chart[]=$mo_invoice_tempura;
+            //             //     $data_link[]=[
+            //             //         'from'=>$query_handover_receipt->code,
+            //             //         'to'=>$row_mo_h_receipt_detail->lookable->code,
+            //             //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
+            //             //     ];
+            //             //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
+            //             //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
+            //             //         $added = true;
+            //             //     }
+            //             // }
+            //             if($row_mo_h_receipt_detail->marketingOrderReceipt()){
+            //                 $properties = [
+            //                     ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
+            //                 ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
-                            ];
-                            $data_go_chart[]=$mo_invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                'to'=>$query_handover_receipt->code,
-                                'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
-                            ];
-                            if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                                $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
-                                $added = true;
-                            }
-                        }
-                    }
-                    if($query_handover_receipt->marketingOrderReceipt()->exists()){
-                        $properties = [
-                            ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
-                        ];
+            //                 if (!$hide_nominal) {
+            //                     $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                     ;
+            //                 }
+            //                 $mo_invoice_tempura=[
+            //                     "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     'properties'=>$properties,
+            //                     'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
+            //                 ];
+            //                 $data_go_chart[]=$mo_invoice_tempura;
+            //                 $data_link[]=[
+            //                     'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     'to'=>$query_handover_receipt->code,
+            //                     'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //                 ];
+            //                 if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                     $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
+            //                     $added = true;
+            //                 }
+            //             }
+            //         }
+            //         if($query_handover_receipt->marketingOrderReceipt()->exists()){
+            //             $properties = [
+            //                 ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
+            //             ];
 
-                        if (!$hide_nominal) {
-                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
-                            ;
-                        }
-                        $mo_receipt_tempura=[
-                            "name"=>$query_handover_receipt->marketingOrderReceipt->code,
-                            "key" => $query_handover_receipt->marketingOrderReceipt->code,
-                            'properties'=>$properties,
-                            'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
-                        ];
-                        $data_go_chart[]=$mo_receipt_tempura;
-                        $data_link[]=[
-                            'from'=>$query_handover_receipt->marketingOrderReceipt->code,
-                            'to'=>$query_handover_receipt->code,
-                            'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
-                        ];
-                        if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                            $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
-                            $added = true;
-                        }
-                    }
-                }
-            }
+            //             if (!$hide_nominal) {
+            //                 $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                 ;
+            //             }
+            //             $mo_receipt_tempura=[
+            //                 "name"=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                 "key" => $query_handover_receipt->marketingOrderReceipt->code,
+            //                 'properties'=>$properties,
+            //                 'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
+            //             ];
+            //             $data_go_chart[]=$mo_receipt_tempura;
+            //             $data_link[]=[
+            //                 'from'=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                 'to'=>$query_handover_receipt->code,
+            //                 'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //             ];
+            //             if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                 $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
+            //                 $added = true;
+            //             }
+            //         }
+            //     }
+            // }
             //marketing handover invoice
-            foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
+            // foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
 
-                if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
-                    $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
-                    $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
-                    foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
-                        if($row_mo_h_invoice_detail->marketingOrderInvoice()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
-                                ];
+            //     if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
+            //         $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
+            //         $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
+            //         foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
+            //             if($row_mo_h_invoice_detail->marketingOrderInvoice()){
+            //                 $properties = [
+            //                     ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
+            //                     ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_invoice_detail->lookable->code,
-                                "key" => $row_mo_h_invoice_detail->lookable->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
-                            ];
-                            $data_go_chart[]=$mo_invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$query_handover_invoice->code,
-                                'to'=>$row_mo_h_invoice_detail->lookable->code,
-                                'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
-                            ];
-                            if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
-                                $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
-                                $added = true;
-                            }
-                        }
-                    }
-                }
-            }
+            //                 if (!$hide_nominal) {
+            //                     $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
+            //                     ;
+            //                 }
+            //                 $mo_invoice_tempura=[
+            //                     "name"=>$row_mo_h_invoice_detail->lookable->code,
+            //                     "key" => $row_mo_h_invoice_detail->lookable->code,
+            //                     'properties'=>$properties,
+            //                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
+            //                 ];
+            //                 $data_go_chart[]=$mo_invoice_tempura;
+            //                 $data_link[]=[
+            //                     'from'=>$query_handover_invoice->code,
+            //                     'to'=>$row_mo_h_invoice_detail->lookable->code,
+            //                     'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
+            //                 ];
+            //                 if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
+            //                     $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
+            //                     $added = true;
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             // menacari anakan invoice
             foreach($data_id_mo_invoice as $row_id_invoice){
@@ -3047,35 +3047,35 @@ class TreeHelper {
                         }
 
                     }
-                    if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
-                        foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $row_handover_detail){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
-                            ];
+                    // if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
+                    //     foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $row_handover_detail){
+                    //         $properties = [
+                    //             ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
+                    //         ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_handover_tempura=[
-                                "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
-                            ];
-                            $data_go_chart[]=$mo_handover_tempura;
-                            $data_link[]=[
-                                'from'=>$query_invoice->code,
-                                'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
-                            ];
+                    //         if (!$hide_nominal) {
+                    //             $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
+                    //             ;
+                    //         }
+                    //         $mo_handover_tempura=[
+                    //             "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             'properties'=>$properties,
+                    //             'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
+                    //         ];
+                    //         $data_go_chart[]=$mo_handover_tempura;
+                    //         $data_link[]=[
+                    //             'from'=>$query_invoice->code,
+                    //             'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //         ];
 
-                            if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
-                                $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
-                                $added = true;
-                            }
-                        }
-                    }
+                    //         if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
+                    //             $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
+                    //             $added = true;
+                    //         }
+                    //     }
+                    // }
                     if($query_invoice->marketingOrderReceiptDetail()->exists()){
                         foreach($query_invoice->marketingOrderReceiptDetail as $row_mo_receipt_detail){
                             $properties =[
@@ -6815,39 +6815,39 @@ class TreeHelper {
                         $finished_data_id_mo_receipt[]=$id_mo_receipt;
                         $query_mo_receipt = MarketingOrderReceipt::find($id_mo_receipt);
 
-                        if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
-                            foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $index=>$row_mo_h_rd){
-                                if($index < 2 || $urutan <=-3){
-                                    $properties =[
-                                        ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
-                                        ];
+                        // if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
+                        //     foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $index=>$row_mo_h_rd){
+                        //         if($index < 2 || $urutan <=-3){
+                        //             $properties =[
+                        //                 ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
+                        //                 ];
 
-                                    if (!$hide_nominal) {
-                                        $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
-                                        ;
-                                    }
-                                    $mohr=[
-                                        "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                        "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                        'properties'=> $properties,
-                                        'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
-                                    ];
-                                    if($putaran == 0 || $urutan <= -3){
-                                        $data_go_chart[]=$mohr;
-                                        $data_link[]=[
-                                            'from'=>$query_mo_receipt->code,
-                                            'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                            'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                        ];
+                        //             if (!$hide_nominal) {
+                        //                 $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
+                        //                 ;
+                        //             }
+                        //             $mohr=[
+                        //                 "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                        //                 "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                        //                 'properties'=> $properties,
+                        //                 'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
+                        //             ];
+                        //             if($putaran == 0 || $urutan <= -3){
+                        //                 $data_go_chart[]=$mohr;
+                        //                 $data_link[]=[
+                        //                     'from'=>$query_mo_receipt->code,
+                        //                     'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                        //                     'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                        //                 ];
 
-                                        if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
-                                            $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
-                                            $added = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        //                 if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
+                        //                     $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
+                        //                     $added = true;
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
 
                         foreach($query_mo_receipt->marketingOrderReceiptDetail as $index=>$row_mo_receipt_detail){
                             if($index < 2 || $urutan <=-3){
@@ -6894,7 +6894,7 @@ class TreeHelper {
                         $query_mo_delivery_process = MarketingOrderDeliveryProcess::find($id_mo_delivery_process);
 
                         if($query_mo_delivery_process->purchaseOrderDetail()->exists()){
-                            
+
                             $properties = [
                                 ['name'=> "Tanggal :".$query_mo_delivery_process->purchaseOrderDetail->purchaseOrder->post_date],
                             ];
@@ -7020,143 +7020,143 @@ class TreeHelper {
             }
 
             //marketing handover receipt
-            if($putaran == 0 || $urutan <= -2){
-                foreach($data_id_hand_over_receipt as $row_handover_id){
-                    if(!in_array($row_handover_id, $finished_data_id_handover)){
-                        $finished_data_id_handover[]=$row_handover_id;
-                        $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
-                        foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $index=>$row_mo_h_receipt_detail){
-                            if($index < 2 || $urutan <=-2){
-                                // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
-                                //     $properties = [
-                                //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                                //     ];
+            // if($putaran == 0 || $urutan <= -2){
+            //     foreach($data_id_hand_over_receipt as $row_handover_id){
+            //         if(!in_array($row_handover_id, $finished_data_id_handover)){
+            //             $finished_data_id_handover[]=$row_handover_id;
+            //             $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
+            //             foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $index=>$row_mo_h_receipt_detail){
+            //                 if($index < 2 || $urutan <=-2){
+            //                     // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
+            //                     //     $properties = [
+            //                     //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+            //                     //     ];
 
-                                //     if (!$hide_nominal) {
-                                //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                                //         ;
-                                //     }
-                                //     $mo_invoice_tempura=[
-                                //         "name"=>$row_mo_h_receipt_detail->lookable->code,
-                                //         "key" => $row_mo_h_receipt_detail->lookable->code,
-                                //         'properties'=>$properties,
-                                //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
-                                //     ];
-                                //     $data_go_chart[]=$mo_invoice_tempura;
-                                //     $data_link[]=[
-                                //         'from'=>$query_handover_receipt->code,
-                                //         'to'=>$row_mo_h_receipt_detail->lookable->code,
-                                //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
-                                //     ];
-                                //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
-                                //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
-                                //         $added = true;
-                                //     }
-                                // }
-                                if($row_mo_h_receipt_detail->marketingOrderReceipt()){
-                                    $properties = [
-                                        ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
-                                    ];
+            //                     //     if (!$hide_nominal) {
+            //                     //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+            //                     //         ;
+            //                     //     }
+            //                     //     $mo_invoice_tempura=[
+            //                     //         "name"=>$row_mo_h_receipt_detail->lookable->code,
+            //                     //         "key" => $row_mo_h_receipt_detail->lookable->code,
+            //                     //         'properties'=>$properties,
+            //                     //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+            //                     //     ];
+            //                     //     $data_go_chart[]=$mo_invoice_tempura;
+            //                     //     $data_link[]=[
+            //                     //         'from'=>$query_handover_receipt->code,
+            //                     //         'to'=>$row_mo_h_receipt_detail->lookable->code,
+            //                     //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
+            //                     //     ];
+            //                     //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
+            //                     //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
+            //                     //         $added = true;
+            //                     //     }
+            //                     // }
+            //                     if($row_mo_h_receipt_detail->marketingOrderReceipt()){
+            //                         $properties = [
+            //                             ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
+            //                         ];
 
-                                    if (!$hide_nominal) {
-                                        $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
-                                        ;
-                                    }
-                                    $mo_invoice_tempura=[
-                                        "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                        "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                        'properties'=>$properties,
-                                        'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
-                                    ];
-                                    if($putaran == 0 || $urutan <= -2){
-                                        $data_go_chart[]=$mo_invoice_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                            'to'=>$query_handover_receipt->code,
-                                            'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
-                                        ];
-                                        if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                                            $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
-                                            $added = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if($query_handover_receipt->marketingOrderReceipt()->exists()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
-                            ];
+            //                         if (!$hide_nominal) {
+            //                             $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                             ;
+            //                         }
+            //                         $mo_invoice_tempura=[
+            //                             "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                             "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                             'properties'=>$properties,
+            //                             'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
+            //                         ];
+            //                         if($putaran == 0 || $urutan <= -2){
+            //                             $data_go_chart[]=$mo_invoice_tempura;
+            //                             $data_link[]=[
+            //                                 'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                                 'to'=>$query_handover_receipt->code,
+            //                                 'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //                             ];
+            //                             if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                                 $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
+            //                                 $added = true;
+            //                             }
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //             if($query_handover_receipt->marketingOrderReceipt()->exists()){
+            //                 $properties = [
+            //                     ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
+            //                 ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_receipt_tempura=[
-                                "name"=>$query_handover_receipt->marketingOrderReceipt->code,
-                                "key" => $query_handover_receipt->marketingOrderReceipt->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
-                            ];
-                            if($putaran == 0 || $urutan <= -2){
-                                $data_go_chart[]=$mo_receipt_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_handover_receipt->marketingOrderReceipt->code,
-                                    'to'=>$query_handover_receipt->code,
-                                    'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
-                                ];
-                                if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                                    $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
-                                    $added = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //                 if (!$hide_nominal) {
+            //                     $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                     ;
+            //                 }
+            //                 $mo_receipt_tempura=[
+            //                     "name"=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                     "key" => $query_handover_receipt->marketingOrderReceipt->code,
+            //                     'properties'=>$properties,
+            //                     'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
+            //                 ];
+            //                 if($putaran == 0 || $urutan <= -2){
+            //                     $data_go_chart[]=$mo_receipt_tempura;
+            //                     $data_link[]=[
+            //                         'from'=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                         'to'=>$query_handover_receipt->code,
+            //                         'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //                     ];
+            //                     if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                         $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
+            //                         $added = true;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
             //marketing handover invoice
-            if($putaran == 0 || $urutan <= -4){
-                foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
-                    if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
-                        $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
-                        $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
+            // if($putaran == 0 || $urutan <= -4){
+            //     foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
+            //         if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
+            //             $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
+            //             $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
 
-                        foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $index=>$row_mo_h_invoice_detail){
+            //             foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $index=>$row_mo_h_invoice_detail){
 
-                            if($index < 2 || $urutan <=-4){
-                                if($row_mo_h_invoice_detail->marketingOrderInvoice()){
-                                    $properties = [
-                                        ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
-                                        ];
+            //                 if($index < 2 || $urutan <=-4){
+            //                     if($row_mo_h_invoice_detail->marketingOrderInvoice()){
+            //                         $properties = [
+            //                             ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
+            //                             ];
 
-                                    if (!$hide_nominal) {
-                                        $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
-                                        ;
-                                    }
-                                    $mo_invoice_tempura=[
-                                        "name"=>$row_mo_h_invoice_detail->lookable->code,
-                                        "key" => $row_mo_h_invoice_detail->lookable->code,
-                                        'properties'=>$properties,
-                                        'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
-                                    ];
-                                    if($putaran == 0 || $urutan <= -4){
-                                        $data_go_chart[]=$mo_invoice_tempura;
-                                        $data_link[]=[
-                                            'from'=>$query_handover_invoice->code,
-                                            'to'=>$row_mo_h_invoice_detail->lookable->code,
-                                            'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
-                                        ];
-                                        if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
-                                            $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
-                                            $added = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //                         if (!$hide_nominal) {
+            //                             $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
+            //                             ;
+            //                         }
+            //                         $mo_invoice_tempura=[
+            //                             "name"=>$row_mo_h_invoice_detail->lookable->code,
+            //                             "key" => $row_mo_h_invoice_detail->lookable->code,
+            //                             'properties'=>$properties,
+            //                             'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
+            //                         ];
+            //                         if($putaran == 0 || $urutan <= -4){
+            //                             $data_go_chart[]=$mo_invoice_tempura;
+            //                             $data_link[]=[
+            //                                 'from'=>$query_handover_invoice->code,
+            //                                 'to'=>$row_mo_h_invoice_detail->lookable->code,
+            //                                 'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
+            //                             ];
+            //                             if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
+            //                                 $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
+            //                                 $added = true;
+            //                             }
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             // menacari anakan invoice
             if($putaran == 0 || $urutan <= -5){
@@ -7292,39 +7292,39 @@ class TreeHelper {
                             }
 
                         }
-                        if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
-                            foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $index=>$row_handover_detail){
-                                if($index < 2 || $urutan <=-5){
-                                    $properties = [
-                                        ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
-                                    ];
+                        // if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
+                        //     foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $index=>$row_handover_detail){
+                        //         if($index < 2 || $urutan <=-5){
+                        //             $properties = [
+                        //                 ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
+                        //             ];
 
-                                    if (!$hide_nominal) {
-                                        $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
-                                        ;
-                                    }
-                                    $mo_handover_tempura=[
-                                        "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                        "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                        'properties'=>$properties,
-                                        'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
-                                    ];
-                                    if($putaran == 0 || $urutan <= -5){
-                                        $data_go_chart[]=$mo_handover_tempura;
-                                        $data_link[]=[
-                                            'from'=>$query_invoice->code,
-                                            'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                            'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                        ];
+                        //             if (!$hide_nominal) {
+                        //                 $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
+                        //                 ;
+                        //             }
+                        //             $mo_handover_tempura=[
+                        //                 "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                        //                 "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                        //                 'properties'=>$properties,
+                        //                 'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
+                        //             ];
+                        //             if($putaran == 0 || $urutan <= -5){
+                        //                 $data_go_chart[]=$mo_handover_tempura;
+                        //                 $data_link[]=[
+                        //                     'from'=>$query_invoice->code,
+                        //                     'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                        //                     'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
+                        //                 ];
 
-                                        if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
-                                            $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
-                                            $added = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        //                 if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
+                        //                     $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
+                        //                     $added = true;
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         if($query_invoice->marketingOrderReceiptDetail()->exists()){
                             foreach($query_invoice->marketingOrderReceiptDetail as $index=>$row_mo_receipt_detail){
                                 if($index < 2 || $urutan <=-5){
@@ -8308,7 +8308,6 @@ class TreeHelper {
                         //         $added = true;
                         //     }
                         // }
-
                         foreach($query_mo->marketingOrderDetail as $index=>$row_marketing_order_detail){
                             if($index < 2 || $urutan <=-8){
                                 if($row_marketing_order_detail->marketingOrderPlanDetail()->exists()){
@@ -11002,35 +11001,35 @@ class TreeHelper {
                     $finished_data_id_mo_receipt[]=$id_mo_receipt;
                     $query_mo_receipt = MarketingOrderReceipt::find($id_mo_receipt);
 
-                    if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
-                        foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
-                            $properties =[
-                                ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
-                                ];
+                    // if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
+                    //     foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
+                    //         $properties =[
+                    //             ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
+                    //             ];
 
-                            if (!$hide_nominal) {
-                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mohr=[
-                                "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                'properties'=> $properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
-                            ];
-                            $data_go_chart[]=$mohr;
-                            $data_link[]=[
-                                'from'=>$query_mo_receipt->code,
-                                'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                            ];
+                    //         if (!$hide_nominal) {
+                    //             $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
+                    //             ;
+                    //         }
+                    //         $mohr=[
+                    //             "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             'properties'=> $properties,
+                    //             'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
+                    //         ];
+                    //         $data_go_chart[]=$mohr;
+                    //         $data_link[]=[
+                    //             'from'=>$query_mo_receipt->code,
+                    //             'to'=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //             'string_link'=>$query_mo_receipt->code.$row_mo_h_rd->marketingOrderHandoverReceipt->code,
+                    //         ];
 
-                            if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
-                                $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
-                                $added = true;
-                            }
-                        }
-                    }
+                    //         if(!in_array($row_mo_h_rd->marketingOrderHandoverReceipt->id, $data_id_hand_over_receipt)){
+                    //             $data_id_hand_over_receipt[] =$row_mo_h_rd->marketingOrderHandoverReceipt->id;
+                    //             $added = true;
+                    //         }
+                    //     }
+                    // }
 
                     foreach($query_mo_receipt->marketingOrderReceiptDetail as $row_mo_receipt_detail){
                         if($row_mo_receipt_detail->marketingOrderInvoice()){
@@ -11186,127 +11185,127 @@ class TreeHelper {
             }
 
             //marketing handover receipt
-            foreach($data_id_hand_over_receipt as $row_handover_id){
-                if(!in_array($row_handover_id, $finished_data_id_handover)){
-                    $finished_data_id_handover[]=$row_handover_id;
-                    $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
-                    foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
-                        // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
-                        //     $properties = [
-                        //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                        //     ];
+            // foreach($data_id_hand_over_receipt as $row_handover_id){
+            //     if(!in_array($row_handover_id, $finished_data_id_handover)){
+            //         $finished_data_id_handover[]=$row_handover_id;
+            //         $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
+            //         foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
+            //             // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
+            //             //     $properties = [
+            //             //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+            //             //     ];
 
-                        //     if (!$hide_nominal) {
-                        //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                        //         ;
-                        //     }
-                        //     $mo_invoice_tempura=[
-                        //         "name"=>$row_mo_h_receipt_detail->lookable->code,
-                        //         "key" => $row_mo_h_receipt_detail->lookable->code,
-                        //         'properties'=>$properties,
-                        //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
-                        //     ];
-                        //     $data_go_chart[]=$mo_invoice_tempura;
-                        //     $data_link[]=[
-                        //         'from'=>$query_handover_receipt->code,
-                        //         'to'=>$row_mo_h_receipt_detail->lookable->code,
-                        //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
-                        //     ];
-                        //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
-                        //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
-                        //         $added = true;
-                        //     }
-                        // }
-                        if($row_mo_h_receipt_detail->marketingOrderReceipt()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
-                            ];
+            //             //     if (!$hide_nominal) {
+            //             //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+            //             //         ;
+            //             //     }
+            //             //     $mo_invoice_tempura=[
+            //             //         "name"=>$row_mo_h_receipt_detail->lookable->code,
+            //             //         "key" => $row_mo_h_receipt_detail->lookable->code,
+            //             //         'properties'=>$properties,
+            //             //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+            //             //     ];
+            //             //     $data_go_chart[]=$mo_invoice_tempura;
+            //             //     $data_link[]=[
+            //             //         'from'=>$query_handover_receipt->code,
+            //             //         'to'=>$row_mo_h_receipt_detail->lookable->code,
+            //             //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
+            //             //     ];
+            //             //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
+            //             //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
+            //             //         $added = true;
+            //             //     }
+            //             // }
+            //             if($row_mo_h_receipt_detail->marketingOrderReceipt()){
+            //                 $properties = [
+            //                     ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
+            //                 ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
-                            ];
-                            $data_go_chart[]=$mo_invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
-                                'to'=>$query_handover_receipt->code,
-                                'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
-                            ];
-                            if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                                $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
-                                $added = true;
-                            }
-                        }
-                    }
-                    if($query_handover_receipt->marketingOrderReceipt()->exists()){
-                        $properties = [
-                            ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
-                        ];
+            //                 if (!$hide_nominal) {
+            //                     $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                     ;
+            //                 }
+            //                 $mo_invoice_tempura=[
+            //                     "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     'properties'=>$properties,
+            //                     'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
+            //                 ];
+            //                 $data_go_chart[]=$mo_invoice_tempura;
+            //                 $data_link[]=[
+            //                     'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+            //                     'to'=>$query_handover_receipt->code,
+            //                     'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //                 ];
+            //                 if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                     $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
+            //                     $added = true;
+            //                 }
+            //             }
+            //         }
+            //         if($query_handover_receipt->marketingOrderReceipt()->exists()){
+            //             $properties = [
+            //                 ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
+            //             ];
 
-                        if (!$hide_nominal) {
-                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
-                            ;
-                        }
-                        $mo_receipt_tempura=[
-                            "name"=>$query_handover_receipt->marketingOrderReceipt->code,
-                            "key" => $query_handover_receipt->marketingOrderReceipt->code,
-                            'properties'=>$properties,
-                            'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
-                        ];
-                        $data_go_chart[]=$mo_receipt_tempura;
-                        $data_link[]=[
-                            'from'=>$query_handover_receipt->marketingOrderReceipt->code,
-                            'to'=>$query_handover_receipt->code,
-                            'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
-                        ];
-                        if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
-                            $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
-                            $added = true;
-                        }
-                    }
-                }
-            }
+            //             if (!$hide_nominal) {
+            //                 $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
+            //                 ;
+            //             }
+            //             $mo_receipt_tempura=[
+            //                 "name"=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                 "key" => $query_handover_receipt->marketingOrderReceipt->code,
+            //                 'properties'=>$properties,
+            //                 'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
+            //             ];
+            //             $data_go_chart[]=$mo_receipt_tempura;
+            //             $data_link[]=[
+            //                 'from'=>$query_handover_receipt->marketingOrderReceipt->code,
+            //                 'to'=>$query_handover_receipt->code,
+            //                 'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
+            //             ];
+            //             if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
+            //                 $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
+            //                 $added = true;
+            //             }
+            //         }
+            //     }
+            // }
             //marketing handover invoice
-            foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
-                if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
-                    $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
-                    $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
-                    foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
-                        if($row_mo_h_invoice_detail->marketingOrderInvoice()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
-                                ];
+            // foreach($data_id_hand_over_invoice as $row_handover_invoice_id){
+            //     if(!in_array($row_handover_invoice_id, $finished_data_id_handover_invoice)){
+            //         $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
+            //         $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
+            //         foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
+            //             if($row_mo_h_invoice_detail->marketingOrderInvoice()){
+            //                 $properties = [
+            //                     ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
+            //                     ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_invoice_detail->lookable->code,
-                                "key" => $row_mo_h_invoice_detail->lookable->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
-                            ];
-                            $data_go_chart[]=$mo_invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$query_handover_invoice->code,
-                                'to'=>$row_mo_h_invoice_detail->lookable->code,
-                                'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
-                            ];
-                            if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
-                                $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
-                                $added = true;
-                            }
-                        }
-                    }
-                }
-            }
+            //                 if (!$hide_nominal) {
+            //                     $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
+            //                     ;
+            //                 }
+            //                 $mo_invoice_tempura=[
+            //                     "name"=>$row_mo_h_invoice_detail->lookable->code,
+            //                     "key" => $row_mo_h_invoice_detail->lookable->code,
+            //                     'properties'=>$properties,
+            //                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
+            //                 ];
+            //                 $data_go_chart[]=$mo_invoice_tempura;
+            //                 $data_link[]=[
+            //                     'from'=>$query_handover_invoice->code,
+            //                     'to'=>$row_mo_h_invoice_detail->lookable->code,
+            //                     'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
+            //                 ];
+            //                 if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
+            //                     $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
+            //                     $added = true;
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             // menacari anakan invoice
             foreach($data_id_mo_invoice as $row_id_invoice){
@@ -11431,35 +11430,35 @@ class TreeHelper {
                         }
 
                     }
-                    if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
-                        foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $row_handover_detail){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
-                            ];
+                    // if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
+                    //     foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $row_handover_detail){
+                    //         $properties = [
+                    //             ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
+                    //         ];
 
-                            if (!$hide_nominal) {
-                                $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_handover_tempura=[
-                                "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
-                            ];
-                            $data_go_chart[]=$mo_handover_tempura;
-                            $data_link[]=[
-                                'from'=>$query_invoice->code,
-                                'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
-                            ];
+                    //         if (!$hide_nominal) {
+                    //             $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
+                    //             ;
+                    //         }
+                    //         $mo_handover_tempura=[
+                    //             "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             'properties'=>$properties,
+                    //             'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
+                    //         ];
+                    //         $data_go_chart[]=$mo_handover_tempura;
+                    //         $data_link[]=[
+                    //             'from'=>$query_invoice->code,
+                    //             'to'=>$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //             'string_link'=>$query_invoice->code.$row_handover_detail->marketingOrderHandoverInvoice->code,
+                    //         ];
 
-                            if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
-                                $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
-                                $added = true;
-                            }
-                        }
-                    }
+                    //         if(!in_array($row_handover_detail->marketingOrderHandoverInvoice->id, $data_id_hand_over_invoice)){
+                    //             $data_id_hand_over_invoice[] =$row_handover_detail->marketingOrderHandoverInvoice->id;
+                    //             $added = true;
+                    //         }
+                    //     }
+                    // }
                     if($query_invoice->marketingOrderReceiptDetail()->exists()){
                         foreach($query_invoice->marketingOrderReceiptDetail as $row_mo_receipt_detail){
                             $properties =[

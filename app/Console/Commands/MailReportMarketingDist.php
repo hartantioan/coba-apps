@@ -70,8 +70,7 @@ class MailReportMarketingDist extends Command
             $aspgl = 0.00;
 
             //asp
-            $query = DB::select("SELECT sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-					ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+            $query = DB::select("SELECT sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -87,8 +86,7 @@ class MailReportMarketingDist extends Command
 
             //asp ht
             $aspht = 0;
-            $query = DB::select("SELECT sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-					ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+            $query = DB::select("SELECT sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -104,8 +102,7 @@ class MailReportMarketingDist extends Command
             }
 
             //asp glaze
-            $query = DB::select("SELECT sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-					ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+            $query = DB::select("SELECT sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -201,8 +198,7 @@ class MailReportMarketingDist extends Command
                	 GROUP BY concat(concat(d.name,' '),h.name)
 					)g ON g.tipe=a.name
 					LEFT JOIN (
-					SELECT concat(concat(d.name,' '),g.name) AS tipe, sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-					ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+					SELECT concat(concat(d.name,' '),g.name) AS tipe, sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -312,8 +308,7 @@ class MailReportMarketingDist extends Command
             $aspjawa = 0;
             $aspluarjawa = 0;
 
-            $query = DB::select("SELECT r.category_region AS area, sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-                        ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+            $query = DB::select("SELECT r.category_region AS area, sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
                         FROM marketing_order_delivery_processes a
                         LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
                         LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -408,8 +403,7 @@ class MailReportMarketingDist extends Command
                         GROUP BY r.sale_area
                         )g ON g.area=a.sale_area
                         LEFT JOIN (
-                        SELECT r.sale_area AS area, sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-                        ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+                        SELECT r.sale_area AS area, sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
                         FROM marketing_order_delivery_processes a
                         LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
                         LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null
@@ -616,8 +610,7 @@ class MailReportMarketingDist extends Command
 					GROUP BY d.name,g.name
 					)g ON g.tipe=a.name AND g.dist=a.cust
                     LEFT JOIN (
-					SELECT d.name as tipe, g.name as dist,sum(case when f.is_include_tax='1' then (b.qty*f.qty_conversion*(f.price/((100+f.percent_tax)/100)))
-					ELSE (b.qty*f.qty_conversion*f.price) END)/SUM(b.qty*f.qty_conversion) AS 'asp'
+					SELECT d.name as tipe, g.name as dist,sum(b.qty*f.qty_conversion*(f.price_after_discount-f.price_delivery))/SUM(b.qty*f.qty_conversion) AS 'asp'
 					FROM marketing_order_delivery_processes a
 					LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
 					LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id AND e.deleted_at IS null

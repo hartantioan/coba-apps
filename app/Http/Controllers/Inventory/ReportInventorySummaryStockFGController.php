@@ -279,6 +279,7 @@ class ReportInventorySummaryStockFGController extends Controller
                 <th  class="center-align" style="min-width:50px !important;">Repack Out (M2)</th>
                 <th  class="center-align" style="min-width:50px !important;">Repack In (M2)</th>
                 <th  class="center-align" style="min-width:50px !important;">GR (M2)</th>
+                <th  class="center-align" style="min-width:50px !important;">Retur (M2)</th>
                 <th  class="center-align" style="min-width:50px !important;">GI (M2)</th>
                 <th  class="center-align" style="min-width:50px !important;">Delivery Blm Barcode (M2)</th>
                 <th  class="center-align" style="min-width:50px !important;">End Stock (Delivery Blm Barcode) (M2)</th>

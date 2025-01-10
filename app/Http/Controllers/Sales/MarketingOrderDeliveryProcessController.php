@@ -592,10 +592,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                 }
 
                 if($request->temp){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, fitur ini sedang dalam perbaikan.'
-                    ]);
+                    // return response()->json([
+                    //     'status'  => 500,
+                    //     'message' => 'Mohon maaf, fitur ini sedang dalam perbaikan.'
+                    // ]);
 
                     $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -1669,7 +1669,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'message' => 'Mohon maaf, untuk SJ tahun 2024, harus memakai tanggal kembali SJ tahun 2024 juga.',
                     ]);
                 } */
-                
+
                 if($request->has('document')) {
                     if($data->document){
                         if(Storage::exists($data->document)){

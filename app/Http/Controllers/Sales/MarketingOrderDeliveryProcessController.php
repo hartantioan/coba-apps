@@ -703,7 +703,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->seal_no = $request->seal_no;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
-                        $query->status = $query->status;
+                        $query->status = '1';
                         $query->total = $mod->getTotal();
                         $query->tax = $mod->getTax();
                         $query->rounding = $mod->getRounding();

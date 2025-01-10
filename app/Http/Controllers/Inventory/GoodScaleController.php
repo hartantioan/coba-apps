@@ -1557,7 +1557,7 @@ class GoodScaleController extends Controller
 
                         $tempQtyFinal = $qty_final;
                         $tempCost = $totalCost;
-                        foreach($gs->goodScaleDetail as $row){
+                        foreach($gs->goodScaleDetail as $key => $row){
                             if($row->lookable_type == 'marketing_order_deliveries'){
                                 if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                                     $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;

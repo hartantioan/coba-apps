@@ -109,7 +109,44 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
 
         $arr=[];
         foreach($query_data as $key => $row){
-            foreach($row->marketingOrderMemoDetail as $row_detail){
+            if($row->marketingOrderMemoDetail()->exists()){
+                foreach($row->marketingOrderMemoDetail as $row_detail){
+                    $arr[] = [
+                        'no'            => ($key + 1),
+                        'kode'          => $row->code,
+                        'status'        => $row->statusRaw(),
+                        'voider'        => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                        'tgl_void'      => $row->voidUser()->exists() ? $row->void_date : '',
+                        'ket_void'      => $row->voidUser()->exists() ? $row->void_note : '',
+                        'deleter'       => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                        'tgl_delete'    => $row->deleteUser()->exists() ? $row->deleted_at : '',
+                        'ket_delete'    => $row->deleteUser()->exists() ? $row->delete_note : '',
+                        'doner'         => ($row->status == 3 && is_null($row->done_id)) ? 'sistem' : (($row->status == 3 && !is_null($row->done_id)) ? $row->doneUser->name : null),
+                        'tgl_done'      => $row->doneUser()->exists() ? $row->done_date : '',
+                        'ket_done'      => $row->doneUser()->exists() ? $row->done_note : '',
+                        'petugas'       => $row->user->name,
+                        'tgl_posting'   => date('d/m/Y',strtotime($row->post_date)),
+                        'pelanggan'     => $row->account->name,
+                        'perusahaan'    => $row->company->name,
+                        'jenis'         => $row->memoType(),
+                        'no_seri_pajak' => $row->tax_no,
+                        'no_sj'         => $row->getSJCode(),
+                        'no_arin'       => $row->getArinCode(),
+                        'catatan'       => $row->note,
+                        'item_sj'        => $row_detail->lookable->itemStock->item->code . ' - ' . $row_detail->lookable->itemStock->item->name,
+                        'item_kembali'   => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->item->code . ' - ' . $row_detail->itemStock->item->name : ''),
+                        'qty'            => $row_detail->qty,
+                        'satuan'         => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->item->uomUnit->code : ''),
+                        'qty_jual'       => $row_detail->qty_sell,
+                        'satuan_jual'    => $row_detail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                        'batch'          => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->productionBatch->code : ''),
+                        'shading'        => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->itemShading->code : ''),
+                        'total'         => $row->total,
+                        'ppn'           => $row->tax,
+                        'grandtotal'    => $row->grandtotal,
+                    ];
+                }
+            }else{
                 $arr[] = [
                     'no'            => ($key + 1),
                     'kode'          => $row->code,
@@ -132,19 +169,20 @@ class ExportTransactionPageMarketingOrderMemo implements FromCollection, WithTit
                     'no_sj'         => $row->getSJCode(),
                     'no_arin'       => $row->getArinCode(),
                     'catatan'       => $row->note,
-                    'item_sj'        => $row_detail->lookable->itemStock->item->code . ' - ' . $row_detail->lookable->itemStock->item->name,
-                    'item_kembali'   => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->item->code . ' - ' . $row_detail->itemStock->item->name : ''),
-                    'qty'            => $row_detail->qty,
-                    'satuan'         => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->item->uomUnit->code : ''),
-                    'qty_jual'       => $row_detail->qty_sell,
-                    'satuan_jual'    => $row_detail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
-                    'batch'          => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->productionBatch->code : ''),
-                    'shading'        => ($row_detail->itemStock()->exists() ? $row_detail->itemStock->itemShading->code : ''),
+                    'item_sj'        => '',
+                    'item_kembali'   => '',
+                    'qty'            => '',
+                    'satuan'         => '',
+                    'qty_jual'       => '',
+                    'satuan_jual'    => '',
+                    'batch'          => '',
+                    'shading'        => '',
                     'total'         => $row->total,
                     'ppn'           => $row->tax,
                     'grandtotal'    => $row->grandtotal,
                 ];
             }
+
 
 
         }

@@ -181,7 +181,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'cat_brand' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->brand->type() ?? '',
                     'warna' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->pattern->name ?? '',
                     'kategori_kw' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->grade->name ?? '',
-                    'cat_color' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->variety->name ?? '',
+                    'cat_color' => $row->getItemCategoryColor(),
                     'qty' => $row->qty,
                     'satuan' => $row->getItemReal()->unit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess?->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code ?? '',
                     'qtym2' => $row->getQtyM2(),

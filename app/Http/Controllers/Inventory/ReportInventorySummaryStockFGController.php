@@ -65,11 +65,11 @@ class ReportInventorySummaryStockFGController extends Controller
         $query = DB::select("
               SELECT a.code,a.name,v.`name` AS jenis, br.name AS brand, pa.name AS motif, gr.name AS grade,
 	case when br.type='1' then 'HB' ELSE 'OEM' end AS 'kategori',a.shading,coalesce(b.initialstock,0) AS initial,COALESCE(c.receivefg,0) AS receivefg,
-            COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(ff.mo,0) AS mo,COALESCE(g.gi,0) AS gi,
+            COALESCE(d.repackout,0) AS repackout, COALESCE(e.repackin,0) AS repackin,COALESCE(f.gr,0) AS gr,COALESCE(ff.rm,0) AS mo,COALESCE(g.gi,0) AS gi,
             COALESCE(h.qtysjbelumbarcode,0) AS qtysjbelumbarcode,  
-             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.mo,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
+             coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.rm,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0) as 'endstockblmbarcode',
             COALESCE(i.qtysjsudahbarcode,0) AS qtysjsudahbarcode,
-            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.mo,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
+            coalesce(b.initialstock,0)+COALESCE(c.receivefg,0)+COALESCE(d.repackout,0)+COALESCE(e.repackin,0)+COALESCE(f.gr,0)+COALESCE(ff.rm,0)+COALESCE(g.gi,0)+COALESCE(h.qtysjbelumbarcode,0)+COALESCE(i.qtysjsudahbarcode,0) AS endstock FROM (
             SELECT  distinct a.code,a.name,a.shading FROM (
                     SELECT d.code,d.name,k.code AS shading
                         FROM production_handovers a
@@ -206,7 +206,7 @@ class ReportInventorySummaryStockFGController extends Controller
                             GROUP BY d.code,d.name,k.code
                                 )f ON f.code=a.code AND f.shading=a.shading
                                 LEFT JOIN (
-                                  SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RM
+                                  SELECT d.code,d.name,k.code as shading, coalesce(SUM(b.qty),0) AS RM
                             FROM marketing_order_memos a
                             LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
                             LEFT JOIN item_stocks c ON c.id=b.item_stock_id

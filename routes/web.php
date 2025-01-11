@@ -206,6 +206,8 @@ use App\Http\Controllers\Sales\RecapSalesInvoiceDownPaymentController;
 use App\Http\Controllers\Sales\ReportProgressSalesOrderController;
 use App\Http\Controllers\Sales\MarketingReportCreditLimitController;
 
+use App\Http\Controllers\Mitra\MitraMarketingOrderController;
+
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
 use App\Http\Controllers\Inventory\InventoryTransferOutController;
@@ -2851,6 +2853,24 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}', [ApprovalCreditLimitController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ApprovalCreditLimitController::class, 'voidStatus'])->middleware('operation.access:approval_credit_limit,void');
                     Route::post('destroy', [ApprovalCreditLimitController::class, 'destroy'])->middleware('operation.access:approval_credit_limit,delete');
+                });
+
+                Route::prefix('mitra_marketing_order')->middleware(['operation.access:mitra_marketing_order,view', 'lockacc'])->group(function () {
+                    Route::get('/', [MitraMarketingOrderController::class, 'index']);
+                    Route::post('datatable', [MitraMarketingOrderController::class, 'datatable']);
+                    Route::get('row_detail', [MitraMarketingOrderController::class, 'rowDetail']);
+                    Route::post('show', [MitraMarketingOrderController::class, 'show']);
+                    Route::post('get_code', [MitraMarketingOrderController::class, 'getCode']);
+                    Route::post('print', [MitraMarketingOrderController::class, 'print']);
+                    Route::post('done', [MitraMarketingOrderController::class, 'done'])->middleware('operation.access:mitra_sales_order,update');
+                    Route::post('print_by_range', [MitraMarketingOrderController::class, 'printByRange']);
+                    Route::get('viewstructuretree', [MitraMarketingOrderController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [MitraMarketingOrderController::class, 'simpleStructrueTree']);
+                    Route::post('create', [MitraMarketingOrderController::class, 'create'])->middleware('operation.access:mitra_sales_order,update');
+                    Route::get('approval/{id}', [MitraMarketingOrderController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [MitraMarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MitraMarketingOrderController::class, 'voidStatus'])->middleware('operation.access:mitra_sales_order,void');
+                    Route::post('destroy', [MitraMarketingOrderController::class, 'destroy'])->middleware('operation.access:mitra_sales_order,delete');
                 });
 
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {

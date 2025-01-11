@@ -8,7 +8,10 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
 {
     protected $start_date, $finish_date, $status,$type,$status_qc;
 
@@ -55,17 +58,17 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
     public function collection()
     {
         $query_data = GoodScaleDetail::whereHas('goodScale',function($query){
-            $query->whereHas('journal',function($query){
-                if($this->start_date && $this->finish_date) {
-                    $query->whereDate('post_date', '>=', $this->start_date)
-                        ->whereDate('post_date', '<=', $this->finish_date);
-                } else if($this->start_date) {
-                    $query->whereDate('post_date','>=', $this->start_date);
-                } else if($this->finish_date) {
-                    $query->whereDate('post_date','<=', $this->finish_date);
-                }
-            });
+            // $query->whereHas('journal',function($query){
 
+            // });
+            if($this->start_date && $this->finish_date) {
+                $query->whereDate('post_date', '>=', $this->start_date)
+                    ->whereDate('post_date', '<=', $this->finish_date);
+            } else if($this->start_date) {
+                $query->whereDate('post_date','>=', $this->start_date);
+            } else if($this->finish_date) {
+                $query->whereDate('post_date','<=', $this->finish_date);
+            }
 
             if($this->status){
                 $status = explode(',',$this->status);
@@ -169,4 +172,23 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
 	{
 		return $this->headings;
 	}
+
+    public function styles($sheet)
+    {
+        $rows = $this->collection();
+
+        foreach ($rows as $key => $row) {
+            // Check if there's no associated journal and qty is 0
+            $hasJournal = $row['No. PO'] != '-' && $row['Qty'] > 0;
+
+            // Apply styles to rows where journal is absent and qty is 0
+            if (!$hasJournal) {
+                $sheet->getStyle('A' . ($key + 2) . ':Z' . ($key + 2)) // Adjust for Excel row starting from 2
+                    ->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setARGB(Color::COLOR_RED);
+            }
+        }
+    }
 }

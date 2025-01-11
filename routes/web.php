@@ -3141,6 +3141,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter_by_date', [MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export', [MarketingOrderReportController::class, 'export']);
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);
+                        Route::get('export_xml', [MarketingOrderReportController::class, 'exportXml']);
                     });
 
                     // Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {

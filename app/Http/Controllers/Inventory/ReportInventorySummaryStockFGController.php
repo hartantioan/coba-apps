@@ -13,10 +13,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Exports\ExportReportSummaryStockFG2;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportReportProductionSummaryStockFg;
+use App\Models\MarketingOrder;
 
 class ReportInventorySummaryStockFGController extends Controller
 {
@@ -345,8 +347,6 @@ class ReportInventorySummaryStockFGController extends Controller
         $user_id = session('bo_id');
 
 
-
-
-        return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock' . uniqid() . '.xlsx');
+         return Excel::download(new ExportReportSummaryStockFG2($start_date, $finish_date), 'summary_stock' . uniqid() . '.xlsx');
     }
 }

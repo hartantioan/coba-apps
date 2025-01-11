@@ -26,7 +26,7 @@
         <div class="col s12">
             <div class="container">
                 <div class="section">
-                    
+
                     <div class="row">
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
@@ -52,7 +52,7 @@
                                                         <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
-                                                    <div class="col m6 s6 pt-2">
+                                                    <div class="col m7 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
                                                             <span class="hide-on-small-onl">Filter</span>
@@ -73,84 +73,101 @@
                                                             <span class="hide-on-small-onl">CSV PAJAK</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
+
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportXml();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">XML</span>
+                                                            <i class="material-icons right">view_list</i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            </div>
-                                        </form>  
+
                                     </div>
-                                </li>
-                            </ul>
+                                    </form>
                         </div>
-                        <div class="card">
-                            <div class="card-content">
-                                <h4 class="card-title">
-                                    Hasil
-                                </h4>
-                                <div class="row">
-                                    <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result" style="width:2500px;">
-                                            <table class="bordered" style="font-size:10px;">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TOP</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Note</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terjadwal</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terkirim</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Retur</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Invoice</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="detail_invoice">
-                                                    <tr>
-                                                        <td class="center-align" colspan="20">Silahkan pilih tanggal dan tekan tombol filter.</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>  
-                                        
+                        </li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <h4 class="card-title">
+                                Hasil
+                            </h4>
+                            <div class="row">
+                                <div class="col s12 m12" style="overflow: auto">
+                                    <div class="result" style="width:2500px;">
+                                        <table class="bordered" style="font-size:10px;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TOP</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Note</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terjadwal</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terkirim</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Retur</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Invoice</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="detail_invoice">
+                                                <tr>
+                                                    <td class="center-align" colspan="20">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="intro">
-                    <div class="row">
-                        <div class="col s12">
-                            
-                        </div>
+            <div id="intro">
+                <div class="row">
+                    <div class="col s12">
+
                     </div>
                 </div>
-                <!-- / Intro -->
             </div>
-            <div class="content-overlay"></div>
+            <!-- / Intro -->
         </div>
+        <div class="content-overlay"></div>
     </div>
+</div>
 </div>
 
 <script>
-    function exportExcel(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
+    function exportExcel() {
+        var start_date = $('#start_date').val(),
+            end_date = $('#end_date').val();
         window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
     }
-    function exportCsv(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
+
+    function exportCsv() {
+        var start_date = $('#start_date').val(),
+            end_date = $('#end_date').val();
         window.location = "{{ Request::url() }}/export_csv?start_date=" + start_date + "&end_date=" + end_date;
     }
-    function filterByDate(){
+
+    function exportXml() {
+        var start_date = $('#start_date').val(),
+            end_date = $('#end_date').val();
+        window.location = "{{ Request::url() }}/export_xml?start_date=" + start_date + "&end_date=" + end_date;
+    }
+
+    function filterByDate() {
         var formData = new FormData($('#form_data_filter')[0]);
         $.ajax({
             url: '{{ Request::url() }}/filter_by_date',
@@ -168,28 +185,28 @@
             },
             success: function(response) {
                 loadingClose('#main-display');
-                if(response.status == 200) {
+                if (response.status == 200) {
                     $('#detail_invoice').empty();
-                    if(response.content.length > 0){
+                    if (response.content.length > 0) {
                         $.each(response.content, function(i, val) {
                             $('#detail_invoice').append(`
                                 <tr>
-                                    <td class="center-align">`+(i+1)+`</td>
-                                    <td>`+val.code+`</td>
-                                    <td>`+val.customer+`</td>
-                                    <td class="center-align">`+val.post_date+`</td>
-                                    <td class="center-align">`+val.top+`</td>
-                                    <td>`+val.note+`</td>
-                                    <td class="right-align">`+val.total+`</td>
-                                    <td class="right-align">`+val.tax+`</td>
-                                    <td class="right-align">`+val.grandtotal+`</td>
-                                    <td class="right-align">`+val.schedule+`</td>
-                                    <td class="right-align">`+val.sent+`</td>
-                                    <td class="right-align">`+val.return+`</td>
-                                    <td class="right-align">`+val.invoice+`</td>
-                                    <td class="right-align">`+val.memo+`</td>
-                                    <td class="right-align">`+val.payment+`</td>
-                                    <td class="right-align">`+val.balance+`</td>
+                                    <td class="center-align">` + (i + 1) + `</td>
+                                    <td>` + val.code + `</td>
+                                    <td>` + val.customer + `</td>
+                                    <td class="center-align">` + val.post_date + `</td>
+                                    <td class="center-align">` + val.top + `</td>
+                                    <td>` + val.note + `</td>
+                                    <td class="right-align">` + val.total + `</td>
+                                    <td class="right-align">` + val.tax + `</td>
+                                    <td class="right-align">` + val.grandtotal + `</td>
+                                    <td class="right-align">` + val.schedule + `</td>
+                                    <td class="right-align">` + val.sent + `</td>
+                                    <td class="right-align">` + val.return+`</td>
+                                    <td class="right-align">` + val.invoice + `</td>
+                                    <td class="right-align">` + val.memo + `</td>
+                                    <td class="right-align">` + val.payment + `</td>
+                                    <td class="right-align">` + val.balance + `</td>
                                 </tr>
                             `);
                         });
@@ -198,14 +215,14 @@
                                 <td class="" colspan="20">Waktu Proses : <b>` + response.execution_time + ` Detik</b></td>
                             </tr>
                         `);
-                    }else{
+                    } else {
                         $('#detail_invoice').append(`
                             <tr>
                                 <td class="center-align" colspan="20">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }
-           
+
                     M.toast({
                         html: 'Sukses proses data'
                     });
@@ -224,11 +241,11 @@
                     icon: 'error'
                 });
             }
-            
+
         });
     }
 
-    function reset(){
+    function reset() {
         $('#form_data_filter')[0].reset();
         $('#detail_invoice').html('').append(`
             <tr>

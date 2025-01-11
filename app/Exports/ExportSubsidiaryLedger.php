@@ -138,15 +138,13 @@ class ExportSubsidiaryLedger implements FromArray, WithTitle, WithHeadings, With
         foreach($coas as $key => $row){
             $rowdata = $row->journalDetail()
             ->selectRaw('*,journal_details.note AS notekuy')
-            ->whereHas('journal',function($query)use($date_start,$date_end){
-                $query->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('journals.lookable_type','!=','closing_journals')
-                                ->orWhereNull('journals.lookable_type');
-                        }
-                    });
+            ->where(function($query){
+                if($this->closing_journal){
+                    $query->where('journals.lookable_type','!=','closing_journals')
+                        ->orWhereNull('journals.lookable_type');
+                }
             })
+            ->where('journals.post_date','>=',$date_start)->where('journals.post_date','<=',$date_end)
             ->where('journal_details.nominal','!=',0)
             ->join('journals', 'journal_details.journal_id', '=', 'journals.id')
             ->orderBy('journals.post_date', 'ASC')->get();

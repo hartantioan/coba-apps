@@ -179,7 +179,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
 
         foreach ($rows as $key => $row) {
             // Check if there's no associated journal and qty is 0
-            $hasJournal = $row['No. PO'] == '-' && $row['qty'] > 0;
+            $hasJournal = $row['No. PO'] == '-' && $row['Qty'] > 0;
 
             // Apply styles to rows where journal is absent and qty is 0
             if (!$hasJournal) {

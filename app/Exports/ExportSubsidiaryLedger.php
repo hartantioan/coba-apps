@@ -10,8 +10,9 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Illuminate\Support\Facades\DB;
-class ExportSubsidiaryLedger implements FromArray, WithTitle, WithHeadings, WithCustomStartCell
+class ExportSubsidiaryLedger implements FromArray, WithTitle, WithHeadings, WithCustomStartCell, WithChunkReading
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -220,4 +221,9 @@ class ExportSubsidiaryLedger implements FromArray, WithTitle, WithHeadings, With
 	{
 		return $this->headings;
 	}
+
+    public function chunkSize(): int
+    {
+        return 1000;  // Process in chunks of 1000 rows
+    }
 }

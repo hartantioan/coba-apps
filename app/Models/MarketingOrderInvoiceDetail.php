@@ -145,7 +145,7 @@ class MarketingOrderInvoiceDetail extends Model
         } else if ($this->lookable_type == 'marketing_order_delivery_details') {
             return $this->lookable->item->name;
         }else if ($this->lookable_type == '' || $this->lookable_type == null ){
-            return '';
+            return $this->description;
         }
     }
 

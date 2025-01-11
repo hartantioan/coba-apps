@@ -683,6 +683,7 @@ class MarketingOrderMemoController extends Controller
                                                 'qty'               => $momd->qty,
                                                 'qty_real'          => $momd->qty,
                                                 'total'             => $total,
+                                                'post_date'         => $request->post_date,
                                             ]);
                                         }
                                     }else{
@@ -700,6 +701,7 @@ class MarketingOrderMemoController extends Controller
                                             'qty'               => $momd->qty,
                                             'qty_real'          => $momd->qty,
                                             'total'             => $total,
+                                            'post_date'         => $request->post_date,
                                         ]);
                                     }
                                     

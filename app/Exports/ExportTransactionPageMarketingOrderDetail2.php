@@ -184,6 +184,11 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
             foreach($shadingData as $key => $row_shading){
 
                 if($row_shading['detail']->deleted_at == null){
+                    if(date('Y-m-d',strtotime($row->created_at)) < '2024-12-24'){
+                        $price = $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+                    }else{
+                        $price = $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price_list;
+                    }
                     $arr[] = [
                         'variant_item'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->item->type->name,
                         'status'            => $row->statusSAP(),
@@ -209,7 +214,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'qty'               => $row_shading['total_palet'] > 0 ? $row_shading['total_palet'] : $row_shading['total_box'],
                         'unit'              => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                         'qty_m2'            => $row_shading['total_conversion'],
-                        'harga_satuan'      => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price,
+                        'harga_satuan'      => $price,
                         'discount_1'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,
                         'discount_2'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,
                         'discount_3'        => $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,

@@ -115,46 +115,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                        <option value="">{{ __('translations.all') }}</option>
-                                                        @foreach ($company as $rowcompany)
-                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_supplier" style="font-size:1rem;">Customer :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_supplier" style="font-size:1rem;">Pengirim / Ekspedisi :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_sender" name="filter_sender" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_supplier" style="font-size:1rem;">Sales :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_sales" name="filter_sales" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
-                                                <div class="input-field">
-                                                    <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
-                                                        <option value="" disabled>{{ __('translations.all') }}</option>
-                                                        @foreach ($currency as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
@@ -179,7 +139,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card green">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Pada form ini akan ada inputan prosentase DP(%) yang mana akan menjadi acuan pro rata pengecekan DP dan limit kredit pelanggan dalam pembuatan AR Invoice secara otomatis setelah Surat Jalan dibuat (mengacu pada pengaturan Master Data - Organisasi - Partner Bisnis untuk seting pelanggan - Auto Generate SJ > AR Invoice = Ya). Contoh : jika Marketing Order Delivery dibuat dari Sales Order yang memiliki DP (100%), maka akan dilakukan pengecekan terhadap AR Down Payment yang tersisa berdasarkan pro rata prosentase DP. Jika syarat tidak terpenuhi maka AR Invoice tidak akan terbuat otomatis. Jika tidak ada DP (0%) maka, akan dilakukan pengecekan terhadap sisa kredit pelanggan, jika syarat tidak terpenuhi maka AR Invoice tidak akan terbuat otomatis.</p>
+                                                    <p>Info : -</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -201,21 +161,6 @@
                                                     <i class="material-icons hide-on-med-and-up">view_headline</i>Export
                                                     </a>
                                                 </li>
-
-                                                @if (session('bo_id')==351 || session('bo_id')== 354 )
-                                                    <li><a href="javascript:void(0);" onclick="exportExcelDetail1();">
-                                                        <i class="material-icons">view_headline</i>
-                                                        <i class="material-icons hide-on-med-and-up">view_headline</i>Detail 1
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);" onclick="exportExcelDetail2();">
-                                                        <i class="material-icons">view_headline</i>
-                                                        <i class="material-icons hide-on-med-and-up">view_headline</i>Detail 2
-                                                        </a>
-                                                    </li>
-                                                @endif
-
                                             </ul>
                                             <table id="datatable_serverside">
                                                 <thead>
@@ -224,37 +169,21 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Petugas</th>
                                                         <th>{{ __('translations.customer') }}</th>
-                                                        <th>{{ __('translations.company') }}</th>
                                                         <th>{{ __('translations.type') }}</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Valid Hingga</th>
-                                                        <th>Proyek</th>
-                                                        <th>Lampiran</th>
                                                         <th>No.Dokumen</th>
+                                                        <th>Kode Branch</th>
                                                         <th>Tipe Pengiriman</th>
-                                                        <th>Pengirim</th>
-                                                        <th>Tipe Transport</th>
                                                         <th>Tgl.Kirim</th>
                                                         <th>Jadwal Pengiriman</th>
-                                                        <th>Tipe Pembayaran</th>
-                                                        <th>Tipe DP</th>
-                                                        <th>TOP.Internal</th>
-                                                        <th>TOP.Customer</th>
-                                                        <th>Alamat Penagihan</th>
-                                                        <th>{{ __('translations.outlet') }}</th>
                                                         <th>Alamat Tujuan</th>
                                                         <th>Provinsi Tujuan</th>
                                                         <th>Kota Tujuan</th>
                                                         <th>Kecamatan Tujuan</th>
-                                                        <th>Telepon</th>
-                                                        <th>Sales</th>
-                                                        <th>Broker</th>
-                                                        <th>Cabang Broker</th>
-                                                        <th>{{ __('translations.currency') }}</th>
-                                                        <th>{{ __('translations.conversion') }}</th>
-                                                        <th>% DP</th>
-                                                        <th>Catatan Internal</th>
-                                                        <th>Catatan Eksternal</th>
+                                                        <th>Tipe Pembayaran</th>
+                                                        <th>Tipe DP</th>
+                                                        <th>Catatan</th>
                                                         <th>{{ __('translations.total') }}</th>
                                                         <th>{{ __('translations.tax') }}</th>
                                                         <th>{{ __('translations.grandtotal') }}</th>
@@ -291,12 +220,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>Mengganti data pelanggan akan menghapus data produk detail (HATI HATI) data yang telah terhapus tidak dapat dikembalikan</p>
-                                        </div>
-                                    </div>
-                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <legend>1. Info Utama</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -326,7 +250,6 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend>5. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
-                                        Note : Harga Ongkir dan Harga Grup BP tidak mempengaruhi harga jual.
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="width:3600px;" id="table-detail">
                                                 <thead>
@@ -372,20 +295,20 @@
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            <td class="right-align" id="total">
+                                                0,00
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            <td class="right-align" id="tax">
+                                                0,00
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            <td class="right-align" id="grandtotal">
+                                                0,00
                                             </td>
                                         </tr>
                                     </thead>
@@ -537,12 +460,6 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
-        <i class="material-icons">add</i>
-    </a>
-</div>
-
-<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
         <i class="material-icons">view_comfy</i>
     </a>
@@ -1019,11 +936,6 @@
                     type : $('#filter_type').val(),
                     delivery_type : $('#filter_delivery').val(),
                     payment_type : $('#filter_payment').val(),
-                    'account_id[]' : $('#filter_account').val(),
-                    'sender_id[]' : $('#filter_sender').val(),
-                    'sales_id[]' : $('#filter_sales').val(),
-                    company_id : $('#filter_company').val(),
-                    'currency_id[]' : $('#filter_currency').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -1050,37 +962,21 @@
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'account_id', className: '' },
-                { name: 'company_id', className: '' },
                 { name: 'type', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'valid_date', className: '' },
-                { name: 'project_id', searchable: false, orderable: false, className: '' },
-                { name: 'document', className: '' },
                 { name: 'document_no', className: '' },
+                { name: 'branch_code', className: '' },
                 { name: 'delivery_type', className: '' },
-                { name: 'sender_id', className: '' },
-                { name: 'transportation_id', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'delivery_schedule', className: '' },
-                { name: 'payment_type', className: '' },
-                { name: 'dp_type', className: '' },
-                { name: 'top_internal', className: '' },
-                { name: 'top_customer', className: '' },
-                { name: 'billing_address', className: '' },
-                { name: 'outlet_id', className: '' },
                 { name: 'destination_address', className: '' },
                 { name: 'province_id', className: '' },
                 { name: 'city_id', className: '' },
                 { name: 'district_id', className: '' },
-                { name: 'phone', className: '' },
-                { name: 'sales_id', className: '' },
-                { name: 'broker_id', className: '' },
-                { name: 'broker_branch_code', className: '' },
-                { name: 'currency_id', className: '' },
-                { name: 'currency_rate', className: 'right-align' },
-                { name: 'percent_dp', className: 'center-align' },
-                { name: 'note_internal', className: '' },
-                { name: 'note_external', className: '' },
+                { name: 'payment_type', className: '' },
+                { name: 'dp_type', className: '' },
+                { name: 'note', className: '' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
@@ -1499,12 +1395,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
-                                        <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                        @foreach ($tax as $row)
-                                            <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                        @endforeach
-                                    </select>
+                                    
                                 </td>
                                 <td class="center">
                                     <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">

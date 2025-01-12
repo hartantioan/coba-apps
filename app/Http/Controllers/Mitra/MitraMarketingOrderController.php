@@ -51,6 +51,7 @@ class MitraMarketingOrderController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
@@ -74,109 +75,27 @@ class MitraMarketingOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
-        UsedData::where('user_id', session('bo_id'))->delete();
-        $code = MitraMarketingOrder::generateCode($request->val);
-
-		return response()->json($code);
-    }
-
-    public function getSalesItemInformation(Request $request){
-        $item = Item::find($request->item_id);
-        $place = Place::where('code',$request->place_code)->first();
-        $account_id   = $request->account_id;
-        $date   = $request->date;
-        $city   = $request->city;
-        $district = $request->district;
-        $payment_type   = $request->payment_type;
-        $user = User::find($account_id);
-        $transportation = Transportation::find($request->transportation_id);
-        $cek_price = ItemPricelist::where('group_id',$user->group_id)
-            ->where('grade_id',$item->grade_id)
-            ->where('place_id',$place->id)
-            ->where('city_id',$city)
-            ->where('type_id',$item->type_id)
-            ->where('status','1')
-            ->first() ?? 0;
-
-            $cek_delivery = DeliveryCostStandard::where('transportation_id',$transportation->id)
-            ->whereDate('start_date', '<=', $date)
-            ->whereDate('end_date', '>=', $date)
-            ->where('city_id',$city)
-            ->where('district_id',$district)
-            ->where('type_id',$item->type_id)
-            ->where('status','1')
-            ->first() ?? 0;
-
-
-            $cek_type = StandardCustomerPrice::where('group_id',$user->group_id)
-            ->whereDate('start_date', '<=', $date)
-            ->whereDate('end_date', '>=', $date)
-            ->where('status','1')
-            ->first() ?? 0;
-
-            $cek_discount = CustomerDiscount::where('account_id',$user->id)
-            ->where('brand_id',$item->brand_id)
-            /* ->where('city_id',$city) */
-            ->where('type_id',$item->type_id)
-            ->where('payment_type',$payment_type)
-            ->where('status','1')
-            ->first() ?? 0;
-
-
-        $response = [
-            'old_prices'        => $item->oldSalePrices($this->dataplaces),
-            'list_warehouse'    => $item->warehouseList(),
-            'list_outletprice'  => $item->listOutletPrice(),
-            'price'             => $cek_price->sell_price ?? 0,
-            'price_delivery'    => $cek_delivery->price ?? 0,
-            'price_bp'          => $cek_type->price ?? 0,
-            'disc1'             => $cek_discount->disc1 ?? 0,
-            'disc2'             => $cek_discount->disc2 ?? 0,
-            'disc3'             => $cek_discount->disc3 ?? 0,
-            'stock_now'         => CustomHelper::formatConditionalQty($item->getStockArrayPlace($this->dataplaces)),
-            'stock_com'         => CustomHelper::formatConditionalQty($item->getQtySalesNotSent($this->dataplaces)),
-            'sell_units'        => $item->arrSellUnits(),
-            'list_area'         => Area::where('status','1')->get(),
-            'uom'               => $item->uomUnit->code,
-        ];
-
-
-		return response()->json($response);
-    }
-
     public function datatable(Request $request){
         $column = [
             'id',
             'code',
             'user_id',
             'account_id',
+            'type',
             'post_date',
             'valid_date',
-            'project_id',
-            'document',
             'document_no',
+            'branch_code',
             'delivery_type',
-            'sender_id',
-            'transportation_id',
             'delivery_date',
             'delivery_schedule',
-            'payment_type',
-            'dp_type',
-            'top_internal',
-            'top_customer',
-            'billing_address',
-            'outlet_id',
             'destination_address',
             'province_id',
             'city_id',
             'district_id',
-            'phone',
-            'sales_id',
-            'currency_id',
-            'currency_rate',
-            'note_internal',
-            'note_external',
+            'payment_type',
+            'dp_type',
+            'note',
             'total',
             'tax',
             'grandtotal',
@@ -188,20 +107,14 @@ class MitraMarketingOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrder::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MitraMarketingOrder::count();
 
-        $query_data = MarketingOrder::where(function($query) use ($search, $request) {
+        $query = MitraMarketingOrder::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note_internal', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
-                            ->orWhere('total', 'like', "%$search%")
-                            ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('phone', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -244,160 +157,36 @@ class MitraMarketingOrderController extends Controller
                     $query->where('payment_type',$request->payment_type);
                 }
 
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
+            });
+        
+        $query_data = $query->offset($start)->limit($length)->orderBy($order, $dir)->get();
 
-                if($request->sender_id){
-                    $query->whereIn('sender_id',$request->sender_id);
-                }
-
-                if($request->sales_id){
-                    $query->whereIn('sales_id',$request->sales_id);
-                }
-
-                if($request->company_id){
-                    $query->where('company_id',$request->company_id);
-                }
-
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
-                }
-
-            })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-            ->offset($start)
-            ->limit($length)
-            ->orderBy($order, $dir)
-            ->get();
-
-        $total_filtered = MarketingOrder::where(function($query) use ($search, $request) {
-                if($search) {
-                    $query->where(function($query) use ($search, $request) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note_internal', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
-                            ->orWhere('total', 'like', "%$search%")
-                            ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('phone', 'like', "%$search%")
-                            ->orWhereHas('user',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('account',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('marketingOrderDetail',function($query) use ($search, $request){
-                                $query->whereHas('item',function($query) use ($search, $request){
-                                    $query->where('code','like',"%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            });
-                    });
-                }
-
-                if($request->status){
-                    $query->whereIn('status', $request->status);
-                }
-
-                if($request->start_date && $request->finish_date) {
-                    $query->whereDate('post_date', '>=', $request->start_date)
-                        ->whereDate('post_date', '<=', $request->finish_date);
-                } else if($request->start_date) {
-                    $query->whereDate('post_date','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    $query->whereDate('post_date','<=', $request->finish_date);
-                }
-
-                if($request->type){
-                    $query->where('type',$request->type);
-                }
-
-                if($request->delivery_type){
-                    $query->where('type_delivery',$request->delivery_type);
-                }
-
-                if($request->payment_type){
-                    $query->where('payment_type',$request->payment_type);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
-
-                if($request->sender_id){
-                    $query->whereIn('sender_id',$request->sender_id);
-                }
-
-                if($request->sales_id){
-                    $query->whereIn('sales_id',$request->sales_id);
-                }
-
-                if($request->company_id){
-                    $query->where('company_id',$request->company_id);
-                }
-
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
-                }
-            })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-            ->count();
+        $total_filtered = $query->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				$dis = '';
-                // if($val->isOpenPeriod()){
-
-                //     $dis = 'style="cursor: default;
-                //     pointer-events: none;
-                //     color: #9f9f9f !important;
-                //     background-color: #dfdfdf !important;
-                //     box-shadow: none;"';
-
-                // }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
                     $val->account->name,
-                    $val->company->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->valid_date)),
-                    $val->project()->exists() ? $val->project->name : '-',
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->document_no,
+                    $val->branch_code,
                     $val->deliveryType(),
-                    $val->sender()->exists() ? $val->sender->name : '-',
-                    $val->transportation->name ?? '-',
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->deliverySchedule(),
+                    $val->destination_address,
+                    $val->deliveryProvince->name,
+                    $val->deliveryCity->name,
+                    $val->deliveryDistrict->name,
                     $val->paymentType(),
                     $val->dpType(),
-                    $val->top_internal,
-                    $val->top_customer,
-                    $val->billing_address,
-                    $val->outlet()->exists() ? $val->outlet->name : '-',
-                    $val->destination_address,
-                    $val->province->name,
-                    $val->city->name,
-                    $val->district->name,
-                    $val->phone,
-                    $val->sales->name,
-                    $val->broker()->exists() ? $val->broker->name : '-',
-                    $val->broker_branch_code,
-                    $val->currency->name,
-                    number_format($val->currency_rate,2,',','.'),
-                    number_format($val->percent_dp,2,',','.'),
-                    $val->note_internal,
-                    $val->note_external,
+                    $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
@@ -422,11 +211,9 @@ class MitraMarketingOrderController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 

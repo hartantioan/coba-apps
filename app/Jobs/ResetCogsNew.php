@@ -54,7 +54,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ResetCogsNew implements ShouldQueue, ShouldBeUnique
+class ResetCogsNew implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     
@@ -75,10 +75,10 @@ class ResetCogsNew implements ShouldQueue, ShouldBeUnique
         $this->production_batch_id = $production_batch_id;
     }
 
-    public function uniqueId(): string
+    /* public function uniqueId(): string
     {
         return $this->item_id.'-'.$this->place_id.'-'.$this->item_shading_id.'-'.$this->production_batch_id.'-'.$this->date;
-    }
+    } */
 
     /**
      * Execute the job.

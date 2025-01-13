@@ -287,7 +287,7 @@ class PersonalVisitController extends Controller
 
         if($query) {
 
-            if(in_array($query->status,['2','3'])){
+            if(in_array($query->status,['5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Tidak Bisa Cancel Karena Data Telah ditutup / Selesai.'

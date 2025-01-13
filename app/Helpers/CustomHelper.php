@@ -5,6 +5,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetCogsNew;
+use App\Jobs\ResetCogsNewNonAccumulate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
@@ -162,8 +163,8 @@ class CustomHelper {
 		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
 	}
 
-	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
-
+	public static function sendCogsNonAccumulate($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
+		ResetCogsNewNonAccumulate::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null, $batch = null){

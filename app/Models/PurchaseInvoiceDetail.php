@@ -209,7 +209,7 @@ class PurchaseInvoiceDetail extends Model
         $note = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->note,
             'landed_cost_fee_details'   => $this->lookable->note,
-            'purchase_order_details'    => $this->lookable->note.($this->lookable->note2 ?? ' - '.$this->lookable->note2),
+            'purchase_order_details'    => $this->lookable->note.($this->lookable->note2 ?? '<br>'.$this->lookable->note2),
             'coas'                      => ($fund_code ?? '<br>'.$fund_code).$this->note,
             default                     => '-',
         };

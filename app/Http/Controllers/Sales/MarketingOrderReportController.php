@@ -206,7 +206,7 @@ class MarketingOrderReportController extends Controller
                 $Code = $dom->createElement('Code', '');
                 $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode );
                 $Unit = $dom->createElement('Unit', 'UM.0012');
-                $Price = $dom->createElement('Price', round($price,2));
+                $Price = $dom->createElement('Price', ($price));
                 $Qty = $dom->createElement('Qty', round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2));
                 $TotalDiscount = $dom->createElement('TotalDiscount', $totalDiscountBeforeTax);
                 $TaxBase = $dom->createElement('TaxBase', $totalBeforeTax-$totalDiscountBeforeTax);

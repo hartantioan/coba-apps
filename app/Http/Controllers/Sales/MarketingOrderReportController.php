@@ -114,11 +114,11 @@ class MarketingOrderReportController extends Controller
 
 
         $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
-           // ->whereDate('post_date', '>=', $start_date)
-           // ->whereDate('post_date', '<=', $finish_date)
+            ->whereDate('post_date', '>=', $start_date)
+            ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            ->where('code', '=', 'ARIN-25P1-00000002')
+           // ->where('code', '=', 'ARIN-25P1-00000002')
             ->get();
 
 
@@ -149,7 +149,7 @@ class MarketingOrderReportController extends Controller
             $TrxCode = $dom->createElement('TrxCode', '04');
             $AddInfo = $dom->createElement('AddInfo', '');
             $CustomDoc = $dom->createElement('CustomDoc', '');
-            $RefDesc = $dom->createElement('RefDesc', '');
+            $RefDesc = $dom->createElement('RefDesc', $row->code);
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
             $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
@@ -213,7 +213,7 @@ class MarketingOrderReportController extends Controller
                 $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11/12*($totalBeforeTax-$totalDiscountBeforeTax),2));
                 $VATRate = $dom->createElement('VATRate', '12');
                 //$VAT = $dom->createElement('VAT', $tax);
-                $VAT = $dom->createElement('VAT', '10062636.15');
+                $VAT = $dom->createElement('VAT', Round(($totalBeforeTax-$totalDiscountBeforeTax) * 0.11,2));
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail

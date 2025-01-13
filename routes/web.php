@@ -3326,7 +3326,7 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('report_marketing_invoice_detail')->middleware('operation.access:report_marketing_invoice_detail,view')->group(function () {
                         Route::get('/', [MarketingInvoiceDetailRecapController::class, 'index']);
-                        Route::get('export', [MarketingInvoiceDetailRecapController::class, 'export']);
+                        Route::post('export', [MarketingInvoiceDetailRecapController::class, 'export']);
                     });
 
                     Route::prefix('report_marketing_down_payment')->middleware('operation.access:report_marketing_down_payment,view')->group(function () {

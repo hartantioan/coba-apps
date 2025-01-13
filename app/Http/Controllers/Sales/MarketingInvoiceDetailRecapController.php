@@ -6,6 +6,7 @@ use App\Exports\ExportMarketingInvoiceDetailRecap;
 
 use App\Http\Controllers\Controller;
 
+use App\Jobs\ReportMarketingInvoiceDetailRecapJob;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,7 +23,7 @@ class MarketingInvoiceDetailRecapController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $data = [
@@ -33,13 +34,23 @@ class MarketingInvoiceDetailRecapController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-  
+
+    // public function export(Request $request){
+    //     ob_end_clean();
+    //     ob_start();
+    //     $response = Excel::download(new ExportMarketingInvoiceDetailRecap($request->start_date,$request->end_date), 'invoice_detail_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    //     return $response;
+    // }
+
     public function export(Request $request){
-        ob_end_clean();
-        ob_start();
-        $response = Excel::download(new ExportMarketingInvoiceDetailRecap($request->start_date,$request->end_date), 'invoice_detail_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-        return $response;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $user_id = session('bo_id');
+
+        ReportMarketingInvoiceDetailRecapJob::dispatch($start_date, $end_date,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
 
-   
+
 }

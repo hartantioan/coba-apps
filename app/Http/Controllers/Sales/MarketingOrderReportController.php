@@ -114,8 +114,8 @@ class MarketingOrderReportController extends Controller
 
 
         $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
-            ->whereDate('post_date', '>=', $start_date)
-            ->whereDate('post_date', '<=', $finish_date)
+           // ->whereDate('post_date', '>=', $start_date)
+           // ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
             ->where('code', '=', 'ARIN-25P1-00000002')
@@ -134,7 +134,7 @@ class MarketingOrderReportController extends Controller
         $root->setAttributeNode($attrroot2);
         $TIN = $dom->createElement('TIN', '0608293056618000');
         $root->appendChild($TIN);
-        $List = $dom->createElement('ListOfTaxInvoice');
+            $List = $dom->createElement('ListOfTaxInvoice');
         //header
         foreach ($invoice as $key => $row) {
            
@@ -180,7 +180,7 @@ class MarketingOrderReportController extends Controller
             $TaxInvoice->appendChild($BuyerEmail);
             $TaxInvoice->appendChild($BuyerIDTKU);
             $TaxInvoice->appendChild($ListOfGoodService);
-            $balance = round($row->tax,2);
+            $balance = floor($row->tax);
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {
                 if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
@@ -212,8 +212,8 @@ class MarketingOrderReportController extends Controller
                 $TaxBase = $dom->createElement('TaxBase', $totalBeforeTax-$totalDiscountBeforeTax);
                 $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11/12*($totalBeforeTax-$totalDiscountBeforeTax),2));
                 $VATRate = $dom->createElement('VATRate', '12');
-                $VAT = $dom->createElement('VAT', $tax);
-                //$VAT = $dom->createElement('VAT', '10062636.14');
+                //$VAT = $dom->createElement('VAT', $tax);
+                $VAT = $dom->createElement('VAT', '10062636.15');
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail

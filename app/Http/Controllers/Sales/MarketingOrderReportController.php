@@ -125,7 +125,7 @@ class MarketingOrderReportController extends Controller
         $dom->encoding = 'utf-8';
         $dom->xmlVersion = '1.0';
         $dom->formatOutput = true;
-        $xml_file_name = 'storage/xml/FK.xml'; //You can give your path to save file.
+        $xml_file_name = 'storage/xml/FK.xml';
         $root = $dom->createElement('TaxInvoiceBulk');
         $attrroot1 = new \DOMAttr('xmlns:xsd', 'http://www.w3.org/2001/XMLSchema');
         $root->setAttributeNode($attrroot1);
@@ -300,7 +300,7 @@ class MarketingOrderReportController extends Controller
         $GoodService->appendChild($VAT);
         $GoodService->appendChild($STLGRate);
         $GoodService->appendChild($STLG);*/
-            $List->appendChild($TaxInvoice);
+           
             $root->appendChild($TIN);
         
         $root->appendChild($List);}

@@ -57,7 +57,7 @@ class ApprovalController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Approval::count();
-        
+
         $query_data = Approval::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -94,7 +94,7 @@ class ApprovalController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->name,
@@ -124,7 +124,7 @@ class ApprovalController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'name'          => 'required',
             'document_text' => 'required'
@@ -167,8 +167,8 @@ class ApprovalController extends Controller
                     DB::rollback();
                 }
 			}
-			
-			if($query) {               
+
+			if($query) {
 
                 activity()
                     ->performedOn(new Approval())
@@ -187,19 +187,19 @@ class ApprovalController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $approval = Approval::find($request->id);
-        				
+
 		return response()->json($approval);
     }
 
     public function destroy(Request $request){
         $query = Approval::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Approval())
@@ -252,7 +252,7 @@ class ApprovalController extends Controller
         $total_data = ApprovalMatrix::where('user_id',session('bo_id'))
                         ->whereIn('status',['1','2'])
                         ->count();
-        
+
         $query_data = ApprovalMatrix::where(function($query) use ($search, $request, $dataplaces) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -378,7 +378,7 @@ class ApprovalController extends Controller
             $query = ApprovalMatrix::where('code',CustomHelper::decrypt($request->temp))->where('status','1')->first();
             $message = '';
             if($query){
-                
+
                 if(!in_array($query->approvalSource->lookable_type,['purchase_requests','material_requests','purchase_orders','good_issue_requests','close_bill_personals','document_taxes','document_tax_handovers','work_orders','request_spareparts','registrations','marketing_orders','fund_requests','payment_requests','hardware_item_handover'])){
                     if(!CustomHelper::checkLockAcc($query->approvalSource->lookable->post_date)){
                         return response()->json([
@@ -387,8 +387,12 @@ class ApprovalController extends Controller
                         ]);
                     }
                 }
-                
 
+                if($query->approvalSource->lookable_type == 'purchase_orders' ||$query->approvalSource->lookable_type == 'purchase_requests' ){
+                    $query->approvalSource->lookable->update([
+                        'approve_date'    => now(),
+                    ]);
+                }
                 if($query->approvalSource->lookable_type == 'work_orders'){
                     if($query->approvalSource->lookable->requestSparepartALL()->exists()){
                         foreach($query->approvalSource->lookable->requestSparepartALL as $row){
@@ -396,7 +400,7 @@ class ApprovalController extends Controller
                                 $work_orders_rp = 1;
                                 $message = 'Data merupakan tipe Work Order yang masih memiliki request sparepart dengan kode '.$row->code.' yang belum di approve';
                                 break;
-                            
+
                             }
                             foreach($row->requestSparepartDetail as $row_detail){
                                 if($row_detail->qty_usage == null){
@@ -470,9 +474,9 @@ class ApprovalController extends Controller
 
                         /* DB::beginTransaction();
                         try { */
-        
+
                             $query->note = $request->note;
-        
+
                             if($request->approve_reject_revision == '1'){
                                 $query->approved = '1';
                                 $query->rejected = NULL;
@@ -489,16 +493,16 @@ class ApprovalController extends Controller
                                 $query->revised = '1';
                                 $text = 'direvisi';
                             }
-        
+
                             $query->date_process = date('Y-m-d H:i:s');
                             $query->status = '2';
                             $query->save();
-                            
+
                             if($request->approve_reject_revision == '1'){
                                 if($query->passedApprove()){
                                     if($query->updateNextLevelApproval() !== ''){
                                         $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
-            
+
                                         if($am){
                                             foreach($am as $row){
                                                 $row->update([
@@ -510,7 +514,7 @@ class ApprovalController extends Controller
                                                 }
                                             }
                                         }else{
-                                            
+
                                         }
                                     }else{
                                         if($query->checkOtherApproval()){
@@ -524,7 +528,7 @@ class ApprovalController extends Controller
                                             $pr->update([
                                                 'status'    => '2'
                                             ]);
-                                            
+
                                             CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
                                         }
                                     }
@@ -552,14 +556,14 @@ class ApprovalController extends Controller
                                     'status'    => '6'
                                 ]);
                             }
-        
+
                             /* DB::commit();
                         }catch(\Exception $e){
                             DB::rollback();
                         } */
-        
+
                         CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
-        
+
                         $response = [
                             'status'    => 200,
                             'message'   => 'Data successfully saved.',
@@ -589,7 +593,7 @@ class ApprovalController extends Controller
                 ];
             }
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -617,7 +621,7 @@ class ApprovalController extends Controller
                 $query = ApprovalMatrix::where('code',CustomHelper::decrypt($row))->where('status','1')->first();
                 $work_orders_rp = 0;
                 $message = '';
-                
+
                 if($query){
                     if(!CustomHelper::checkLockAcc($query->approvalSource->lookable->post_date)){
                         return response()->json([
@@ -634,7 +638,7 @@ class ApprovalController extends Controller
                                 $work_orders_rp = 1;
                                 $message = 'Data merupakan tipe Work Order yang masih memiliki request sparepart dengan kode '.$row->code.' yang belum di approve';
                                 break;
-                               
+
                             }
                             foreach($row->requestSparepartDetail as $row_detail){
                                 if($row_detail->qty_usage == null){
@@ -672,12 +676,12 @@ class ApprovalController extends Controller
                 }
                 if($work_orders_rp == 0){
                     if($query) {
-    
+
                         DB::beginTransaction();
                         try {
-        
+
                             $query->note = $request->note_multi;
-    
+
                             if($request->approve_reject_revision_multi == '1'){
                                 $query->approved = '1';
                                 $query->rejected = NULL;
@@ -694,16 +698,16 @@ class ApprovalController extends Controller
                                 $query->revised = '1';
                                 $text = 'direvisi';
                             }
-    
+
                             $query->date_process = date('Y-m-d H:i:s');
                             $query->status = '2';
                             $query->save();
-                            
+
                             if($request->approve_reject_revision_multi == '1'){
                                 if($query->passedApprove()){
                                     if($query->updateNextLevelApproval() !== ''){
                                         $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
-            
+
                                         if($am){
                                             foreach($am as $rowdetail){
                                                 $rowdetail->update([
@@ -721,7 +725,7 @@ class ApprovalController extends Controller
                                             $pr->update([
                                                 'status'    => '2'
                                             ]);
-        
+
                                             CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
                                         }
                                     }
@@ -739,20 +743,20 @@ class ApprovalController extends Controller
                                     'status'    => '6'
                                 ]);
                             }
-        
+
                             CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
-        
+
                             activity()
                                 ->performedOn(new ApprovalMatrix())
                                 ->causedBy(session('bo_id'))
                                 ->withProperties($query)
                                 ->log('Add / edit approval data.');
-        
+
                             DB::commit();
                         }catch(\Exception $e){
                             DB::rollback();
                         }
-    
+
                     } else {
                         $success = false;
                     }
@@ -763,7 +767,7 @@ class ApprovalController extends Controller
                     ];
                     return response()->json($response);
                 }
-                
+
             }
 
             if($success){
@@ -778,13 +782,13 @@ class ApprovalController extends Controller
                 ];
             }
 		}
-		
+
 		return response()->json($response);
     }
 
     public function directApproval(Request $request){
         $am = ApprovalMatrix::where('code',CustomHelper::decrypt($request->c))->first();
-        
+
         if($am){
             $data = [
                 'title'     => 'Direct Approval',

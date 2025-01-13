@@ -35,6 +35,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
     private $headings = [
         'No',
         'No. PO',
+        'Tgl. Approve',
         'Status',
         'Voider',
         'Tgl.Void',
@@ -135,6 +136,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     $arr[] = [
                         'no'                => ($no),
                         'code'              => $row->purchaseOrder->code,
+                        'Tgl. Approve'      => $row->purchaseOrder->approve_date ?? '-',
                         'status'            => $row->purchaseOrder->statusRaw(),
                         'voider'            => $row->purchaseOrder->voidUser()->exists() ? $row->purchaseOrder->voidUser->name : '',
                         'void_date'         => $row->purchaseOrder->voidUser()->exists() ? $row->purchaseOrder->void_date : '',

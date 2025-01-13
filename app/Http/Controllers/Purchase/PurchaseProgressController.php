@@ -28,7 +28,7 @@ class PurchaseProgressController extends Controller
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $itemGroup = ItemGroup::whereHas('childSub',function($query){
@@ -71,13 +71,13 @@ class PurchaseProgressController extends Controller
                     });
                 });
             }
-          
+
         })
         ->get();
-        
+
         $array_detail=[];
         foreach($data as $row_item_request){
-            
+
             foreach($row_item_request->materialRequestDetail as $row_item_request_detail){
                 $max_count=1;
                 $array_item_req = [
@@ -94,19 +94,19 @@ class PurchaseProgressController extends Controller
                     'warehouse'    => $row_item_request_detail->warehouse->name,
                 ];
                 $max_count_pr = 1;
-            
+
                 $all_pr=[];
                 if($row_item_request_detail->purchaseRequestDetailProgressReport()->exists()){
                     if($max_count<count($row_item_request_detail->purchaseRequestDetailProgressReport)){
                         $max_count=count($row_item_request_detail->purchaseRequestDetailProgressReport);
                     }
-                    
-                  
+
+
                     $total_pr = 0; $total_grpo_satuan_max = 0;$total_po_satuan_max = 0;
                     foreach($row_item_request_detail->purchaseRequestDetailProgressReport as $row_pr_detail){
-                       
+
                         $total_pr++;
-                        
+
                         $pr=[
                             'pr_code'      => $row_pr_detail->purchaseRequest->code,
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
@@ -114,6 +114,7 @@ class PurchaseProgressController extends Controller
                             'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
                             'pr_note'      => $row_pr_detail->note,
                             'pr_note2'     => $row_pr_detail->note2,
+                            'pr_approve_date'     => $row_pr_detail->purchaseRequest->approve_date ?? '-',
                             'status'       => $row_pr_detail->purchaseRequest->status(),
                             'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
                             'done_date'    => $row_pr_detail->purchaseRequest->done_date,
@@ -122,7 +123,7 @@ class PurchaseProgressController extends Controller
                             if($max_count<count($row_pr_detail->purchaseOrderDetailProgressReport)){
                                 $max_count=count($row_pr_detail->purchaseOrderDetailProgressReport);
                             }
-                            
+
                             if ($max_count_pr < count($row_pr_detail->purchaseOrderDetailProgressReport)) {
                                 $max_count_pr = count($row_pr_detail->purchaseOrderDetailProgressReport);
                             }
@@ -134,12 +135,13 @@ class PurchaseProgressController extends Controller
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
                                     'po_qty'       => CustomHelper::formatConditionalQty($row_po_detail->qty),
                                     'status'       => $row_po_detail->purchaseOrder->status(),
+                                    'po_approve_date'      => $row_po_detail->purchaseOrder->approve_date?? '-',
                                     'done_user'    => ($row_po_detail->purchaseOrder->status == 3 && is_null($row_po_detail->purchaseOrder->done_id)) ? 'sistem' : (($row_po_detail->purchaseOrder->status == 3 && !is_null($row_po_detail->purchaseOrder->done_id)) ? $row_po_detail->purchaseOrder->doneUser->name : ''),
                                     'done_date'    => $row_po_detail->purchaseOrder->done_date,
                                 ];
                                 if($row_po_detail->goodReceiptDetailProgressReport()->exists()){
-                                    
-                                    
+
+
                                     foreach($row_po_detail->goodReceiptDetailProgressReport as $row_grpo_detail){
                                         $grpo=[
                                             'grpo_code'    => $row_grpo_detail->goodReceipt->code,
@@ -168,19 +170,19 @@ class PurchaseProgressController extends Controller
                                         //     'grpo_date'    => $row_grpo_detail->goodReceipt->post_date,
                                         //     'grpo_qty'     => CustomHelper::formatConditionalQty($row_grpo_detail->qty),
                                         // ];
-                                        
+
                                     }
                                     $pr['po'][]=$po;
-                                    
+
                                     if($max_count<$total_grpo){
                                         $max_count=$total_grpo;
                                     }
-                                    
+
                                     if ($max_count_pr < $total_grpo) {
                                         $max_count_pr = $total_grpo;
                                     }
                                     $pr['rowspan']=$max_count_pr;
-                                   
+
                                 }else{
                                     $po['grpo'][]=[
                                         'grpo_code'    => '',
@@ -193,7 +195,7 @@ class PurchaseProgressController extends Controller
                                     ];
                                     $pr['po'][]=$po;
                                     $pr['rowspan']=$max_count_pr;
-                                   
+
                                     /* $array_detail[]=[
                                         'item'         => $row_item_request_detail->item->name,
                                         'item_code'    => $row_item_request_detail->item->code,
@@ -215,7 +217,7 @@ class PurchaseProgressController extends Controller
                             if($max_count<$total_po){
                                 $max_count=$total_po;
                             }
-                        
+
                         }else{
                             $grpo=['grpo_code'    => '',
                             'grpo_date'    => '',
@@ -228,6 +230,7 @@ class PurchaseProgressController extends Controller
                             'po_date'      => '',
                             'po_qty'       => '',
                             'status'       => '',
+                            'po_approve_date'      =>'',
                             'done_user'    => '',
                             'done_date'    => '',];
                             $pr=[
@@ -238,13 +241,14 @@ class PurchaseProgressController extends Controller
                                 'pr_note'      => $row_pr_detail->note,
                                 'pr_note2'     => $row_pr_detail->note2,
                                 'status'       => $row_pr_detail->purchaseRequest->status(),
+                                'pr_approve_date'     => $row_pr_detail->purchaseRequest->approve_date?? '-',
                                 'done_user'    => '',
                                 'done_date'    => '',
                             ];
                             $po['grpo'][]=$grpo;
                             $pr['po'][]=$po;
                             $pr['rowspan']=1;
-                           
+
                            /*  $array_detail[]=[
                                 'item'         => $row_item_request_detail->item->name,
                                 'item_code'    => $row_item_request_detail->item->code,
@@ -263,18 +267,18 @@ class PurchaseProgressController extends Controller
                             ]; */
                         }
                         $all_pr[]=$pr;
-                        
+
                     }
                     if($max_count<$total_pr){
                         $max_count=$total_pr;
                     }
-                   
-                    
+
+
                     // if($max_count==$total_pr){
                     //     $max_count=$total_pr+1;
                     // }
-                   
-                
+
+
                 }else{
                     $grpo=[ 'grpo_code'    => '',
                             'grpo_date'    => '',
@@ -287,6 +291,7 @@ class PurchaseProgressController extends Controller
                     'po_date'      => '',
                     'po_qty'       => '',
                     'status'       => '',
+
                     'done_user'    => '',
                     'done_date'    => '',];
                     $pr=[
@@ -295,6 +300,7 @@ class PurchaseProgressController extends Controller
                         'pr_use_date'  => '',
                         'pr_qty'       => '',
                         'pr_note'      => '',
+                        'pr_approve_date'     =>'',
                         'pr_note2'     => '',
                         'status'       => '',
                         'done_user'    => '',
@@ -321,14 +327,14 @@ class PurchaseProgressController extends Controller
                         'grpo_qty'     => '',
                     ]; */
                 }
-                
+
                 $array_item_req['pr']=$all_pr;
-               
+
                 $array_item_req['rowspan']=$max_count;
                 $array_detail[]=$array_item_req;
-                
+
             }
-           
+
         }
         // info($array_detail);
         return response()->json([
@@ -336,12 +342,12 @@ class PurchaseProgressController extends Controller
             'message' => $this->renderTable($array_detail,$request->type),
         ]);
 
-        
+
     }
 
     public function renderTable($data,$request)
     {
-    
+
 
         // Generate the HTML for the table
         $tableHtml = '<table border="1" class="bordered">';
@@ -364,12 +370,14 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<th>PR Ket.1</th>';
         $tableHtml .= '<th>PR Ket.2</th>';
         $tableHtml .= '<th>PR Status</th>';
+        $tableHtml .= '<th>PR Tgl Approve</th>';
         $tableHtml .= '<th>PR Updated By</th>';
         // $tableHtml .= '<th>PR Tanggal Done</th>';
         $tableHtml .= '<th>PO Code</th>';
         $tableHtml .= '<th>PO Date</th>';
         $tableHtml .= '<th>PO Qty</th>';
         $tableHtml .= '<th>PO Status</th>';
+        $tableHtml .= '<th>PO Tgl Approve</th>';
         $tableHtml .= '<th>PO Updated By</th>';
         // $tableHtml .= '<th>PO Tanggal Done</th>';
         $tableHtml .= '<th>GRPO Code</th>';
@@ -382,10 +390,10 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '</tr>';
         $tableHtml .= '</thead>';
         $tableHtml .= '<tbody>';
-      
+
         foreach ($data as $row) {
             $prCount = count($row['pr']);
-         
+
             foreach ($row['pr'] as $prIndex => $pr) {
                 $max_count_pr=1;
                 $poCount = count($pr['po']);
@@ -408,13 +416,13 @@ class PurchaseProgressController extends Controller
                     if($request != 'all'){
                         foreach ($po['grpo'] as $grpoIndex => $grpo) {
                             if( $grpo['outstanding'] == '' || $grpo['outstanding'] > 0){
-                                $masuk =1; 
+                                $masuk =1;
                             }
                         }
                     }else{
                         $masuk = 1;
                     }
-                    
+
                     foreach ($po['grpo'] as $grpoIndex => $grpo) {
                         $tableHtml .= '<tr>';
                         if($masuk == 1){
@@ -438,6 +446,7 @@ class PurchaseProgressController extends Controller
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_note'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_note2'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['status'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_approve_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_user'] . '</td>';
                                 // $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_date'] . '</td>';
                             }
@@ -446,6 +455,7 @@ class PurchaseProgressController extends Controller
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_qty'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['status'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_approve_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['done_user'] . '</td>';
                                 // $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['done_date'] . '</td>';
                             }
@@ -458,7 +468,7 @@ class PurchaseProgressController extends Controller
                             $tableHtml .= '<td>' . $grpo['outstanding'] . '</td>';
                             $tableHtml .= '</tr>';
                         }
-                        
+
                     }
                 }
             }

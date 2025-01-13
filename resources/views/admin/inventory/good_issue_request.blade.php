@@ -1064,7 +1064,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true, passedRequester = true;
+                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true, passedRequester = true, passedNoteDetail = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1088,6 +1088,9 @@
                     formData.append('arr_requester[]',($(this).val() ? $(this).val() : ''));
                     if(!$(this).val()){
                         passedRequester = false;
+                    }
+                    if(!$('input[name^="arr_note[]"]').eq(index).val()){
+                        passedNoteDetail = false;
                     }
                 });
 
@@ -1128,6 +1131,15 @@
                     swal({
                         title: 'Ups!',
                         text: 'Divisi wajib diiisi.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
+                if(!passedNoteDetail){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Keterangan 1 wajib diisi.',
                         icon: 'warning'
                     });
                     return false;

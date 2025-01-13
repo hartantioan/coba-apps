@@ -59,7 +59,7 @@
                                 <span class="avatar-status avatar-online"><img src="{{ session('bo_photo') }}" alt="avatar"><i></i></span>
                             </a>
                         </li>
-                        
+
                     </ul>
                     <!-- notifications-dropdown-->
                     <ul class="dropdown-content" id="notifications-dropdown" style="max-height:550px !important;">
@@ -96,6 +96,9 @@
                         </li>
                         <li>
                             <a class="grey-text text-darken-1" href="{{ url('admin/personal/check_in') }}"><i class="material-icons">person_pin_circle</i> Absensi </a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/personal_visit') }}"><i class="material-icons">supervisor_account</i> Visit </a>
                         </li>
                         <li class="divider" tabindex="0"></li>
                         <li><a class="grey-text text-darken-1" href="{{ url('admin/lock/enable') }}"><i class="material-icons">lock_outline</i> Kunci</a></li>

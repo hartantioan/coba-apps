@@ -54,6 +54,7 @@ use App\Http\Controllers\MasterData\UserSpecialController;
 use App\Http\Controllers\Other\MenuIndexController;
 use App\Http\Controllers\Personal\TaskController;
 use App\Http\Controllers\Personal\CheckInController;
+use App\Http\Controllers\Personal\PersonalVisitController;
 use App\Http\Controllers\Personal\PersonalCloseBillController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
@@ -577,6 +578,17 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('check_in')->group(function () {
                     Route::get('/', [CheckInController::class, 'index']);
                     Route::post('create', [CheckInController::class, 'create']);
+                });
+
+                Route::prefix('personal_visit')->group(function () {
+                    Route::get('/', [PersonalVisitController::class, 'index']);
+                    Route::post('get_code', [PersonalVisitController::class, 'getCode']);
+                    Route::post('visit_out', [PersonalVisitController::class, 'visitOUt']);
+                    Route::post('create', [PersonalVisitController::class, 'create']);
+                    Route::get('datatable', [PersonalVisitController::class, 'datatable']);
+                    Route::post('show', [PersonalVisitController::class, 'show']);
+                    Route::post('destroy', [PersonalVisitController::class, 'destroy']);
+                    Route::post('void_status', [PersonalVisitController::class, 'voidStatus']);
                 });
 
                 Route::prefix('notification')->group(function () {

@@ -202,11 +202,15 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getNote(){
+        $fund_code = '';
+        if($this->fundRequestDetail()->exists()){
+            $fund_code = $this->fundRequestDetail->fundRequest->code;
+        }
         $note = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->note,
             'landed_cost_fee_details'   => $this->lookable->note,
-            'purchase_order_details'    => $this->lookable->note,
-            'coas'                      => $this->note,
+            'purchase_order_details'    => $this->lookable->note.($this->lookable->note2 ?? ' - '.$this->lookable->note2),
+            'coas'                      => ($fund_code ?? '<br>'.$fund_code).$this->note,
             default                     => '-',
         };
 

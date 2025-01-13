@@ -169,14 +169,14 @@ class MarketingOrderOutstandingMODController extends Controller
             GROUP BY d.name,k.code
             UNION ALL
             SELECT c.name,k.code, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
-                FROM marketing_order_delivery_processes a
-                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id and b.deleted_at is null
-                LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
-                LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
-                LEFT JOIN item_stocks l ON l.id=b.item_stock_id
-                LEFT JOIN items c ON c.id=e.item_id
-            LEFT JOIN item_shadings k ON k.id=l.item_shading_id
-                WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  
+                  FROM marketing_order_delivery_processes a
+                  LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id and b.deleted_at is null
+                  LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
+                  LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
+                  LEFT JOIN item_stocks l ON l.id=b.item_stock_id
+                  LEFT JOIN items c ON c.id=e.item_id
+              LEFT JOIN item_shadings k ON k.id=l.item_shading_id
+                  WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  
             GROUP BY c.name,k.code)a GROUP BY NAME,shading)a
 
             LEFT JOIN (            

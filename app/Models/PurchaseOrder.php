@@ -65,6 +65,7 @@ class PurchaseOrder extends Model
         'receiver_name',
         'receiver_address',
         'receiver_phone',
+        'approve_date',
     ];
 
     public function user()

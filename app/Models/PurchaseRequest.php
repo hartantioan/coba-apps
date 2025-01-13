@@ -35,6 +35,7 @@ class PurchaseRequest extends Model
         'done_id',
         'done_date',
         'done_note',
+        'approve_date',
     ];
 
     public function user()
@@ -99,7 +100,7 @@ class PurchaseRequest extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -160,7 +161,7 @@ class PurchaseRequest extends Model
         return $ada;
     }
 
-    
+
 
     public function hasBalance(){
         $qty = 0;
@@ -221,7 +222,7 @@ class PurchaseRequest extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

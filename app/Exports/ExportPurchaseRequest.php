@@ -32,6 +32,7 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
     private $headings = [
         'No',
         'No. Dokumen',
+        'Tgl. Approve',
         'Status',
         'Voider',
         'Tgl.Void',
@@ -88,7 +89,7 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
                 }
             })
             ->where(function ($query) {
-                    
+
                 $query->whereNull('deleted_at')
                       ->orWhereHas('purchaseRequest', function ($query) {
                           $query->withTrashed()->whereNotNull('deleted_at');
@@ -104,6 +105,7 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
             $arr[] = [
                 'no'                => ($key + 1),
                 'code'              => $row->purchaseRequest->code,
+                'Tgl. Approve'      => $row->purchaseRequest->approve_date ?? '-',
                 'status'            => $row->purchaseRequest->statusRaw(),
                 'voider'            => $row->purchaseRequest->voidUser()->exists() ? $row->purchaseRequest->voidUser->name : '',
                 'void_date'         => $row->purchaseRequest->voidUser()->exists() ? $row->purchaseRequest->void_date : '',

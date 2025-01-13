@@ -28,7 +28,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
     public function view(): View
     {
         $data = MaterialRequest::where(function($query) {
-            
+
             if($this->start_date && $this->end_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
                     ->whereDate('post_date', '<=', $this->end_date);
@@ -48,7 +48,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
         ->get();
         $array_detail=[];
         foreach($data as $row_item_request){
-            
+
             foreach($row_item_request->materialRequestDetail as $row_item_request_detail){
                 $max_count=1;
                 $array_item_req = [
@@ -65,17 +65,17 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     'warehouse'    => $row_item_request_detail->warehouse->name,
                 ];
                 $max_count_pr = 1;
-            
+
                 $all_pr=[];
                 if($row_item_request_detail->purchaseRequestDetail()->exists()){
                     if($max_count<count($row_item_request_detail->purchaseRequestDetail)){
                         $max_count=count($row_item_request_detail->purchaseRequestDetail);
                     }
-                    
-                  
+
+
                     $total_pr = 0;
                     foreach($row_item_request_detail->purchaseRequestDetail as $row_pr_detail){
-                    
+
                         $total_pr++;
                         $pr=[
                             'pr_code'      => $row_pr_detail->purchaseRequest->code,
@@ -84,6 +84,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             'pr_qty'       => $row_pr_detail->qty,
                             'pr_note'      => $row_pr_detail->note,
                             'pr_note2'     => $row_pr_detail->note2,
+                            'pr_approve_date'      => $row_pr_detail->purchaseRequest->approve_date?? '-',
                             'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                             'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
                             'done_date'    => $row_pr_detail->purchaseRequest->done_date,
@@ -92,7 +93,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             if($max_count<count($row_pr_detail->purchaseOrderDetail)){
                                 $max_count=count($row_pr_detail->purchaseOrderDetail);
                             }
-                            
+
                             if ($max_count_pr < count($row_pr_detail->purchaseOrderDetail)) {
                                 $max_count_pr = count($row_pr_detail->purchaseOrderDetail);
                             }
@@ -103,13 +104,14 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                     'po_code'      => $row_po_detail->purchaseOrder->code,
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
                                     'po_qty'       => $row_po_detail->qty,
+                                    'po_approve_date'      => $row_po_detail->purchaseOrder->approve_date ?? '-',
                                     'status'       => $row_po_detail->purchaseOrder->statusRaw(),
                                     'done_user'    => ($row_po_detail->purchaseOrder->status == 3 && is_null($row_po_detail->purchaseOrder->done_id)) ? 'sistem' : (($row_po_detail->purchaseOrder->status == 3 && !is_null($row_po_detail->purchaseOrder->done_id)) ? $row_po_detail->purchaseOrder->doneUser->name : ''),
                                     'done_date'    => $row_po_detail->purchaseOrder->done_date,
                                 ];
                                 if($row_po_detail->goodReceiptDetail()->exists()){
-                                    
-                                    
+
+
                                     foreach($row_po_detail->goodReceiptDetail as $row_grpo_detail){
                                         $grpo=[
                                             'grpo_code'    => $row_grpo_detail->goodReceipt->code,
@@ -138,19 +140,19 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                         //     'grpo_date'    => $row_grpo_detail->goodReceipt->post_date,
                                         //     'grpo_qty'     => CustomHelper::formatConditionalQty($row_grpo_detail->qty),
                                         // ];
-                                        
+
                                     }
                                     $pr['po'][]=$po;
-                                    
+
                                     if($max_count<$total_grpo){
                                         $max_count=$total_grpo;
                                     }
-                                    
+
                                     if ($max_count_pr < $total_grpo) {
                                         $max_count_pr = $total_grpo;
                                     }
                                     $pr['rowspan']=$max_count_pr;
-                                   
+
                                 }else{
                                     $po['grpo'][]=[
                                         'grpo_code'    => '',
@@ -163,7 +165,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                     ];
                                     $pr['po'][]=$po;
                                     $pr['rowspan']=$max_count_pr;
-                                   
+
                                     /* $array_detail[]=[
                                         'item'         => $row_item_request_detail->item->name,
                                         'item_code'    => $row_item_request_detail->item->code,
@@ -185,7 +187,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             if($max_count<$total_po){
                                 $max_count=$total_po;
                             }
-                        
+
                         }else{
                             $grpo=['grpo_code'    => '',
                             'grpo_date'    => '',
@@ -198,6 +200,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             'po_date'      => '',
                             'po_qty'       => '',
                             'done_user'    => '',
+                            'po_approve_date'=>'',
                             'done_date'    => '',
                             'status'       => '',];
                             $pr=[
@@ -207,6 +210,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                 'pr_qty'       => $row_pr_detail->qty,
                                 'pr_note'      => $row_pr_detail->note,
                                 'pr_note2'     => $row_pr_detail->note2,
+                                'pr_approve_date'      => $row_pr_detail->purchaseRequest->approve_date ?? '-',
                                 'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                                 'done_user'    => '',
                                 'done_date'    => '',
@@ -214,7 +218,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             $po['grpo'][]=$grpo;
                             $pr['po'][]=$po;
                             $pr['rowspan']=$max_count_pr;
-                           
+
                            /*  $array_detail[]=[
                                 'item'         => $row_item_request_detail->item->name,
                                 'item_code'    => $row_item_request_detail->item->code,
@@ -237,7 +241,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     if($max_count<$total_pr){
                         $max_count=$total_pr;
                     }
-                
+
                 }else{
                     $grpo=[ 'grpo_code'    => '',
                             'grpo_date'    => '',
@@ -250,6 +254,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     'po_date'      => '',
                     'po_qty'       => '',
                     'status'       => '',
+                    'po_approve_date'      => '',
                     'done_user'    => '',
                     'done_date'    => '',];
                     $pr=[
@@ -266,7 +271,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     $po['grpo'][]=$grpo;
                     $pr['po'][]=$po;
                     $pr['rowspan']=$max_count_pr;
-                    
+
                     /* $array_detail[]=[
                         'item'         => $row_item_request_detail->item->name,
                         'item_code'    => $row_item_request_detail->item->code,
@@ -284,12 +289,12 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                         'grpo_qty'     => '',
                     ]; */
                 }
-                
+
                 $array_item_req['pr']=$all_pr;
                 $array_item_req['rowspan']=$max_count;
                 $array_detail[]=$array_item_req;
             }
-           
+
         }
         return view('admin.exports.purchase_progress_report', [
             'data' => $array_detail,

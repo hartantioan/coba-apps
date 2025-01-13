@@ -2688,7 +2688,7 @@
         $('#last-row-detail').before(`
             <tr class="row_detail">
                 <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
-                <input type="hidden" name="arr_frd_id[]" value="" data-id="` + count + `">
+                <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
                 <input type="hidden" name="arr_total[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">

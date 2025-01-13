@@ -128,35 +128,37 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             if($po_total == 0 || $po_total == null){
                 $cost = 0;
             }
-            $arr[] = [
-                'no'                     => ($key+1),
-                'no_document'            => $row->goodScale->code,
-                'status'                 => $row->goodScale->statusRaw(),
-                'voider'                 => $row->goodScale->voidUser()->exists() ? $row->goodScale->voidUser->name : '',
-                'tgl_void'               => $row->goodScale->voidUser()->exists() ? date('d/m/Y', strtotime($row->goodScale->void_date)) : '',
-                'ket_void'               => $row->goodScale->voidUser()->exists() ? $row->goodScale->void_note : '',
-                'deleter'                => $row->goodScale->deleteUser()->exists() ? $row->goodScale->deleteUser->name : '',
-                'tgl_delete'             => $row->goodScale->deleteUser()->exists() ? date('d/m/Y', strtotime($row->goodScale->deleted_at)) : '',
-                'ket_delete'             => $row->goodScale->deleteUser()->exists() ? $row->goodScale->delete_note : '',
-                'nik'                    => $row->goodScale->user->employee_no,
-                'user'                   => $row->goodScale->user->name,
-                'tgl_terima'             => date('d/m/Y', strtotime($row->goodScale->post_date)),
-                'No. SO'                 => $row->lookable->getSO(),
-                'No. MOD'                 => $row->lookable->code,
-                'Customer'         => $customer,
-                'Kota / Kabupaten'          => $row->lookable->city->name ?? '-',
-                'Tipe Transport'                 => $row->lookable->transportation->name,
-                'Metode Hitung Ongkir'                  => $row->lookable->costDeliveryType(),
-                'Tipe Pengiriman'           => $row->lookable->deliveryType(),
-                'Based On'                => $no_sj,
-                'No. PO'              => $po_code,
-                'Ekspedisi'             => $row->goodScale->account->name,
-                'Qty'            => $row->qty,
-                'Harga'             => $price,
-                'Total'             => round($cost,2),
-                'No. APIN'             => $list,
+            if($row->lookable->type_delivery != 1){
+                $arr[] = [
+                    'no'                     => ($key+1),
+                    'no_document'            => $row->goodScale->code,
+                    'status'                 => $row->goodScale->statusRaw(),
+                    'voider'                 => $row->goodScale->voidUser()->exists() ? $row->goodScale->voidUser->name : '',
+                    'tgl_void'               => $row->goodScale->voidUser()->exists() ? date('d/m/Y', strtotime($row->goodScale->void_date)) : '',
+                    'ket_void'               => $row->goodScale->voidUser()->exists() ? $row->goodScale->void_note : '',
+                    'deleter'                => $row->goodScale->deleteUser()->exists() ? $row->goodScale->deleteUser->name : '',
+                    'tgl_delete'             => $row->goodScale->deleteUser()->exists() ? date('d/m/Y', strtotime($row->goodScale->deleted_at)) : '',
+                    'ket_delete'             => $row->goodScale->deleteUser()->exists() ? $row->goodScale->delete_note : '',
+                    'nik'                    => $row->goodScale->user->employee_no,
+                    'user'                   => $row->goodScale->user->name,
+                    'tgl_terima'             => date('d/m/Y', strtotime($row->goodScale->post_date)),
+                    'No. SO'                 => $row->lookable->getSO(),
+                    'No. MOD'                 => $row->lookable->code,
+                    'Customer'         => $customer,
+                    'Kota / Kabupaten'          => $row->lookable->city->name ?? '-',
+                    'Tipe Transport'                 => $row->lookable->transportation->name,
+                    'Metode Hitung Ongkir'                  => $row->lookable->costDeliveryType(),
+                    'Tipe Pengiriman'           => $row->lookable->deliveryType(),
+                    'Based On'                => $no_sj,
+                    'No. PO'              => $po_code,
+                    'Ekspedisi'             => $row->goodScale->account->name,
+                    'Qty'            => $row->qty,
+                    'Harga'             => $price,
+                    'Total'             => round($cost,2),
+                    'No. APIN'             => $list,
 
-            ];
+                ];
+            }
 
         }
 

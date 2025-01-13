@@ -118,7 +118,7 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-           // ->where('code', '=', 'ARIN-25P1-00000002')
+            // ->where('code', '=', 'ARIN-25P1-00000002')
             ->get();
 
 
@@ -134,16 +134,16 @@ class MarketingOrderReportController extends Controller
         $root->setAttributeNode($attrroot2);
         $TIN = $dom->createElement('TIN', '0608293056618000');
         $root->appendChild($TIN);
-            $List = $dom->createElement('ListOfTaxInvoice');
+        $List = $dom->createElement('ListOfTaxInvoice');
         //header
         foreach ($invoice as $key => $row) {
-           
-         
-    
-        
+
+
+
+
             $TaxInvoice = $dom->createElement('TaxInvoice');
             $freeAreaTax = $row->marketingOrderDeliveryProcess()->exists() ? ($row->marketingOrderDeliveryProcess->marketingOrderDelivery->getMaxTaxType() == '2' ? '18' : '') : '';
-           
+
             $TaxInvoiceDate = $dom->createElement('TaxInvoiceDate', $row->post_date);
             $TaxInvoiceOpt = $dom->createElement('TaxInvoiceOpt', 'Normal');
             $TrxCode = $dom->createElement('TrxCode', '04');
@@ -159,7 +159,7 @@ class MarketingOrderReportController extends Controller
             $BuyerName = $dom->createElement('BuyerName', $row->userData->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->userData->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp().'000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp() . '000000');
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 
@@ -187,16 +187,17 @@ class MarketingOrderReportController extends Controller
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
                 }
-                
+
                 $hscode = '';
                 if ($freeAreaTax) {
                     $hscode = ' ' . $rowdetail->lookable->item->type->hs_code;
                 }
                 $boxQty = '';
-               
+
                 $boxQty = ' ( ' . CustomHelper::formatConditionalQty($rowdetail->qty * $rowdetail->lookable->item->pallet->box_conversion) . ' BOX )';
-                $price = $rowdetail->priceBeforeTax();
-                $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                $price = round($rowdetail->priceBeforeTax(), 2);
+                $qty = round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2);
+                $totalBeforeTax = round($price * $qty, 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
 
                 $GoodService = $dom->createElement('GoodService');
@@ -204,16 +205,16 @@ class MarketingOrderReportController extends Controller
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
                 $Code = $dom->createElement('Code', '');
-                $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode );
+                $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode);
                 $Unit = $dom->createElement('Unit', 'UM.0012');
-                $Price = $dom->createElement('Price', ($price));
+                $Price = $dom->createElement('Price', round($price, 2));
                 $Qty = $dom->createElement('Qty', round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2));
                 $TotalDiscount = $dom->createElement('TotalDiscount', $totalDiscountBeforeTax);
-                $TaxBase = $dom->createElement('TaxBase', $totalBeforeTax-$totalDiscountBeforeTax);
-                $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11/12*($totalBeforeTax-$totalDiscountBeforeTax),2));
+                $TaxBase = $dom->createElement('TaxBase', $totalBeforeTax - $totalDiscountBeforeTax);
+                $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * ($totalBeforeTax - $totalDiscountBeforeTax), 2));
                 $VATRate = $dom->createElement('VATRate', '12');
                 //$VAT = $dom->createElement('VAT', $tax);
-                $VAT = $dom->createElement('VAT', Round(($totalBeforeTax-$totalDiscountBeforeTax) * 0.11,2));
+                $VAT = $dom->createElement('VAT', Round(($totalBeforeTax - $totalDiscountBeforeTax) * 0.11, 2));
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail
@@ -304,10 +305,11 @@ class MarketingOrderReportController extends Controller
         $GoodService->appendChild($VAT);
         $GoodService->appendChild($STLGRate);
         $GoodService->appendChild($STLG);*/
-           
-       
-        
-        $root->appendChild($List);}
+
+
+
+            $root->appendChild($List);
+        }
         // $root = $dom->createElement('Movies');
         /* $movie_node = $dom->createElement('movie');
         $attr_movie_id = new \DOMAttr('movie_id', '5467');

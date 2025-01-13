@@ -26,7 +26,7 @@
         <div class="col s12">
             <div class="container">
                 <div class="section">
-                    
+
                     <div class="row">
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
@@ -38,7 +38,7 @@
                                                 <div id="validation_alert_multi" style="display:none;"></div>
                                             </div>
                                             <div class="col s12">
-                                               
+
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
@@ -49,31 +49,31 @@
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m6 s6 pt-2">
-                                                      
+
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
-                                                      
+
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             </div>
-                                        </form>  
+                                        </form>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                       
+
                     </div>
                 </div>
 
                 <div id="intro">
                     <div class="row">
                         <div class="col s12">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -86,11 +86,41 @@
 
 <script>
     function exportExcel(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
+        var end_date = $('#end_date').val();
+        var start_date = $('#start_date').val();
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                end_date : end_date,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
-   
-   
 
-   
+
+
+
 </script>

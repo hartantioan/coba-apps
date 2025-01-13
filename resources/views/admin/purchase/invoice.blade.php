@@ -3198,7 +3198,6 @@
 
                 if($('#type_detail').val() == '1'){
                     formData.delete("arr_code[]");
-                    formData.delete("arr_frd_id[]");
                     formData.delete("arr_type[]");
                     formData.delete("arr_total[]");
                     formData.delete("arr_tax[]");
@@ -3234,7 +3233,6 @@
                         if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
                             if($('#arr_coa' + $(this).data('id')).val()){
                                 formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
-                                formData.append('arr_frd_id[]',$('input[name^="arr_frd_id[]"][data-id="' + $(this).data('id') + '"]').val());
                             }else{
                                 passed = false;
                             }

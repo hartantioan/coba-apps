@@ -134,7 +134,7 @@ class MarketingOrderReportController extends Controller
        
         //header
         foreach ($invoice as $key => $row) {
-            $TIN = $dom->createElement('TIN', $row->getNpwp());
+            $TIN = $dom->createElement('TIN', '608293056618000');
          
     
             $List = $dom->createElement('ListOfTaxInvoice');
@@ -148,15 +148,15 @@ class MarketingOrderReportController extends Controller
             $CustomDoc = $dom->createElement('CustomDoc', '');
             $RefDesc = $dom->createElement('RefDesc', '');
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
-            $SellerIDTKU = $dom->createElement('SellerIDTKU', $row->getNpwp().'000000');
-            $BuyerTin = $dom->createElement('BuyerTin', '0314113663616000');
+            $SellerIDTKU = $dom->createElement('SellerIDTKU', '608293056618000000000');
+            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
             $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
             $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
-            $BuyerName = $dom->createElement('BuyerName', 'PT. SUPERIOR PRIMA SUKSES TBK');
-            $BuyerAdress = $dom->createElement('BuyerAdress', 'Jl. Raya Kupang Baru No 27, Surabaya');
+            $BuyerName = $dom->createElement('BuyerName', $row->userData->title);
+            $BuyerAdress = $dom->createElement('BuyerAdress', $row->userData->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', '0314113663616000000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp().'000000');
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 

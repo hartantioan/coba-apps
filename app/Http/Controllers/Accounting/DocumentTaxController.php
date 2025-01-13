@@ -61,7 +61,7 @@ class DocumentTaxController extends Controller
             $codes = explode(',', $request->multiple);
 
             // Initialize an array to store the conditions
-            
+
 
             foreach ($codes as $code) {
                 // Extract parts of the code
@@ -85,7 +85,7 @@ class DocumentTaxController extends Controller
         $search = $request->input('search.value');
 
         $total_data = DocumentTax::count();
-        
+
         $query_data = DocumentTax::where(function($query) use ($search, $request , $conditions) {
                         $query->where(function($query) use ($search) {
                             $query->where('code', 'like', "%$search%")
@@ -108,7 +108,7 @@ class DocumentTaxController extends Controller
                                 }
                             });
                         }
-                    
+
                         if($request->start_date && $request->finish_date) {
                             $query->whereDate('date', '>=', $request->start_date)
                                 ->whereDate('date', '<=', $request->finish_date);
@@ -132,14 +132,14 @@ class DocumentTaxController extends Controller
                                 $query->whereDate('created_at', '<=', $request->handover_date_end);
                             });
                         }
-                        
+
                     })
-                    
+
                     ->offset($start)
                     ->limit($length)
                     ->orderBy($order, $dir)
                     ->get();
-        
+
 
         $total_filtered = DocumentTax::where(function($query) use ($search, $request , $conditions) {
                 $query->where(function($query) use ($search) {
@@ -164,7 +164,7 @@ class DocumentTaxController extends Controller
                         }
                     });
                 }
-            
+
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
                         ->whereDate('date', '<=', $request->finish_date);
@@ -197,7 +197,7 @@ class DocumentTaxController extends Controller
                 $refrence = '';
                 $pdate_dtax ="";
 				if($val->documentTaxHandoverDetail()->exists()){
-                 
+
                     $refrence = $val->documentTaxHandoverDetail->documentTaxHandover->code;
                     $pdate_dtax =  date('d/m/Y',strtotime($val->documentTaxHandoverDetail->documentTaxHandover->post_date));
                 }else{
@@ -221,7 +221,7 @@ class DocumentTaxController extends Controller
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
-                    
+
                 ];
 
             }
@@ -243,7 +243,7 @@ class DocumentTaxController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = DocumentTax::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                         <tr>
@@ -262,36 +262,36 @@ class DocumentTaxController extends Controller
                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Alamat Lengkap</th>
                         </tr>
                         </thead><tbody>';
-        
+
         foreach($data->documentTaxDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align" style="border: 1px solid black;">'.($key + 1).'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->date.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_number.'</td>
-                <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_name.'</td>              
+                <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_name.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_address.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.number_format(round($row->total - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.').'</td>
                 <td class="center-align" style="border: 1px solid black;">'.number_format(round($row->tax - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.').'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->item.'</td>
             </tr>';
-        } 
+        }
 
         $string .= '</tbody></table></div>
             ';
-       
+
         return response()->json($string);
     }
 
     public function show(Request $request){
         $country = DocumentTax::find($request->id);
-        				
+
 		return response()->json($country);
     }
 
     public function destroy(Request $request){
         $query = DocumentTax::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new DocumentTax())
@@ -327,7 +327,7 @@ class DocumentTaxController extends Controller
                         ->orWhere('npwp_target_name', 'like', "%$request->search%")
                         ->orWhere('total', 'like', "%$request->search%")
                         ->orWhere('tax', 'like', "%$request->search%");
-                        
+
                 }
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
@@ -339,7 +339,7 @@ class DocumentTaxController extends Controller
                 }
             })->get()
 		];
-		
+
 		return view('admin.print.accounting.document_tax', $data);
     }
 
@@ -363,7 +363,7 @@ class DocumentTaxController extends Controller
         $finish_date = $request->finish_date ? $request->finish_date : '';
         $search = $request->search ? $request->search : '';
         $multiple = $request->multiple ? $request->multiple : '';
-        
+
 		return Excel::download(new ExportDocumentTaxTable($start_date,$finish_date,$search,$multiple),'faktur_pajak'.uniqid().'.xlsx');
     }
 
@@ -372,116 +372,170 @@ class DocumentTaxController extends Controller
         $xmlDataString = @file_get_contents($barcode);
         $xmlObject = simplexml_load_string($xmlDataString);
         if ($xmlDataString === false) {
-           
-            $response = [
-                'status' => 422,
-                'error'  => 'Bukan merupakan barcode yang dimaksud'
-            ];
-            return response()->json($response);
-        }
 
-        $existingRecord = DB::table('document_taxes')
-        ->where('code', $xmlObject->nomorFaktur)
-        ->where('replace', $xmlObject->fgPengganti)
-        ->where('transaction_code', $xmlObject->kdJenisTransaksi)
-        ->whereNull('deleted_at')
-        ->whereIn('status',['1','2','4']) 
-        ->exists();
-        
-        
-        if ($existingRecord) {
+            $Isi = explode('#', $barcode);
+            $no_faktur = $Isi[4];
+            if (count($Isi) > 10) {
+
+                $response = [
+                    'status' => 422,
+                    'error'  => 'Ada Perubahan Format Mohon Hubungi EDP'
+                ];
+                return response()->json($response);
+            }
+
+            $kdJenisTransaksi = substr($no_faktur, 0, 2);
+            $fgPengganti = substr($no_faktur, 2, 1);
+            $nomorFaktur = substr($no_faktur, 3, 13);
+            $existingRecord = DB::table('document_taxes')
+            ->where('code', $nomorFaktur)
+            ->where('replace', $fgPengganti)
+            ->where('transaction_code', $kdJenisTransaksi)
+            ->whereNull('deleted_at')
+            ->whereIn('status',['1','2','4'])
+            ->exists();
+            if ($existingRecord) {
+                $response = [
+                    'status' => 422,
+                    'error'  => 'kode sudah pernah diinput'
+                ];
+                return response()->json($response);
+            }else{
+                DB::beginTransaction();
+
+                $date = Carbon::createFromFormat('d-m-Y', $Isi[5])->format('Y-m-d');
+                $query = DocumentTax::create([
+                    'transaction_code'=> $kdJenisTransaksi,
+                    'replace' => $fgPengganti,
+                    'code'=> $nomorFaktur,
+                    'date'=> $date,
+                    'npwp_number'=> $Isi[1],
+                    'npwp_name'=> $Isi[0],
+                    'npwp_target'=> $Isi[3],
+                    'npwp_target_name'=> $Isi[2],
+                    'npwp_target_address'=> 'JL. RAYA KUPANG BARU  Blok - No.27 RT:004 RW:005 Kel.DUKUH KUPANG  Kec.DUKUH PAKIS  Kota/Kab.SURABAYA  JAWA TIMUR 00000',
+                    'total' => floatval($Isi[6]),
+                    'tax' => floatval($Isi[7]),
+                    'wtax' => floatval($Isi[8]),
+                    'approval_status'=> $Isi[9],
+                    'url'=> $barcode,
+                    'user_id'=> session('bo_id'),
+                    'status'=> '1',
+                ]);
+
+            }
+
+            DB::commit();
             $response = [
-                'status' => 422,
-                'error'  => 'kode sudah pernah diinput'
+                'status'    => 200,
+                'message'   => 'Data successfully saved.',
             ];
-            return response()->json($response);
         }else{
+            $existingRecord = DB::table('document_taxes')
+            ->where('code', $xmlObject->nomorFaktur)
+            ->where('replace', $xmlObject->fgPengganti)
+            ->where('transaction_code', $xmlObject->kdJenisTransaksi)
+            ->whereNull('deleted_at')
+            ->whereIn('status',['1','2','4'])
+            ->exists();
 
-            $json = json_encode($xmlObject);
-            $phpDataArray = json_decode($json, true);
-            DB::beginTransaction();
-            if (count($phpDataArray) > 0) {
-                
-                $dataArray = array();
-                $detail_transaksi_faktur = $phpDataArray['detailTransaksi'];
-                $date = Carbon::createFromFormat('d/m/Y', $phpDataArray['tanggalFaktur'])->format('Y-m-d');
-                try{
-                    $query = DocumentTax::create([
-                                'transaction_code'=> $phpDataArray['kdJenisTransaksi'],
-                                'replace' => $phpDataArray['fgPengganti'],
-                                'code'=> $phpDataArray['nomorFaktur'],
-                                'date'=> $date,
-                                'npwp_number'=> $phpDataArray['npwpPenjual'],
-                                'npwp_name'=> $phpDataArray['namaPenjual'],
-                                'npwp_address'=> $phpDataArray['alamatPenjual'],
-                                'npwp_target'=> $phpDataArray['npwpLawanTransaksi'],
-                                'npwp_target_name'=> $phpDataArray['namaLawanTransaksi'],
-                                'npwp_target_address'=> $phpDataArray['alamatLawanTransaksi'],
-                                'total'=> $phpDataArray['jumlahDpp'],
-                                'tax'=> $phpDataArray['jumlahPpn'],
-                                'wtax'=> $phpDataArray['jumlahPpnBm'],
-                                'approval_status'=> $phpDataArray['statusApproval'],
-                                'tax_status'=> $phpDataArray['statusFaktur'],
-                                'reference'=> isset($phpDataArray['referensi'])? $phpDataArray['referensi'] : null,
-                                'url'=> $barcode,
-                                'user_id'=> session('bo_id'),
-                                'status'=> '1',
+
+            if ($existingRecord) {
+                $response = [
+                    'status' => 422,
+                    'error'  => 'kode sudah pernah diinput'
+                ];
+                return response()->json($response);
+            }else{
+
+                $json = json_encode($xmlObject);
+                $phpDataArray = json_decode($json, true);
+                DB::beginTransaction();
+                if (count($phpDataArray) > 0) {
+
+                    $dataArray = array();
+                    $detail_transaksi_faktur = $phpDataArray['detailTransaksi'];
+                    $date = Carbon::createFromFormat('d/m/Y', $phpDataArray['tanggalFaktur'])->format('Y-m-d');
+                    try{
+                        $query = DocumentTax::create([
+                                    'transaction_code'=> $phpDataArray['kdJenisTransaksi'],
+                                    'replace' => $phpDataArray['fgPengganti'],
+                                    'code'=> $phpDataArray['nomorFaktur'],
+                                    'date'=> $date,
+                                    'npwp_number'=> $phpDataArray['npwpPenjual'],
+                                    'npwp_name'=> $phpDataArray['namaPenjual'],
+                                    'npwp_address'=> $phpDataArray['alamatPenjual'],
+                                    'npwp_target'=> $phpDataArray['npwpLawanTransaksi'],
+                                    'npwp_target_name'=> $phpDataArray['namaLawanTransaksi'],
+                                    'npwp_target_address'=> $phpDataArray['alamatLawanTransaksi'],
+                                    'total'=> $phpDataArray['jumlahDpp'],
+                                    'tax'=> $phpDataArray['jumlahPpn'],
+                                    'wtax'=> $phpDataArray['jumlahPpnBm'],
+                                    'approval_status'=> $phpDataArray['statusApproval'],
+                                    'tax_status'=> $phpDataArray['statusFaktur'],
+                                    'reference'=> isset($phpDataArray['referensi'])? $phpDataArray['referensi'] : null,
+                                    'url'=> $barcode,
+                                    'user_id'=> session('bo_id'),
+                                    'status'=> '1',
+                                ]);
+
+
+
+                        if ($this->hasNestedArrays($detail_transaksi_faktur)) {
+                            foreach ($detail_transaksi_faktur as $data) {
+
+                                $dataArray[] = [
+                                    'document_tax_id'=>$query->id,
+                                    'item'=>$data['nama'],
+                                    'price'=>$data['hargaSatuan'],
+                                    'qty'=>$data['jumlahBarang'],
+                                    'subtotal'=>$data['hargaTotal'],
+                                    'discount'=>$data['diskon'],
+                                    'total'=>$data['dpp'],
+                                    'tax'=>$data['ppn'],
+                                    'nominal_ppnbm'=>$data['tarifPpnbm'],
+                                    'ppnbm'=>$data['ppnbm'],
+                                ];
+                            }
+                            DocumentTaxDetail::insert($dataArray);
+
+                        } else {
+                            DocumentTaxDetail::create([
+                            'document_tax_id'=>$query->id,
+                            'item'=>$detail_transaksi_faktur['nama'],
+                            'price'=>$detail_transaksi_faktur['hargaSatuan'],
+                            'qty'=>$detail_transaksi_faktur['jumlahBarang'],
+                            'subtotal'=>$detail_transaksi_faktur['hargaTotal'],
+                            'discount'=>$detail_transaksi_faktur['diskon'],
+                            'total'=>$detail_transaksi_faktur['dpp'],
+                            'tax'=>$detail_transaksi_faktur['ppn'],
+                            'nominal_ppnbm'=>$detail_transaksi_faktur['tarifPpnbm'],
+                            'ppnbm'=>$detail_transaksi_faktur['ppnbm'],
                             ]);
-    
-                    
-    
-                    if ($this->hasNestedArrays($detail_transaksi_faktur)) {
-                        foreach ($detail_transaksi_faktur as $data) {
-                            
-                            $dataArray[] = [
-                                'document_tax_id'=>$query->id,
-                                'item'=>$data['nama'],
-                                'price'=>$data['hargaSatuan'],
-                                'qty'=>$data['jumlahBarang'],
-                                'subtotal'=>$data['hargaTotal'],
-                                'discount'=>$data['diskon'],
-                                'total'=>$data['dpp'],
-                                'tax'=>$data['ppn'],
-                                'nominal_ppnbm'=>$data['tarifPpnbm'],
-                                'ppnbm'=>$data['ppnbm'],
-                            ];
                         }
-                        DocumentTaxDetail::insert($dataArray);
 
-                    } else {
-                        DocumentTaxDetail::create([
-                        'document_tax_id'=>$query->id,
-                        'item'=>$detail_transaksi_faktur['nama'],
-                        'price'=>$detail_transaksi_faktur['hargaSatuan'],
-                        'qty'=>$detail_transaksi_faktur['jumlahBarang'],
-                        'subtotal'=>$detail_transaksi_faktur['hargaTotal'],
-                        'discount'=>$detail_transaksi_faktur['diskon'],
-                        'total'=>$detail_transaksi_faktur['dpp'],
-                        'tax'=>$detail_transaksi_faktur['ppn'],
-                        'nominal_ppnbm'=>$detail_transaksi_faktur['tarifPpnbm'],
-                        'ppnbm'=>$detail_transaksi_faktur['ppnbm'],
-                        ]);
+
+
+                        DB::commit();
+                        $response = [
+                            'status'    => 200,
+                            'message'   => 'Data successfully saved.',
+                        ];
+
+                    }catch(\Exception $e){
+                        DB::rollback();
+                        $response = [
+                            'status'    => 500,
+                            'message'   => 'Data failed to save cause'+ $e -> getMessage(),
+                        ];
                     }
-                    
-                    
-                    
-                    DB::commit();
-                    $response = [
-                        'status'    => 200,
-                        'message'   => 'Data successfully saved.',
-                    ];
-    
-                }catch(\Exception $e){
-                    DB::rollback();
-                    $response = [
-                        'status'    => 500,
-                        'message'   => 'Data failed to save cause'+ $e -> getMessage(),
-                    ];
                 }
             }
         }
-        
-       
+
+
+
+
         return response()->json($response);
     }
 }

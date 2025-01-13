@@ -114,10 +114,11 @@ class MarketingOrderReportController extends Controller
 
 
         $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
-            ->whereDate('post_date', '>=', $start_date)
-            ->whereDate('post_date', '<=', $finish_date)
+           // ->whereDate('post_date', '>=', $start_date)
+           // ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
+            ->where('code', '=', 'ARIN-25P1-00000002')
             ->get();
 
 
@@ -131,13 +132,15 @@ class MarketingOrderReportController extends Controller
         $root->setAttributeNode($attrroot1);
         $attrroot2 = new \DOMAttr('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $root->setAttributeNode($attrroot2);
-       
+        $TIN = $dom->createElement('TIN', '0608293056618000');
+        $root->appendChild($TIN);
+            $List = $dom->createElement('ListOfTaxInvoice');
         //header
         foreach ($invoice as $key => $row) {
-            $TIN = $dom->createElement('TIN', '608293056618000');
+           
          
     
-            $List = $dom->createElement('ListOfTaxInvoice');
+        
             $TaxInvoice = $dom->createElement('TaxInvoice');
             $freeAreaTax = $row->marketingOrderDeliveryProcess()->exists() ? ($row->marketingOrderDeliveryProcess->marketingOrderDelivery->getMaxTaxType() == '2' ? '18' : '') : '';
            
@@ -148,7 +151,7 @@ class MarketingOrderReportController extends Controller
             $CustomDoc = $dom->createElement('CustomDoc', '');
             $RefDesc = $dom->createElement('RefDesc', '');
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
-            $SellerIDTKU = $dom->createElement('SellerIDTKU', '608293056618000000000');
+            $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
             $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
             $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
@@ -209,7 +212,8 @@ class MarketingOrderReportController extends Controller
                 $TaxBase = $dom->createElement('TaxBase', $totalBeforeTax-$totalDiscountBeforeTax);
                 $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11/12*($totalBeforeTax-$totalDiscountBeforeTax),2));
                 $VATRate = $dom->createElement('VATRate', '12');
-                $VAT = $dom->createElement('VAT', $tax);
+                //$VAT = $dom->createElement('VAT', $tax);
+                $VAT = $dom->createElement('VAT', '10062636.15');
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail
@@ -301,7 +305,7 @@ class MarketingOrderReportController extends Controller
         $GoodService->appendChild($STLGRate);
         $GoodService->appendChild($STLG);*/
            
-            $root->appendChild($TIN);
+       
         
         $root->appendChild($List);}
         // $root = $dom->createElement('Movies');

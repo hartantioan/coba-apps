@@ -170,7 +170,7 @@ class MarketingOrderOutstandingMODController extends Controller
             UNION ALL
             SELECT c.name,k.code, coalesce(SUM(b.qty*f.qty_conversion),0)*-1 AS qtySJ
                 FROM marketing_order_delivery_processes a
-                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
+                LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id and b.deleted_at is null
                 LEFT JOIN marketing_order_delivery_details e ON e.id=b.marketing_order_delivery_detail_id and e.deleted_at is null
                 LEFT JOIN marketing_order_details f ON f.id=e.marketing_order_detail_id and f.deleted_at is null
                 LEFT JOIN item_stocks l ON l.id=b.item_stock_id

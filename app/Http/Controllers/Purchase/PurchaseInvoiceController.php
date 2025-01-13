@@ -1311,7 +1311,7 @@ class PurchaseInvoiceController extends Controller
                                     'purchase_invoice_id'   => $query->id,
                                     'lookable_type'         => $row,
                                     'lookable_id'           => $request->arr_code[$key],
-                                    'fund_request_detail_id'=> $request->arr_frd_id[$key] ?? NULL,
+                                    'fund_request_detail_id'=> $request->arr_frd_id[$key] ? ($request->arr_frd_id[$key] == '0' ? NULL : $request->arr_frd_id[$key]) : NULL,
                                     'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                     'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                     'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),

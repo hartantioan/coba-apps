@@ -2277,6 +2277,7 @@
                                             }else{
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">
+                                                        <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
                                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                                         <input type="hidden" name="arr_price[]" value="` + val.raw_price + `" data-id="` + count + `">
                                                         <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
@@ -3818,6 +3819,7 @@
                             }else{
                                 $('#last-row-detail').before(`
                                     <tr class="row_detail">
+                                        <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">

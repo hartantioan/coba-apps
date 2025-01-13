@@ -29,180 +29,241 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
         $totalAll = 0;
         $array_filter = [];
         $mo = MarketingOrderDeliveryProcess::where('post_date', '>=', $this->start_date)->where('post_date', '<=', $this->end_date)->orderBy('code')->get();
+        $key = 0;
+        foreach ($mo as $key => $row) {
+            foreach($row->marketingOrderDelivery->marketingOrderDeliveryDetail as $rowdetail){
+                $array_filter[] = [
+                    'no'                => ($key+1),
+                    'code'              => $row->code,
+                    'status'            => $row->statusRaw(),
+                    'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                    'tgl_void'         => $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' ,
+                    'ket_void'               => $row->voidUser()->exists() ? $row->void_note : '' ,
+                    'deleter'              =>$row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                    'tgl_delete'             => $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '',
+                    'ket_delete'               => $row->deleteUser()->exists() ? $row->delete_note : '',
+                    'doner'        => ($row->status == 3 && is_null($row->done_id)) ? 'sistem' : (($row->status == 3 && !is_null($row->done_id)) ? $row->doneUser->name : null),
+                    'tgl_done'          => $row->doneUser ? $row->done_date : '',
+                    'ket_done'              => $row->doneUser ? $row->done_note : '' ,
 
-        $query = "
-            SELECT
-                ROW_NUMBER() OVER() AS no,
-                modp.code,
-                    CASE
-                            WHEN modp.status = '1' THEN 'Menunggu'
-                            WHEN modp.status = '2' THEN 'Proses'
-                            WHEN modp.status = '3' THEN 'Selesai'
-                            WHEN modp.status = '4' THEN 'Ditolak'
-                            WHEN modp.status = '5' THEN 'Ditutup'
-                            WHEN modp.status = '6' THEN 'Direvisi'
-                            ELSE 'Invalid'
-                    END AS status,
-                CASE
-                    WHEN vu.id IS NOT NULL THEN vu.name
-                    ELSE ''
-                END AS voider,
-                CASE
-                    WHEN vu.id IS NOT NULL THEN DATE_FORMAT(modp.void_date, '%d/%m/%Y')
-                    ELSE ''
-                END AS tgl_void,
-                CASE
-                    WHEN vu.id IS NOT NULL THEN modp.void_note
-                    ELSE ''
-                END AS ket_void,
-                CASE
-                    WHEN du.id IS NOT NULL THEN du.name
-                    ELSE ''
-                END AS deleter,
-                CASE
-                    WHEN du.id IS NOT NULL THEN DATE_FORMAT(modp.deleted_at, '%d/%m/%Y')
-                    ELSE ''
-                END AS tgl_delete,
-                CASE
-                    WHEN du.id IS NOT NULL THEN modp.delete_note
-                    ELSE ''
-                END AS ket_delete,
-                CASE
-                    WHEN modp.status = 3 AND modp.done_id IS NULL THEN 'sistem'
-                    WHEN modp.status = 3 AND modp.done_id IS NOT NULL THEN du2.name
-                    ELSE NULL
-                END AS doner,
-                CASE
-                    WHEN du2.id IS NOT NULL THEN DATE_FORMAT(modp.done_date, '%d/%m/%Y')
-                    ELSE ''
-                END AS tgl_done,
-                CASE
-                    WHEN du2.id IS NOT NULL THEN modp.done_note
-                    ELSE ''
-                END AS ket_done,
-                u.employee_no AS nik,
-                u.name AS user,
-                DATE_FORMAT(modp.post_date, '%d/%m/%Y') AS post_date,
-                c.name AS customer,
-                idt.`code` AS itemcode,
-                idt.name AS itemname,
-                bra.`name` AS brand,
-                p.code AS plant,
-                modd.qty AS qtysj,
-                uu.unit_id AS satuan_konversi,
-                (mdd.qty * modet.qty_conversion) AS qty,
-                'M2' AS satuan,
-                w.name AS gudang,
-                a.name AS area,
-                ishad.code AS shading,
-                pb.code AS batch,
-                md.type_delivery AS delivery_type,
-                ac.name AS expedisi,
-                modp.driver_name AS sopir,
-                modp.driver_hp AS no_wa_supir,
-                modp.vehicle_name AS truk,
-                modp.vehicle_no AS nopol,
-                modp.no_container AS no_kontainer,
-                ot.`name` AS outlet,
-                md.destination_address AS alamat_tujuan,
-                md.note_internal AS catatan_internal,
-                md.note_external AS catatan_eksternal,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM marketing_order_delivery_process_tracks modpt
-                        WHERE modpt.marketing_order_delivery_process_id = modp.id
-                        AND modpt.status = '2'
-                    ) THEN DATE_FORMAT(modp.post_date, '%d/%m/%Y')
-                    ELSE ''
-                END AS status_item_sent,
-                    CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM marketing_order_delivery_process_tracks modpt
-                        WHERE modpt.marketing_order_delivery_process_id = modp.id
-                        AND modpt.status = '3'
-                    ) THEN DATE_FORMAT(modp.receive_date, '%d/%m/%Y')
-                    ELSE ''
-                END AS status_received_by_customer,
-                CASE
-                    WHEN modp.return_date IS NOT NULL THEN DATE_FORMAT(modp.return_date, '%d/%m/%Y')
-                    ELSE ''
-                END AS status_returned_document,
-                mi.code AS list_invoice,
-                md.`code` AS based_on,
-                gs.code AS no_timbangan,
-                mo.document_no AS po_customer,
-                mo.code AS so,
-                CASE
-                            WHEN md.so_type = '1' THEN 'Proyek'
-                            WHEN md.so_type = '2' THEN 'Retail'
-                            WHEN md.so_type = '3' THEN 'Khusus'
-                            WHEN md.so_type = '4' THEN 'Sample'
-                            ELSE 'Invalid'
-                    END AS so_type
+                    'nik' =>$row->user->employee_no,
+                    'user' =>$row->user->name,
 
-            FROM
-                marketing_order_delivery_process_details modd
-            JOIN
-                marketing_order_delivery_processes modp ON modp.id = modd.marketing_order_delivery_process_id
-            JOIN
-                marketing_order_delivery_details mdd ON mdd.id = modd.marketing_order_delivery_detail_id
-            JOIN
-                marketing_order_deliveries md ON md.id = mdd.marketing_order_delivery_id
-            JOIN
-                marketing_order_details modet ON modet.id = mdd.marketing_order_detail_id
-            JOIN
-                item_stocks isd ON isd.id = modd.item_stock_id
-            JOIN
-                item_shadings ishad ON ishad.id = isd.item_shading_id
-            JOIN
-                item_units uu ON uu.id = modet.item_unit_id
-            JOIN
-                items idt ON idt.id = mdd.item_id
-            LEFT JOIN
-                brands bra ON bra.id = idt.brand_id
-            JOIN
-                marketing_orders mo ON mo.id = modet.marketing_order_id
-            LEFT JOIN
-                outlets ot ON ot.id = mo.outlet_id
-            JOIN
-                users u ON u.id = modp.user_id
-            LEFT JOIN
-                users vu ON vu.id = modp.void_id
-            LEFT JOIN
-                users du ON du.id = modp.delete_id
-            LEFT JOIN
-                users du2 ON du2.id = modp.done_id
-            LEFT JOIN
-                users ac ON ac.id = modp.account_id
-            LEFT JOIN
-                users c ON c.id = md.customer_id
-            LEFT JOIN
-                places p ON p.id = mdd.place_id
-            LEFT JOIN
-                warehouses w ON w.id = isd.warehouse_id
-            LEFT JOIN
-                areas a ON a.id = isd.area_id
-            LEFT JOIN
-                item_shadings sd ON sd.id = isd.item_shading_id
-            LEFT JOIN
-                production_batches pb ON pb.id = isd.production_batch_id
-            LEFT JOIN
-                marketing_order_invoices mi ON mi.marketing_order_delivery_process_id = modp.id
-            LEFT JOIN
-                good_scale_details gsd ON gsd.lookable_id = md.id AND gsd.lookable_type = 'marketing_order_deliveries'
-            LEFT JOIN
-                good_scales gs ON gs.id = gsd.good_scale_id
-            WHERE
-                modp.post_date BETWEEN :start_date AND :end_date
-        ";
-        $parameters = [
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-        ];
-        $result = DB::select($query, $parameters);
-        $resultArray = json_decode(json_encode($result), true);
+                    'post_date'         => date('d/m/Y', strtotime($row->post_date)),
+                    'customer' =>$rowdetail->marketingOrderDelivery->customer->name,
+                    'itemcode' => $rowdetail->item->code,
+                    'itemname' => $rowdetail->item->name,
+
+                    'plant' => $rowdetail->place->name??'-',
+                    'qtysj' => $rowdetail->qty,
+                    // 'qty_konversi' => $row->getQtyM2(),
+                    'satuan_konversi' => $rowdetail->marketingOrderDetail->itemUnit->unit->code,
+                    'qty' => $rowdetail->qty * $rowdetail->getQtyM2(),
+                    'satuan' => 'M2',
+                    'gudang' => $row->getWarehouse(),
+                    'area' => $row->getArea(),
+                    'shading' => $row->getShading(),
+                    'batch' => $row->getBatch(),
+                    'delivery_type' => $rowdetail->marketingOrderDelivery->deliveryType(),
+                    'list_invoice' =>$row->marketingOrderInvoice->code ?? '',
+                    'expedisi' =>$row->account->name,
+                    'sopir'                => $row->driver_name,
+                    'no_wa_supir'                => $row->driver_hp,
+                    'truk'=>$row->vehicle_name,
+                    'nopol' => $row->vehicle_no,
+                    'no_kontainer'          => $row->no_container,
+                    'outlet' => $rowdetail->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
+                    'alamat_tujuan'=> $rowdetail->marketingOrderDelivery->destination_address,
+                    'catatan_internal'=>$rowdetail->marketingOrderDelivery->note_internal,
+                    'catatan_eksternal'=>$rowdetail->marketingOrderDelivery->note_external,
+                    'tracking'=>$row->statusTrackingRaw(),
+                    'status_item_sent'=>$row->isItemSent() ? date('d/m/Y', strtotime($row->post_date)) : '',
+                    'status_received_by_customer'=>$row->isDelivered() ? date('d/m/Y', strtotime($row->receive_date)) : '',
+                    'status_returned_document' =>$row->return_date
+                        ? date('d/m/Y', strtotime($row->return_date))
+                        : '',
+                    'based_on'=>$rowdetail->marketingOrderDelivery->code,
+                    'so' => $rowdetail->marketingOrderDetail->marketingOrder->code,
+                    'no_timbangan'=> $rowdetail->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
+                    'po_customer' => $rowdetail->marketingOrderDetail->marketingOrder->document_no,
+                    'brand' => $row->getBrand(),
+                    'so_type' => $rowdetail->marketingOrderDelivery->soType(),
+                ];
+            }
+        }
+        // $query = "
+        //     SELECT
+        //         ROW_NUMBER() OVER() AS no,
+        //         modp.code,
+        //             CASE
+        //                     WHEN modp.status = '1' THEN 'Menunggu'
+        //                     WHEN modp.status = '2' THEN 'Proses'
+        //                     WHEN modp.status = '3' THEN 'Selesai'
+        //                     WHEN modp.status = '4' THEN 'Ditolak'
+        //                     WHEN modp.status = '5' THEN 'Ditutup'
+        //                     WHEN modp.status = '6' THEN 'Direvisi'
+        //                     ELSE 'Invalid'
+        //             END AS status,
+        //         CASE
+        //             WHEN vu.id IS NOT NULL THEN vu.name
+        //             ELSE ''
+        //         END AS voider,
+        //         CASE
+        //             WHEN vu.id IS NOT NULL THEN DATE_FORMAT(modp.void_date, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS tgl_void,
+        //         CASE
+        //             WHEN vu.id IS NOT NULL THEN modp.void_note
+        //             ELSE ''
+        //         END AS ket_void,
+        //         CASE
+        //             WHEN du.id IS NOT NULL THEN du.name
+        //             ELSE ''
+        //         END AS deleter,
+        //         CASE
+        //             WHEN du.id IS NOT NULL THEN DATE_FORMAT(modp.deleted_at, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS tgl_delete,
+        //         CASE
+        //             WHEN du.id IS NOT NULL THEN modp.delete_note
+        //             ELSE ''
+        //         END AS ket_delete,
+        //         CASE
+        //             WHEN modp.status = 3 AND modp.done_id IS NULL THEN 'sistem'
+        //             WHEN modp.status = 3 AND modp.done_id IS NOT NULL THEN du2.name
+        //             ELSE NULL
+        //         END AS doner,
+        //         CASE
+        //             WHEN du2.id IS NOT NULL THEN DATE_FORMAT(modp.done_date, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS tgl_done,
+        //         CASE
+        //             WHEN du2.id IS NOT NULL THEN modp.done_note
+        //             ELSE ''
+        //         END AS ket_done,
+        //         u.employee_no AS nik,
+        //         u.name AS user,
+        //         DATE_FORMAT(modp.post_date, '%d/%m/%Y') AS post_date,
+        //         c.name AS customer,
+        //         idt.`code` AS itemcode,
+        //         idt.name AS itemname,
+        //         bra.`name` AS brand,
+        //         p.code AS plant,
+        //         modd.qty AS qtysj,
+        //         uu.unit_id AS satuan_konversi,
+        //         (mdd.qty * modet.qty_conversion) AS qty,
+        //         'M2' AS satuan,
+        //         w.name AS gudang,
+        //         a.name AS area,
+        //         ishad.code AS shading,
+        //         pb.code AS batch,
+        //         md.type_delivery AS delivery_type,
+        //         ac.name AS expedisi,
+        //         modp.driver_name AS sopir,
+        //         modp.driver_hp AS no_wa_supir,
+        //         modp.vehicle_name AS truk,
+        //         modp.vehicle_no AS nopol,
+        //         modp.no_container AS no_kontainer,
+        //         ot.`name` AS outlet,
+        //         md.destination_address AS alamat_tujuan,
+        //         md.note_internal AS catatan_internal,
+        //         md.note_external AS catatan_eksternal,
+        //         CASE
+        //             WHEN EXISTS (
+        //                 SELECT 1
+        //                 FROM marketing_order_delivery_process_tracks modpt
+        //                 WHERE modpt.marketing_order_delivery_process_id = modp.id
+        //                 AND modpt.status = '2'
+        //             ) THEN DATE_FORMAT(modp.post_date, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS status_item_sent,
+        //             CASE
+        //             WHEN EXISTS (
+        //                 SELECT 1
+        //                 FROM marketing_order_delivery_process_tracks modpt
+        //                 WHERE modpt.marketing_order_delivery_process_id = modp.id
+        //                 AND modpt.status = '3'
+        //             ) THEN DATE_FORMAT(modp.receive_date, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS status_received_by_customer,
+        //         CASE
+        //             WHEN modp.return_date IS NOT NULL THEN DATE_FORMAT(modp.return_date, '%d/%m/%Y')
+        //             ELSE ''
+        //         END AS status_returned_document,
+        //         mi.code AS list_invoice,
+        //         md.`code` AS based_on,
+        //         gs.code AS no_timbangan,
+        //         mo.document_no AS po_customer,
+        //         mo.code AS so,
+        //         CASE
+        //                     WHEN md.so_type = '1' THEN 'Proyek'
+        //                     WHEN md.so_type = '2' THEN 'Retail'
+        //                     WHEN md.so_type = '3' THEN 'Khusus'
+        //                     WHEN md.so_type = '4' THEN 'Sample'
+        //                     ELSE 'Invalid'
+        //             END AS so_type
+
+        //     FROM
+        //         marketing_order_delivery_process_details modd
+        //     JOIN
+        //         marketing_order_delivery_processes modp ON modp.id = modd.marketing_order_delivery_process_id
+        //     JOIN
+        //         marketing_order_delivery_details mdd ON mdd.id = modd.marketing_order_delivery_detail_id
+        //     JOIN
+        //         marketing_order_deliveries md ON md.id = mdd.marketing_order_delivery_id
+        //     JOIN
+        //         marketing_order_details modet ON modet.id = mdd.marketing_order_detail_id
+        //     JOIN
+        //         item_stocks isd ON isd.id = modd.item_stock_id
+        //     JOIN
+        //         item_shadings ishad ON ishad.id = isd.item_shading_id
+        //     JOIN
+        //         item_units uu ON uu.id = modet.item_unit_id
+        //     JOIN
+        //         items idt ON idt.id = mdd.item_id
+        //     LEFT JOIN
+        //         brands bra ON bra.id = idt.brand_id
+        //     JOIN
+        //         marketing_orders mo ON mo.id = modet.marketing_order_id
+        //     LEFT JOIN
+        //         outlets ot ON ot.id = mo.outlet_id
+        //     JOIN
+        //         users u ON u.id = modp.user_id
+        //     LEFT JOIN
+        //         users vu ON vu.id = modp.void_id
+        //     LEFT JOIN
+        //         users du ON du.id = modp.delete_id
+        //     LEFT JOIN
+        //         users du2 ON du2.id = modp.done_id
+        //     LEFT JOIN
+        //         users ac ON ac.id = modp.account_id
+        //     LEFT JOIN
+        //         users c ON c.id = md.customer_id
+        //     LEFT JOIN
+        //         places p ON p.id = mdd.place_id
+        //     LEFT JOIN
+        //         warehouses w ON w.id = isd.warehouse_id
+        //     LEFT JOIN
+        //         areas a ON a.id = isd.area_id
+        //     LEFT JOIN
+        //         item_shadings sd ON sd.id = isd.item_shading_id
+        //     LEFT JOIN
+        //         production_batches pb ON pb.id = isd.production_batch_id
+        //     LEFT JOIN
+        //         marketing_order_invoices mi ON mi.marketing_order_delivery_process_id = modp.id
+        //     LEFT JOIN
+        //         good_scale_details gsd ON gsd.lookable_id = md.id AND gsd.lookable_type = 'marketing_order_deliveries'
+        //     LEFT JOIN
+        //         good_scales gs ON gs.id = gsd.good_scale_id
+        //     WHERE
+        //         modp.post_date BETWEEN :start_date AND :end_date
+        // ";
+        // $parameters = [
+        //     'start_date' => $this->start_date,
+        //     'end_date' => $this->end_date,
+        // ];
+        // $result = DB::select($query, $parameters);
+        // $resultArray = json_decode(json_encode($result), true);
         activity()
             ->performedOn(new marketingOrderDeliveryProcess())
             ->causedBy(session('bo_id'))
@@ -210,7 +271,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
             ->log('Export Delivery Recap.');
 
         return view('admin.exports.marketing_delivery_recap', [
-            'data'      => $resultArray,
+            'data'      => $array_filter,
         ]);
     }
 

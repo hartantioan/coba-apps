@@ -150,11 +150,15 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getCode(){
+        $fund_code = '';
+        if($this->fundRequestDetail()->exists()){
+            $fund_code = $this->fundRequestDetail->fundRequest->code;
+        }
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
             'landed_cost_fee_details'   => $this->lookable?->landedCostFee?->name,
             'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->code.' - '.$this->lookable->coa->name,
-            'coas'                      => ($this->lookable->prefix ? $this->lookable->prefix.' - ' : '').$this->lookable->name,
+            'coas'                      => ($this->lookable->prefix ? $this->lookable->prefix.' - ' : '').$this->lookable->name.($fund_code ? '<br>'.$fund_code : ''),
             default                     => '-',
         };
 
@@ -202,15 +206,11 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getNote(){
-        $fund_code = '';
-        if($this->fundRequestDetail()->exists()){
-            $fund_code = $this->fundRequestDetail->fundRequest->code;
-        }
         $note = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->note,
             'landed_cost_fee_details'   => $this->lookable->note,
             'purchase_order_details'    => $this->lookable->note.($this->lookable->note2 ? '<br>'.$this->lookable->note2 : ''),
-            'coas'                      => ($fund_code ? '<br>'.$fund_code : '').$this->note,
+            'coas'                      => $this->note,
             default                     => '-',
         };
 

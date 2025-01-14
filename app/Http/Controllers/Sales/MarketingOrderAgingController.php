@@ -629,13 +629,13 @@ class MarketingOrderAgingController extends Controller
                     $memo = $pi->totalMemoByDate($date);
                     $paid = $pi->totalPayByDate($date);
                     
-                    $grandtotal = 0;
+                    $rowgrandtotal = 0;
                     if(substr($pi->tax_no,0,3) == '070'){
                         $balance = $pi->total - $memo - $paid;
-                        $grandtotal = $pi->total;
+                        $rowgrandtotal = $pi->total;
                     }else{
                         $balance = $pi->grandtotal - $memo - $paid;
-                        $grandtotal = $pi->grandtotal;
+                        $rowgrandtotal = $pi->grandtotal;
                     }
                     $results[] = [
                         'code'          => $pi->code,
@@ -643,7 +643,7 @@ class MarketingOrderAgingController extends Controller
                         'post_date'     => date('d/m/Y', strtotime($pi->post_date)),
                         'due_date'      => date('d/m/Y', strtotime($pi->due_date_internal)),
                         'due_days'      => $this->dateDiffInDays($pi->due_date_internal, $date),
-                        'grandtotal'    => number_format($grandtotal, 2, ',', '.'),
+                        'grandtotal'    => number_format($rowgrandtotal, 2, ',', '.'),
                         'memo'          => number_format($memo, 2, ',', '.'),
                         'paid'          => number_format($paid, 2, ',', '.'),
                         'balance'       => number_format($balance, 2, ',', '.'),

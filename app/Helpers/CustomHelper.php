@@ -3180,7 +3180,7 @@ class CustomHelper {
 				$ir->update([
 					'status'	=> '3'
 				]);
-				
+
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $ir->company_id,
@@ -3188,7 +3188,7 @@ class CustomHelper {
 					'lookable_type'	=> $ir->getTable(),
 					'lookable_id'	=> $ir->id,
 					'post_date'		=> $data->post_date,
-					'note'			=> $data->code,
+					'note'			=> $data->code.' - '.$data->note,
 					'status'		=> '3'
 				]);
 

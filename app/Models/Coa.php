@@ -275,7 +275,7 @@ class Coa extends Model
         $totalDebit = 0;
         $totalCredit = 0;
         foreach($child as $row){
-            $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
+            /* $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date < '$month-01'");
             })->get();
@@ -291,9 +291,47 @@ class Coa extends Model
 
             foreach($dataBalanceBeforeCredit as $rowbefore){
                 $totalBalanceBeforeCredit += round($rowbefore->nominal,2);
-            }
+            } */
 
-            $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $month.'-01',
+            ));
+
+            $dataBalanceBeforeCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '2'
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $month.'-01',
+            ));
+            
+            $totalBalanceBeforeDebit += $dataBalanceBeforeDebit[0]->total;
+
+            $totalBalanceBeforeCredit += $dataBalanceBeforeCredit[0]->total;
+
+            /* $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
                     ->where(function($query){
@@ -317,7 +355,46 @@ class Coa extends Model
 
             foreach($dataCredit as $rownow){
                 $totalCredit += round($rownow->nominal,2);
-            }
+            } */
+
+            $dataDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date LIKE '$month%'
+                    AND jd.type = '1'
+                    AND (j.lookable_type != 'closing_journals' OR j.lookable_type IS NULL)
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $month.'-01',
+            ));
+
+            $dataCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date LIKE '$month%'
+                    AND jd.type = '2'
+                    AND (j.lookable_type != 'closing_journals' OR j.lookable_type IS NULL)
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $month.'-01',
+            ));
+
+            $totalDebit += $dataDebit[0]->total;
+            $totalCredit += $dataCredit[0]->total;
         }
 
         $arr = [

@@ -737,6 +737,7 @@ class GoodReceiptPOController extends Controller
                         ]);
                     }
                 }catch(\Exception $e){
+                    info($e->getMessage());
                     DB::rollback();
                 }
 			}else{
@@ -769,6 +770,7 @@ class GoodReceiptPOController extends Controller
 
                     DB::commit();
                 }catch(\Exception $e){
+                    info($e->getMessage());
                     DB::rollback();
                 }
 			}
@@ -823,6 +825,7 @@ class GoodReceiptPOController extends Controller
 
                     DB::commit();
                 }catch(\Exception $e){
+                    info($e->getMessage());
                     DB::rollback();
                 }
 

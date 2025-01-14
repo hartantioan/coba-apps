@@ -47,17 +47,17 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
                 }
 
                 if ($group_id) {
-                    
+
                     if (isset($row['detail_1']) && $row['detail_1']) {
-                       
+
                         if (isset($row['barang']) && $row['barang']) {
-                          
+
                             $query = HardwareItem::create([
                                 'code' => HardwareItem::generateCode(),
-                                'item' => $row['barang'],
+                                'item' => strtoupper($row['barang']),
                                 'user_id' => session('bo_id'),
                                 'hardware_item_group_id' => $group_id->id,
-                                'detail1' => $row['detail_1'],
+                                'detail1' => strtoupper($row['detail_1']),
                                 'status' => '1',
                             ]);
                         }else{
@@ -73,13 +73,13 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
                         throw new RowImportException('Ada yang tidak Lengkap', $row->getIndex(),$this->error,$sheet);
                     }
 
-                    
+
                 }
             }else{
                 DB::rollback();
                 $sheet='BOM';
                 throw new RowImportException('Group belum di isi', $row->getIndex(),'Group',$sheet);
-            } 
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
@@ -87,7 +87,7 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
-    
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)

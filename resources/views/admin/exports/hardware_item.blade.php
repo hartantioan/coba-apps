@@ -19,14 +19,14 @@
             <tr align="center">
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
-                <td>{{ $row->item }}</td>
+                <td>{{ strtoupper($row->item) }}</td>
                 <td>{{ $row->hardwareItemGroup->name }}</td>
-                <td>{{ $row->detail1 }}</td>
+                <td>{{ strtoupper($row->detail1) }}</td>
                 <td>{{ $row->hasAsset() }}</td>
                 <td>{{ $row->latestReceptionHardwareItemUsage() }}</td>
                 <td>{{ $row->statusRaw() }}</td>
-
             </tr>
+
             @php
                 $no++;
             @endphp

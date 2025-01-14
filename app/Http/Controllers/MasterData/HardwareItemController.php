@@ -45,7 +45,7 @@ class HardwareItemController extends Controller
             'department'    => Department::where('status','1')->get(),
             'group'         => HardwareItemGroup::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            
+
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -58,7 +58,7 @@ class HardwareItemController extends Controller
             'user_id',
             'hardware_item_group_id',
             'detail1',
-          
+
             'status',
         ];
 
@@ -69,7 +69,7 @@ class HardwareItemController extends Controller
         $search = $request->input('search.value');
 
         $total_data = HardwareItem::count();
-        
+
         $query_data = HardwareItem::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -111,13 +111,13 @@ class HardwareItemController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->item,
+                    strtoupper($val->item),
                     $val->hardwareItemGroup->name,
-                    $val->detail1,
+                    strtoupper($val->detail1),
                     $val->hasAsset(),
                     $val->latestReceptionHardwareItemUsage(),
                     $val->status(),
@@ -160,7 +160,7 @@ class HardwareItemController extends Controller
 
     public function getCode(Request $request){
         $code = HardwareItem::generateCode();
-        				
+
 		return response()->json($code);
     }
 
@@ -172,20 +172,20 @@ class HardwareItemController extends Controller
         if($query){
             if($query->receptionHardwareItemsUsageALL()->exists()  || $query->asset()->exists()){
                 $validation = Validator::make($request->all(), [
-                
+
                 ], [
-                    
-                
+
+
                 ]);
             }else{
                 $validation = Validator::make($request->all(), [
                     'item'                       => 'required',
                     'item_group_id_edit'         => 'required',
                     'detail1_edit'               => 'required',
-                   
+
                 ], [
-                    
-                   
+
+
                     'item.required'          => 'Harap Isi Item.',
                     'detail1_edit.required'      => 'Harap isi detail item',
                     'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
@@ -196,16 +196,16 @@ class HardwareItemController extends Controller
                 'item'                       => 'required',
                 'item_group_id_edit'         => 'required',
                 'detail1_edit'               => 'required',
-               
+
             ], [
-                
-               
+
+
                 'item.required'          => 'Harap Isi Item.',
                 'detail1_edit.required'      => 'Harap isi detail item',
                 'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
             ]);
         }
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -213,32 +213,32 @@ class HardwareItemController extends Controller
             ];
         } else {
 			if($request->temp){
-                
+
                 DB::beginTransaction();
                 try {
                     $query = HardwareItem::find($request->temp);
                     if($query->receptionHardwareItemsUsageALL()->exists() || $query->asset()->exists()){
                         $query->status          = $request->status ? $request->status : '2';
-                    
+
                         $query->save();
                         DB::commit();
                     }else{
                         $query->item	        = $request->item;
                         $query->hardware_item_group_id	        = $request->item_group_id_edit;
                         $query->detail1	        = $request->detail1_edit;
-                    
+
                         $query->status          = $request->status ? $request->status : '2';
-                    
+
                         $query->save();
                         DB::commit();
                     }
-                    
+
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 			}else{
                 DB::beginTransaction();
-                
+
                 $query = HardwareItem::create([
                     'code'                      => HardwareItem::generateCode(),
                     'item'			            => $request->item,
@@ -247,14 +247,14 @@ class HardwareItemController extends Controller
                     'detail1'			        => $request->detail1_edit,
                     'status'                    => $request->status ? $request->status : '2',
                 ]);
-                
-                    
+
+
 
                 DB::commit();
             }
-			
+
 			if($query) {
-                
+
 
                 activity()
                     ->performedOn(new HardwareItem())
@@ -273,7 +273,7 @@ class HardwareItemController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -285,7 +285,7 @@ class HardwareItemController extends Controller
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
         $group = $request->group ? $request->group : '';
-		
+
 		return Excel::download(new ExportHardwareItem($search,$status,$group), 'inventaris_'.uniqid().'.xlsx');
     }
 
@@ -338,14 +338,14 @@ class HardwareItemController extends Controller
                         'status'                    => $request->status ? $request->status : '2'
                     ]);
                 }
-                    
+
 
                 DB::commit();
-                
+
 			}
-			
+
 			if($query) {
-                
+
 
                 activity()
                     ->performedOn(new HardwareItem())
@@ -364,7 +364,7 @@ class HardwareItemController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -397,15 +397,15 @@ class HardwareItemController extends Controller
                     'action'    =>'Penyerahan'
                 ];
                 $temp_reception[]=$temp_data_rec;
-    
-                
+
+
                 $title='History Usage '.$reception->hardwareItem->item;
                 // ...
             }
             $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('return_date','!=',null)->get();
-    
+
             foreach($query_return as $return){
-                
+
                 $temp_data=[
                     'post_date' => $return->return_date,
                     'code'      => $return->code,
@@ -417,11 +417,11 @@ class HardwareItemController extends Controller
                 $temp_return[]=$temp_data;
             }
             $combined = array_merge($temp_return, $temp_reception);
-    
+
             usort($combined, function($a, $b) {
                 return strtotime($a['post_date']) - strtotime($b['post_date']);
             });
-            
+
             $string = '';
             $string1 = '';
             foreach ($combined as $key => $row) {
@@ -462,7 +462,7 @@ class HardwareItemController extends Controller
                             </div>
                         </li>';
                 }
-                
+
                 $string1 .= '<tr>
                     <td class="center-align">' . ($key + 1) . '</td>
                     <td>' . $row['code'] . '</td>
@@ -472,7 +472,7 @@ class HardwareItemController extends Controller
                     <td class="center-align">' . $row['action'] . '</td>
                 </tr>';
             }
-            
+
             $string.='<li class="clearfix" style="float: none;"></li>';
             $response["tbody"] = $string;
             $response["tbody1"] = $string1;
@@ -492,7 +492,7 @@ class HardwareItemController extends Controller
 
                 $query_maintenance = MaintenanceHardwareItemsUsage::where('request_repair_hardware_items_usage_id',$request->id)->get();
                 foreach($query_maintenance as $maintenance){
-                   
+
                     $temp_data1=[
                         'image'     => $reception->user()->exists() ?  $reception->user->profilePicture(): '',
                         'code'      => $maintenance->code,
@@ -504,7 +504,7 @@ class HardwareItemController extends Controller
                     $temp_mt[]=$temp_data1;
                 }
                 $combine_rm = array_merge($temp_request, $temp_mt);
-    
+
                 usort($combine_rm, function($a, $b) {
                     return strtotime($a['date']) - strtotime($b['date']);
                 });
@@ -552,8 +552,8 @@ class HardwareItemController extends Controller
                             </div>
                         </li>';
                     }
-                    
-                    
+
+
                     $string1 .= '<tr>
                         <td class="center-align">' . ($key + 1) . '</td>
                         <td>' . $row['code'] . '</td>
@@ -572,11 +572,11 @@ class HardwareItemController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data Tidak Dapat Diambil.'
-            ]; 
+            ];
         }
-        
+
         return response()->json($response);
-        
+
     }
 
     public function destroy(Request $request){
@@ -588,7 +588,7 @@ class HardwareItemController extends Controller
             ];
             return response()->json($response);
         }
-        
+
         if($query->delete()) {
             activity()
                 ->performedOn(new HardwareItem())
@@ -641,7 +641,7 @@ class HardwareItemController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -652,8 +652,8 @@ class HardwareItemController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             $pr = HardwareItem::whereIn('code',$request->arr_id)->get();
-               
-                
+
+
             if($pr){
                 $data = [
                     'title'     => 'Inventaris',
@@ -681,17 +681,17 @@ class HardwareItemController extends Controller
 
                 $content = $pdf->download()->getOriginalContent();
                 $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-                
+
             }
-    
+
 
             $response =[
                 'status'=>200,
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -719,7 +719,7 @@ class HardwareItemController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -731,8 +731,8 @@ class HardwareItemController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = HardwareItem::where('code',$row)->first();
-               
-                
+
+
                 if($pr){
                     $data = [
                         'title'     => 'Inventaris',
@@ -744,13 +744,13 @@ class HardwareItemController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-        
+
                     $pdf = Pdf::loadView('admin.print.usage.hardware_item_barcode', $data);
                     $content = $pdf->download()->getOriginalContent();
-                    $document_po = PrintHelper::savePrint($content); 
+                    $document_po = PrintHelper::savePrint($content);
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -768,8 +768,8 @@ class HardwareItemController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 }

@@ -28,17 +28,17 @@ class ExportTemplateJournalCopy implements WithEvents
         $event->writer->getSheetByIndex(0); #main
         $event->writer->getSheetByIndex(1); #item group
         $event->writer->getSheetByIndex(2); #unit
-    
+
         $company = Company::where('status','1')->get();
         $currency = Currency::where('status','1')->get();
         $user = User::where('status','1')->get();
-        $coa = Coa::where('status','1')->where('level','5')->get();
+        $coa = Coa::where('status','1')->where('level','5')->orderBy('code', 'asc')->get();
         $place = Place::where('status','1')->get();
         $line = Line::where('status','1')->get();
         $machine = Machine::where('status','1')->get();
         $department = Division::where('status','1')->get();
         $project = Project::where('status','1')->get();
-        
+
         $startRow = 2;
         foreach($company as $row){
             $event->getWriter()->getSheetByIndex(1)->setCellValue('A'.$startRow,$row->code);

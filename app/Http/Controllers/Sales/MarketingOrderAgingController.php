@@ -528,7 +528,7 @@ class MarketingOrderAgingController extends Controller
         }
 
         $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
-        <thead id="head_detail">
+        <thead class="sidebar-sticky" id="head_detail">
             <tr>
                 <th rowspan="2" class="center-align">No.</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Code</th>
@@ -589,7 +589,21 @@ class MarketingOrderAgingController extends Controller
                     <td colspan="' . ($countPeriod + 3) . '">Waktu proses : ' . $execution_time . ' detik</td>
                 </tr>';
 
-        $html .= '</tbody></table>';
+        $html .= '</tbody></table><script>
+                var element = $(".sidebar-sticky"),
+                    originalY = element.offset().top;
+
+                var topMargin = 65;
+
+                element.css("position", "relative");
+                element.css("border", "1px solid;");
+
+                $(window).on("scroll", function(event) {
+                    var scrollTop = $(window).scrollTop();
+                    var imgtop = scrollTop < originalY ? 0 : scrollTop - originalY + topMargin;
+                    element.css("top", imgtop + "px");
+                });
+            </script>';
 
         $response = [
             'status'            => 200,

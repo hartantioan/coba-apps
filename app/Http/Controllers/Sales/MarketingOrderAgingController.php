@@ -528,7 +528,7 @@ class MarketingOrderAgingController extends Controller
         }
 
         $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
-        <thead class="sidebar-sticky" id="head_detail">
+        <thead class="sidebar-sticky" id="head_detail" style="background-color:white;">
             <tr>
                 <th rowspan="2" class="center-align">No.</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Code</th>

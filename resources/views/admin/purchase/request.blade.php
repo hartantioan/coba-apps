@@ -1565,7 +1565,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                var formData = new FormData($('#form_data')[0]), passedUnit = true, passedRequester = true;
+                var formData = new FormData($('#form_data')[0]), passedUnit = true, passedRequester = true, passedDepartment = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1579,6 +1579,11 @@
                 });
                 $('select[name^="arr_project[]"]').each(function(index){
                     formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_department[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedDepartment = false;
+                    }
                 });
 
                 $('select[name^="arr_satuan[]"]').each(function(index){
@@ -1597,6 +1602,15 @@
                     swal({
                         title: 'Ups!',
                         text: 'Requester tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
+                if(!passedDepartment){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Divisi wajib diiisi.',
                         icon: 'warning'
                     });
                     return false;

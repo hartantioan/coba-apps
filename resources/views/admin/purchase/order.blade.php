@@ -2425,7 +2425,7 @@
                 }
 
                 if(passedUpload){
-                    var formData = new FormData($('#form_data')[0]), passedUnit = true;
+                    var formData = new FormData($('#form_data')[0]), passedUnit = true, passedDepartment = true;
 
                     formData.delete("arr_tax[]");
                     formData.delete("arr_is_include_tax[]");
@@ -2441,6 +2441,21 @@
                                 passedUnit = false;
                             }
                         });
+                    }
+
+                    $('select[name^="arr_department[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedDepartment = false;
+                        }
+                    });
+
+                    if(!passedDepartment){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Divisi wajib diiisi.',
+                            icon: 'warning'
+                        });
+                        return false;
                     }
 
                     $('select[name^="arr_tax"]').each(function(index){

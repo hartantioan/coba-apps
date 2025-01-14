@@ -7408,7 +7408,7 @@ class CustomHelper {
 
 				$balance = round($totalitem - $totalcost,2);
 				$balancefc = round($totalfcitem - $totalfccost,2);
-				if($balance < 0 || $balance > 0){
+				if(round($balance,2) < 0 || round($balance,2) > 0){
 					$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$lc->company_id)->first();
 					JournalDetail::create([
 						'journal_id'	=> $query->id,

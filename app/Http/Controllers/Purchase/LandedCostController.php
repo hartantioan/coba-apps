@@ -209,7 +209,7 @@ class LandedCostController extends Controller
                     $details = [];
 
                     foreach($data->goodReceiptDetail as $row){
-                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $coa = Coa::where('code','500.02.01.07.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
                         $details[] = [
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
@@ -279,7 +279,7 @@ class LandedCostController extends Controller
                     }
 
                     foreach($data->landedCostDetail as $row){
-                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $coa = Coa::where('code','500.02.01.07.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
                         $details[] = [
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
@@ -337,7 +337,7 @@ class LandedCostController extends Controller
                     $details = [];
 
                     foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $row){
-                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->itemStock->place->company_id)->where('status','1')->first();
+                        $coa = Coa::where('code','500.02.01.07.01')->where('company_id',$row->itemStock->place->company_id)->where('status','1')->first();
                         $details[] = [
                             'item_id'                   => $row->itemStock->item_id,
                             'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,

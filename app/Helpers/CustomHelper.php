@@ -2530,7 +2530,7 @@ class CustomHelper {
 						if($key == $lastIndex){
 							$nominal = $total - $accumulation;
 						}else{
-							$nominal = round(($rowcost->percentage / 100) * $total);
+							$nominal = round(($rowcost->percentage / 100) * $total,2);
 							$accumulation += $nominal;
 						}
 						JournalDetail::create([
@@ -3194,7 +3194,7 @@ class CustomHelper {
 
 				foreach($ir->inventoryRevaluationDetail as $rowdetail){
 
-					/* if($rowdetail->nominal < 0){
+					if($rowdetail->nominal < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $rowdetail->coa_id,
@@ -3232,7 +3232,7 @@ class CustomHelper {
 							'detailable_type'=> $rowdetail->getTable(),
 							'detailable_id'	=> $rowdetail->id,
 						]);
-					}else{ */
+					}else{
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
@@ -3269,7 +3269,7 @@ class CustomHelper {
 							'detailable_type'=> $rowdetail->getTable(),
 							'detailable_id'	=> $rowdetail->id,
 						]);
-					//}
+					}
 					self::sendCogs($ir->getTable(),
 						$ir->id,
 						$rowdetail->place->company_id,

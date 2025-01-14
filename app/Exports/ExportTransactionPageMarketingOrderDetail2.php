@@ -185,7 +185,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
                 if($row_shading['detail']->deleted_at == null){
                     if(date('Y-m-d',strtotime($row->created_at)) < '2024-12-24'){
-                        $price = $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+                        $price = $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price_list;
                     }else{
                         $price = $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->price_list;
                     }

@@ -3176,6 +3176,11 @@ class CustomHelper {
 			$ir = InventoryRevaluation::find($data->id);
 
 			if($ir){
+
+				$ir->update([
+					'status'	=> '3'
+				]);
+				
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $ir->company_id,

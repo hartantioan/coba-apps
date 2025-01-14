@@ -202,8 +202,8 @@ class DeliveryScanController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $query = MarketingOrderDeliveryProcess::find($request->temp);
             if($query){
                 $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$request->temp)
@@ -322,11 +322,11 @@ class DeliveryScanController extends Controller
 
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             info($e->getMessage());
             DB::rollback();
-        }
+        } */
 
         return response()->json($response);
     }

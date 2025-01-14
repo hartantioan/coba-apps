@@ -372,7 +372,6 @@ class Coa extends Model
                     AND (j.lookable_type != 'closing_journals' OR j.lookable_type IS NULL)
             ", array(
                 'coa_id'    => $row->id,
-                'date'      => $month.'-01',
             ));
 
             $dataCredit = DB::select("
@@ -390,7 +389,6 @@ class Coa extends Model
                     AND (j.lookable_type != 'closing_journals' OR j.lookable_type IS NULL)
             ", array(
                 'coa_id'    => $row->id,
-                'date'      => $month.'-01',
             ));
 
             $totalDebit += $dataDebit[0]->total;

@@ -31,7 +31,7 @@
             @foreach ($row['pr'] as $prIndex => $pr)
                 @php
                     $poCount = count($pr['po']);
-                    
+
                 @endphp
                 @foreach ($pr['po'] as $poIndex => $po)
                     @php
@@ -40,7 +40,7 @@
                         if($type != 'all'){
                             foreach ($po['grpo'] as $grpoIndex => $grpo) {
                                 if( $grpo['outstanding'] == '' || $grpo['outstanding'] > 0){
-                                $masuk =1; 
+                                $masuk =1;
                             }
                             }
                         }else{
@@ -100,12 +100,14 @@
             <th>PR Tgl.Pakai</th>
             <th>PR Qty</th>
             <th>PR Status</th>
+            <th>PR Tgl Approve</th>
             <th>PR Updated By</th>
             {{-- <th>PR Done Date</th> --}}
             <th>PO Code</th>
             <th>PO Date</th>
             <th>PO Qty</th>
             <th>PO Status</th>
+            <th>PO Tgl Approve</th>
             <th>PO Updated By</th>
             {{-- <th>PO Done Date</th> --}}
             <th>GRPO Code</th>
@@ -126,7 +128,7 @@
             @foreach ($row['pr'] as $prIndex => $pr)
                 @php
                     $poCount = count($pr['po']);
-                    
+
                 @endphp
                 @foreach ($pr['po'] as $poIndex => $po)
                     @php
@@ -135,7 +137,7 @@
                         if($type != 'all'){
                             foreach ($po['grpo'] as $grpoIndex => $grpo) {
                                 if( $grpo['outstanding'] == '' || $grpo['outstanding'] > 0){
-                                $masuk =1; 
+                                $masuk =1;
                             }
                             }
                         }else{
@@ -145,7 +147,7 @@
                     @foreach ($po['grpo'] as $grpoIndex => $grpo)
                         @if($masuk == 1)
                             <tr>
-                                
+
                                     <td>{{ $row['item'] }}</td>
                                     <td>{{ $row['group'] }}</td>
                                     <td>{{ $row['warehouse'] }}</td>
@@ -156,23 +158,25 @@
                                     <td>{{ $row['status'] }}</td>
                                     <td>{{ $row['done_user'] }}</td>
                                     {{-- <td>{{ $row['done_date'] }}</td> --}}
-                             
+
                                     <td>{{ $pr['pr_code'] }}</td>
                                     <td>{{ $pr['pr_date'] }}</td>
                                     <td>{{ $pr['pr_use_date'] }}</td>
                                     <td>{{ $pr['pr_qty'] }}</td>
+                                    <td>{{ $pr['pr_approve_date'] }}</td>
                                     <td>{{ $pr['status'] }}</td>
                                     <td>{{ $pr['done_user'] }}</td>
                                     {{-- <td>{{ $pr['done_date'] }}</td> --}}
-                                
-                            
+
+
                                     <td >{{ $po['po_code'] }}</td>
                                     <td >{{ $po['po_date'] }}</td>
                                     <td >{{ $po['po_qty'] }}</td>
                                     <td >{{ $po['status'] }}</td>
+                                    <td>{{ $pr['po_approve_date'] }}</td>
                                     <td>{{ $po['done_user'] }}</td>
                                     {{-- <td>{{ $po['done_date'] }}</td> --}}
-                           
+
                                 <td>{{ $grpo['grpo_code'] }}</td>
                                 <td>{{ $grpo['grpo_date'] }}</td>
                                 <td>{{ $grpo['grpo_qty'] }}</td>

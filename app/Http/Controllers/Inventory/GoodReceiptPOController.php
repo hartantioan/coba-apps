@@ -660,8 +660,8 @@ class GoodReceiptPOController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = GoodReceipt::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -729,20 +729,20 @@ class GoodReceiptPOController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        //DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status GRPO sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     info($e->getMessage());
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodReceipt::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -768,16 +768,16 @@ class GoodReceiptPOController extends Controller
                         'is_multiple_lc'        => '1',
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     info($e->getMessage());
                     DB::rollback();
-                }
+                } */
 			}
 
 			if($query) {
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     foreach($request->arr_purchase as $key => $row){
                         $pod = PurchaseOrderDetail::find(intval($row));
                         $grd = GoodReceiptDetail::create([
@@ -823,11 +823,11 @@ class GoodReceiptPOController extends Controller
                     CustomHelper::sendApproval('good_receipts',$query->id,$query->note);
                     CustomHelper::sendNotification('good_receipts',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     info($e->getMessage());
                     DB::rollback();
-                }
+                } */
 
                 activity()
                     ->performedOn(new GoodReceipt())

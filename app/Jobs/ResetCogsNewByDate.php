@@ -212,11 +212,36 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
                 ]);
 
                 if($row->journalDetail()->exists()){
-                    foreach($row->journalDetail as $rowjournal){
-                        $rowjournal->update([
-                            'nominal_fc'  => $total,
-                            'nominal'     => $total,
-                        ]);
+                    if($row->journalDetail()->where('type','1')->count() > 1){
+                        $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+                        $accumulation = 0;
+                        $totalrow = $total;
+                        $datacost  = $row->costDistribution->costDistributionDetail;
+                        foreach($row->journalDetail()->where('type','1')->get() as $key => $rowjournal){
+                            if($key == $lastIndex){
+                                $nominal = $totalrow - $accumulation;
+                            }else{
+                                $nominal = round(($datacost[$key]->percentage / 100) * $totalrow,2);
+                                $accumulation += $nominal;
+                            }
+                            $rowjournal->update([
+                                'nominal_fc'  => $nominal,
+                                'nominal'     => $nominal,
+                            ]);
+                        }
+                        foreach($row->journalDetail()->where('type','2')->get() as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $total,
+                                'nominal'     => $total,
+                            ]);
+                        }
+                    }else{
+                        foreach($row->journalDetail as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $total,
+                                'nominal'     => $total,
+                            ]);
+                        }
                     }
                 }
             }

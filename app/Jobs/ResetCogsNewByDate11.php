@@ -212,12 +212,12 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 ]);
 
                 if($row->journalDetail()->exists()){
-                    if($row->journalDetail()->where('type','1')->count() > 1){
+                    if($row->journalDetail()->where('type','2')->count() > 1){
                         $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
                         $accumulation = 0;
                         $totalrow = $total;
                         $datacost  = $row->costDistribution->costDistributionDetail;
-                        foreach($row->journalDetail()->where('type','1')->get() as $key => $rowjournal){
+                        foreach($row->journalDetail()->where('type','2')->get() as $key => $rowjournal){
                             if($key == $lastIndex){
                                 $nominal = $totalrow - $accumulation;
                             }else{
@@ -229,7 +229,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                                 'nominal'     => $nominal,
                             ]);
                         }
-                        foreach($row->journalDetail()->where('type','2')->get() as $rowjournal){
+                        foreach($row->journalDetail()->where('type','1')->get() as $rowjournal){
                             $rowjournal->update([
                                 'nominal_fc'  => $total,
                                 'nominal'     => $total,

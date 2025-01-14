@@ -17,7 +17,7 @@
             margin-left:-5px;
             margin-right:-5px;
             }
-            
+
             .column1 {
             float: left;
             width: 50%;
@@ -39,41 +39,41 @@
 
             td {
                 vertical-align:top !important;
-            }            
+            }
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
                     font-size:11px !important;
                 }
-        
+
                 table > thead > tr > th {
-                    
+
                     font-size:13px !important;
                     font-weight: 800 !important;
                 }
                 td{
                     font-size:1em !important;
-              
+
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:13px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:15px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -81,33 +81,33 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-info {
                     font-size:12px !important;
                 }
-        
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -118,22 +118,22 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 border:1px solid black;
                 min-height: auto;
@@ -141,9 +141,9 @@
 
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
-        
-           
+
+
+
         </style>
     </head>
     <body>
@@ -172,13 +172,13 @@
                     </td>
                     <td width="33%" class="right-align">
                     </td>
-                    
+
                     <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
                         <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:250px;right:25px;" height="20%" />
                     </td>
                 </tr>
-                
+
             </table>
         </header>
         <main>
@@ -322,7 +322,7 @@
                             </td>
                         </tr>
                     </table>
-                    
+
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
@@ -334,12 +334,12 @@
                                                 Catatan Tambahan : {!! $data->note !!}
                                             </div>
                                         </td>
-                                        
+
                                     </tr>
                                 </table>
                             </div>
                             <div class="column2">
-                                
+
                             </div>
                         </div>
 
@@ -348,7 +348,7 @@
                                 {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                             </div>
                             <div class="col">
-                                
+
                             </div>
                         </div>
                         <table class="mt-3" width="100%" border="0">
@@ -378,13 +378,38 @@
                                     @endforeach
                                 @endif
                             </tr>
-                        </table>  
+                        </table>
                     </div>
+
+                    @php
+                        $validImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+                        $attachments = $data->officialReportDetail();
+                    @endphp
+
+                    @if($attachments->count() > 0)
+                        @foreach($data->officialReportDetail as $attachment)
+
+                            @if($attachment->document) <!-- Assuming 'document' is the field containing the file path -->
+                                @php
+
+                                    $extension = strtolower(pathinfo(trim($attachment->document), PATHINFO_EXTENSION));
+                                @endphp
+
+                                @if(in_array($extension, $validImageExtensions))
+                                    <div class="attachment-page" style="page-break-before: always; text-align: center; padding-top: 20px;">
+                                        <img src="{{ storage_path('app/' . trim($attachment->document)) }}" alt="Attachment Image" style="width: 80%; max-width: 100%; height: auto;" />
+                                    </div>
+                                @endif
+                            @endif
+                        @endforeach
+                    @endif
+
+
                 </div>
             </div>
         </main>
-       
+
     </body>
-    
-    
+
+
 </html>

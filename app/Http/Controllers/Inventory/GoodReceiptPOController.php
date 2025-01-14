@@ -800,7 +800,9 @@ class GoodReceiptPOController extends Controller
                             'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                            'warehouse_id'              => $request->arr_warehouse[$key]
+                            'warehouse_id'              => $request->arr_warehouse[$key],
+                            'qty_balance'               => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
+                            'percentage_modifier'                 => str_replace(',','.',str_replace('.','',$request->arr_percentage_modifier[$key])),
                         ]);
                         if($request->arr_serial_po){
                             foreach($request->arr_serial_po as $keyserial => $rowserial){

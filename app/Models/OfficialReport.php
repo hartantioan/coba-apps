@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class OfficialReport extends Model
 {
@@ -118,7 +118,7 @@ class OfficialReport extends Model
             '4' => 'Ditolak',
             '5' => 'Ditutup',
             '6' => 'Direvisi',
-            default => 'Invalid', 
+            default => 'Invalid',
         };
 
         return $status;

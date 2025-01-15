@@ -136,7 +136,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 if ($key2 == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
                 } else {
-                    $tax = $rowdetail->proportionalTaxFromHeader();
+                    $tax = $rowdetail->proportionalTaxFromHeader().'-kambing';
                 }
 
 

@@ -102,7 +102,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $balance = floor($row->subtotal * ($row->taxMaster->percentage / 100));
             }
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key2 => $rowdetail) {
-                if ($key2 == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
+                if ($key2 == ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->count() - 1)) {
                     $tax = $balance;
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
@@ -133,7 +133,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             }
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key2 => $rowdetail) {
 
-                if ($key2 == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
+                if ($key2 == ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->count() - 1)) {
                     $tax = $balance;
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
@@ -160,7 +160,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
 
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax.'-kambing' . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
             }

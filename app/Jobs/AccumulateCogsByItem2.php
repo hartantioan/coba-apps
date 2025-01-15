@@ -33,7 +33,7 @@ class AccumulateCogsByItem2 implements ShouldQueue
         $this->date = $date;
         $this->place_id = $place_id;
         $this->item_id = $item_id;
-        $this->queue = 'cogsbydate10';
+        $this->queue = 'cogsbydate11';
     }
 
     /**

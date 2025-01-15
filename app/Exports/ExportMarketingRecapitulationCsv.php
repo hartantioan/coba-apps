@@ -94,12 +94,13 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $arr[] = [
                     '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
+                $balance = floor($row->tax);
             } else {
                 $arr[] = [
                     '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal * ($row->taxMaster->percentage / 100)) . ';0;' . $freeAreaTax . ';2;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
+                $balance = floor($row->subtotal * ($row->taxMaster->percentage / 100));
             }
-            $balance = floor($row->tax);
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key => $rowdetail) {
                 if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;

@@ -101,8 +101,8 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
                 $balance = floor($row->subtotal * ($row->taxMaster->percentage / 100));
             }
-            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key => $rowdetail) {
-                if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
+            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key2 => $rowdetail) {
+                if ($key2 == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
@@ -131,9 +131,9 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
                 $balance -= $tax;
             }
-            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {
+            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key2 => $rowdetail) {
 
-                if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
+                if ($key2 == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
@@ -164,7 +164,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
                 $balance -= $tax;
             }
-            foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key => $rowdetail) {
+            foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key2 => $rowdetail) {
                 $price = $rowdetail->priceBeforeTax();
                 $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);

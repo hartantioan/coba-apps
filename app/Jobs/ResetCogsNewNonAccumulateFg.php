@@ -432,6 +432,7 @@ class ResetCogsNewNonAccumulateFg implements ShouldQueue
                 'total' => $total
             ]);
             if($row->goodReturnIssueDetail()->exists()){
+                $price = $total / $row->qty;
                 foreach($row->goodReturnIssueDetail as $rowretur){
                     $rowretur->update([
                         'total'   => round($price * $rowretur->qty,2),

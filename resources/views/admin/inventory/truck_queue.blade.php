@@ -200,7 +200,6 @@
                             <select class="form-control" id="type" name="type">
                                 <option value="1">Timbang Barang Masuk (Pembelian)</option>
                                 <option value="2">Timbang Barang Keluar (Penjualan)</option>
-                                <option value="3">Timbang Barang Manual</option>
                             </select>
                             <label class="ac" for="type">Tipe Timbang</label>
                         </div>

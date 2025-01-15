@@ -293,7 +293,7 @@ class ReportProductionSummaryStockFgController extends Controller
         foreach ($query as $key => $row) {
 
             $html .= '<tr class="row_detail"><td class="center-align">' . ($key + 1) . '</td><td>' . $row->code . '</td><td>' . $row->name . '</td><td>' . $row->jenis . '</td><td>' . $row->brand   . '</td><td>' . $row->motif   . '</td><td>' . $row->grade   . '</td><td>' . $row->kategori   . '</td><td>' . $row->shading   . '</td>
-            <td class="right-align">' . round($row->initial, 3)   . '</td><td class="right-align">' . round($row->receivefg, 3)   . '</td><td class="right-align">' . round($row->repackout, 3)   . '</td><td class="right-align">' . round($row->repackin, 3)   . '</td><td class="right-align">' . round($row->gr, 3)   . '</td><td class="right-align">' . round($row->gi, 3)   . '</td><td class="right-align">' . round($row->qtysjbelumbarcode, 3)   . '</td>
+            <td class="right-align">' . round($row->initial, 3)   . '</td><td class="right-align">' . round($row->receivefg, 3)   . '</td><td class="right-align">' . round($row->repackout, 3)   . '</td><td class="right-align">' . round($row->repackin, 3)   . '</td><td class="right-align">' . round($row->gr, 3)   . '</td><td class="right-align">' . round($row->mo, 3)   . '</td><td class="right-align">' . round($row->gi, 3)   . '</td><td class="right-align">' . round($row->qtysjbelumbarcode, 3)   . '</td>
             <td class="right-align">' . round($row->endstockblmbarcode, 3)   . '</td><td class="right-align">' . round($row->qtysjsudahbarcode, 3)   . '</td><td class="right-align">' . round($row->endstock, 3)   . '</td>
             </tr>';
 

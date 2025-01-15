@@ -173,7 +173,7 @@
                                     <td >{{ $po['po_date'] }}</td>
                                     <td >{{ $po['po_qty'] }}</td>
                                     <td >{{ $po['status'] }}</td>
-                                    <td>{{ $pr['po_approve_date'] }}</td>
+                                    <td>{{ $po['po_approve_date'] }}</td>
                                     <td>{{ $po['done_user'] }}</td>
                                     {{-- <td>{{ $po['done_date'] }}</td> --}}
 

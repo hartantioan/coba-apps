@@ -291,7 +291,7 @@ class PurchaseProgressController extends Controller
                     'po_date'      => '',
                     'po_qty'       => '',
                     'status'       => '',
-
+                    'po_approve_date'      => '',
                     'done_user'    => '',
                     'done_date'    => '',];
                     $pr=[

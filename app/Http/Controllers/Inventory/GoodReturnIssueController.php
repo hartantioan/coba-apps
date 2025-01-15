@@ -311,7 +311,8 @@ class GoodReturnIssueController extends Controller
                 foreach($request->arr_good_issue_detail as $key => $row){
                     $gid = GoodIssueDetail::find(intval($row));
                     if($gid){
-                        $total = round($gid->price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
+                        $price = $gid->total / $gid->qty;
+                        $total = round($price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
                         $grandtotal += $total;
                         $arrRow[] = $total;
                     }

@@ -2854,7 +2854,7 @@ class CustomHelper {
 				'lookable_type'	=> $gr->getTable(),
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
-				'note'			=> $gr->code,
+				'note'			=> $gr->code.' - '.$gr->note,
 				'status'		=> '3'
 			]);
 

@@ -101,6 +101,12 @@ class ProductionIssueController extends Controller
                                 $query->whereHas('productionOrder',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
                                 });
+                            })->orWhereHas('productionIssueDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionBatchUsage',function($query) use ($search){
+                                    $query->whereHas('productionBatch',function($query) use ($search){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
+                                });
                             });
                     });
                 }
@@ -140,6 +146,12 @@ class ProductionIssueController extends Controller
                             })->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
                                 $query->whereHas('productionOrder',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
+                                });
+                            })->orWhereHas('productionIssueDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionBatchUsage',function($query) use ($search){
+                                    $query->whereHas('productionBatch',function($query) use ($search){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
                                 });
                             });
                     });

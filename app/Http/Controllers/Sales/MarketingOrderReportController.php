@@ -279,6 +279,47 @@ class MarketingOrderReportController extends Controller
             $TaxInvoice->appendChild($BuyerIDTKU);
             $TaxInvoice->appendChild($ListOfGoodService);
             $balance = floor($row->tax);
+            foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key => $rowdetail) {
+                $price = $rowdetail->priceBeforeTax();
+                $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
+                $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
+
+                
+                $GoodService = $dom->createElement('GoodService');
+                $ListOfGoodService->appendChild($GoodService);
+                //detail
+                $Opt = $dom->createElement('Opt', 'A');
+                $Code = $dom->createElement('Code', '');
+                $Name = $dom->createElement('Name',   $rowdetail->description);
+                $Unit = $dom->createElement('Unit', 'UM.0033');
+                $Price = $dom->createElement('Price', round($price, 2));
+                $Qty = $dom->createElement('Qty', round($rowdetail->qty, 2));
+                $TotalDiscount = $dom->createElement('TotalDiscount', $totalDiscountBeforeTax);
+                $TaxBase = $dom->createElement('TaxBase', round($rowdetail->total, 2));
+                $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * (round($rowdetail->total, 2)), 2));
+                $VATRate = $dom->createElement('VATRate', '12');
+                //$VAT = $dom->createElement('VAT', $tax);
+                $VAT = $dom->createElement('VAT', round($rowdetail->tax,2));
+                $STLGRate = $dom->createElement('STLGRate', '0');
+                $STLG = $dom->createElement('STLG', '0');
+                //detail
+                $GoodService->appendChild($Opt);
+                $GoodService->appendChild($Code);
+                $GoodService->appendChild($Name);
+                $GoodService->appendChild($Unit);
+                $GoodService->appendChild($Price);
+                $GoodService->appendChild($Qty);
+                $GoodService->appendChild($TotalDiscount);
+                $GoodService->appendChild($TaxBase);
+                $GoodService->appendChild($TaxBase);
+                $GoodService->appendChild($OtherTaxBase);
+                $GoodService->appendChild($VATRate);
+                $GoodService->appendChild($VAT);
+                $GoodService->appendChild($STLGRate);
+                $GoodService->appendChild($STLG);
+                
+            }
+
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {
                 if ($key == ($row->marketingOrderInvoiceDetail()->count() - 1)) {
                     $tax = $balance;

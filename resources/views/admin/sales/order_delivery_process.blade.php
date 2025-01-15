@@ -955,6 +955,7 @@ document.addEventListener('focusin', function (event) {
                 }
                 $('#receive_date').val('');
                 $('#div-receive-date').addClass('hide');
+                $('#dateTracking1,#dateTracking2,#dateTracking3,#dateTracking5,#userTracking1,#userTracking2,#userTracking3,#userTracking5').text('-');
             }
         });
 

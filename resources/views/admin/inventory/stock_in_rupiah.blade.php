@@ -222,6 +222,8 @@
                         $('#result-final').removeClass('hide');
                         $('#result-final').html(response.html);
                     }else{
+                        $('#table_laporan').removeClass('hide');
+                        $('#result-final').addClass('hide');
                         if (response.message.length > 0) {
                             var processedItems = [];
                             $('#t_head').empty();

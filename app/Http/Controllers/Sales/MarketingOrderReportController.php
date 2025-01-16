@@ -196,7 +196,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '');
+                $Code = $dom->createElement('Code', '000000');
                 $Name = $dom->createElement('Name',   $row->note);
                 $Unit = $dom->createElement('Unit', 'UM.0033');
                 $Price = $dom->createElement('Price', round($row->total, 2));
@@ -218,7 +218,7 @@ class MarketingOrderReportController extends Controller
                 $GoodService->appendChild($Qty);
                 $GoodService->appendChild($TotalDiscount);
                 $GoodService->appendChild($TaxBase);
-                $GoodService->appendChild($TaxBase);
+                //$GoodService->appendChild($TaxBase);
                 $GoodService->appendChild($OtherTaxBase);
                 $GoodService->appendChild($VATRate);
                 $GoodService->appendChild($VAT);
@@ -289,7 +289,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '');
+                $Code = $dom->createElement('Code', '000000');
                 $Name = $dom->createElement('Name',   $rowdetail->description);
                 $Unit = $dom->createElement('Unit', 'UM.0033');
                 $Price = $dom->createElement('Price', round($price, 2));
@@ -311,7 +311,7 @@ class MarketingOrderReportController extends Controller
                 $GoodService->appendChild($Qty);
                 $GoodService->appendChild($TotalDiscount);
                 $GoodService->appendChild($TaxBase);
-                $GoodService->appendChild($TaxBase);
+                //$GoodService->appendChild($TaxBase);
                 $GoodService->appendChild($OtherTaxBase);
                 $GoodService->appendChild($VATRate);
                 $GoodService->appendChild($VAT);
@@ -343,7 +343,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '');
+                $Code = $dom->createElement('Code', '000000');
                 $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode);
                 $Unit = $dom->createElement('Unit', 'UM.0012');
                 $Price = $dom->createElement('Price', round($price, 2));
@@ -365,7 +365,7 @@ class MarketingOrderReportController extends Controller
                 $GoodService->appendChild($Qty);
                 $GoodService->appendChild($TotalDiscount);
                 $GoodService->appendChild($TaxBase);
-                $GoodService->appendChild($TaxBase);
+                //$GoodService->appendChild($TaxBase);
                 $GoodService->appendChild($OtherTaxBase);
                 $GoodService->appendChild($VATRate);
                 $GoodService->appendChild($VAT);

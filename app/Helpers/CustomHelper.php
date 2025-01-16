@@ -8011,21 +8011,21 @@ class CustomHelper {
 			if($key2 == 0){
 				if($old_data2){
 					if($row->type == 'IN'){
-						$total_final = $old_data2->total_final + $row->total_in;
-						$qty_final = $old_data2->qty_final + $row->qty_in;
+						$total_final = round($old_data2->total_final,2) + round($row->total_in,2);
+						$qty_final = round($old_data2->qty_final,3) + round($row->qty_in,3);
 					}elseif($row->type == 'OUT'){
-						$total_final = $old_data2->total_final - $row->total_out;
-						$qty_final = $old_data2->qty_final - $row->qty_out;
+						$total_final = round($old_data2->total_final,2) - round($row->total_out,2);
+						$qty_final = round($old_data2->qty_final,3) - round($row->qty_out,3);
 					}
 
 					$price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
 				}else{
 					if($row->type == 'IN'){
-						$total_final = $row->total_in;
-						$qty_final = $row->qty_in;
+						$total_final = round($row->total_in,2);
+						$qty_final = round($row->qty_in,3);
 					}elseif($row->type == 'OUT'){
-						$total_final = 0 - $row->total_out;
-						$qty_final = 0 - $row->qty_out;
+						$total_final = 0 - round($row->total_out,2);
+						$qty_final = 0 - round($row->qty_out,3);
 					}
 
 					$price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;

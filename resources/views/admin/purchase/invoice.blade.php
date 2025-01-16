@@ -3214,12 +3214,6 @@
                     formData.delete("arr_warehouse[]");
                     formData.delete("arr_project[]");
 
-                    $('select[name^="arr_project[]"]').each(function(){
-                        if(!$(this).val()){
-                            passedProject = false;
-                        }
-                    });
-
                     $('select[name^="arr_percent_tax"]').each(function(){
                         formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
                     });

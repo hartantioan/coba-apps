@@ -1100,6 +1100,21 @@ class PurchaseInvoiceController extends Controller
             ];
         } else {
 
+            if($request->arr_coa){
+                foreach($request->arr_coa as $key => $row){
+                    if ( $row == 105) {
+                        if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
+                            $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant.';
+                            $response = [
+                                'status' => 422,
+                                'error'  => $kambing
+                            ];
+                            return response()->json($response);
+                        }
+                    }
+                }
+            }
+
             if(!CustomHelper::checkLockAcc($request->post_date)){
                 return response()->json([
                     'status'  => 500,

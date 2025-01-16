@@ -163,8 +163,8 @@
                                     <td>{{ $pr['pr_date'] }}</td>
                                     <td>{{ $pr['pr_use_date'] }}</td>
                                     <td>{{ $pr['pr_qty'] }}</td>
-                                    <td>{{ $pr['pr_approve_date'] }}</td>
                                     <td>{{ $pr['status'] }}</td>
+                                    <td>{{ $pr['pr_approve_date'] }}</td>
                                     <td>{{ $pr['done_user'] }}</td>
                                     {{-- <td>{{ $pr['done_date'] }}</td> --}}
 

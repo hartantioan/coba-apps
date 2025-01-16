@@ -31,7 +31,7 @@ class MailReportProcurementOutstandPO extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id','heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
+        $recipient = ['edp@superior.co.id','david@superior.co.id','heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
         Excel::store(new ExportProcurementOutstandPO, 'public/auto_email/OutstandPO.xlsx', 'local');
         Mail::to($recipient)->send(new SendMailProcurementOutstandPO());
     }

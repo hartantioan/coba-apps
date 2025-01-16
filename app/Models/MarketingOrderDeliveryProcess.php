@@ -862,6 +862,60 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
+    public function createJournalSentDocumentWithoutStock(){
+        $modp = $this;
+
+        $query = Journal::create([
+            'user_id'		=> $modp->user_id,
+            'company_id'    => $modp->company_id,
+            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
+            'lookable_type'	=> $modp->getTable(),
+            'lookable_id'	=> $modp->id,
+            'post_date'		=> $modp->post_date,
+            'note'			=> $modp->note_internal.' - '.$modp->note_external,
+            'status'		=> '3'
+        ]);
+
+        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
+
+        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+            $hpp = $row->getHpp();
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'		=> $coabdp->id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '1',
+                'nominal'		=> $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '2',
+                'nominal'		=> $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
+        }
+    }
+
     public function createJournalReceiveDocument(){
         $modp = MarketingOrderDeliveryProcess::find($this->id);
 

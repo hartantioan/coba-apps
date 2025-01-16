@@ -46,6 +46,6 @@ class AccumulateCogsByItem2 implements ShouldQueue
         $company_id = $this->company_id;
         $place_id = $this->place_id;
         $item_id = $this->item_id;
-        CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
+        CustomHelper::accumulateCogsForAll($this->date,$company_id,$place_id,$item_id);
     }
 }

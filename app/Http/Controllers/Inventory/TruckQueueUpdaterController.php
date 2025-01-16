@@ -87,7 +87,11 @@ class TruckQueueUpdaterController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            });
+                            })
+                            ->orWhere('no_pol', 'like', "%$search%")
+                            ->orWhere('truck', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('code_barcode', 'like', "%$search%");
                     });
                 }
                 if($request->start_date && $request->finish_date) {
@@ -116,7 +120,11 @@ class TruckQueueUpdaterController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            });
+                            })
+                            ->orWhere('no_pol', 'like', "%$search%")
+                            ->orWhere('truck', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('code_barcode', 'like', "%$search%");
                     });
                 }
                 if($request->start_date && $request->finish_date) {

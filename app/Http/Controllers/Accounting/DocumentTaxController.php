@@ -383,10 +383,17 @@ class DocumentTaxController extends Controller
                 ];
                 return response()->json($response);
             }
+            if (empty($no_faktur)) {
+                $response = [
+                    'status' => 422,
+                    'error'  => 'Nomor Faktur Kosong'
+                ];
+                return response()->json($response);
+            }
 
             $kdJenisTransaksi = substr($no_faktur, 0, 2);
             $fgPengganti = substr($no_faktur, 2, 1);
-            $nomorFaktur = substr($no_faktur, 3, 13);
+            $nomorFaktur = substr($no_faktur, 3);
             $existingRecord = DB::table('document_taxes')
             ->where('code', $nomorFaktur)
             ->where('replace', $fgPengganti)

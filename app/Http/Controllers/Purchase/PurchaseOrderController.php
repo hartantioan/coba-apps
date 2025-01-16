@@ -931,7 +931,6 @@ class PurchaseOrderController extends Controller
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => (float)str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
-                        'approve_date'              => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
                         'received_date'             => $request->received_date,
                         'due_date'                  => $request->due_date,

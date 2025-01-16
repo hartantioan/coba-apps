@@ -733,7 +733,6 @@ class PurchaseRequestController extends Controller
                         'company_id'    => $request->company_id,
                         'status'        => '1',
                         'post_date'     => $request->post_date,
-                        'approve_date'  => $request->post_date,
                         'due_date'      => $request->due_date,
                         'note'          => $request->note,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,

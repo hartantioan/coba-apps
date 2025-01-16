@@ -104,7 +104,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                     'po_code'      => $row_po_detail->purchaseOrder->code,
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
                                     'po_qty'       => $row_po_detail->qty,
-                                    'po_approve_date' => $row_pr_detail->purchaseOrder->approve_date ? date('Y-m-d', strtotime($row_po_detail->purchaseOrder->approve_date)) : '-',
+                                    'po_approve_date' => $row_po_detail->purchaseOrder->approve_date ? date('Y-m-d', strtotime($row_po_detail->purchaseOrder->approve_date)) : '-',
                                     'status'       => $row_po_detail->purchaseOrder->statusRaw(),
                                     'done_user'    => ($row_po_detail->purchaseOrder->status == 3 && is_null($row_po_detail->purchaseOrder->done_id)) ? 'sistem' : (($row_po_detail->purchaseOrder->status == 3 && !is_null($row_po_detail->purchaseOrder->done_id)) ? $row_po_detail->purchaseOrder->doneUser->name : ''),
                                     'done_date'    => $row_po_detail->purchaseOrder->done_date,

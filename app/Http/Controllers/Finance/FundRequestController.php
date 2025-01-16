@@ -1079,7 +1079,7 @@ class FundRequestController extends Controller
         /* if($request->arr_item){
             foreach($request->arr_item as $key => $row){
                 if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
-                    $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant 1';
+                    $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant';
                     $response = [
                         'status' => 422,
                         'error'  => $kambing

@@ -705,7 +705,37 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/purchase_item") }}');
+
+        $('#arr_lookable_id'+ count).select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
     }
 
     function addResource(){
@@ -1068,7 +1098,35 @@
                         <option value="` + val.lookable_id + `">` + val.code + ` - ` + val.name + `</option>
                     `);
                     if(val.lookable_type == 'items'){
-                        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/purchase_item") }}');
+                        $('#arr_lookable_id'+ count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 4,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/purchase_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                delay: 250,
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
                     }
                     if(val.lookable_type == 'resources'){
                         select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/resource") }}');

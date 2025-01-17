@@ -787,7 +787,37 @@
         });
 
         $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
+        /* // select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}'); */
+        $('#arr_item0').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
         select2ServerSide('#arr_project0', '{{ url("admin/select2/project") }}');
 
         $("#table-detail th").resizable({
@@ -1490,7 +1520,35 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        $('#arr_item'+ count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 4,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/purchase_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                delay: 250,
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
                         $('#arr_place' + count).val(val.place_id);
 
                         if(val.line_id){
@@ -1692,7 +1750,36 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                                $('#arr_item'+ count).select2({
+                                    placeholder: '-- Pilih ya --',
+                                    minimumInputLength: 4,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/purchase_item") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        delay: 250,
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                            };
+                                        },
+                                        processResults: function(data, params) {
+                                            params.page = params.page || 1;
+                                            return {
+                                                results: data.items,
+                                                pagination: {
+                                                    more: data.pagination.more
+                                                }
+                                            };
+                                        },
+                                        cache: true,
+                                    }
+                                });
+
                                 $('#arr_place' + count).val(val.place_id);
 
                                 if(val.line_id){
@@ -2029,7 +2116,36 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        $('#arr_item'+ count).select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 

@@ -1081,13 +1081,23 @@ class CustomHelper {
 				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()){
 					$place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
 
+					$receive_date = '';
+
+					foreach($gs->goodScaleDetail as $row){
+						if($row->lookable_type == 'marketing_order_deliveries'){
+							if($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()){
+								$receive_date = $row->lookable->marketingOrderDeliveryProcess->receive_date;
+							}
+						}
+					}
+
 					$query = Journal::create([
 						'user_id'		=> session('bo_id'),
 						'company_id'	=> $gs->company_id,
 						'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $gs->id,
-						'post_date'		=> $data->post_date,
+						'post_date'		=> $receive_date,
 						'note'			=> 'BIAYA KIRIM '.$gs->referenceGRPODO(),
 						'status'		=> '3',
 					]);

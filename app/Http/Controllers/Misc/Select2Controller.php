@@ -91,7 +91,7 @@ use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
 use App\Models\IssueGlaze;
-use App\Models\ItemPricelist;
+use App\Models\RuleBPScale;
 use App\Models\CustomerDiscount;
 use App\Models\DeliveryCostStandard;
 use App\Models\Group;
@@ -2719,33 +2719,42 @@ class Select2Controller extends Controller {
         $search     = $request->search;
         $place      = $request->place;
         $warehouse  = $request->warehouse;
-        $data = Item::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
-                })
-                ->whereHas('itemStock',function($query)use($place,$warehouse){
-                    $query->where('place_id',$place)
-                        ->where('warehouse_id',$warehouse);
-                })
-                ->where('status','1')->get();
 
-        foreach($data as $d) {
-            $response[] = [
-                'id'   			    => $d->id,
-                'text' 			    => $d->code.' - '.$d->name,
+        $data = Item::where(function($query) use($search) {
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name', 'like', "%$search%");
+        })
+        ->whereHas('itemStock', function($query) use($place, $warehouse) {
+            $query->where('place_id', $place)
+                ->where('warehouse_id', $warehouse);
+        })
+        ->where('status', '1')
+        ->paginate(10);
+
+
+        $response = $data->map(function($d) use ($place, $warehouse) {
+            return [
+                'id'                => $d->id,
+                'text'              => $d->code.' - '.$d->name,
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStockPlaceWarehouse($place,$warehouse),
+                'stock_list'        => $d->currentStockPlaceWarehouse($place, $warehouse),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
             ];
-        }
+        });
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
     }
+
 
     public function itemRevaluation(Request $request)
     {
@@ -3033,10 +3042,19 @@ class Select2Controller extends Controller {
                 ->get();
 
         foreach($data as $d) {
+            $id_rules = null;
+            $percentage_mod = 0;
+            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('effective_date','>=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
+            if($getRules){
+                $id_rules = $getRules->id;
+                $percentage_mod = $getRules->percentage_level;
+            }
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code,
                 'qty'               => CustomHelper::formatConditionalQty($d->qty_final),
+                'percentage_modifier'     => CustomHelper::formatConditionalQty($percentage_mod),
+                'id_rules'          => $id_rules,
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
                 'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
                 'residue'           => CustomHelper::formatConditionalQty($d->residue),
@@ -3836,12 +3854,15 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Outlet::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
-                })
-                ->where('status','1')
-                ->get();
+        $data = Outlet::where(function($query) use($search,$request){
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                if($request->account_id){
+                    $query->where('account_id',$request->account_id);
+                }
+            })
+            ->where('status','1')
+            ->get();
 
         foreach($data as $d) {
             $response[] = [

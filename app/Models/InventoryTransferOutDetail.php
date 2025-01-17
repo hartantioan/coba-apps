@@ -107,6 +107,6 @@ class InventoryTransferOutDetail extends Model
     }
 
     public function itemSerialIn(){
-        return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table)->whereIn('status',['2','3']);
+        return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
     }
 }

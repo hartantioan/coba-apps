@@ -51,7 +51,7 @@ class InventoryTransferOut extends Model
     }
 
     public function inventoryTransferIn(){
-        return $this->hasOne('App\Models\InventoryTransferIn','inventory_transfer_out_id','id');
+        return $this->hasOne('App\Models\InventoryTransferIn','inventory_transfer_out_id','id')->whereIn('status',['2','3']);
     }
 
     public function placeFrom(){

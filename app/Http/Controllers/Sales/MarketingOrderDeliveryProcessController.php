@@ -566,7 +566,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 $passedQty = false;
                             }
                             if($itemstock){
-                                if($itemstock->balanceWithUnsent() < round($arrQtyNeeded[$key],3)){
+                                if(round($itemstock->balanceWithUnsent(),3) < round($arrQtyNeeded[$key],3)){
                                     $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
                                     $passedQty = false;
                                 }

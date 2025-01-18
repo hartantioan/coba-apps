@@ -1070,6 +1070,11 @@ class MarketingOrderDeliveryProcess extends Model
         return $total;
     }
 
+    public function totalCost(){
+        $total = $this->marketingOrderDeliveryProcessDetail()->sum('total');
+        return round($total,2);
+    }
+
     public function hasBalance(){
         $status = true;
 

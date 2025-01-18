@@ -63,7 +63,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
             if (isset($row['item']) && $row['item']) {
 
 
-                $note = trim($row['catatan']);;$divisi=$row['divisi'];$location = trim($row['lokasi']);
+                $note = trim($row['catatan']);$divisi=$row['divisi'];$location = trim($row['lokasi']);
                 $item = HardwareItem::where('code', explode('#', $row['item'])[0])->first();
                 $user = User::where('employee_no',explode('#', $row['user'])[0])->first();
                 $area = explode('#', $row['area'])[0];
@@ -111,7 +111,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
 
 
             }else{
-                return null;
+                throw new RowImportException('ada yang kurang', $row->getIndex(),$this->error,'item');
             }
             DB::commit();
         }catch (\Exception $e) {

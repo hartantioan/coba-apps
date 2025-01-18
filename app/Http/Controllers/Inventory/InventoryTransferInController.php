@@ -692,6 +692,8 @@ class InventoryTransferInController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -703,10 +705,10 @@ class InventoryTransferInController extends Controller
                     $row->itemSerialIn()->delete();
                 }
 
-                if(in_array($query->status,['2','3'])){
+                //if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal('inventory_transfer_ins',$query->id);
                     CustomHelper::removeCogs('inventory_transfer_ins',$query->id);
-                }
+                //}
     
                 activity()
                     ->performedOn(new InventoryTransferIn())

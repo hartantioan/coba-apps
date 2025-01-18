@@ -224,6 +224,6 @@ class ExportSubsidiaryLedger implements FromArray, WithTitle, WithHeadings, With
 
     public function chunkSize(): int
     {
-        return 1000;  // Process in chunks of 1000 rows
+        return 10000;  // Process in chunks of 1000 rows
     }
 }

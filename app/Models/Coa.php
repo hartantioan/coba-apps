@@ -149,7 +149,7 @@ class Coa extends Model
 
             $totalBalanceBeforeCredit += $dataBalanceBeforeCredit[0]->total;
 
-            $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
+            /* $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
             })->get();
     
@@ -163,7 +163,42 @@ class Coa extends Model
 
             foreach($dataCredit as $rownow2){
                 $totalCredit += round($rownow2->nominal,2);
-            }
+            } */
+
+            $dataDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date LIKE '$month%'
+                    AND jd.type = '1'
+            ", array(
+                'coa_id'    => $row->id,
+            ));
+
+            $dataCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date LIKE '$month%'
+                    AND jd.type = '2'
+            ", array(
+                'coa_id'    => $row->id,
+            ));
+
+            $totalDebit += $dataDebit[0]->total;
+            $totalCredit += $dataCredit[0]->total;
         }
 
         $arr = [

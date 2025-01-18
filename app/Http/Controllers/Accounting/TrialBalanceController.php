@@ -373,14 +373,14 @@ class TrialBalanceController extends Controller
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';
-                    $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
-                    $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
-                    $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
-                    $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
-                    $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
-                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalDebit'] += round($val['totalDebit'],2);
+                    $arrMonth[$key]['totalCredit'] += round($val['totalCredit'],2);
+                    $arrMonth[$key]['totalBalance'] += round($val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'],2);
+                    $arrMonth[$key]['tempDebit'] += round($val['totalDebit'],2);
+                    $arrMonth[$key]['tempCredit'] += round($val['totalCredit'],2);
+                    $arrMonth[$key]['tempBalance'] += round($val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'],2);
+                    $arrMonth[$key]['tempBalanceBefore'] += round($val['totalBalanceBefore'],2);
+                    $arrMonth[$key]['totalBalanceBefore'] += round($val['totalBalanceBefore'],2);
                 }
 
                 $html .= '</tr>';

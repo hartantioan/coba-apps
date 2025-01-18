@@ -192,6 +192,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     $arr[] = [
                         'no'                => ($no),
                         'code'              => $row->purchaseOrder->code,
+                        'Tgl. Approve'      => $row->purchaseOrder->approve_date ?? '-',
                         'status'            => $row->purchaseOrder->statusRaw(),
                         'voider'            => $row->purchaseOrder->voidUser()->exists() ? $row->purchaseOrder->voidUser->name : '',
                         'void_date'         => $row->purchaseOrder->voidUser()->exists() ? $row->purchaseOrder->void_date : '',

@@ -115,10 +115,14 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
             }
             else{
 
-                if($row->is_include_tax == 1) {
-                    $price = $row->price / (($row->percent_tax + 100) / 100);
-                }else{
+                if(date('Y-m-d',strtotime($row->getMoDetail()->created_at)) >= '2024-12-24'){
                     $price = $row->price;
+                }else{
+                    if($row->is_include_tax == 1) {
+                        $price = $row->price / (($row->percent_tax + 100) / 100);
+                    }else{
+                        $price = $row->price;
+                    }
                 }
 
                 if($row->is_include_tax == 1) {

@@ -11,6 +11,7 @@ use App\Models\Place;
 use App\Models\Region;
 use App\Models\Type;
 use App\Models\User;
+use App\Models\Variety;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
@@ -31,6 +32,7 @@ class ExportTemplatePriceList extends \PhpOffice\PhpSpreadsheet\Cell\StringValue
         $event->writer->getSheetByIndex(4);
         $event->writer->getSheetByIndex(5);
         $event->writer->getSheetByIndex(6);
+        $event->writer->getSheetByIndex(7);
 
         $Item =  Type::where('status',1)->get();
         $Group = Group::where('type',2)->where('status',1)->get();
@@ -38,6 +40,7 @@ class ExportTemplatePriceList extends \PhpOffice\PhpSpreadsheet\Cell\StringValue
         $city =  Region::whereRaw('LENGTH(code) = 5')->get();
         $province = Region::whereRaw('LENGTH(code) = 2')->get();
         $Grade = Grade::where('status',1)->get();
+        $variety = Variety::where('status',1)->get();
 
         $startRow = 2;
         foreach($Item as $row){
@@ -76,6 +79,13 @@ class ExportTemplatePriceList extends \PhpOffice\PhpSpreadsheet\Cell\StringValue
         foreach($city as $row){
             $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($variety as $row){
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 

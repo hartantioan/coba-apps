@@ -56,7 +56,7 @@
             background-color:white !important;
             zoom:0.8;
         }
-        
+
         .modal {
             background-color:white !important;
         }
@@ -88,7 +88,7 @@
             overflow: visible !important;
             min-width:100% !important;
         }
-        
+
         .modal-content {
             visibility: visible !important;
             overflow: visible !important;
@@ -224,6 +224,28 @@
                 </div>
             </div>
         </div>
+        @php
+            $validImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+            $attachments = $data->officialReportDetail();
+        @endphp
+
+        @if($attachments->count() > 0)
+            @foreach($data->officialReportDetail as $attachment)
+
+                @if($attachment->document) <!-- Assuming 'document' is the field containing the file path -->
+                    @php
+
+                        $extension = strtolower(pathinfo(trim($attachment->document), PATHINFO_EXTENSION));
+                    @endphp
+
+                    @if(in_array($extension, $validImageExtensions))
+                        <div class="attachment-page" style="page-break-before: always; text-align: center; padding-top: 20px;">
+                            <img src="{{ storage_path('app/' . trim($attachment->document)) }}" alt="Attachment Image" style="width: 80%; max-width: 100%; height: auto;" />
+                        </div>
+                    @endif
+                @endif
+            @endforeach
+        @endif
         <div class="invoice-subtotal mt-3">
             <div class="row">
                 <div class="col m6 s6 l6">
@@ -236,34 +258,34 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        
-                        
+
+
                         <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
-                       
+
                     </td>
                 </tr>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
                             @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                            <tr>    
+                            <tr>
                                 <td>
-                                        
-                                        
+
+
                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                            {{ $row->user->name }} 
+                                            {{ $row->user->name }}
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}
                                             @endif
                                             {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-').' Keterangan : '.$row->note }}</div>
                                         <div class="{{ $row->user->date_process ? '' : 'mt-2' }}"></div>
-                                        
+
                                 </td>
                             </tr>
                             @endforeach
                         @endforeach
                     @endif
-                
-            </table>   
+
+            </table>
         </div>
     </div>
 </div>

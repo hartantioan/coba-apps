@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Exports\ExportSubsidiaryLedger;
-use App\Exports\ExportSubsidiaryLedger2;
 use App\Models\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -36,7 +35,7 @@ class SubsidiaryLedgerExportJob implements ShouldQueue
     {
         $filename = 'subsidiary_ledger_' . uniqid() . '.xlsx';
 
-        Excel::store(new ExportSubsidiaryLedger2($this->datestart,$this->dateend,$this->coastart,$this->coaend,$this->closing_journal), 'public/report/'.$filename);
+        Excel::store(new ExportSubsidiaryLedger($this->datestart,$this->dateend,$this->coastart,$this->coaend,$this->closing_journal), 'public/report/'.$filename);
         Notification::create([
             'code'				=> Str::random(20),
             'menu_id'			=> 0,

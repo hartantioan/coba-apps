@@ -25,6 +25,7 @@ class ItemPricelist extends Model
         'group_id',
         'place_id',
 
+        'variety_id',
         'discount',
         'sell_price',
 
@@ -36,6 +37,10 @@ class ItemPricelist extends Model
 
     public function grade(){
         return $this->belongsTo('App\Models\Grade','grade_id','id')->withTrashed();
+    }
+
+    public function variety(){
+        return $this->belongsTo('App\Models\Variety','variety_id','id')->withTrashed();
     }
 
     public function customer(){

@@ -86,6 +86,7 @@
                                                         <th>Grup BP</th>
                                                         <th>Tipe Pengiriman</th>
                                                         <th>Grade</th>
+                                                        <th>Variasi</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>Disc.</th>
                                                         <th>Harga Jual</th>
@@ -146,6 +147,11 @@
 
                             <select class="browser-default" id="grade_id" name="grade_id"></select>
                             <label class="active" for="grade_id">Grade</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+
+                            <select class="browser-default" id="variety_id" name="variety_id"></select>
+                            <label class="active" for="variety_id">Variasi Item</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="type_delivery" name="type_delivery">
@@ -397,6 +403,7 @@
         });
 
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
+        select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
@@ -451,6 +458,7 @@
                 { name: 'group_id', className: 'center-align' },
                 { name: 'group_id', className: 'center-align' },
                 { name: 'group_id', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'end_date', className: 'center-align' },

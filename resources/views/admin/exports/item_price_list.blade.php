@@ -5,7 +5,8 @@
             <th>Tipe Item</th>
             <th>Grup BP</th>
             <th>Tipe Pengiriman</th>
-            <th>Grade</th>
+            <th>Grade</th>>
+            <th>Variety</th>
             <th>{{ __('translations.plant') }}</th>
             <th>Disc.</th>
             <th>Harga Jual</th>
@@ -26,6 +27,7 @@
                 <td>{{ $row->type->code ?? '-' }}</td>
                 <td>{{ $row->deliveryType() ?? '-'}}</td>
                 <td>{{ $row->grade->code ?? '-'}}</td>
+                <td>{{ $row->variety->name ?? '-'}}</td>
                 <td>{{ $row->place->code.' - '.$row->place->name}}</td>
                 <td>{{ $row->discount}}</td>
                 <td>{{ $row->sell_price}}</td>

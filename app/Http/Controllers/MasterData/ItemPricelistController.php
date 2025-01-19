@@ -116,6 +116,7 @@ class ItemPricelistController extends Controller
                     $val->group->name,
                     $val->deliveryType() ?? '-',
                     $val->grade->code ?? '-',
+                    $val->variety->name ?? '-',
                     $val->place->code.' - '.$val->place->name,
                     number_format($val->discount,2,',','.') ?? 0,
                     number_format($val->sell_price,2,',','.') ?? '-',
@@ -150,8 +151,6 @@ class ItemPricelistController extends Controller
             'place_id'              => 'required',
             'group_id'              => 'required',
             'price'                 => 'required',
-            'start_date'            => 'required',
-            'end_date'              => 'required',
             'province_id'       => 'required',
             'city_id'           => 'required'
         ], [
@@ -161,8 +160,6 @@ class ItemPricelistController extends Controller
             'price.required'        => 'Harga tidak boleh kosong.',
             'province_id.required'  => 'Provinsi tidak boleh kosong.',
             'city_id.required'      => 'Kota tidak boleh kosong.',
-            'start_date.required'   => 'Tgl.Mulai Aktif tidak boleh kosong.',
-            'end_date.required'     => 'Tgl.Akhir Aktif tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -183,6 +180,7 @@ class ItemPricelistController extends Controller
                     $query->grade_id        = $request->grade_id;
                     $query->type_delivery   = $request->type_delivery;
                     $query->province_id     = $request->province_id;
+                    $query->variety_id     = $request->variety_id;
                     $query->city_id         = $request->city_id;
                     $query->discount           = str_replace(',','.',str_replace('.','',$request->discount));
                     $query->sell_price           = str_replace(',','.',str_replace('.','',$request->sell_price));
@@ -203,6 +201,7 @@ class ItemPricelistController extends Controller
                         'grade_id'			=> $request->grade_id,
                         'type_delivery'          => $request->type_delivery,
 
+                        'variety_id'			=> $request->variety_id,
                         'discount'             => str_replace(',','.',str_replace('.','',$request->discount)),
                         'sell_price'             => str_replace(',','.',str_replace('.','',$request->sell_price)),
                         'price'             => str_replace(',','.',str_replace('.','',$request->price)),
@@ -244,6 +243,7 @@ class ItemPricelistController extends Controller
         $bp['type'] = $bp->type;
         $bp['grade'] = $bp->grade;
         $bp['group']= $bp->group;
+        $bp['variety']= $bp->variety;
         $bp['province'] = $bp->province;
         $bp['city']= $bp->city;
 

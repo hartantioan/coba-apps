@@ -16,6 +16,7 @@ use App\Models\Grade;
 use App\Models\Region;
 use App\Models\Type;
 use App\Models\User;
+use App\Models\Variety;
 use DateTime;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -61,6 +62,10 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                 $grade = Grade::where('code',$grade_code)->first();
                 $delivery_type = explode('#', $row['tipe_delivery'])[0];
 
+                $variety = str_replace(',', '.', explode('#', $row['variety'])[0]);
+                $variety_id = Variety::where('code',$variety)->first()->id;
+
+
                 if(!$item && $this->error ==null){
                     $this->error = "type.";
                 }elseif(!$group && $this->error ==null){
@@ -71,6 +76,8 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                     $this->error = "Provinsi.";
                 }elseif(!$city_id && $this->error ==null){
                     $this->error = "Kota.";
+                }elseif(!$variety_id && $this->error ==null){
+                    $this->error = "Variasi Item.";
                 }
 
                 if(!$this->error){
@@ -83,6 +90,7 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                         'grade_id'          => $grade->id,
                         'province_id'       => $province_id,
                         'city_id'           => $city_id,
+                        'variety_id'           => $variety_id,
                         'type_delivery'     => $delivery_type,
                         'price'             => $row['price'],
                         'sell_price'        => $row['harga_jual'],

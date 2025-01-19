@@ -260,7 +260,7 @@ class MarketingOrderAgingController extends Controller
             <tr>
                 <th rowspan="2" class="center-align">No.</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Code</th>
-                <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
+                <th rowspan="2" class="center-align" style="min-width:250px !important;">Customer</th>
                     <th rowspan="2" class="center-align" style="min-width:250px !important;">Grup</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Credit Limit</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Sisa Limit</th>

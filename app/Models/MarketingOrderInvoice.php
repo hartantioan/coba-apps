@@ -276,19 +276,17 @@ class MarketingOrderInvoice extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        foreach($this->marketingOrderInvoiceDetail as $row){
-            if($row->marketingOrderMemoDetail()->exists()){
-                $hasRelation = true;
-            }
+        if($this->incomingPaymentDetail()->exists()){
+            $hasRelation = true;
         }
 
-        if($this->marketingOrderHandoverInvoiceDetail()->exists()){
+        /* if($this->marketingOrderHandoverInvoiceDetail()->exists()){
             $hasRelation = true;
         }
 
         if($this->marketingOrderReceiptDetail()->exists()){
             $hasRelation = true;
-        }
+        } */
 
         return $hasRelation;
     }

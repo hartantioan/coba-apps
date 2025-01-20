@@ -181,37 +181,39 @@ class ReportStockMovementPerShadingController extends Controller
         $array_first_item = [];
         $first_qty = 0;
         $qty_final = 0;
-        if($request->shading_id ||$request->batch_id ){
-            $query_for_shading = ItemCogs::where(function($query) use ( $request) {
-                $query->where('date', '<', $request->start_date);
-
-                if($request->plant != 'all'){
-                    $query->whereHas('place',function($query) use($request){
-                        $query->where('id',$request->plant);
-                    });
+        if($request->type !== 'final'){
+            if($request->shading_id ||$request->batch_id ){
+                $query_for_shading = ItemCogs::where(function($query) use ( $request) {
+                    $query->where('date', '<', $request->start_date);
+    
+                    if($request->plant != 'all'){
+                        $query->whereHas('place',function($query) use($request){
+                            $query->where('id',$request->plant);
+                        });
+                    }
+                    if($request->shading_id) {
+                        $query->where('item_shading_id',$request->shading_id);
+                    }
+                    if($request->batch_id) {
+                        $query->where('production_batch_id',$request->batch_id);
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query) use($request){
+                            $query->where('id',$request->warehouse);
+                        });
+                    }
+                })
+                ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->orderBy('id', 'desc')
+                ->get();
+                $qty_total_shading = 0;
+                foreach($query_for_shading as $row_cum_bef){
+                    $qty_total_shading += $row_cum_bef->qty_in;
+                    $qty_total_shading -= $row_cum_bef->qty_out;
                 }
-                if($request->shading_id) {
-                    $query->where('item_shading_id',$request->shading_id);
-                }
-                if($request->batch_id) {
-                    $query->where('production_batch_id',$request->batch_id);
-                }
-                if($request->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query) use($request){
-                        $query->where('id',$request->warehouse);
-                    });
-                }
-            })
-            ->orderBy('date', 'desc') // Order by 'date' column in descending order
-            ->orderBy('id', 'desc')
-            ->get();
-            $qty_total_shading = 0;
-            foreach($query_for_shading as $row_cum_bef){
-                $qty_total_shading += $row_cum_bef->qty_in;
-                $qty_total_shading -= $row_cum_bef->qty_out;
+                $first_qty = $query_for_shading ? $qty_total_shading : 0;
+                $cum_qty += $first_qty;
             }
-            $first_qty = $query_for_shading ? $qty_total_shading : 0;
-            $cum_qty += $first_qty;
         }
         foreach($query_data as $key=>$row){
 

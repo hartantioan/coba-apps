@@ -540,23 +540,18 @@
                 changeDateMinimum($('#post_date').val());
             },
             onCloseEnd: function(modal, trigger){
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
                 $('#form_data')[0].reset();
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
-                $('#temp').val('');
-                $('#account_id').empty();
-                $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,00');
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
-                M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal,#subtotal-convert,#discount-convert,#total-convert,#tax-convert,#wtax-convert,#grandtotal-convert,#rounding-convert').text('0,00');
-                $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
+                $('.row_item').remove();
+                $('#percentage_value').text('0%');
+                $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
+                $('#lookable_id,#marketing_order_id_complaint').empty();
+                document.getElementById("so_sj_value").innerText = "0";
+                document.getElementById("customer_name_value").innerText = "0";
+                document.getElementById("grandtotal_value").innerText =  "0";
+                document.getElementById("volume_value").innerText =  "0";
+                document.getElementById("qty_value").innerText =  "0";
+                document.getElementById("plant").value = '-';
+                document.getElementById("marketing_order_delivery_process_date").value = '-';
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -628,9 +623,39 @@
             updateGrandTotal();
         });
 
+        $('#marketing_order_id_complaint').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
         select2ServerSide('#lookable_id', '{{ url("admin/select2/marketing_order_delivery_process") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#marketing_order_id_complaint', '{{ url("admin/select2/marketing_order") }}');
 
         $("#table-detail th").resizable({
             minWidth: 100,
@@ -638,7 +663,16 @@
     });
 
     function getMODSj() {
+        document.getElementById("so_sj_value").innerText = "0";
+        document.getElementById("customer_name_value").innerText = "0";
+        document.getElementById("grandtotal_value").innerText =  "0";
+        document.getElementById("volume_value").innerText =  "0";
+        document.getElementById("qty_value").innerText =  "0";
+        document.getElementById("plant").value = '-';
+        document.getElementById("marketing_order_delivery_process_date").value = '-';
         $('.row_item').remove();
+        $('#percentage_value').text('0%');
+        $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
         $('#grandtotal_detail').text('0');
         if ($('#lookable_id').val()) {
             $('#grand-total').text('0');

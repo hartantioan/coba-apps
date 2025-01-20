@@ -813,9 +813,39 @@ document.addEventListener('focusin', function (event) {
             }
         });
 
+        $('#filter_marketing_order').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/vendor") }}');
         select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
-        select2ServerSide('#filter_marketing_order', '{{ url("admin/select2/marketing_order") }}');
 
         $('#marketing_order_id').select2({
             placeholder: '-- Kosong --',

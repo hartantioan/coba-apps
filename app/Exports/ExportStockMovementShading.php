@@ -179,31 +179,31 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
             ->get();
             $qty_total_shading = 0;
             foreach($query_for_shading as $row_cum_bef){
-                $qty_total_shading += $row_cum_bef->qty_in;
-                $qty_total_shading -= $row_cum_bef->qty_out;
+                $qty_total_shading += round($row_cum_bef->qty_in,3);
+                $qty_total_shading -= round($row_cum_bef->qty_out,3);
             }
-            $first_qty = $query_for_shading ? $qty_total_shading : 0;
-            $cum_qty += $first_qty;
+            $first_qty = $query_for_shading ? round($qty_total_shading,3) : 0;
+            $cum_qty += round($first_qty,3);
         }
         foreach($query_data as $key=>$row){
 
             if($row->type=='IN'){
-                $cum_qty=$row->qty_in;
-                $cum_val=$row->total_in;
+                $cum_qty=round($row->qty_in,3);
+                $cum_val=round($row->total_in,3);
             }else{
-                $cum_qty=$row->qty_out * -1;
-                $cum_val=$row->total_out * -1;
+                $cum_qty=round($row->qty_out,3) * -1;
+                $cum_val=round($row->total_out,3) * -1;
             }
 
             if($this->shading_id || $this->batch_id) {
                 if($key == 0){
 
-                    $qty_final += $cum_qty+$first_qty;
+                    $qty_final += round($cum_qty,3)+round($first_qty,3);
                 }else{
-                    $qty_final += $cum_qty;
+                    $qty_final += round($cum_qty,3);
                 }
             }else{
-                $qty_final =$row->qty_final;
+                $qty_final =round($row->qty_final,3);
             }
 
             $data_tempura = [
@@ -223,7 +223,7 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                 'qty' => $perlu == 0 ? '-' : $cum_qty,
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => $qty_final,
+                'cum_qty' => round($qty_final,3),
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
@@ -277,12 +277,12 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                     ->get();
                     $qty_total_shading = 0;
                     foreach($query_for_shading as $row_cum_bef){
-                        $qty_total_shading += $row_cum_bef->qty_in;
-                        $qty_total_shading -= $row_cum_bef->qty_out;
+                        $qty_total_shading += round($row_cum_bef->qty_in,3);
+                        $qty_total_shading -= round($row_cum_bef->qty_out,3);
                     }
-                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($qty_total_shading) : 0;
+                    $last_qty = $query_first ? CustomHelper::formatConditionalQty(round($qty_total_shading,3)) : 0;
                 }else{
-                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0;
+                    $last_qty = $query_first ? CustomHelper::formatConditionalQty(round($query_first->qty_final,3)) : 0;
                 }
 
                 $array_last_item[] = [
@@ -425,7 +425,7 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
                         'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
                         'shading'      => $row_tidak_ada->itemShading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
-                        'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
+                        'last_qty'     => $row_tidak_ada ? round($row_tidak_ada->qty_final,3) : 0,
                     ];
                 }
             }

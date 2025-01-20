@@ -757,7 +757,7 @@ class MarketingOrderInvoiceController extends Controller
             $totalgrandtotal+=$row->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcessWithVoid->code.'</td>
                 <td class="center-align">'.$row->lookable->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty(round($row->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)).'</td>
                 <td class="center-align">'.$row->lookable->item->uomUnit->code.'</td>

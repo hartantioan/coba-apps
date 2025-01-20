@@ -73,7 +73,7 @@ class MarketingOrderAgingController extends Controller
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
-                    AND moi.status IN ('2','3')
+                    AND moi.status IN ('2','3','8')
                     AND IFNULL((SELECT
                         1
                         FROM cancel_documents cd

@@ -639,7 +639,7 @@ class MarketingOrderController extends Controller
                             ->where('status','1')
                             ->first() ?? 0;
                             if($cek_price){
-                                if($cek_price != 0){
+                                if($cek_price->sell_price != 0){
                                     if($cek_price->sell_price != str_replace(',','.',str_replace('.','',$request->arr_price_list[$key]))){
                                         return response()->json([
                                             'status'  => 500,

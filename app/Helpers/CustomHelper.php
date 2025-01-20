@@ -6825,6 +6825,132 @@ class CustomHelper {
 				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
 				'note'			=> $pdp->code
 			]);
+		}elseif($data->lookable_type == 'marketing_order_invoices'){
+			$moi = MarketingOrderInvoice::find($data->lookable_id);
+
+			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$moi->company_id)->first();
+			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$moi->company_id)->first();
+			$coapenjualan = Coa::where('code','400.01.01.01.01')->where('company_id',$moi->company_id)->first();
+			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$moi->company_id)->first();
+
+			$arrNote = [];
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $moi->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $moi->getTable(),
+				'lookable_id'	=> $moi->id,
+				'currency_id'	=> $moi->currency_id,
+				'currency_rate'	=> $moi->currency_rate,
+				'post_date'		=> $date,
+				'note'			=> 'VOID CANCEL '.$moi->code,
+				'status'		=> '3'
+			]);
+
+			$place = Place::where('code',substr($moi->code,7,2))->where('status','1')->first();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coapenjualan->id,
+				'account_id'	=> $coapenjualan->bp_journal ? $moi->account_id : NULL,
+				'place_id'		=> $place->id,
+				'type'			=> '1',
+				'nominal'		=> $moi->subtotal,
+				'nominal_fc'	=> $moi->subtotal,
+				'lookable_type'	=> $moi->getTable(),
+				'lookable_id'	=> $moi->id,
+			]);
+
+			if($moi->downpayment > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $moi->account_id : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> '2',
+					'nominal'		=> $moi->downpayment,
+					'nominal_fc'	=> $moi->downpayment,
+					'lookable_type'	=> $moi->getTable(),
+					'lookable_id'	=> $moi->id,
+				]);
+				CustomHelper::addDeposit($moi->account_id,$moi->downpayment);
+			}
+
+			if($moi->rounding > 0 || $moi->rounding < 0){
+				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$moi->company_id)->first();
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding->id,
+					'account_id'	=> $coarounding->bp_journal ? ($moi->account_id ? $moi->account_id : NULL) : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> $moi->rounding > 0 ? '1' : '2',
+					'nominal'		=> floatval(abs($moi->rounding)),
+					'nominal_fc'	=> floatval(abs($moi->rounding)),
+					'lookable_type'	=> $moi->getTable(),
+					'lookable_id'	=> $moi->id,
+					'note'			=> 'PEMBULATAN'
+				]);
+			}
+
+			if($moi->tax > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $moi->taxMaster->coa_sale_id,
+					'account_id'	=> $moi->taxMaster->coaSale->bp_journal ? $moi->account_id : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> '1',
+					'nominal'		=> $moi->tax,
+					'nominal_fc'	=> $moi->tax,
+					'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+					'lookable_type'	=> $moi->getTable(),
+					'lookable_id'	=> $moi->id,
+				]);
+			}
+
+			if($moi->grandtotal > 0){
+				if($moi->isExport()){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapiutang->id,
+						'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
+						'place_id'		=> $place->id,
+						'type'			=> '2',
+						'nominal'		=> $moi->subtotal,
+						'nominal_fc'	=> $moi->subtotal,
+						'lookable_type'	=> $moi->getTable(),
+						'lookable_id'	=> $moi->id,
+					]);
+					if($moi->tax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $moi->taxMaster->coa_sale_id,
+							'account_id'	=> $moi->taxMaster->coaSale->bp_journal ? $moi->account_id : NULL,
+							'place_id'		=> $place->id,
+							'type'			=> '2',
+							'nominal'		=> $moi->tax,
+							'nominal_fc'	=> $moi->tax,
+							'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+							'lookable_type'	=> $moi->getTable(),
+							'lookable_id'	=> $moi->id,
+						]);
+					}
+					CustomHelper::removeCountLimitCredit($moi->account_id,$moi->subtotal);
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapiutang->id,
+						'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
+						'place_id'		=> $place->id,
+						'type'			=> '2',
+						'nominal'		=> $moi->grandtotal,
+						'nominal_fc'	=> $moi->grandtotal,
+						'lookable_type'	=> $moi->getTable(),
+						'lookable_id'	=> $moi->id,
+					]);
+					CustomHelper::removeCountLimitCredit($moi->account_id,$moi->grandtotal);
+				}
+			}
 		}elseif($data->lookable_type == 'purchase_invoices'){
 			$pi = PurchaseInvoice::find($data->lookable_id);
 

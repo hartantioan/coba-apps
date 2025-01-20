@@ -211,80 +211,63 @@ class ReportStockMovementPerShadingController extends Controller
             ->get();
             $qty_total_shading = 0;
             foreach($query_for_shading as $row_cum_bef){
-                $qty_total_shading += $row_cum_bef->qty_in;
-                $qty_total_shading -= $row_cum_bef->qty_out;
+                $qty_total_shading += round($row_cum_bef->qty_in,3);
+                $qty_total_shading -= round($row_cum_bef->qty_out,3);
             }
             $first_qty = $query_for_shading ? $qty_total_shading : 0;
             $cum_qty += $first_qty;
         }
-        foreach($query_data as $key=>$row){
 
-            if($row->type=='IN'){
-                $cum_qty=$row->qty_in;
-                $cum_val=$row->total_in;
-            }else{
-                $cum_qty=$row->qty_out * -1;
-                $cum_val=$row->total_out * -1;
-            }
+        if($request->type !== 'final'){
+            foreach($query_data as $key=>$row){
 
-            if($request->shading_id || $request->batch_id) {
-                if($key == 0){
-
-                    $qty_final += $cum_qty+$first_qty;
+                if($row->type=='IN'){
+                    $cum_qty=$row->qty_in;
+                    $cum_val=$row->total_in;
                 }else{
-                    $qty_final += $cum_qty;
+                    $cum_qty=$row->qty_out * -1;
+                    $cum_val=$row->total_out * -1;
                 }
-            }else{
-                $qty_final =$row->qty_final;
-            }
 
+                if($request->shading_id || $request->batch_id) {
+                    if($key == 0){
 
-
-            $data_tempura = [
-                'item_id'      => $row->item->id,
-                'perlu'        => 0,
-                'requester'    => $request->type == 'final' ? '-' : $row->getRequester(),
-                'plant' => $row->place->code,
-                'warehouse' => $row->warehouse->name,
-                'item' => $row->item->name,
-                'satuan' => $row->item->uomUnit->code,
-                'area'         => $row->area->name ?? '-',
-                'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                'shading'      => $row->itemShading->code ?? '-',
-                'kode' => $row->item->code,
-                'final'=>number_format($row->price_final,2,',','.'),
-                'total'=>number_format($cum_val,2,',','.'),
-                'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($cum_qty),
-                'date' =>  date('d/m/Y',strtotime($row->date)),
-                'document' => $row->lookable->code,
-                'cum_qty' => CustomHelper::formatConditionalQty($qty_final),
-                'cum_val' => number_format($row->total_final,2,',','.'),
-            ];
-            $array_filter[]=$data_tempura;
-
-            if ($row->item_id !== $previousId) {
-
-                $query_first =
-                ItemCogs::where(function($query) use ( $request,$row) {
-                    $query->where('item_id',$row->item_id)
-                    ->where('date', '<', $row->date);
-
-                    if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
+                        $qty_final += $cum_qty+$first_qty;
+                    }else{
+                        $qty_final += $cum_qty;
                     }
-                    if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query) use($request){
-                            $query->where('id',$request->warehouse);
-                        });
-                    }
-                })
-                ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                ->orderBy('id', 'desc')
-                ->first();
-                if($request->shading_id|| $request->batch_id) {
-                    $query_for_shading = ItemCogs::where(function($query) use ( $request,$row) {
+                }else{
+                    $qty_final =$row->qty_final;
+                }
+
+
+
+                $data_tempura = [
+                    'item_id'      => $row->item->id,
+                    'perlu'        => 0,
+                    'requester'    => $request->type == 'final' ? '-' : $row->getRequester(),
+                    'plant' => $row->place->code,
+                    'warehouse' => $row->warehouse->name,
+                    'item' => $row->item->name,
+                    'satuan' => $row->item->uomUnit->code,
+                    'area'         => $row->area->name ?? '-',
+                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                    'shading'      => $row->itemShading->code ?? '-',
+                    'kode' => $row->item->code,
+                    'final'=>number_format($row->price_final,2,',','.'),
+                    'total'=>number_format($cum_val,2,',','.'),
+                    'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($cum_qty),
+                    'date' =>  date('d/m/Y',strtotime($row->date)),
+                    'document' => $row->lookable->code,
+                    'cum_qty' => CustomHelper::formatConditionalQty($qty_final),
+                    'cum_val' => number_format($row->total_final,2,',','.'),
+                ];
+                $array_filter[]=$data_tempura;
+
+                if ($row->item_id !== $previousId) {
+
+                    $query_first =
+                    ItemCogs::where(function($query) use ( $request,$row) {
                         $query->where('item_id',$row->item_id)
                         ->where('date', '<', $row->date);
 
@@ -292,13 +275,6 @@ class ReportStockMovementPerShadingController extends Controller
                             $query->whereHas('place',function($query) use($request){
                                 $query->where('id',$request->plant);
                             });
-                        }
-
-                        if($request->batch_id) {
-                            $query->where('production_batch_id',$request->batch_id);
-                        }
-                        if($request->shading_id) {
-                            $query->where('item_shading_id',$request->shading_id);
                         }
                         if($request->warehouse != 'all'){
                             $query->whereHas('warehouse',function($query) use($request){
@@ -308,38 +284,65 @@ class ReportStockMovementPerShadingController extends Controller
                     })
                     ->orderBy('date', 'desc') // Order by 'date' column in descending order
                     ->orderBy('id', 'desc')
-                    ->get();
-                    $qty_total_shading = 0;
-                    foreach($query_for_shading as $row_cum_bef){
-                        $qty_total_shading += $row_cum_bef->qty_in;
-                        $qty_total_shading -= $row_cum_bef->qty_out;
+                    ->first();
+                    if($request->shading_id|| $request->batch_id) {
+                        $query_for_shading = ItemCogs::where(function($query) use ( $request,$row) {
+                            $query->where('item_id',$row->item_id)
+                            ->where('date', '<', $row->date);
+
+                            if($request->plant != 'all'){
+                                $query->whereHas('place',function($query) use($request){
+                                    $query->where('id',$request->plant);
+                                });
+                            }
+
+                            if($request->batch_id) {
+                                $query->where('production_batch_id',$request->batch_id);
+                            }
+                            if($request->shading_id) {
+                                $query->where('item_shading_id',$request->shading_id);
+                            }
+                            if($request->warehouse != 'all'){
+                                $query->whereHas('warehouse',function($query) use($request){
+                                    $query->where('id',$request->warehouse);
+                                });
+                            }
+                        })
+                        ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                        ->orderBy('id', 'desc')
+                        ->get();
+                        $qty_total_shading = 0;
+                        foreach($query_for_shading as $row_cum_bef){
+                            $qty_total_shading += $row_cum_bef->qty_in;
+                            $qty_total_shading -= $row_cum_bef->qty_out;
+                        }
+                        $last_qty = $query_first ? CustomHelper::formatConditionalQty($qty_total_shading) : 0;
+                    }else{
+                        $last_qty = $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0;
                     }
-                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($qty_total_shading) : 0;
-                }else{
-                    $last_qty = $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0;
+                    $array_last_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row->item->id,
+                        'requester'    => '-',
+                        'id'           => $query_first->id ?? null,
+                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                        'item'         => $row->item->name,
+                        'satuan'       => $row->item->uomUnit->code,
+                        'area'         => $row->area->name ?? '-',
+                        'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                        'shading'      => $row->itemShading->code ?? '-',
+                        'kode'         => $row->item->code,
+                        'last_qty'     => $last_qty,
+                    ];
+
+
                 }
-                $array_last_item[] = [
-                    'perlu'        => 1,
-                    'item_id'      => $row->item->id,
-                    'requester'    => '-',
-                    'id'           => $query_first->id ?? null,
-                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
-                    'item'         => $row->item->name,
-                    'satuan'       => $row->item->uomUnit->code,
-                    'area'         => $row->area->name ?? '-',
-                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                    'shading'      => $row->itemShading->code ?? '-',
-                    'kode'         => $row->item->code,
-                    'last_qty'     => $last_qty,
-                ];
+                $previousId = $row->item_id;
 
-
-            }
-            $previousId = $row->item_id;
-
-            if($uom_unit ===null){
-                $uom_unit = $row->item->uomUnit->code;
+                if($uom_unit ===null){
+                    $uom_unit = $row->item->uomUnit->code;
+                }
             }
         }
 

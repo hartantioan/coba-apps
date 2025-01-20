@@ -30,7 +30,7 @@ class StockMovementShadingJob implements ShouldQueue
         $this->type = $type ? $type : '';
         $this->group = $group ? $group : '';
         $this->user_id = $user_id;
-        $this->batch_id = $shading_id ? $shading_id : '';
+        $this->batch_id = $batch_id ? $batch_id : '';
         $this->shading_id = $shading_id ? $shading_id : '';
         $this->queue = 'report';
     }

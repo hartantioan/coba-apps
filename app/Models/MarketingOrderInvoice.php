@@ -555,4 +555,8 @@ class MarketingOrderInvoice extends Model
         }
         return $ya;
     }
+
+    public function cancelDocument(){
+        return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

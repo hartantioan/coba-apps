@@ -26,7 +26,7 @@ class ItemPricelistController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $dataplaces = $user ? $user->userPlaceArray() : [];
 
     }
 
@@ -71,7 +71,11 @@ class ItemPricelistController extends Controller
                         $query->whereHas('type',function($query) use ($search, $request) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('name', 'like', "%$search%");
-                        });
+                        })->orWhereHas('province', function ($query)use ($search, $request) {
+                            $query->where('name', 'like', "%$search%");
+                        })->orWhereHas('city', function ($query)use ($search, $request) {
+                            $query->where('name', 'like', "%$search%");
+                        });;
                     });
                 }
 
@@ -91,7 +95,11 @@ class ItemPricelistController extends Controller
                             $query->whereHas('type',function($query) use ($search, $request) {
                                 $query->where('code', 'like', "%$search%")
                                     ->orWhere('name', 'like', "%$search%");
-                            });
+                            })->orWhereHas('province', function ($query)use ($search, $request) {
+                                $query->where('name', 'like', "%$search%");
+                            })->orWhereHas('city', function ($query)use ($search, $request) {
+                                $query->where('name', 'like', "%$search%");
+                            });;
                         });
                     });
                 }

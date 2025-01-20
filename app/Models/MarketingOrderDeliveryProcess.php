@@ -55,74 +55,79 @@ class MarketingOrderDeliveryProcess extends Model
         'revision_counter',
     ];
 
-    public function getTypePayment(){
+    public function getTypePayment()
+    {
         $type = '';
-        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach ($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row) {
             $type = $row->marketingOrderDetail->marketingOrder->payment_type;
         }
         return $type;
     }
 
-    public function qtyPerShading(){
+    public function qtyPerShading()
+    {
         $arr = [];
         $totalQty = 0;
-        $totalPalet = 0;$totalGross = 0;
-        $totalBox = 0;$totalNetto = 0;
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if($row->itemStock->item->pallet->box_conversion > 1){
+        $totalPalet = 0;
+        $totalGross = 0;
+        $totalBox = 0;
+        $totalNetto = 0;
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->itemStock->item->pallet->box_conversion > 1) {
                 $totalPalet += $row->qty;
                 $qty = $row->qty;
-            }else{
+            } else {
                 $qty = 0;
             }
             $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
             if (!isset($arr[$row->itemStock->item_shading_id])) {
                 $arr[$row->itemStock->item_shading_id] = [
-                    'item'=> $row->itemStock->item->print_name,
-                    'hs_code'=> $row->itemStock->item->type->hs_code ?? '',
-                    'shading'=>$row->itemStock->itemShading->code,
-                    'total_box'=> 0,
-                    'total_conversion'=> 0,
-                    'total_gross'=> 0,
-                    'total_netto'=> 0,
-                    'unit_code'=> $row->itemStock->item->uomUnit->code,
-                    'total_palet'=> 0,
-                    'satuan_terakir'=> $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
-                    'detail'=> $row,
+                    'item' => $row->itemStock->item->print_name,
+                    'hs_code' => $row->itemStock->item->type->hs_code ?? '',
+                    'shading' => $row->itemStock->itemShading->code,
+                    'total_box' => 0,
+                    'total_conversion' => 0,
+                    'total_gross' => 0,
+                    'total_netto' => 0,
+                    'unit_code' => $row->itemStock->item->uomUnit->code,
+                    'total_palet' => 0,
+                    'satuan_terakir' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                    'detail' => $row,
                 ];
-
             }
-            if($row->itemStock->item->itemWeightFg){
+            if ($row->itemStock->item->itemWeightFg) {
                 $gross = $row->itemStock->item->itemWeightFg->gross_weight ?? 0;
                 $netto = $row->itemStock->item->itemWeightFg->netto_weight ?? 0;
-            }else{
+            } else {
                 $gross = 0;
                 $netto = 0;
             }
             $conversion = ($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion);
-            $totalBox +=($row->qty * $row->itemStock->item->pallet->box_conversion);
+            $totalBox += ($row->qty * $row->itemStock->item->pallet->box_conversion);
             $arr[$row->itemStock->item_shading_id]['total_box'] += ($row->qty * $row->itemStock->item->pallet->box_conversion);
-            $arr[$row->itemStock->item_shading_id]['total_conversion'] += round($conversion,3);
+            $arr[$row->itemStock->item_shading_id]['total_conversion'] += round($conversion, 3);
             $arr[$row->itemStock->item_shading_id]['total_palet'] += $qty;
-            $arr[$row->itemStock->item_shading_id]['total_gross'] += round($conversion*$gross,3);
-            $arr[$row->itemStock->item_shading_id]['total_netto'] += round($conversion*$netto,3);
-            $totalNetto+=round($conversion*$netto,3);$totalGross+=round($conversion*$gross,3);
+            $arr[$row->itemStock->item_shading_id]['total_gross'] += round($conversion * $gross, 3);
+            $arr[$row->itemStock->item_shading_id]['total_netto'] += round($conversion * $netto, 3);
+            $totalNetto += round($conversion * $netto, 3);
+            $totalGross += round($conversion * $gross, 3);
         }
 
         $data = [
-            'data'=>$arr,
-            'total_qty'=>$totalQty,
-            'total_palet'=>$totalPalet,
-            'total_box'=>$totalBox,
-            'total_gross'=>$totalGross,
-            'total_netto'=>$totalNetto,
+            'data' => $arr,
+            'total_qty' => $totalQty,
+            'total_palet' => $totalPalet,
+            'total_box' => $totalBox,
+            'total_gross' => $totalGross,
+            'total_netto' => $totalNetto,
         ];
         return $data;
     }
 
 
 
-    public function statusSAP(){
+    public function statusSAP()
+    {
         $status = match ($this->status) {
             '1' => 'W',
             '2' => 'Y',
@@ -136,140 +141,150 @@ class MarketingOrderDeliveryProcess extends Model
         return $status;
     }
 
-    public function getPoCustomer(){
+    public function getPoCustomer()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,$arr)){
-                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no, $arr)) {
+                if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no) {
 
-                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
+                    $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
                 }
             }
         }
 
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getPoCustomerDate(){
+    public function getPoCustomerDate()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array(date('d/m/Y',strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date)),$arr)){
-                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date){
-                    $arr[] =  date('d/m/Y',strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date));
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array(date('d/m/Y', strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date)), $arr)) {
+                if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date) {
+                    $arr[] =  date('d/m/Y', strtotime($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->post_date));
                 }
             }
         }
 
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getUnit(){
+    public function getUnit()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,$arr)){
-                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code, $arr)) {
+                if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code) {
 
-                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code;
+                    $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code;
                 }
             }
         }
 
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getOutlet(){
+    public function getOutlet()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet()->exists()){
-                if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet()->exists()) {
+                if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name, $arr)) {
                     $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name;
                 }
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getProject(){
+    public function getProject()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project()->exists()){
-                if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project()->exists()) {
+                if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name, $arr)) {
                     $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name;
                 }
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getBrand(){
+    public function getBrand()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->item->brand->name,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->itemStock->item->brand->name, $arr)) {
                 $arr[] = $row->itemStock->item->brand->name;
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getBatch(){
+    public function getBatch()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->productionBatch->code,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->itemStock->productionBatch->code, $arr)) {
                 $arr[] = $row->itemStock->productionBatch->code;
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getShading(){
+    public function getShading()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->itemShading->item->name.'-'.$row->itemStock->itemShading->code,$arr)){
-                $arr[] = $row->itemStock->itemShading->item->name.'-'.$row->itemStock->itemShading->code;
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->itemStock->itemShading->item->name . '-' . $row->itemStock->itemShading->code, $arr)) {
+                $arr[] = $row->itemStock->itemShading->item->name . '-' . $row->itemStock->itemShading->code;
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getSalesOrderCode(){
+    public function getSalesOrderCode()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code, $arr)) {
                 $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code;
             }
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getGrandtotalSalesOrder(){
+    public function getGrandtotalSalesOrder()
+    {
         $gt = 0;
-        $arr=[];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,$arr)){
+        $arr = [];
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code, $arr)) {
                 $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code;
                 $gt += $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->grandtotal;
             }
@@ -277,15 +292,17 @@ class MarketingOrderDeliveryProcess extends Model
         return $gt;
     }
 
-    public function getNote() {
-        $text = 'BASED ON SALES ORDER '.$this->getSalesOrderCode().'. BASED ON MARKETING ORDER DELIVERY '.$this->marketingOrderDelivery->code.'. BASED ON DELIVERY ORDER '.$this->code.'.';
+    public function getNote()
+    {
+        $text = 'BASED ON SALES ORDER ' . $this->getSalesOrderCode() . '. BASED ON MARKETING ORDER DELIVERY ' . $this->marketingOrderDelivery->code . '. BASED ON DELIVERY ORDER ' . $this->code . '.';
         return $text;
     }
 
-    public function totalQty(){
+    public function totalQty()
+    {
         $total = 0;
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            $total += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3);
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            $total += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 3);
         }
         return $total;
     }
@@ -297,7 +314,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function attachment()
     {
-        if($this->document !== NULL && Storage::exists($this->document)) {
+        if ($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
             $document = asset('website/empty.png');
@@ -306,53 +323,60 @@ class MarketingOrderDeliveryProcess extends Model
         return $document;
     }
 
-    public function getPlace(){
-        return substr($this->code,7,2);
+    public function getPlace()
+    {
+        return substr($this->code, 7, 2);
     }
 
-    public function getWarehouse(){
+    public function getWarehouse()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->warehouse->name,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->itemStock->warehouse->name, $arr)) {
                 $arr[] = $row->itemStock->warehouse->name;
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function getArea(){
+    public function getArea()
+    {
         $arr = [];
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if(!in_array($row->itemStock->area->name,$arr)){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if (!in_array($row->itemStock->area->name, $arr)) {
                 $arr[] = $row->itemStock->area->name;
             }
         }
-        if(count($arr) == 0){
-            $arr[]='-';
+        if (count($arr) == 0) {
+            $arr[] = '-';
         }
-        return implode(', ',$arr);
+        return implode(', ', $arr);
     }
 
-    public function deleteFile(){
-		if(Storage::exists($this->document)) {
+    public function deleteFile()
+    {
+        if (Storage::exists($this->document)) {
             Storage::delete($this->document);
         }
-	}
-
-    public function used(){
-        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function deliveryScan(){
-        return $this->hasOne('App\Models\DeliveryScan','lookable_id','id')->where('lookable_type',$this->table);
+    public function used()
+    {
+        return $this->hasOne('App\Models\UsedData', 'lookable_id', 'id')->where('lookable_type', $this->table);
+    }
+
+    public function deliveryScan()
+    {
+        return $this->hasOne('App\Models\DeliveryScan', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
 
-    public function marketingOrderInvoice(){
-        return $this->hasOne('App\Models\MarketingOrderInvoice')->whereIn('status',['1','2','3']);
+    public function marketingOrderInvoice()
+    {
+        return $this->hasOne('App\Models\MarketingOrderInvoice')->whereIn('status', ['1', '2', '3']);
     }
 
     public function user()
@@ -390,21 +414,23 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function status(){
+    public function status()
+    {
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
-          '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
-          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+            '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+            '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+            '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+            '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+            '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
+            '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+            default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
         return $status;
     }
 
-    public function statusRaw(){
+    public function statusRaw()
+    {
         $status = match ($this->status) {
             '1' => 'Menunggu',
             '2' => 'Proses',
@@ -418,26 +444,29 @@ class MarketingOrderDeliveryProcess extends Model
         return $status;
     }
 
-    public function statusTracking(){
+    public function statusTracking()
+    {
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
 
-        if($status){
+        if ($status) {
             return $status->status();
-        }else{
+        } else {
             return 'Status tracking tidak ditemukan.';
         }
     }
 
-    public function latestTracking(){
+    public function latestTracking()
+    {
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
-        if($status){
+        if ($status) {
             return $status->status;
-        }else{
+        } else {
             return '';
         }
     }
 
-    public function statusTrackingRaw(){
+    public function statusTrackingRaw()
+    {
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
 
         if ($status) {
@@ -454,7 +483,8 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function statusTrackingDate() {
+    public function statusTrackingDate()
+    {
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
         if ($status) {
             $xstatus = match ($status->status) {
@@ -471,7 +501,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public static function generateCode($prefix)
     {
-        $cek = substr($prefix,0,7);
+        $cek = substr($prefix, 0, 7);
         $query = MarketingOrderDeliveryProcess::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
@@ -480,7 +510,7 @@ class MarketingOrderDeliveryProcess extends Model
             ->limit(1)
             ->get();
 
-        if($query->count() > 0) {
+        if ($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
             $code = '00000001';
@@ -488,59 +518,66 @@ class MarketingOrderDeliveryProcess extends Model
 
         $no = str_pad($code, 8, 0, STR_PAD_LEFT);
 
-        return substr($prefix,0,9).'-'.$no;
+        return substr($prefix, 0, 9) . '-' . $no;
     }
 
-    public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
-        if($source){
+    public function approval()
+    {
+        $source = ApprovalSource::where('lookable_type', $this->table)->where('lookable_id', $this->id)->whereHas('approvalMatrix')->get();
+        if ($source) {
             return $source;
-        }else{
+        } else {
             return '';
         }
     }
 
-    public function isItemSent(){
+    public function isItemSent()
+    {
         $status = false;
-        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','2')->count();
-        if($count > 0){
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status', '2')->count();
+        if ($count > 0) {
             $status = true;
         }
         return $status;
     }
 
-    public function isDelivered(){
+    public function isDelivered()
+    {
         $status = false;
-        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','3')->count();
-        if($count > 0){
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status', '3')->count();
+        if ($count > 0) {
             $status = true;
         }
         return $status;
     }
 
-    public function isReturnedSj(){
+    public function isReturnedSj()
+    {
         $status = false;
-        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','5')->count();
-        if($count > 0){
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status', '5')->count();
+        if ($count > 0) {
             $status = true;
         }
         return $status;
     }
 
-    public function marketingOrderDeliveryProcessTrack(){
-        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
+    public function marketingOrderDeliveryProcessTrack()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack', 'marketing_order_delivery_process_id', 'id');
     }
 
-    public function marketingOrderDeliveryProcessDetail(){
-        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail','marketing_order_delivery_process_id','id');
+    public function marketingOrderDeliveryProcessDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail', 'marketing_order_delivery_process_id', 'id');
     }
 
-    public function getSendStatusTracking(){
+    public function getSendStatusTracking()
+    {
         $status = false;
 
-        $data = $this->marketingOrderDeliveryProcessTrack()->whereIn('status',['2','3','4','5'])->count();
+        $data = $this->marketingOrderDeliveryProcessTrack()->whereIn('status', ['2', '3', '4', '5'])->count();
 
-        if($data > 0){
+        if ($data > 0) {
             $status = true;
         }
 
@@ -549,22 +586,24 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function purchaseOrderDetail()
     {
-        return $this->hasOne('App\Models\PurchaseOrderDetail')->whereHas('purchaseOrder',function($query){
-            $query->whereIn('status',['2','3']);
+        return $this->hasOne('App\Models\PurchaseOrderDetail')->whereHas('purchaseOrder', function ($query) {
+            $query->whereIn('status', ['2', '3']);
         });
     }
 
-    public function getArrStatusTracking(){
+    public function getArrStatusTracking()
+    {
         $arr = $this->marketingOrderDeliveryProcessTrack()->orderBy('status')->pluck('status')->toArray();
 
         return $arr;
     }
 
-    public function hasDetailMatrix(){
+    public function hasDetailMatrix()
+    {
         $ada = false;
-        if($this->approval()){
-            foreach($this->approval() as $row){
-                if($row->approvalMatrix()->exists()){
+        if ($this->approval()) {
+            foreach ($this->approval() as $row) {
+                if ($row->approvalMatrix()->exists()) {
                     $ada = true;
                 }
             }
@@ -573,36 +612,42 @@ class MarketingOrderDeliveryProcess extends Model
         return $ada;
     }
 
-    public function hasChildDocument(){
+    public function hasChildDocument()
+    {
         $hasRelation = false;
 
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if($row->marketingOrderReturnDetail()->exists()){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->marketingOrderReturnDetail()->exists()) {
                 $hasRelation = true;
             }
         }
 
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            if($row->marketingOrderInvoiceDetail()->exists()){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->marketingOrderInvoiceDetail()->exists()) {
                 $hasRelation = true;
             }
+        }
+
+        if ($this->marketingOrderInvoice()->exists()) {
+            $hasRelation = true;
         }
 
         return $hasRelation;
     }
 
-    public function updateJournal(){
-        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
+    public function updateJournal()
+    {
+        $journal = Journal::where('lookable_type', $this->table)->where('lookable_id', $this->id)->first();
 
-        if($journal){
-            foreach($this->marketingOrderDeliveryProcessDetail as $row){
+        if ($journal) {
+            foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
                 $total = $row->getHpp();
 
                 $row->update([
                     'total'     => $total
                 ]);
 
-                foreach($row->journalDetail as $rowjournal){
+                foreach ($row->journalDetail as $rowjournal) {
                     $rowjournal->update([
                         'nominal_fc'  => $total,
                         'nominal'     => $total,
@@ -612,40 +657,43 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function journal(){
-        return $this->hasMany('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    public function journal()
+    {
+        return $this->hasMany('App\Models\Journal', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
-    public function balanceInvoice(){
+    public function balanceInvoice()
+    {
         $total = 0;
 
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
             $total += $row->balanceInvoice();
         }
 
-        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach ($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row) {
             $total += $row->balanceInvoice();
         }
 
         return $total;
     }
 
-    public function createInvoice(){
+    public function createInvoice()
+    {
         #linkkan ke AR Invoice
         $query = MarketingOrderDeliveryProcess::find($this->id);
         $passed = true;
-        foreach($query->marketingOrderDeliveryProcessDetail as $row){
-            if($row->marketingOrderInvoiceDetail()->exists()){
+        foreach ($query->marketingOrderDeliveryProcessDetail as $row) {
+            if ($row->marketingOrderInvoiceDetail()->exists()) {
                 $passed = false;
             }
         }
-        foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-            if($row->marketingOrderInvoiceDetail()->exists()){
+        foreach ($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row) {
+            if ($row->marketingOrderInvoiceDetail()->exists()) {
                 $passed = false;
             }
         }
-        if($passed){
-            if($query->marketingOrderDelivery->customer->is_ar_invoice){
+        if ($passed) {
+            if ($query->marketingOrderDelivery->customer->is_ar_invoice) {
                 $total = 0;
                 $tax = 0;
                 $grandtotal = 0;
@@ -658,7 +706,7 @@ class MarketingOrderDeliveryProcess extends Model
                 $tax_id = 0;
                 $tax_no = '';
 
-                foreach($query->marketingOrderDeliveryProcessDetail as $row){
+                foreach ($query->marketingOrderDeliveryProcessDetail as $row) {
                     $subtotal += $row->getTotal();
                     $tax += $row->getTax();
                     $grandtotal += $row->getGrandtotal();
@@ -666,24 +714,24 @@ class MarketingOrderDeliveryProcess extends Model
                     $tax_id = $row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id;
                 }
 
-                if($percent_dp > 0){
+                if ($percent_dp > 0) {
                     $tempDownpayment = $total;
                     $tempBalance = $tempDownpayment;
-                    foreach($query->marketingOrderDelivery->customer->marketingOrderDownPayment()->orderBy('code')->get() as $row){
-                        if($tempBalance > 0){
+                    foreach ($query->marketingOrderDelivery->customer->marketingOrderDownPayment()->orderBy('code')->get() as $row) {
+                        if ($tempBalance > 0) {
                             $balanceInvoice = $row->balanceInvoice();
-                            if($balanceInvoice > 0){
+                            if ($balanceInvoice > 0) {
                                 $nominal = 0;
-                                if($tempBalance > $balanceInvoice){
+                                if ($tempBalance > $balanceInvoice) {
                                     $nominal = $balanceInvoice;
-                                }else{
+                                } else {
                                     $nominal = $tempBalance;
                                 }
                                 $arrDownPayment[] = [
                                     'id'            => $row->id,
                                     'type'          => $row->getTable(),
                                     'code'          => $row->code,
-                                    'is_include_tax'=> $row->is_include_tax,
+                                    'is_include_tax' => $row->is_include_tax,
                                     'percent_tax'   => $row->percent_tax,
                                     'tax_id'        => $row->tax_id,
                                     'total'         => $nominal,
@@ -695,28 +743,28 @@ class MarketingOrderDeliveryProcess extends Model
                             }
                         }
                     }
-                    if($tempBalance > 0){
+                    if ($tempBalance > 0) {
                         $passedDp = false;
-                    }else{
+                    } else {
                         $passedDp = true;
                     }
-                }else{
+                } else {
                     $passedDp = true;
                 }
 
-                if($passedDp){
-                    $arrayTax = TaxSeries::getTaxCode($this->company_id,$this->post_date,'010');
-                    if($arrayTax['status'] == 200){
+                if ($passedDp) {
+                    $arrayTax = TaxSeries::getTaxCode($this->company_id, $this->post_date, '010');
+                    if ($arrayTax['status'] == 200) {
                         $tax_no = $arrayTax['no'];
                     }
                     $total = $subtotal - $downpayment;
-                    $menu = Menu::where('table_name','marketing_order_invoices')->first();
+                    $menu = Menu::where('table_name', 'marketing_order_invoices')->first();
                     $prefixCode = $menu->document_code;
-                    $code = MarketingOrderInvoice::generateCode($prefixCode.date('y',strtotime($query->return_date)).substr($query->code,7,2));
-                    $dueDate = date('Y-m-d', strtotime($query->return_date. ' + '.$query->marketingOrderDelivery->customer->top.' days'));
+                    $code = MarketingOrderInvoice::generateCode($prefixCode . date('y', strtotime($query->return_date)) . substr($query->code, 7, 2));
+                    $dueDate = date('Y-m-d', strtotime($query->return_date . ' + ' . $query->marketingOrderDelivery->customer->top . ' days'));
                     $querymoi = MarketingOrderInvoice::create([
-                        'code'			                => $code,
-                        'user_id'		                => $query->user_id,
+                        'code'                            => $code,
+                        'user_id'                        => $query->user_id,
                         'account_id'                    => $query->marketingOrderDelivery->customer_id,
                         'company_id'                    => $query->company_id,
                         'marketing_order_delivery_process_id' => $this->id,
@@ -733,10 +781,10 @@ class MarketingOrderDeliveryProcess extends Model
                         'document'                      => NULL,
                         'tax_no'                        => $tax_no,
                         'tax_id'                        => $tax_id,
-                        'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
+                        'note'                          => 'Dibuat otomatis setelah Surat Jalan No. ' . $query->code,
                     ]);
 
-                    foreach($query->marketingOrderDeliveryProcessDetail as $key => $rowdata){
+                    foreach ($query->marketingOrderDeliveryProcessDetail as $key => $rowdata) {
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $querymoi->id,
                             'lookable_type'                 => $rowdata->getTable(),
@@ -749,11 +797,11 @@ class MarketingOrderDeliveryProcess extends Model
                             'total'                         => $rowdata->getTotal(),
                             'tax'                           => $rowdata->getTax(),
                             'grandtotal'                    => $rowdata->getGrandtotal(),
-                            'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$query->code,
+                            'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code . ' - ' . $rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code . ' - ' . $query->code,
                         ]);
                     }
 
-                    foreach($arrDownPayment as $rowdata){
+                    foreach ($arrDownPayment as $rowdata) {
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $querymoi->id,
                             'lookable_type'                 => $rowdata['type'],
@@ -770,8 +818,8 @@ class MarketingOrderDeliveryProcess extends Model
                         ]);
                     }
 
-                    CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note_external);
-                    CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note_external,$query->user_id);
+                    CustomHelper::sendApproval($querymoi->getTable(), $querymoi->id, $querymoi->note_internal . ' - ' . $querymoi->note_external);
+                    CustomHelper::sendNotification($querymoi->getTable(), $querymoi->id, 'Pengajuan AR Invoice No. ' . $querymoi->code, $querymoi->note_internal . ' - ' . $querymoi->note_external, $query->user_id);
 
                     activity()
                         ->performedOn(new MarketingOrderInvoice())
@@ -784,59 +832,61 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function createJournalSentDocument(){
+    public function createJournalSentDocument()
+    {
         $modp = $this;
 
         $query = Journal::create([
-            'user_id'		=> $modp->user_id,
+            'user_id'        => $modp->user_id,
             'company_id'    => $modp->company_id,
-            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
-            'lookable_type'	=> $modp->getTable(),
-            'lookable_id'	=> $modp->id,
-            'post_date'		=> $modp->post_date,
-            'note'			=> $modp->note_internal.' - '.$modp->note_external,
-            'status'		=> '3'
+            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->post_date)) . '00'),
+            'lookable_type'    => $modp->getTable(),
+            'lookable_id'    => $modp->id,
+            'post_date'        => $modp->post_date,
+            'note'            => $modp->note_internal . ' - ' . $modp->note_external,
+            'status'        => '3'
         ]);
 
-        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
+        $coabdp = Coa::where('code', '100.01.04.05.01')->where('company_id', $modp->company_id)->first();
 
-        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+        foreach ($modp->marketingOrderDeliveryProcessDetail as $row) {
             $hpp = $row->getHpp();
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
-                'coa_id'		=> $coabdp->id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '1',
-                'nominal'		=> $hpp,
+                'journal_id'    => $query->id,
+                'account_id'    => $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coabdp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '1',
+                'nominal'        => $hpp,
                 'nominal_fc'    => $hpp,
                 'note'          => 'Item dikirimkan / keluar dari gudang.',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '2',
-                'nominal'		=> $hpp,
+                'journal_id'    => $query->id,
+                'coa_id'        => $row->itemStock->item->itemGroup->coa_id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '2',
+                'nominal'        => $hpp,
                 'nominal_fc'    => $hpp,
                 'note'          => 'Item dikirimkan / keluar dari gudang.',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
 
-            CustomHelper::sendCogs($modp->getTable(),
+            CustomHelper::sendCogs(
+                $modp->getTable(),
                 $modp->id,
                 $row->itemStock->place->company_id,
                 $row->itemStock->place_id,
@@ -866,173 +916,175 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function createJournalSentDocumentWithoutStock(){
+    public function createJournalSentDocumentWithoutStock()
+    {
         $modp = $this;
 
         $query = Journal::create([
-            'user_id'		=> $modp->user_id,
+            'user_id'        => $modp->user_id,
             'company_id'    => $modp->company_id,
-            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
-            'lookable_type'	=> $modp->getTable(),
-            'lookable_id'	=> $modp->id,
-            'post_date'		=> $modp->post_date,
-            'note'			=> $modp->note_internal.' - '.$modp->note_external,
-            'status'		=> '3'
+            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->post_date)) . '00'),
+            'lookable_type'    => $modp->getTable(),
+            'lookable_id'    => $modp->id,
+            'post_date'        => $modp->post_date,
+            'note'            => $modp->note_internal . ' - ' . $modp->note_external,
+            'status'        => '3'
         ]);
 
-        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
+        $coabdp = Coa::where('code', '100.01.04.05.01')->where('company_id', $modp->company_id)->first();
 
-        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+        foreach ($modp->marketingOrderDeliveryProcessDetail as $row) {
             $hpp = $row->total;
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
-                'coa_id'		=> $coabdp->id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '1',
-                'nominal'		=> $hpp,
+                'journal_id'    => $query->id,
+                'account_id'    => $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coabdp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '1',
+                'nominal'        => $hpp,
                 'nominal_fc'    => $hpp,
                 'note'          => 'Item dikirimkan / keluar dari gudang.',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '2',
-                'nominal'		=> $hpp,
+                'journal_id'    => $query->id,
+                'coa_id'        => $row->itemStock->item->itemGroup->coa_id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '2',
+                'nominal'        => $hpp,
                 'nominal_fc'    => $hpp,
                 'note'          => 'Item dikirimkan / keluar dari gudang.',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
         }
     }
 
-    public function createJournalReceiveDocument(){
+    public function createJournalReceiveDocument()
+    {
         $modp = MarketingOrderDeliveryProcess::find($this->id);
 
         $query = Journal::create([
-            'user_id'		=> $modp->user_id,
+            'user_id'        => $modp->user_id,
             'company_id'    => $modp->company_id,
-            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->receive_date)).'00'),
-            'lookable_type'	=> 'marketing_order_delivery_processes',
-            'lookable_id'	=> $modp->id,
-            'post_date'		=> $modp->receive_date,
-            'note'			=> 'PENGIRIMAN '.$modp->marketingOrderDelivery->code,
-            'status'		=> '3'
+            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->receive_date)) . '00'),
+            'lookable_type'    => 'marketing_order_delivery_processes',
+            'lookable_id'    => $modp->id,
+            'post_date'        => $modp->receive_date,
+            'note'            => 'PENGIRIMAN ' . $modp->marketingOrderDelivery->code,
+            'status'        => '3'
         ]);
 
-        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
-        $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first();
+        $coabdp = Coa::where('code', '100.01.04.05.01')->where('company_id', $modp->company_id)->first();
+        $coahpp = Coa::where('code', '500.01.01.01.01')->where('company_id', $modp->company_id)->first();
 
-        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+        foreach ($modp->marketingOrderDeliveryProcessDetail as $row) {
             $hpp = $row->total;
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
-                'coa_id'		=> $coahpp->id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '1',
-                'nominal'		=> $hpp,
-                'nominal_fc'	=> $hpp,
+                'journal_id'    => $query->id,
+                'account_id'    => $coahpp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coahpp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '1',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
                 'note'          => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
                 'note2'         => $modp->marketingOrderDelivery->goodScaleDetail()->exists() ? $modp->marketingOrderDelivery->goodScaleDetail->goodScale->code : '-',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
 
             JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
-                'coa_id'		=> $coabdp->id,
-                'place_id'		=> $row->itemStock->place_id,
-                'item_id'		=> $row->itemStock->item_id,
-                'warehouse_id'	=> $row->itemStock->warehouse_id,
-                'type'			=> '2',
-                'nominal'		=> $hpp,
-                'nominal_fc'	=> $hpp,
+                'journal_id'    => $query->id,
+                'account_id'    => $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coabdp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '2',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
                 'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.',
-                'lookable_type'	=> $modp->getTable(),
-                'lookable_id'	=> $modp->id,
-                'detailable_type'=> $row->getTable(),
-                'detailable_id'	=> $row->id,
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
             ]);
         }
 
-        if($this->marketingOrderDelivery->goodScaleDetail()->exists()){
-            if(!$this->marketingOrderDelivery->goodScaleDetail->goodScale->purchaseOrder()->exists() && !$this->marketingOrderDelivery->goodScaleDetail->goodScale->journal()->exists()){
+        if ($this->marketingOrderDelivery->goodScaleDetail()->exists()) {
+            if (!$this->marketingOrderDelivery->goodScaleDetail->goodScale->purchaseOrder()->exists() && !$this->marketingOrderDelivery->goodScaleDetail->goodScale->journal()->exists()) {
                 $gs = $this->marketingOrderDelivery->goodScaleDetail->goodScale;
 
-                if($gs){
-                    if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()){
-                        $place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
+                if ($gs) {
+                    if ($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()) {
+                        $place = Place::where('code', substr($gs->code, 7, 2))->where('status', '1')->first();
 
                         $query = Journal::create([
-                            'user_id'		=> session('bo_id'),
-                            'company_id'	=> $gs->company_id,
-                            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->receive_date)).'00'),
-                            'lookable_type'	=> $gs->getTable(),
-                            'lookable_id'	=> $gs->id,
-                            'post_date'		=> $modp->receive_date,
-                            'note'			=> 'BIAYA KIRIM '.$gs->referenceGRPODO(),
-                            'status'		=> '3',
+                            'user_id'        => session('bo_id'),
+                            'company_id'    => $gs->company_id,
+                            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->receive_date)) . '00'),
+                            'lookable_type'    => $gs->getTable(),
+                            'lookable_id'    => $gs->id,
+                            'post_date'        => $modp->receive_date,
+                            'note'            => 'BIAYA KIRIM ' . $gs->referenceGRPODO(),
+                            'status'        => '3',
                         ]);
 
-                        $coabiayakirim = Coa::where('code','600.01.02.02.01')->where('company_id',$gs->company_id)->first();
-                        $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.06')->where('company_id',$gs->company_id)->first();
+                        $coabiayakirim = Coa::where('code', '600.01.02.02.01')->where('company_id', $gs->company_id)->first();
+                        $coahutangusahabelumditagih = Coa::where('code', '200.01.03.01.06')->where('company_id', $gs->company_id)->first();
 
-                        foreach($gs->goodScaleDetail as $row){
-                            if($row->lookable_type == 'marketing_order_deliveries'){
-                                if($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()){
+                        foreach ($gs->goodScaleDetail as $row) {
+                            if ($row->lookable_type == 'marketing_order_deliveries') {
+                                if ($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()) {
                                     $delivery_cost = $row->total;
-                                    if($delivery_cost > 0){
+                                    if ($delivery_cost > 0) {
                                         JournalDetail::create([
-                                            'journal_id'	=> $query->id,
-                                            'account_id'	=> $coabiayakirim->bp_journal ? $gs->account_id : NULL,
-                                            'coa_id'		=> $coabiayakirim->id,
+                                            'journal_id'    => $query->id,
+                                            'account_id'    => $coabiayakirim->bp_journal ? $gs->account_id : NULL,
+                                            'coa_id'        => $coabiayakirim->id,
                                             'place_id'      => $place->id,
-                                            'type'			=> '1',
-                                            'nominal'		=> $delivery_cost,
+                                            'type'            => '1',
+                                            'nominal'        => $delivery_cost,
                                             'nominal_fc'    => $delivery_cost,
                                             'note'          => $row->lookable->code,
-                                            'note2'			=> $gs->code,
-                                            'lookable_type'	=> $gs->getTable(),
-                                            'lookable_id'	=> $gs->id,
-                                            'detailable_type'=> $row->getTable(),
-                                            'detailable_id'	=> $row->id,
+                                            'note2'            => $gs->code,
+                                            'lookable_type'    => $gs->getTable(),
+                                            'lookable_id'    => $gs->id,
+                                            'detailable_type' => $row->getTable(),
+                                            'detailable_id'    => $row->id,
                                         ]);
 
                                         JournalDetail::create([
-                                            'journal_id'	=> $query->id,
-                                            'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
-                                            'coa_id'		=> $coahutangusahabelumditagih->id,
+                                            'journal_id'    => $query->id,
+                                            'account_id'    => $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
+                                            'coa_id'        => $coahutangusahabelumditagih->id,
                                             'place_id'      => $place->id,
-                                            'type'			=> '2',
-                                            'nominal'		=> $delivery_cost,
+                                            'type'            => '2',
+                                            'nominal'        => $delivery_cost,
                                             'nominal_fc'    => $delivery_cost,
                                             'note'          => $row->lookable->code,
-                                            'note2'			=> $gs->code,
-                                            'lookable_type'	=> $gs->getTable(),
-                                            'lookable_id'	=> $gs->id,
-                                            'detailable_type'=> $row->getTable(),
-                                            'detailable_id'	=> $row->id,
+                                            'note2'            => $gs->code,
+                                            'lookable_type'    => $gs->getTable(),
+                                            'lookable_id'    => $gs->id,
+                                            'detailable_type' => $row->getTable(),
+                                            'detailable_id'    => $row->id,
                                         ]);
                                     }
                                 }
@@ -1041,9 +1093,9 @@ class MarketingOrderDeliveryProcess extends Model
 
                         $gs->createPurchaseOrder($modp->receive_date);
                     }
-                    if($gs->type == '2'){
+                    if ($gs->type == '2') {
                         $gs->update([
-                            'status'	=> '3',
+                            'status'    => '3',
                         ]);
                     }
                 }
@@ -1051,35 +1103,38 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function deliveryCost($qty){
+    public function deliveryCost($qty)
+    {
         $price = 0;
         $total = 0;
         $typeTransport = $this->marketingOrderDelivery->cost_delivery_type;
-        $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
+        $place = Place::where('code', substr($this->code, 7, 2))->where('status', '1')->first();
         $cityFrom = $place->city_id;
         $districtFrom = $place->district_id;
         $cityTo = $this->marketingOrderDelivery->city_id;
         $districtTo = $this->marketingOrderDelivery->district_id;
-        $deliveryCost = DeliveryCost::where('account_id',$this->account_id)->where('valid_from','<=',$this->post_date)->where('valid_to','>=',$this->post_date)->where('transportation_id',$this->marketingOrderDelivery->transportation_id)->where('from_subdistrict_id',$districtFrom)->where('to_subdistrict_id',$districtTo)->where('status','1')->orderByDesc('id')->first();
-        if($deliveryCost){
-            if($typeTransport == '1'){
+        $deliveryCost = DeliveryCost::where('account_id', $this->account_id)->where('valid_from', '<=', $this->post_date)->where('valid_to', '>=', $this->post_date)->where('transportation_id', $this->marketingOrderDelivery->transportation_id)->where('from_subdistrict_id', $districtFrom)->where('to_subdistrict_id', $districtTo)->where('status', '1')->orderByDesc('id')->first();
+        if ($deliveryCost) {
+            if ($typeTransport == '1') {
                 $price = $deliveryCost->tonnage;
-                $total = round($price * $qty,2);
-            }elseif($typeTransport == '2'){
+                $total = round($price * $qty, 2);
+            } elseif ($typeTransport == '2') {
                 $price = $deliveryCost->ritage;
-                $total = round($price,2);
+                $total = round($price, 2);
             }
         }
 
         return $total;
     }
 
-    public function totalCost(){
+    public function totalCost()
+    {
         $total = $this->marketingOrderDeliveryProcessDetail()->sum('total');
-        return round($total,2);
+        return round($total, 2);
     }
 
-    public function hasBalance(){
+    public function hasBalance()
+    {
         $status = true;
 
         return $status;
@@ -1087,19 +1142,20 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function printCounter()
     {
-        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\PrintCounter', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
-    public function isOpenPeriod(){
+    public function isOpenPeriod()
+    {
         $monthYear = substr($this->post_date, 0, 7); // '2023-02'
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', ['2','3'])
-                        ->get();
+            ->whereIn('status_closing', ['2', '3'])
+            ->get();
 
-        if(count($see)>0){
+        if (count($see) > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }

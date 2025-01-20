@@ -81,22 +81,41 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                 }
 
                 if(!$this->error){
-                    $query = ItemPricelist::create([
-                        'code'              => strtoupper(Str::random(15)),
-                        'user_id'           => session('bo_id'),
-                        'type_id'           => $item->id,
-                        'group_id'          => $group->id,
-                        'place_id'          => $place->id,
-                        'grade_id'          => $grade->id,
-                        'province_id'       => $province_id,
-                        'city_id'           => $city_id,
-                        'variety_id'           => $variety_id,
-                        'type_delivery'     => $delivery_type,
-                        'price'             => $row['price'],
-                        'sell_price'        => $row['harga_jual'],
-                        'discount'          => $row['discount'],
-                        'status'            => '1',
-                    ]);
+                    $query_ada = ItemPricelist::where('type_id',$item->id)
+                    ->where('group_id',$group->id)
+                    ->where('province_id',$province_id)
+                    ->where('city_id',$city_id)
+                    ->where('variety_id',$variety_id)
+                    ->where('type_delivery',$delivery_type)
+                    ->first();
+
+                    if($query_ada){
+                        $query_ada->update([
+                            'price'             => $row['price'],
+                            'sell_price'        => $row['harga_jual'],
+                            'discount'          => $row['discount'],
+                            'status'            => '1',
+                        ]);
+                    }else{
+                        $query = ItemPricelist::create([
+                            'code'              => strtoupper(Str::random(15)),
+                            'user_id'           => session('bo_id'),
+                            'type_id'           => $item->id,
+                            'group_id'          => $group->id,
+                            'place_id'          => $place->id,
+                            'grade_id'          => $grade->id,
+                            'province_id'       => $province_id,
+                            'city_id'           => $city_id,
+                            'variety_id'        => $variety_id,
+                            'type_delivery'     => $delivery_type,
+                            'price'             => $row['price'],
+                            'sell_price'        => $row['harga_jual'],
+                            'discount'          => $row['discount'],
+                            'status'            => '1',
+                        ]);
+                    }
+
+
 
                 }else{
 

@@ -209,7 +209,7 @@ class ComplaintSalesController extends Controller
             $detail = [];
             foreach($mod->marketingOrderDeliveryDetail as $row_detail){
                 $detail[] = [
-                    'item' => $row_detail->item->name,
+                    'item' => $row_detail->item->name.' ukuran 1 item:'. number_format($row_detail->item->size->m2_conversion,0,',','.').' m2',
                     'id'   => $row_detail->id,
                     'lookable_type'=>'marketing_order_delivery_details',
                     'lookable_id'  =>$row_detail->id,

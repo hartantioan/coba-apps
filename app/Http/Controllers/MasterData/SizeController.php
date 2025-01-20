@@ -76,7 +76,7 @@ class SizeController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
-                    number_format($val->m2_conversion,2,',','.'),
+                    number_format($val->m2_conversion,0,',','.'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>

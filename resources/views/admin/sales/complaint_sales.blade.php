@@ -543,7 +543,7 @@
                 $('#form_data')[0].reset();
                 $('.row_item').remove();
                 $('#percentage_value').text('0%');
-                $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
+                $('#grandtotal_detail').text(0);
                 $('#lookable_id,#marketing_order_id_complaint').empty();
                 document.getElementById("so_sj_value").innerText = "0";
                 document.getElementById("customer_name_value").innerText = "0";
@@ -672,7 +672,7 @@
         document.getElementById("marketing_order_delivery_process_date").value = '-';
         $('.row_item').remove();
         $('#percentage_value').text('0%');
-        $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
+        $('#grandtotal_detail').text('0');
         $('#grandtotal_detail').text('0');
         if ($('#lookable_id').val()) {
             $('#grand-total').text('0');

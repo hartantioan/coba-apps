@@ -86,16 +86,18 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                     ->where('province_id',$province_id)
                     ->where('city_id',$city_id)
                     ->where('variety_id',$variety_id)
+                    ->where('grade_id',$grade->id)
                     ->where('type_delivery',$delivery_type)
                     ->first();
 
                     if($query_ada){
-                        $query_ada->update([
-                            'price'             => $row['price'],
-                            'sell_price'        => $row['harga_jual'],
-                            'discount'          => $row['discount'],
-                            'status'            => '1',
-                        ]);
+                        $query_ada->user_id    = session('bo_id');
+                        $query_ada->price      = $row['price'];
+                        $query_ada->sell_price = $row['harga_jual'];
+                        $query_ada->discount   = $row['discount'];
+                        $query_ada->status     = '1';  // Assuming you want to set status to '1'
+
+                        $query_ada->save();
                     }else{
                         $query = ItemPricelist::create([
                             'code'              => strtoupper(Str::random(15)),

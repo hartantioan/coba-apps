@@ -931,6 +931,31 @@
             }
         });
 
+        $('#outlet_id').select2({
+            placeholder: '-- Pilih outlet --',
+            minimumInputLength: 3,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/outlet") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').select2('data')[0].id,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#sales_id,#filter_sales', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#broker_id', '{{ url("admin/select2/broker") }}');
@@ -938,7 +963,6 @@
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#transportation_id', '{{ url("admin/select2/transportation") }}');
-        select2ServerSide('#outlet_id', '{{ url("admin/select2/outlet") }}');
     });
 
     function getOutletAddress(){

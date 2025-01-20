@@ -118,7 +118,7 @@ class MarketingOrderAgingController extends Controller
                     FROM cancel_documents cd
                     WHERE 
                         cd.post_date <= :date2
-                        AND cd.lookable_type = 'marketing_order_invoices'
+                        AND cd.lookable_type = 'marketing_order_memos'
                         AND cd.lookable_id = pi.id
                         AND cd.deleted_at IS NULL
                 ),0) AS status_cancel

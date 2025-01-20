@@ -130,6 +130,9 @@ class AppServiceProvider extends ServiceProvider
             'good_return_issue_details'             => 'App\Models\GoodReturnIssueDetail',
             'official_reports'                      => 'App\Models\OfficialReport',
             'mitra_marketing_orders'                => 'App\Models\MitraMarketingOrder',
+            'units'                                 => 'App\Models\Unit',
+            'mitra_price_lists'                     => 'App\Models\MitraPriceList',
+            'mitra_sales_areas'                     => 'App\Models\MitraSalesArea',
             'complaint_sales'                       => 'App\Models\ComplaintSales',
             'personal_visits'                       => 'App\Models\PersonalVisit',
         ]);

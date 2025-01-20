@@ -71,14 +71,14 @@ class MarketingOrderAgingController extends Controller
                 JOIN users u
                     ON u.id = moi.account_id
                 WHERE 
-                    moi.post_date <= :date3
+                    moi.post_date <= :date2
                     AND moi.grandtotal > 0
                     AND moi.status IN ('2','3')
                     AND IFNULL((SELECT
                         1
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date2
+                            cd.post_date <= :date3
                             AND cd.lookable_type = 'marketing_order_invoices'
                             AND cd.lookable_id = moi.id
                             AND cd.deleted_at IS NULL

@@ -540,23 +540,18 @@
                 changeDateMinimum($('#post_date').val());
             },
             onCloseEnd: function(modal, trigger){
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
                 $('#form_data')[0].reset();
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
-                $('#temp').val('');
-                $('#account_id').empty();
-                $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,00');
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
-                M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal,#subtotal-convert,#discount-convert,#total-convert,#tax-convert,#wtax-convert,#grandtotal-convert,#rounding-convert').text('0,00');
-                $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
+                $('.row_item').remove();
+                $('#percentage_value').text('0%');
+                $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
+                $('#lookable_id,#marketing_order_id_complaint').empty();
+                document.getElementById("so_sj_value").innerText = "0";
+                document.getElementById("customer_name_value").innerText = "0";
+                document.getElementById("grandtotal_value").innerText =  "0";
+                document.getElementById("volume_value").innerText =  "0";
+                document.getElementById("qty_value").innerText =  "0";
+                document.getElementById("plant").value = '-';
+                document.getElementById("marketing_order_delivery_process_date").value = '-';
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -668,7 +663,16 @@
     });
 
     function getMODSj() {
+        document.getElementById("so_sj_value").innerText = "0";
+        document.getElementById("customer_name_value").innerText = "0";
+        document.getElementById("grandtotal_value").innerText =  "0";
+        document.getElementById("volume_value").innerText =  "0";
+        document.getElementById("qty_value").innerText =  "0";
+        document.getElementById("plant").value = '-';
+        document.getElementById("marketing_order_delivery_process_date").value = '-';
         $('.row_item').remove();
+        $('#percentage_value').text('0%');
+        $('#grandtotal_detail').text(formatRupiahIni('0'.toFixed(2).toString().replace('.',',')));
         $('#grandtotal_detail').text('0');
         if ($('#lookable_id').val()) {
             $('#grand-total').text('0');

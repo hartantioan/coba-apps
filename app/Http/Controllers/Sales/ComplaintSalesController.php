@@ -213,6 +213,8 @@ class ComplaintSalesController extends Controller
                     'id'   => $row_detail->id,
                     'lookable_type'=>'marketing_order_delivery_details',
                     'lookable_id'  =>$row_detail->id,
+                    'm2_conversion'  =>$row_detail->item->size->m2_conversion,
+                    'box_conversion'  =>$row_detail->id,
 
                 ];
             }

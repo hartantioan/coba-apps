@@ -709,6 +709,8 @@
                                     <tr class="row_item" data-id="` + data.id + `" style="background-color:` + getRandomColor() + `;">
                                         <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
+                                        <input type="hidden" name="arr_box_conversion[]" id="arr_box_conversion` + count + `" value="` + val.arr_box_conversion + `">
+                                        <input type="hidden" name="arr_m2_conversion[]" id="arr_m2_conversion` + count + `" value="` + val.arr_m2_conversion + `">
                                         <td class="center" >
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>

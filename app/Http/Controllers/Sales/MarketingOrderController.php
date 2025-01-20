@@ -638,16 +638,17 @@ class MarketingOrderController extends Controller
                             ->where('type_id',$item->type_id)
                             ->where('status','1')
                             ->first() ?? 0;
-                            if($cek_price != 0){
-                                if($cek_price->sell_price != str_replace(',','.',str_replace('.','',$request->arr_price_list[$key]))){
-                                    return response()->json([
-                                        'status'  => 500,
-                                        'message' => 'Ada Barang yang belum sama dengan price list yang telah ditetapkan',
-                                    ]);
+                            if($cek_price){
+                                if($cek_price != 0){
+                                    if($cek_price->sell_price != str_replace(',','.',str_replace('.','',$request->arr_price_list[$key]))){
+                                        return response()->json([
+                                            'status'  => 500,
+                                            'message' => 'Ada Barang yang belum sama dengan price list yang telah ditetapkan',
+                                        ]);
 
+                                    }
                                 }
                             }
-
                         }
 
                     }

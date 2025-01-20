@@ -65,10 +65,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
             $typesell = '-';
 
             if ($row->lookable_type == 'marketing_order_delivery_process_details') {
-                if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == "0") {
+                if(date('Y-m-d',strtotime($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->created_at)) >= '2024-12-24'){
                     $pricefinal = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
-                } else {
-                    $pricefinal = Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price / (($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) / 100), 2);
+                }else{
+                    if ($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == "0") {
+                        $pricefinal = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price;
+                    } else {
+                        $pricefinal = Round($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price / (($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax + 100) / 100), 2);
+                    }
                 }
                 $item = $row->lookable->itemStock->item->name;
                 $qty = $row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
@@ -78,10 +82,14 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 $disc3 = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3;
                 $typesell = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->type();
             } elseif ($row->lookable_type == 'marketing_order_delivery_details') {
-                if ($row->lookable->marketingOrderDetail->is_include_tax == "0") {
+                if(date('Y-m-d',strtotime($row->lookable->marketingOrderDetail->created_at)) >= '2024-12-24'){
                     $pricefinal = $row->lookable->marketingOrderDetail->price;
-                } else {
-                    $pricefinal = Round($row->lookable->marketingOrderDetail->price / (($row->lookable->marketingOrderDetail->percent_tax + 100) / 100), 2);
+                }else{
+                    if ($row->lookable->marketingOrderDetail->is_include_tax == "0") {
+                        $pricefinal = $row->lookable->marketingOrderDetail->price;
+                    } else {
+                        $pricefinal = Round($row->lookable->marketingOrderDetail->price / (($row->lookable->marketingOrderDetail->percent_tax + 100) / 100), 2);
+                    }
                 }
                 $item = $row->lookable->item->name;
                 $qty = $row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion;

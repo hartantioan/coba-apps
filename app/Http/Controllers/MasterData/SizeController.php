@@ -25,6 +25,7 @@ class SizeController extends Controller
             'id',
             'code',
             'name',
+            'm2_conversion',
         ];
 
         $start  = $request->start;
@@ -34,7 +35,7 @@ class SizeController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Size::count();
-        
+
         $query_data = Size::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -70,11 +71,12 @@ class SizeController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->code,
                     $val->name,
+                    number_format($val->m2_conversion,2,',','.'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -121,6 +123,7 @@ class SizeController extends Controller
                     $query = Size::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->m2_conversion	= str_replace(',','.',str_replace('.','',$request->m2_conversion));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -133,14 +136,15 @@ class SizeController extends Controller
                     $query = Size::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
-                        'status'        => $request->status ? $request->status : '2'
+                        'status'        => $request->status ? $request->status : '2',
+                        'm2_conversion' => str_replace(',','.',str_replace('.','',$request->m2_conversion)),
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -160,19 +164,19 @@ class SizeController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $size = Size::find($request->id);
-        				
+
 		return response()->json($size);
     }
 
     public function destroy(Request $request){
         $query = Size::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Size())

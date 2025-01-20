@@ -17,7 +17,8 @@ class Size extends Model
     protected $fillable = [
         'code',
         'name',
-        'status'
+        'status',
+        'm2_conversion'
     ];
 
     public function status(){

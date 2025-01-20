@@ -73,7 +73,7 @@ class MarketingOrderAgingController extends Controller
                     WHERE 
                         cd.post_date <= :date2
                         AND cd.lookable_type = 'marketing_order_invoices'
-                        AND cd.lookable_id = pi.id
+                        AND cd.lookable_id = moi.id
                         AND cd.deleted_at IS NULL
                 ),0) AS status_cancel
                 FROM marketing_order_invoices moi
@@ -119,7 +119,7 @@ class MarketingOrderAgingController extends Controller
                     WHERE 
                         cd.post_date <= :date2
                         AND cd.lookable_type = 'marketing_order_memos'
-                        AND cd.lookable_id = pi.id
+                        AND cd.lookable_id = moi.id
                         AND cd.deleted_at IS NULL
                 ),0) AS status_cancel
                 FROM marketing_order_memos moi

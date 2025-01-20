@@ -40,14 +40,14 @@ class MarketingOrderOutstandingController extends Controller
                     $query->whereDate('post_date', '<=', $request->date);
                 }
             })
-            ->whereIn('status',['2','3'])
+            ->whereIn('status',['2','3','8'])
             ->get();
         $query_data2 = MarketingOrderMemo::where(function($query) use ( $request) {
                 if($request->date) {
                     $query->whereDate('post_date', '<=', $request->date);
                 }
             })
-            ->whereIn('status',['2','3'])
+            ->whereIn('status',['2','3','8'])
             ->get();
         if($query_data){
             $grandtotalAll = 0;

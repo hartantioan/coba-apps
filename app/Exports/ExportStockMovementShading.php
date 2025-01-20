@@ -29,16 +29,6 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
     }
     public function view(): View
     {
-        info($this->plant);
-		info($this->item);
-        info($this->warehouse);
-        info($this->start_date);
-        info($this->finish_date);
-        info($this->type);
-        info($this->group);
-        info($this->batch_id);
-        info($this->shading_id);
-
         DB::statement("SET SQL_MODE=''");
         $item_shading_ids = ItemShading::join('items', 'item_shadings.item_id', '=', 'items.id')
         ->whereHas('item', function ($query) {

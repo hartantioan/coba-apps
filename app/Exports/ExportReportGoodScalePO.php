@@ -100,8 +100,8 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             if($row->goodScale->purchaseOrder()->exists()){
                 $po_code =$row->goodScale->purchaseOrder->code;
                 $list = $row->goodScale->purchaseOrder->getInvoice();
-                $subtotal = $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->subtotal * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate;
-                $discount = $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->discountHeader() * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate;
+                $subtotal = $row->lookable->marketingOrderDeliveryProcess()->exists() ?$row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->subtotal * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate : 0;
+                $discount = $row->lookable->marketingOrderDeliveryProcess()->exists() ?$row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->discountHeader() * $row->lookable->marketingOrderDeliveryProcess->purchaseOrderDetail->purchaseOrder->currency_rate : 0;
                 $po_total = $subtotal-$discount;
             }
 

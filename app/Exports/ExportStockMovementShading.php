@@ -463,8 +463,6 @@ class ExportStockMovementShading implements FromView,ShouldAutoSize
             $combinedArray=$array_filter;
         }
 
-        info($combinedArray);
-
         activity()
             ->performedOn(new ItemCogs())
             ->causedBy(session('bo_id'))

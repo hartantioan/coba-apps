@@ -297,6 +297,7 @@ class TruckQueueUpdaterController extends Controller
         $gs_time_out = "-";
         $sj_code = "-";
         $gs_time_out = "-";
+        $sj_keluar = '-';
 
         if ($data->truckQueueDetail->goodScale()->exists()) {
             $gs_code = $data->truckQueueDetail->goodScale->code;

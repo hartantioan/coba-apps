@@ -620,6 +620,7 @@ class MarketingOrderController extends Controller
 
                 $passedNettPrice = true;
                 $arrMessage = [];
+                $account = User::find($request->account_id);
                 foreach($request->arr_item as $key => $row){
                     $item = Item::find($row);
                     $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
@@ -629,6 +630,23 @@ class MarketingOrderController extends Controller
                             /* $passedNettPrice = false;
                             $arrMessage[] = 'Item '.$item->code.' - '.$item->name.' belum memiliki harga nett price dari hpp atau kalkulator BOM.'; */
                         }
+                        if($request->type != '4'){
+                            $cek_price = ItemPricelist::where('group_id',$account->group_id)
+                            ->where('grade_id',$item->grade_id)
+                            ->where('place_id',$codePlace->id)
+                            ->where('city_id',$request->city_id)
+                            ->where('type_id',$item->type_id)
+                            ->where('status','1')
+                            ->first() ?? 0;
+                            if($cek_price->sell_price != str_replace(',','.',str_replace('.','',$request->arr_price_list[$key]))){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Ada Barang yang belum sama dengan price list yang telah ditetapkan',
+                                ]);
+
+                            }
+                        }
+
                     }
                 }
 
@@ -823,6 +841,7 @@ class MarketingOrderController extends Controller
                         $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                         $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
                         $item = Item::find($row);
+
                         $price_nett = $item->cogsSales($codePlace->id,$request->post_date) + 10000;
                         MarketingOrderDetail::create([
                             'marketing_order_id'            => $query->id,

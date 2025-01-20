@@ -66,17 +66,28 @@ class MarketingOrderAgingController extends Controller
                 ),0) AS outstandcheck,
                 0 AS total_memo,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                IFNULL((SELECT
+                    1
+                    FROM cancel_documents cd
+                    WHERE 
+                        cd.post_date <= :date2
+                        AND cd.lookable_type = 'marketing_order_invoices'
+                        AND cd.lookable_id = pi.id
+                        AND cd.deleted_at IS NULL
+                ),0) AS status_cancel
                 FROM marketing_order_invoices moi
                 JOIN users u
                     ON u.id = moi.account_id
                 WHERE 
-                    moi.post_date <= :date2
+                    moi.post_date <= :date3
                     AND moi.grandtotal > 0
                     AND moi.status IN ('2','3')
+                    AND status_cancel = 0
         ", array(
             'date1' => $date,
             'date2' => $date,
+            'date3' => $date,
         ));
 
         $results2 = DB::select("
@@ -101,17 +112,28 @@ class MarketingOrderAgingController extends Controller
                 0 AS outstandcheck,
                 0 AS total_memo,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                IFNULL((SELECT
+                    1
+                    FROM cancel_documents cd
+                    WHERE 
+                        cd.post_date <= :date2
+                        AND cd.lookable_type = 'marketing_order_invoices'
+                        AND cd.lookable_id = pi.id
+                        AND cd.deleted_at IS NULL
+                ),0) AS status_cancel
                 FROM marketing_order_memos moi
                 JOIN users u
                     ON u.id = moi.account_id
                 WHERE 
-                    moi.post_date <= :date2
+                    moi.post_date <= :date3
                     AND moi.grandtotal > 0
                     AND moi.status IN ('2','3')
+                    AND status_cancel = 0
         ", array(
             'date1' => $date,
             'date2' => $date,
+            'date3' => $date,
         ));
 
         $countPeriod = 1;

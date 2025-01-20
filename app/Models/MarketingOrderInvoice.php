@@ -510,6 +510,12 @@ class MarketingOrderInvoice extends Model
             $total += $row->subtotal;
         }
 
+        if($this->cancelDocument()->exists()){
+            if($this->cancelDocument->post_date >= $date){
+                $total += $this->grandtotal;
+            }
+        }
+
         return $total;
     }
 

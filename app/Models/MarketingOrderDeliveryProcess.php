@@ -267,8 +267,12 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function getGrandtotalSalesOrder(){
         $gt = 0;
+        $arr=[];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            $gt += $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->grandtotal;
+            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,$arr)){
+                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code;
+                $gt += $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->grandtotal;
+            }
         }
         return $gt;
     }

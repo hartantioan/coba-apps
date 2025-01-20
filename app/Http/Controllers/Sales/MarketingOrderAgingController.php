@@ -102,7 +102,7 @@ class MarketingOrderAgingController extends Controller
                         ipd.lookable_id = moi.id 
                         AND ipd.lookable_type = 'marketing_order_memos'
                         AND ip.post_date <= :date1
-                        AND ip.status IN ('2','3')
+                        AND ip.status IN ('2','3','8')
                 ),0) AS total_payment,
                 IFNULL((SELECT 
                     gr.name 
@@ -128,7 +128,7 @@ class MarketingOrderAgingController extends Controller
                 WHERE 
                     moi.post_date <= :date3
                     AND moi.grandtotal > 0
-                    AND moi.status IN ('2','3')
+                    AND moi.status IN ('2','3','8')
                     AND status_cancel = 0
         ", array(
             'date1' => $date,

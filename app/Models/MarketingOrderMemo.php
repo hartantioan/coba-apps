@@ -339,7 +339,7 @@ class MarketingOrderMemo extends Model
         }
 
         if($this->cancelDocument()->exists()){
-            if($this->cancelDocument->post_date >= $date){
+            if($this->cancelDocument->post_date <= $date){
                 $total += $this->grandtotal;
             }
         }

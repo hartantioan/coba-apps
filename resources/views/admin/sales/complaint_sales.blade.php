@@ -628,9 +628,39 @@
             updateGrandTotal();
         });
 
+        $('#marketing_order_id_complaint').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
         select2ServerSide('#lookable_id', '{{ url("admin/select2/marketing_order_delivery_process") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#marketing_order_id_complaint', '{{ url("admin/select2/marketing_order") }}');
 
         $("#table-detail th").resizable({
             minWidth: 100,

@@ -3200,20 +3200,21 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = MarketingOrder::where(function($query) use($search){
             $query->where('code', 'like', "%$search%")
-                ->orWhere('note_internal','like',"%$search%")
-                ->orWhere('note_external','like',"%$search%")
-                ->orWhereHas('user',function($query) use ($search){
-                    $query->where('name','like',"%$search%")
-                        ->orWhere('employee_no','like',"%$search%");
-                })
-                ->orWhereHas('account',function($query) use ($search){
-                    $query->where('name','like',"%$search%")
-                        ->orWhere('employee_no','like',"%$search%");
-                });
+                  ->orWhere('note_internal', 'like', "%$search%")
+                  ->orWhere('note_external', 'like', "%$search%")
+                  ->orWhereHas('user', function($query) use ($search){
+                      $query->where('name', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%");
+                  })
+                  ->orWhereHas('account', function($query) use ($search){
+                      $query->where('name', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%");
+                  });
         })
         ->whereDoesntHave('used')
-        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2','3'])->get();
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','", $this->dataplacecode)."')")
+        ->whereIn('status', ['2', '3'])
+        ->paginate(10);
 
         foreach($data as $d) {
             if($d->hasBalanceMod()){
@@ -3221,7 +3222,7 @@ class Select2Controller extends Controller {
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->account->name,
                     'account_id' 	=> $d->account_id,
-                    'outlet'        => $d->outlet->name,
+                    'outlet'        => $d->outlet->name ?? '-',
                     'address'       => $d->destination_address,
                     'province'      => $d->province->name,
                     'city'          => $d->city->name,
@@ -3237,7 +3238,12 @@ class Select2Controller extends Controller {
             }
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
     }
 
     public function marketingOrderByAccount(Request $request)
@@ -3863,9 +3869,9 @@ class Select2Controller extends Controller {
         $data = Outlet::where(function($query) use($search,$request){
                 $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
-                if($request->account_id){
-                    $query->where('account_id',$request->account_id);
-                }
+                // if($request->account_id){
+                //     $query->where('account_id',$request->account_id);
+                // }
             })
             ->where('status','1')
             ->get();

@@ -7,6 +7,7 @@
             <th>Kode Inventaris</th>
             <th>{{ __('translations.item') }}</th>
             <th>Keterangan </th>
+            <th><Area></Area> </th>
             <th>{{ __('translations.location') }}</th>
             <th>Tanggal Penyerahan</th>
             <th>Keterangan Penyerahan</th>
@@ -36,6 +37,7 @@
                 <td style="{{$mbeng}}">{{ $row->hardwareItem->code ?? '' }}</td>
                 <td style="{{$mbeng}}">{{ $row->hardwareItem->item ?? '' }}</td>
                 <td style="{{$mbeng}}">{{ $row->hardwareItem->detail1 ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ $row->area }}</td>
                 <td style="{{$mbeng}}">{{ $row->location }}</td>
                 <td style="{{$mbeng}}">{{ $row->reception_date }}</td>
                 <td style="{{$mbeng}}">{{ $row->info }}</td>

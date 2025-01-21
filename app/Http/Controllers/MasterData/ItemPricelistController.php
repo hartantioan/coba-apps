@@ -35,7 +35,7 @@ class ItemPricelistController extends Controller
         $data = [
             'title'     => 'Pricelist Item FG',
             'content'   => 'admin.master_data.item_pricelist',
-            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'place'     => Place::where('status','1')->get(),
             'group'     => Group::where('status','1')->where('type','2')->get(),
         ];
 

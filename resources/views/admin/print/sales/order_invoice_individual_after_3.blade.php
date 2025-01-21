@@ -347,7 +347,7 @@
                                 <tr>
                                     <td style="width:5% !important"><strong>{{ ($key + 1) }}</td>
                                     <td style="width:41% !important;padding-left:5px"><strong>{{ $row->lookable->item->print_name.$boxQty.$hscode }}</td>
-                                    <td style="width:9% !important;padding-right:5px" align="right"><strong>{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td style="width:9% !important;padding-right:5px" align="right"><strong>{{ $row->lookable->isPallet() ? CustomHelper::formatConditionalQty($row->lookable->qty) : '' }}</td>
                                     <td style="width:6% !important;padding-right:3px" align="right"><strong>{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:5% !important"align="right"><strong>{{ $row->lookable->item->uomUnit->code }}</td>
                                     <td style="width:10% !important" align="right"><strong>{{ number_format($row->priceBeforeTax(),2,',','.') }}</td>

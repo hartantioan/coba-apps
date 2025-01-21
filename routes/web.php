@@ -522,6 +522,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('batch_id_movement', [Select2Controller::class, 'batchIdMovement']);
                 Route::get('shading_id_movement', [Select2Controller::class, 'shadingIdMovement']);
                 Route::get('truck_queue_good_scale', [Select2Controller::class, 'truckQueueGoodScale']);
+                Route::get('marketing_order_delivery_process_complaint', [Select2Controller::class, 'marketingOrderDeliveryProcessComplaint']);
             });
 
             Route::prefix('dashboard')->group(function () {

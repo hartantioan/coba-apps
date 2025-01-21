@@ -395,12 +395,22 @@ class MarketingOrderAgingController extends Controller
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
-                    AND moi.status IN ('2','3')
+                    AND moi.status IN ('2','3','8')
+                    AND IFNULL((SELECT
+                        1
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date5
+                            AND cd.lookable_type = 'marketing_order_invoices'
+                            AND cd.lookable_id = moi.id
+                            AND cd.deleted_at IS NULL
+                    ),0) = 0
         ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
             'date4' => $date,
+            'date5' => $date,
         ));
 
         $results2 = DB::select("
@@ -432,10 +442,20 @@ class MarketingOrderAgingController extends Controller
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
-                    AND moi.status IN ('2','3')
+                    AND moi.status IN ('2','3','8')
+                    AND IFNULL((SELECT
+                        1
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date3
+                            AND cd.lookable_type = 'marketing_order_memos'
+                            AND cd.lookable_id = moi.id
+                            AND cd.deleted_at IS NULL
+                    ),0) = 0
         ", array(
             'date1' => $date,
             'date2' => $date,
+            'date3' => $date,
         ));
 
         $countPeriod = 1;

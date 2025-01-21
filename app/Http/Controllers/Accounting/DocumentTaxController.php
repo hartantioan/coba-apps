@@ -196,6 +196,7 @@ class DocumentTaxController extends Controller
             foreach($query_data as $val) {
                 $refrence = '';
                 $pdate_dtax ="";
+                $code = '<button class="btn-floating green btn-small" data-popup="tooltip" title="Tambah No Faktur" onclick="addNoFaktur(`'.$val->id.'`)"><i class="material-icons">priority_high</i></button>';
 				if($val->documentTaxHandoverDetail()->exists()){
 
                     $refrence = $val->documentTaxHandoverDetail->documentTaxHandover->code;
@@ -204,6 +205,9 @@ class DocumentTaxController extends Controller
                     $refrence = "-";
                     $pdate_dtax ="-";
                 }
+                if($val->code){
+                    $code=$val->transaction_code.$val->replace.$val->code;
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $pdate_dtax,
@@ -211,7 +215,7 @@ class DocumentTaxController extends Controller
                     $val->user->name ?? '-',
                     $val->status(),
                     $val->date,
-                    $val->transaction_code.$val->replace.$val->code,
+                    $code,
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
@@ -283,7 +287,105 @@ class DocumentTaxController extends Controller
         return response()->json($string);
     }
 
+    public function saveNoFaktur(Request $request){
+        $validation = Validator::make($request->all(), [
+            'no_factor'               => 'required',
+        ], [
+            'no_factor.required'      => 'No Faktur Pajak',
+        ]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            DB::beginTransaction();
+            try {
+                if($request->temp){
+                    $barcode = $request->no_factor;
+                    $kdJenisTransaksi = substr($barcode, 0, 2);
+                    $fgPengganti = substr($barcode, 2, 1);
+                    $nomorFaktur = substr($barcode, 3);
+                    $existingRecord = DB::table('document_taxes')
+                    ->where('code', $nomorFaktur)
+                    ->where('replace', $fgPengganti)
+                    ->where('transaction_code', $kdJenisTransaksi)
+                    ->whereNull('deleted_at')
+                    ->whereIn('status',['1','2','4'])
+                    ->exists();
+                    if($existingRecord){
+                        $response = [
+                            'status' => 500,
+                            'message'  => 'kode sudah pernah diinput'
+                        ];
+                        return response()->json($response);
+                    }else{
+                        $query = DocumentTax::find($request->temp);
+                        $query->user_id         = session('bo_id');
+                        $query->transaction_code        = $kdJenisTransaksi;
+                        $query->replace        = $fgPengganti;
+                        $query->code        = $nomorFaktur;
+                        $query->save();
+                    }
+
+                }else{
+                    $query = DocumentTax::create([
+                        'code'              => strtoupper(Str::random(15)),
+                        'user_id'           => session('bo_id'),
+
+                        'group_id'          => $request->group_id,
+                        'place_id'          => $request->place_id,
+
+                        'type_id'			=> $request->type_id,
+                        'province_id'			=> $request->province_id,
+                        'city_id'			=> $request->city_id,
+                        'grade_id'			=> $request->grade_id,
+                        'type_delivery'          => $request->type_delivery,
+
+                        'variety_id'			=> $request->variety_id,
+                        'discount'             => str_replace(',','.',str_replace('.','',$request->discount)),
+                        'sell_price'             => str_replace(',','.',str_replace('.','',$request->sell_price)),
+                        'price'             => str_replace(',','.',str_replace('.','',$request->price)),
+                        'status'            => $request->status ? $request->status : '2'
+                    ]);
+                }
+
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
+
+			if($query) {
+
+                activity()
+                    ->performedOn(new DocumentTax())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit no faktur data.');
+
+				$response = [
+					'status'  => 200,
+					'message' => 'Data successfully saved.'
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+
+		return response()->json($response);
+    }
+
     public function show(Request $request){
+        $country = DocumentTax::find($request->id);
+
+		return response()->json($country);
+    }
+
+    public function addNoFaktur(Request $request){
         $country = DocumentTax::find($request->id);
 
 		return response()->json($country);
@@ -383,13 +485,13 @@ class DocumentTaxController extends Controller
                 ];
                 return response()->json($response);
             }
-            if (empty($no_faktur)) {
-                $response = [
-                    'status' => 422,
-                    'error'  => 'Nomor Faktur Kosong'
-                ];
-                return response()->json($response);
-            }
+            // if (empty($no_faktur)) {
+            //     $response = [
+            //         'status' => 422,
+            //         'error'  => 'Nomor Faktur Kosong'
+            //     ];
+            //     return response()->json($response);
+            // }
 
             $kdJenisTransaksi = substr($no_faktur, 0, 2);
             $fgPengganti = substr($no_faktur, 2, 1);

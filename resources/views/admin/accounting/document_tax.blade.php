@@ -3,7 +3,7 @@
     #modal4 {
         top:0px !important;
     }
-    
+
 </style>
 <div id="main">
     <div class="row">
@@ -51,7 +51,7 @@
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -93,12 +93,12 @@
                                                     <i class="material-icons right">subtitles</i>
                                                 </a>
                                             </div>
-                                           
+
                                         </div>
                                         <div class="col m12 s12">
                                             Handover Date
                                         </div>
-                                        
+
                                         <div class="col m4 s6 ">
                                             <label for="handover_date_start" style="font-size:1rem;">{{ __('translations.start_date') }} :</label>
                                             <div class="input-field col s12">
@@ -117,7 +117,7 @@
                                                 <textarea type="text" id="textarea_multiple" name="textarea_multiple" class="materialize-textarea" onchange="loadDataTable()"></textarea>
                                             </div>
                                         </div>
-                                        
+
                                         {{-- <div class="col m12 s6 ">
                                             <a class="waves-effect waves-light btn-small"><i class="material-icons left">cloud</i>button</a>
                                         </div> --}}
@@ -128,7 +128,7 @@
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
-                                          
+
                                     </div>
                                 </li>
                             </ul> --}}
@@ -176,31 +176,24 @@
     </div>
 </div>
 
-{{-- <div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+<div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Country</h4>
+                <h4>Tambah No Faktur</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode Negara">
-                            <label class="active" for="code">{{ __('translations.code') }}</label>
+                            <input id="no_factor" name="no_factor" type="text" placeholder="No Faktur">
+                            <label class="active" for="no_factor">No Faktur</label>
                         </div>
-                        <div class="input-field col s6">
-                            <input id="name" name="name" type="text" placeholder="Nama Negara">
-                            <label class="active" for="name">{{ __('translations.name') }}</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="phone_code" name="phone_code" type="text" placeholder="Kode Telepon">
-                            <label class="active" for="phone_code">{{ __('translations.telephone_code') }}</label>
-                        </div>
+
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="saveNoPajak();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -210,7 +203,7 @@
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
-</div> --}}
+</div>
 
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
@@ -239,9 +232,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -251,9 +244,9 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -271,7 +264,7 @@
 
     $('#barcode-form').submit(function(event) {
             event.preventDefault();
-            
+
             var formData = new FormData(this);
 
             $.ajax({
@@ -333,7 +326,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            
+
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
@@ -342,7 +335,7 @@
                     start_date : $('#start-date').val(),
                     finish_date : $('#finish-date').val(),
                     handover_date_start : $('#handover_date_start').val(),
-                    
+
                     handover_date_end : $('#handover_date_end').val(),
                     multiple : $('#textarea_multiple').val(),
                 },
@@ -380,7 +373,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             select: {
                 style: 'multi'
@@ -391,9 +384,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -425,7 +418,7 @@
                     $.each(response.error, function(field, errorMessage) {
                         $('#' + field).addClass('error-input');
                         $('#' + field).css('border', '1px solid red');
-                        
+
                     });
                     swal({
                         title: 'Ups! Validation',
@@ -483,7 +476,7 @@
                 icon: 'warning'
             });
         }
-        
+
     }
 
     function excelFilterTable(){
@@ -491,7 +484,7 @@
         var startDate = $('#start-date').val();
         var search = window.table.search();
         var multiple = $('#textarea_multiple').val();
-        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&finish_date=" + endDate + "&search=" + search + "&multiple=" + multiple; 
+        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&finish_date=" + endDate + "&search=" + search + "&multiple=" + multiple;
     }
 
 
@@ -543,7 +536,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
@@ -551,6 +544,40 @@
 
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function addNoFaktur(id){
+
+        $.ajax({
+            url: '{{ Request::url() }}/add_no_faktur',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                console.log(response);
+                $('#temp').val(response.id);
                 M.updateTextFields();
             },
             error: function() {
@@ -610,7 +637,7 @@
 
     function print(){
         var search = window.table.search();
-        
+
         $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print',
@@ -626,6 +653,81 @@
                 w.document.open();
                 w.document.write(data);
                 w.document.close();
+            }
+        });
+    }
+
+    function saveNoPajak(){
+
+        var formData = new FormData($('#form_data')[0]);
+
+        $.ajax({
+            url: '{{ Request::url() }}/save_no_faktur',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    $.each(response.error, function(field, errorMessage) {
+                        $('#' + field).addClass('error-input');
+                        $('#' + field).css('border', '1px solid red');
+
+                    });
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
         });
     }

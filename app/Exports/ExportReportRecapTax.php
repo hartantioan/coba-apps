@@ -45,7 +45,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
         'Uang Muka (DP)',
 
         'Total',
-        'DPP FP',
+        'Harga Jual',
+        'DPP Nilai Lain',
         'PPN FP',
         'Status Cancel',
         'Tipe Pembayaran',
@@ -167,7 +168,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         'Uang Muka (DP)' => '',
                         'Total' =>  $price_satuan * $jumlah_barang,
 
-                        'DPP FP' => $total_detail,
+                        'Harga Jual' => $total_detail,
+                        'DPP Nilai Lain' => round(11 / 12 * (round($row_detail->total, 2)), 2),
                         'PPN FP' => $ppn_fp_detail,
                         'Status Cancel' => '',
                         'Tipe Pembayaran' => '',
@@ -203,7 +205,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Uang Muka (DP)' => $row->downpayment,
                 'Total' =>  $total_before_disc,
 
-                'DPP FP' => floor($row->total),
+                'Harga Jual' => floor($row->total),
+                'DPP Nilai Lain' => round(11 / 12 * (round($row->total, 2)), 2),
                 'PPN FP' => $row->tax,
                 'Status Cancel' => $row->statusRaw(),
                 'Tipe Pembayaran' => $row->type(),
@@ -234,7 +237,8 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                 'Uang Muka (DP)' => '',
                 'Total' =>  '',
 
-                'DPP FP' => '',
+                'Harga Jual' => '',
+                'DPP Nilai Lain' => '',
                 'PPN FP' => '',
                 'Status Cancel' => '',
                 'Tipe Pembayaran' => '',

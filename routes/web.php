@@ -2875,15 +2875,15 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [MitraMarketingOrderController::class, 'show']);
                     Route::post('get_code', [MitraMarketingOrderController::class, 'getCode']);
                     Route::post('print', [MitraMarketingOrderController::class, 'print']);
-                    Route::post('done', [MitraMarketingOrderController::class, 'done'])->middleware('operation.access:mitra_sales_order,update');
+                    Route::post('done', [MitraMarketingOrderController::class, 'done'])->middleware('operation.access:mitra_marketing_order,update');
                     Route::post('print_by_range', [MitraMarketingOrderController::class, 'printByRange']);
                     Route::get('viewstructuretree', [MitraMarketingOrderController::class, 'viewStructureTree']);
                     Route::get('simplestructuretree', [MitraMarketingOrderController::class, 'simpleStructrueTree']);
-                    Route::post('create', [MitraMarketingOrderController::class, 'create'])->middleware('operation.access:mitra_sales_order,update');
+                    Route::post('create', [MitraMarketingOrderController::class, 'create'])->middleware('operation.access:mitra_marketing_order,update');
                     Route::get('approval/{id}', [MitraMarketingOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}', [MitraMarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::post('void_status', [MitraMarketingOrderController::class, 'voidStatus'])->middleware('operation.access:mitra_sales_order,void');
-                    Route::post('destroy', [MitraMarketingOrderController::class, 'destroy'])->middleware('operation.access:mitra_sales_order,delete');
+                    Route::post('void_status', [MitraMarketingOrderController::class, 'voidStatus'])->middleware('operation.access:mitra_marketing_order,void');
+                    Route::post('destroy', [MitraMarketingOrderController::class, 'destroy'])->middleware('operation.access:mitra_marketing_order,delete');
                 });
 
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {

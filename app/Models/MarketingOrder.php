@@ -290,6 +290,10 @@ class MarketingOrder extends Model
         }
 	}
 
+    public function mitraMarketingOrder(){
+        return $this->hasOne('App\Models\MitraMarketingOrder','code','document_no');
+    }
+
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);

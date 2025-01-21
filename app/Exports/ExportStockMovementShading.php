@@ -119,6 +119,17 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         '',
                     ];
 
+                    $arr[] = [
+                        'Plant',
+                        'Kode Item',
+                        'Nama Item',
+                        'Satuan',
+                        'Shading',
+                        'Batch',
+                        'Balance Qty',
+                        'Balance Nominal',
+                    ];
+
                     #detail per batch
                     foreach($shading as $key => $rowshading){
                         $datadetail = DB::select("
@@ -168,12 +179,12 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
 
                         foreach($datadetail as $key => $rowdetail){
                             $arr[] = [
-                                $key + 1,
                                 $rowdetail->place_code,
                                 $rowdetail->item_code,
                                 $rowdetail->item_name,
                                 'M2',
                                 $rowdetail->shading_code,
+                                $rowdetail->batch_code,
                                 $rowdetail->balance_qty,
                                 $rowdetail->balance_nominal,
                             ];

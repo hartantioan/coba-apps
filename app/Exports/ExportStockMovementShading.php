@@ -134,17 +134,16 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                     foreach($shading as $key => $rowshading){
                         $datadetail = DB::select("
                             SELECT 
-                                rs.production_batch_id,
-                                pb.code AS batch_code,
-                                rs.shading_code,
-                                rs.item_code,
-                                rs.item_name,
-                                rs.place_code,
-                                rs.total_qty_in,
-                                rs.total_qty_out,
+                                rs.batch_code AS batch_code,
+                                rs.shading_code AS shading_code,
+                                rs.item_code AS item_code,
+                                rs.item_name AS item_name,
+                                rs.place_code AS place_code,
+                                rs.total_qty_in AS total_qty_in,
+                                rs.total_qty_out AS total_qty_out,
                                 (rs.total_qty_in - rs.total_qty_out) AS balance_qty,
-                                rs.total_in,
-                                rs.total_out,
+                                rs.total_in AS total_in,
+                                rs.total_out AS total_out,
                                 (rs.total_in - rs.total_out) AS balance_nominal
                                 FROM (
                                     SELECT 
@@ -152,12 +151,14 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                         IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out,
                                         IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
                                         IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out,
-                                        ic.production_batch_id,
+                                        pb.code AS batch_code,
                                         ish.code AS shading_code,
                                         i.code AS item_code,
                                         i.name AS item_name,
                                         p.code AS place_code
                                     FROM item_cogs ic
+                                        LEFT JOIN production_batches pb
+                                            ON pb.id = ic.production_batch_id
                                         LEFT JOIN item_shadings ish
                                             ON ish.id = ic.item_shading_id
                                         LEFT JOIN items i
@@ -170,8 +171,6 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                         AND ic.deleted_at IS NULL
                                     GROUP BY ic.production_batch_id
                                 ) AS rs
-                                LEFT JOIN production_batches pb
-                                    ON pb.id = rs.production_batch_id
                             WHERE (rs.total_qty_in - rs.total_qty_out) > 0
                         ", array(
                             'date'              => $this->finish_date,

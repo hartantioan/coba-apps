@@ -69,7 +69,7 @@
                                                         <th>Nama Rule</th>
                                                         <th>Tanggal Valid</th>
                                                         <th>Nama Item</th>
-                                                        <th>Kadar Air (%)</th>
+                                                        <th>Kadar (%)</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -112,8 +112,8 @@
                             <label class="active" for="item_id">Item</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="water_percent" name="water_percent" type="number" placeholder="Kadar Air">
-                            <label class="active" for="water_percent">Kadar Air (%)</label>
+                            <input id="percentage_level" name="percentage_level" type="number" placeholder="Kadar Air">
+                            <label class="active" for="percentage_level">Kadar(%)</label>
                         </div>
                         <div class="col m6 s12 ">
                             <label for="effective_date" style="font-size:1rem;">Tanggal Valid : </label>
@@ -385,7 +385,7 @@
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
-                { name: 'water_percent', className: '' },
+                { name: 'percentage_level', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -493,7 +493,7 @@
                 $('#rule_procurement_id').empty().append(`
                     <option value="` + response.rule_procurement_id + `">` + response.rule_procurement_name + `</option>
                 `);
-                $('#water_percent').val(response.water_percent);
+                $('#percentage_level').val(response.percentage_level);
                 $('#effective_date').val(response.effective_date);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();

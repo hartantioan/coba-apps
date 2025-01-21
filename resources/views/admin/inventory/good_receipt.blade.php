@@ -280,6 +280,8 @@
                                                     <th class="center">Kadar Air (%)</th>
                                                     <th class="center">Viskositas (detik)</th>
                                                     <th class="center">Residu (gr)</th>
+                                                    <th class="center">Limit (%)</th>
+                                                    <th class="center">Selisih</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
                                                     <th class="center">{{ __('translations.engine') }}</th>
@@ -1042,7 +1044,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1714,7 +1716,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + ($('#type').val() == '2' ? `readonly` : ``) + `>
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + ($('#type').val() == '2' ? `readonly` : ``) + `>
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1735,13 +1737,19 @@
                                             <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
                                         </td>
                                         <td>
-                                            <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);adjustPercentageModifier(this)" style="text-align:right;width:100px;" data-count="` + count + `">
                                         </td>
                                         <td>
                                             <input name="arr_viscosity[]" id="arr_viscosity` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td>
                                             <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);adjustPercentageModifier(this)" style="text-align:right;width:100px;" data-count="` + count + `" >
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
@@ -1788,6 +1796,8 @@
                                         }
                                     }
                                 });
+
+
                             });
                         }
                         if(response.serials.length > 0){
@@ -1840,6 +1850,57 @@
         }
     }
 
+    function adjustPercentageModifier(element) {
+
+        let typingTimer;
+        const doneTypingInterval = 1000;
+
+        clearTimeout(typingTimer);
+
+        typingTimer = setTimeout(function() {
+            const count = element.getAttribute('data-count');
+            hitungSelisih(count)
+        }, doneTypingInterval);
+    }
+
+    function hitungSelisih(count){
+        function parseNumber(inputString) {
+            let normalizedString = inputString.replace(/\./g, '');
+
+            normalizedString = normalizedString.replace(/,([^,]*)$/, '.$1');
+
+            return parseFloat(parseFloat(normalizedString).toFixed(3));
+        }
+        function formatNumber(number) {
+
+            let formatted = new Intl.NumberFormat('de-DE').format(number);
+
+            return formatted;
+        }
+
+        var water_content = parseNumber($('#arr_water_content' + count).val());
+        var percent_mod = parseNumber($('#arr_percentage_modifier' + count).val());
+        var qty_balance = parseNumber($('#arr_qty' + count).val());
+        if(percent_mod > 0){
+            var kadar_air = 0;
+            var finance_kg = 0;
+            var total_bayar = qty_balance;
+            if(percent_mod < water_content){
+                kadar_air = water_content-percent_mod;
+            }
+            if(kadar_air > 0){
+                finance_kg = (kadar_air*qty_balance) / 100;
+                total_bayar = total_bayar-finance_kg;
+            }
+
+            $('#arr_qty_balance' + count).val(formatNumber(total_bayar));
+        }else{
+
+            $('#arr_qty_balance' + count).val(formatNumber(qty_balance));
+        }
+
+    }
+
     function applyScale(code,oldQty){
         if($('#arr_scale' + code).val()){
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
@@ -1847,11 +1908,14 @@
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
             $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
             $('#arr_residue' + code).val($('#arr_scale' + code).select2('data')[0].residue);
+            $('#arr_percentage_modifier' + code).val($('#arr_scale' + code).select2('data')[0].percentage_modifier);
+            hitungSelisih(code);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
             $('#arr_water_content' + code).val('0,000');
             $('#arr_viscosity' + code).val('0,000');
             $('#arr_residue' + code).val('0,000');
+            $('#arr_percentage_modifier' + code).val('0,000');
         }
     }
 
@@ -1965,7 +2029,7 @@
                                     ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
@@ -1993,6 +2057,12 @@
                                 </td>
                                 <td>
                                     <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="` + val.residue + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                </td>
+                                <td>
+                                    <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" >
+                                </td>
+                                <td>
+                                    <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
                                 </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>
@@ -2105,6 +2175,47 @@
             if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function unlockProcurement(id){
+        var msg = '';
+        swal({
+            title: "Alasan Mengapa Dibuka",
+            text: "Apabila Telah dibuka untuk mengunci anda harus menarik report lagi",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/unlock_procurement',
                     type: 'POST',
                     dataType: 'JSON',
                     data: { id : id, msg : message },

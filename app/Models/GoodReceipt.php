@@ -174,6 +174,7 @@ class GoodReceipt extends Model
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
           '8' => '<span class="pink darken-4 medium-small white-text padding-3">Ditutup Balik</span>',
+          '9' => '<span class="pink darken-4 medium-small white-text padding-3">Dilock Procurement</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -189,6 +190,7 @@ class GoodReceipt extends Model
             '5' => 'Ditutup',
             '6' => 'Direvisi',
             '8' => 'Ditutup Balik',
+            '9' => 'Dilock Procurement',
             default => 'Invalid',
         };
 

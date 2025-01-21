@@ -62,7 +62,13 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
         $all_finance_price = 0;
         foreach ($query_data as $key => $row) {
 
-            $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->water_percent ?? 0;
+            foreach($row->goodReceiptDetail as $grpo_det){
+                $grpo_det->goodReceipt->update([
+                    'status'    => '9',
+                ]);
+            }
+
+            $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
 
             $finance_kadar_air = 0;
             $finance_kg = 0;

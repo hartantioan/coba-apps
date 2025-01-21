@@ -315,6 +315,7 @@ class GoodReceiptPOController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Multiple LC" onclick="multiple(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">share</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="unlockProcurement(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">lock_open</i></button>
                         <!-- <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> -->
 					'
                 ];
@@ -803,8 +804,8 @@ class GoodReceiptPOController extends Controller
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'              => $request->arr_warehouse[$key],
-                            /* 'qty_balance'               => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
-                            'percentage_modifier'                 => str_replace(',','.',str_replace('.','',$request->arr_percentage_modifier[$key])), */
+                            'qty_balance'               => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
+                            'percent_modifier'                 => str_replace(',','.',str_replace('.','',$request->arr_percentage_modifier[$key])),
                         ]);
                         if($request->arr_serial_po){
                             foreach($request->arr_serial_po as $keyserial => $rowserial){
@@ -1140,6 +1141,57 @@ class GoodReceiptPOController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function unlockProcurement(Request $request){
+        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '2',
+                ]);
+
+                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah dibuka kembali dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+
+
+                activity()
+                    ->performedOn(new GoodReceipt())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('unlock procurement the good receipt data');
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data unlock successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to unlock.'
             ];
         }
 

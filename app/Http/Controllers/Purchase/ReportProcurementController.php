@@ -104,7 +104,7 @@ class ReportProcurementController extends Controller
                             $account = $detail_gs->account->name;
                         }
 
-                        $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)->where('account_id',$detail_gs->purchaseOrderDetail->purchaseOrder->account_id)->first()->water_percent ?? 0;
+                        $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)->where('account_id',$detail_gs->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
 
                         $finance_kadar_air = 0;
                         $finance_kg = 0;

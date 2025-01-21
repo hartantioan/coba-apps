@@ -37,6 +37,8 @@ class GoodReceiptDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'qty_balance',
+        'percent_modifier',
     ];
 
     public function goodReceipt()
@@ -63,7 +65,7 @@ class GoodReceiptDetail extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-    
+
     public function machine()
     {
         return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
@@ -194,7 +196,7 @@ class GoodReceiptDetail extends Model
 
         return $qty;
     }
-    
+
 
     public function qtyInvoice(){
         $qty = $this->purchaseInvoiceDetail()->sum('qty');

@@ -19,7 +19,7 @@ class RuleBpScale extends Model
         'item_id',
         'rule_procurement_id',
         'effective_date',
-        'water_percent',
+        'percentage_level',
     ];
 
     public function user()

@@ -94,12 +94,12 @@
                                         </div>
                                         <div class="col m12 s12">
                                         </div>
-                                        <div class="input-field col m6 s12">
+                                        {{-- <div class="input-field col m6 s12">
                                             <select class="select2 browser-default" id="batch_id" name="batch_id">
 
                                             </select>
                                             <label class="active" for="item">Batch</label>
-                                        </div>
+                                        </div> --}}
                                         <div class="input-field col m4 s12">
                                             <select class="select2 browser-default" id="shading_id" name="shading_id">
 
@@ -164,29 +164,6 @@
 
                 </div>
                 <div class="row" id="table_laporan">
-                    <table class="bordered" style="font-size:10px;">
-                        <thead id="t_head">
-                            <tr>
-                                <th class="center-align">{{ __('translations.no') }}.</th>
-                                <th class="center-align">Tanggal.</th>
-                                <th class="center-align">Plant.</th>
-                                <th class="center-align">Gudang.</th>
-                                <th class="center-align">Kode Item</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">{{ __('translations.unit') }}</th>
-                                <th class="center-align">Requester</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Batch Produksi</th>
-                                <th class="center-align">No Dokumen</th>
-                                <th class="center-align">Mutasi</th>
-                                <th class="center-align">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody id="movement_body">
-                        </tbody>
-                    </table>
-
                 </div>
             </div>
         </div>
@@ -212,7 +189,7 @@
 
         select2ServerSide('#item_id', '{{ url("admin/select2/sales_item_child") }}');
 
-        $('#batch_id').select2({
+        /* $('#batch_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -235,7 +212,7 @@
                     }
                 }
             }
-        });
+        }); */
 
         $('#shading_id').select2({
             placeholder: '-- Kosong --',
@@ -270,6 +247,18 @@
     /* $('#export_button').hide(); */
 
     function filter() {
+        if(!$('#item_id').val()){
+            M.toast({
+                html: 'Silahkan pilih item.'
+            });
+            return false;
+        }
+        if($('#batch_id').val() && $('#shading_id').val()){
+            M.toast({
+                html: 'Silahkan pilih salah satu batch atau shading.'
+            });
+            return false;
+        }
         var formData = new FormData($('#form_data')[0]);
         formData.append('group[]', $('#filter_group').val());
         $.ajax({
@@ -291,108 +280,9 @@
                 $('#export_button').show();
                 loadingClose('#main');
                 if (response.status == 200) {
-                    $('#movement_body').empty();
+                    $('#table_laporan').empty();
                     $('.uomunit').empty();
-                    var gtall = 0;
-                    if ($('#type').val() == 'final') {
-                        $('#t_head').empty();
-                        $('#t_head').append(`
-                            <tr>
-                                <th class="center-align">{{ __('translations.no') }}.</th>
-                                <th class="center-align">{{ __('translations.plant') }}</th>
-                                <th class="center-align">{{ __('translations.warehouse') }}</th>
-                                <th class="center-align">{{ __('translations.code') }}</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">{{ __('translations.unit') }}</th>
-                                <th class="center-align">Requester</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Batch Produksi</th>
-                                <th class="center-align">Balance</th>
-                            </tr>`);
-                        $.each(response.message, function(i, val) {
-
-                            $('#movement_body').append(`
-                                <tr>
-                                    <td class="center-align">` + (i + 1) + `</td>
-                                    <td >` + val.plant + `</td>
-                                    <td >` + val.warehouse + `</td>
-                                    <td >` + val.kode + `</td>
-                                    <td >` + val.item + `</td>
-                                    <td >` + val.satuan + `</td>
-                                    <td >` + val.requester + `</td>
-                                    <td >` + val.area + `</td>
-                                    <td >` + val.shading + `</td>
-                                    <td >` + val.production_batch + `</td>
-                                    <td class="right-align">` + val.cum_qty + `</td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        var processedItems = [];
-                        $('#t_head').empty();
-                        $('#t_head').append(`
-                            <tr>
-                                <th class="center-align">{{ __('translations.no') }}.</th>
-                                <th class="center-align">Tanggal.</th>
-                                <th class="center-align">Plant.</th>
-                                <th class="center-align">Gudang.</th>
-                                <th class="center-align">Kode Item</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">{{ __('translations.unit') }}</th>
-                                <th class="center-align">Requester</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Batch Produksi</th>
-                                <th class="center-align">No Dokumen</th>
-                                <th class="center-align">Mutasi</th>
-                                <th class="center-align">Balance</th>
-                            </tr>`);
-
-                        var itung = 0;
-                        $.each(response.message, function(i, val) {
-                            if (val.perlu == 1) {
-                                $('#movement_body').append(`
-                                    <tr>
-                                        <td class="center-align">` + (itung + 1) + `</td>
-                                        <td class="center-align"></td>
-                                        <td class="center-align"></td>
-                                        <td class="center-align"></td>
-                                        <td class="">` + val.kode + `</td>
-                                        <td class="">` + val.item + `</td>
-                                        <td class="">` + val.satuan + `</td>
-                                        <td >` + val.requester + `</td>
-                                        <td ></td>
-                                        <td ></td>
-                                        <td ></td>
-                                        <td>Saldo Awal</td>
-                                        <td class="right-align"></td>
-                                        <td class="right-align">` + val.last_qty + `</td>
-                                    </tr>`);
-                                itung++;
-                            } else {
-                                $('#movement_body').append(`
-                                    <tr>
-                                        <td class="center-align"></td>
-                                        <td >` + val.date + `</td>
-                                        <td >` + val.plant + `</td>
-                                        <td >` + val.warehouse + `</td>
-                                        <td >` + val.kode + `</td>
-                                        <td >` + val.item + `</td>
-                                        <td >` + val.satuan + `</td>
-                                        <td >` + val.requester + `</td>
-                                        <td >` + val.area + `</td>
-                                        <td >` + val.shading + `</td>
-                                        <td >` + val.production_batch + `</td>
-                                        <td>` + val.document + `</td>
-                                        <td class="right-align">` + val.qty + `</td>
-                                        <td class="right-align">` + val.cum_qty + `</td>
-                                    </tr>
-                                `);
-                            }
-                        });
-                    }
-
+                    $('#table_laporan').html(response.html);
                 } else if (response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
@@ -437,6 +327,18 @@
     }
 
     function exportExcel() {
+        if(!$('#item_id').val()){
+            M.toast({
+                html: 'Silahkan pilih item.'
+            });
+            return false;
+        }
+        if($('#batch_id').val() && $('#shading_id').val()){
+            M.toast({
+                html: 'Silahkan pilih salah satu batch atau shading.'
+            });
+            return false;
+        }
         swal({
             title: 'ALERT',
             text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',

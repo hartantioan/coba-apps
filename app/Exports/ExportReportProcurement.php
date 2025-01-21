@@ -2,6 +2,8 @@
 
 namespace App\Exports;
 
+use App\Models\GoodReceipt;
+use App\Models\GoodReceiptDetail;
 use App\Models\GoodScale;
 use App\Models\GoodScaleDetail;
 use App\Models\MarketingOrderDeliveryDetail;
@@ -49,41 +51,113 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
     public function collection()
     {
 
-        $query_data = GoodScale::where('post_date', '>=',$this->start_date)
-        ->where('post_date', '<=', $this->finish_date)
-        ->where('item_id',$this->item_id)
-        ->whereIn('status',["2","3"])
-        ->get();
+        // $query_data = GoodScale::where('post_date', '>=',$this->start_date)
+        // ->where('post_date', '<=', $this->finish_date)
+        // ->where('item_id',$this->item_id)
+        // ->whereIn('status',["2","3"])
+        // ->get();
 
+
+        // $arr = [];
+        // $no = 1;
+        // $all_penerimaan = 0;
+        // $all_finance_price = 0;
+        // foreach ($query_data as $key => $row) {
+
+        //     foreach($row->goodReceiptDetail as $grpo_det){
+        //         $grpo_det->goodReceipt->update([
+        //             'status'    => '9',
+        //         ]);
+        //     }
+
+        //     $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
+
+        //     $finance_kadar_air = 0;
+        //     $finance_kg = 0;
+        //     if($row->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
+        //         $finance_kadar_air = $row->water_content - $take_item_rule_percent;
+        //     }
+        //     if($finance_kadar_air > 0){
+        //         $finance_kg = ($finance_kadar_air*$row->qty_balance) / 100;
+        //     }
+        //     $total_bayar = $row->qty_balance;
+        //     if($finance_kadar_air > 0){
+        //         $total_bayar = $total_bayar-$finance_kg;
+        //     }
+        //     $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
+        //     $price = $row->purchaseOrderDetail->price;
+        //     $finance_price = $price*$total_bayar;
+
+
+        //     $all_penerimaan += $total_penerimaan;
+        //     $all_finance_price += $finance_price;
+
+
+
+        //     $arr[] = [
+        //         'no'                => $no,
+        //         'PLANT'=> $row->place->name,
+        //         'NO PO'=> $row->note,
+        //         'NAMA ITEM'=> $row->item->name,
+        //         'NO SJ'=> $row->delivery_no,
+        //         'TGL MASUK'=> date('d/m/Y',strtotime($row->post_date)),
+        //         'NO. KENDARAAN' =>$row->vehicle_no,
+        //         'NETTO JEMBATAN TIMBANG' =>$row->qty_balance,
+        //         'HASIL QC' =>$row->water_content,
+        //         'STD POTONGAN QC' =>$take_item_rule_percent,
+        //         'FINANCE Kadar air' =>$finance_kadar_air,
+        //         'FINANCE Kg' =>$finance_kg,
+        //         'TOTAL BAYAR KG'=>$total_bayar,
+        //         'TOTAL PENERIMAAN'=>$total_penerimaan,
+        //         'HARGA PO'=>$price,
+        //         'HARGA FINANCE'=>$finance_price,
+        //         'HARGA OP/BBM'=>0,
+        //     ];
+        // }
+
+
+        // $avg = $all_finance_price / (($all_penerimaan != 0) ? $all_penerimaan : 1);
+
+        // foreach ($arr as &$row_arr) {
+        //     $row_arr['HARGA OP/BBM'] = $row_arr['TOTAL PENERIMAAN'] * $avg;
+        // }
+
+        $query_data = GoodReceiptDetail::whereHas('goodScale', function ($querys) {
+            $querys->where('post_date', '>=',$this->start_date)
+            ->where('post_date', '<=', $this->finish_date)
+            ->where('item_id',$this->item_id)
+            ->whereIn('status',["2","3"]);
+        })->get();
+        info($this->item_id);
+        info($this->start_date);
+        info($this->finish_date);
 
         $arr = [];
         $no = 1;
         $all_penerimaan = 0;
         $all_finance_price = 0;
+
         foreach ($query_data as $key => $row) {
+            $row->goodReceipt->update([
+                'status'    => '9',
+            ]);
 
-            foreach($row->goodReceiptDetail as $grpo_det){
-                $grpo_det->goodReceipt->update([
-                    'status'    => '9',
-                ]);
-            }
-
-            $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
+            $take_item_rule_percent = $row->percent_modifier;
 
             $finance_kadar_air = 0;
             $finance_kg = 0;
-            if($row->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
-                $finance_kadar_air = $row->water_content - $take_item_rule_percent;
+            if($row->goodScale->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
+                $finance_kadar_air = $row->goodScale->water_content - $take_item_rule_percent;
             }
             if($finance_kadar_air > 0){
-                $finance_kg = ($finance_kadar_air*$row->qty_balance) / 100;
+                $finance_kg = ($finance_kadar_air*$row->goodScale->qty_balance) / 100;
             }
-            $total_bayar = $row->qty_balance;
+            $total_bayar = $row->goodScale->qty_balance;
             if($finance_kadar_air > 0){
                 $total_bayar = $total_bayar-$finance_kg;
             }
-            $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
-            $price = $row->purchaseOrderDetail->price;
+            $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->goodScale->water_content/100));
+            $price = $row->goodScale->purchaseOrderDetail->price;
             $finance_price = $price*$total_bayar;
 
 
@@ -95,13 +169,13 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             $arr[] = [
                 'no'                => $no,
                 'PLANT'=> $row->place->name,
-                'NO PO'=> $row->note,
+                'NO PO'=> $row->goodScale->purchaseOrderDetail->purchaseOrder->code,
                 'NAMA ITEM'=> $row->item->name,
-                'NO SJ'=> $row->delivery_no,
-                'TGL MASUK'=> date('d/m/Y',strtotime($row->post_date)),
-                'NO. KENDARAAN' =>$row->vehicle_no,
-                'NETTO JEMBATAN TIMBANG' =>$row->qty_balance,
-                'HASIL QC' =>$row->water_content,
+                'NO SJ'=> $row->goodScale->delivery_no,
+                'TGL MASUK'=> date('d/m/Y',strtotime($row->goodScale->post_date)),
+                'NO. KENDARAAN' =>$row->goodScale->vehicle_no,
+                'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance,
+                'HASIL QC' =>$row->goodScale->water_content,
                 'STD POTONGAN QC' =>$take_item_rule_percent,
                 'FINANCE Kadar air' =>$finance_kadar_air,
                 'FINANCE Kg' =>$finance_kg,
@@ -109,8 +183,10 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 'TOTAL PENERIMAAN'=>$total_penerimaan,
                 'HARGA PO'=>$price,
                 'HARGA FINANCE'=>$finance_price,
+                'No GS'=>$row->goodScale->code,
                 'HARGA OP/BBM'=>0,
             ];
+            $no++;
         }
 
         $avg = $all_finance_price / (($all_penerimaan != 0) ? $all_penerimaan : 1);
@@ -118,6 +194,8 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
         foreach ($arr as &$row_arr) {
             $row_arr['HARGA OP/BBM'] = $row_arr['TOTAL PENERIMAAN'] * $avg;
         }
+
+
 
 
 

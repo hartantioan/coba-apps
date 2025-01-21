@@ -931,31 +931,6 @@
             }
         });
 
-        $('#outlet_id').select2({
-            placeholder: '-- Pilih outlet --',
-            minimumInputLength: 3,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/outlet") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        account_id: $('#account_id').select2('data')[0].id,
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
-        });
-
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#sales_id,#filter_sales', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#broker_id', '{{ url("admin/select2/broker") }}');
@@ -963,6 +938,146 @@
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#transportation_id', '{{ url("admin/select2/transportation") }}');
+        select2ServerSide('#outlet_id', '{{ url("admin/select2/outlet") }}');
+
+        @if($mitra_data)
+            $('#modal1').modal('open');
+            $('#document_no').val('{{ $mitra_data->code }}');
+            $('#account_id').empty();
+            $('#account_id').append(`
+                <option value="{{ $mitra_data->account_id }}">{{ $mitra_data->account_name }}</option>
+            `);
+            $('#post_date').val('{{ $mitra_data->post_date }}');
+            $('#valid_date').val('{{ $mitra_data->valid_date }}');
+            $('#type_delivery').val('{{ $mitra_data->type_delivery }}').formSelect();
+            $('#delivery_date').val('{{ $mitra_data->delivery_date }}');
+            $('#delivery_date').attr('min','{{ $mitra_data->post_date }}');
+            $('#billing_address').empty();
+            @if($mitra_data->user_data)
+                $('#billing_address').append(`
+                    <option value="{{ $mitra_data->user_data->id }}">{{ $mitra_data->user_data->npwp.' - '.$mitra_data->user_data->address }}</option>
+                `);
+            @endif
+            $('#destination_address').val('{{ $mitra_data->delivery_address }}');
+            $('#province_id').empty().append(`<option value="{{ $mitra_data->province_id }}">{{ $mitra_data->province_name }}</option>`);
+            $('#city_id').empty().append(`<option value="{{ $mitra_data->city_id }}">{{ $mitra_data->city_name }}</option>`);
+            $('#district_id').empty().append(`<option value="{{ $mitra_data->district_id }}">{{ $mitra_data->district_name }}</option>`);
+            $('#payment_type').val('{{ $mitra_data->payment_type }}');
+            $('#top_internal').val('{{ $mitra_data->top_internal }}');
+            $('#top_customer').val('{{ $mitra_data->top_customer }}');
+            $('#percent_dp').val('{{ $mitra_data->percent_dp }}');
+            $('#broker_id').empty().append(`<option value="{{ $mitra_data->user_id }}">{{ $mitra_data->broker_name }}</option>`);
+            $('#note_internal').val('');
+            $('#note_external').val('');
+            $('#phone').val('{{ $mitra_data->account->phone }}');
+            $('#total').val('{{ $mitra_data->total }}');
+            $('#tax').val('{{ $mitra_data->tax }}');
+            $('#total_after_tax').val('{{ $mitra_data->grandtotal }}');
+            $('#rounding').val('0,00');
+            $('#grandtotal').val('{{ $mitra_data->grandtotal }}');
+
+            @if(count($mitra_data->details) > 0)
+                $('#last-row-item').remove();
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+
+                @foreach($mitra_data->details as $row)
+                    var count = makeid(10);
+                    $('#body-item').append(`
+                        <tr class="row_item">
+                            <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="{{ $row['rawtax'] }}">
+                            <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="{{ $row['rawgrandtotal'] }}">
+                            <input name="arr_price[]" type="hidden" value="{{ $row['price'] }}" id="rowPrice`+ count +`">
+                            <td>
+                                <label>
+                                    <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                                    <span>Ya/Tidak</span>
+                                </label>
+                            </td>
+                            <td>
+                                <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                            </td>
+                            <td class="center-align">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="right-align" id="arr_qty_now` + count + `">{{ $row['qty_now'] }}</td>
+                            <td class="right-align" id="arr_qty_temporary` + count + `">{{ $row['qty_commited'] }}</td>
+                            <td class="center">
+                                <input name="arr_qty_uom[]" type="text" value="{{ $row['qty'] }}" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
+                            </td>
+                            <td class="center-align" id="arr_uom_unit` + count + `">{{ $row['unit'] }}</td>
+                            <td class="center">
+                                <input name="arr_price_delivery[]" type="text" value="0" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <input name="arr_price_type_bp[]" type="text" value="0" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <input name="arr_price_list[]" type="text" value="{{ $row['price'] }}" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                            </td>
+                            <td class="right-align">
+                                <b id="tempPrice` + count + `">{{ $row['price'] }}</b>
+                            </td>
+                            <td>
+                                <input name="arr_qty[]" type="text" value="{{ $row['qty_conversion'] }}" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
+                                    @foreach ($row['arr_sell_unit'] as $rowunit)
+                                        <option value="{{ $rowunit['id'] }}" data-conversion="{{ $rowunit['conversion'] }}">{{ $rowunit['code'] }}</option>
+                                    @endforeach                                    
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
+                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                    @foreach ($tax as $rowtax)
+                                        <option value="{{ $rowtax->percentage }}" {{ $rowtax->is_default_ppn ? 'selected' : '' }} data-id="{{ $rowtax->id }}">{{ $rowtax->name.' - '.number_format($rowtax->percentage,2,',','.').'%' }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="center">
+                                <input name="arr_disc1[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                            </td>
+                            <td class="center">
+                                <input name="arr_disc2[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                            </td>
+                            <td class="center">
+                                <input name="arr_disc3[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                            </td>
+
+                            <td class="center">
+                                <input name="arr_final_price[]" class="browser-default" type="text" value="{{ $row['price'] }}" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <input name="arr_total[]" class="browser-default" type="text" value="{{ $row['total'] }}" style="text-align:right;" id="arr_total`+ count +`" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang..." value="{{ $row['note'] }}">
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                    $('#arr_item' + count).append(`
+                        <option value="{{ $row['item_id'] }}">{{ $row['item_code'].' - '.$row['item_name'] }}</option>
+                    `);
+                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                    /* $('#rowQtyUom' + count).trigger('keyup'); */                    
+                @endforeach
+            @endif
+
+            $('.modal-content').scrollTop(0);
+            $('#note').focus();
+        @endif
     });
 
     function getOutletAddress(){

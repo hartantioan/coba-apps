@@ -207,17 +207,23 @@ class ComplaintSalesController extends Controller
         if($sj){
             $mod = $sj->marketingOrderDelivery;
             $detail = [];
-            foreach($mod->marketingOrderDeliveryDetail as $row_detail){
+            foreach($mod->marketingOrderDeliveryDetail  as $row_detail){
+                $box_conversion = $sj->marketingOrderDeliveryProcessDetail->first() ?
+                        $sj->marketingOrderDeliveryProcessDetail->first()->itemStock->item->pallet->box_conversion :
+                        null;
                 $detail[] = [
-                    'item' => $row_detail->item->name.' ukuran 1 item:'. number_format($row_detail->item->size->m2_conversion,0,',','.').' m2',
+                    'item' => $row_detail->item->name.' ukuran 1 item:'. number_format($row_detail->item->size->m2_conversion,2,',','.').' m2',
                     'id'   => $row_detail->id,
                     'lookable_type'=>'marketing_order_delivery_details',
                     'lookable_id'  =>$row_detail->id,
                     'm2_conversion'  =>$row_detail->item->size->m2_conversion,
-                    'box_conversion'  =>$row_detail->id,
+                    'box_conversion'  =>$box_conversion,
+                    'sale_conversion'=>$row_detail->item->itemUnitDefault()->conversion,
 
                 ];
             }
+            info($detail);
+
             $so = [];
 
 

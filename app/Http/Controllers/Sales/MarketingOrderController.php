@@ -18,6 +18,7 @@ use App\Models\MarketingOrderInvoiceDetail;
 use App\Models\MarketingOrderMemo;
 use App\Models\MarketingOrderReceipt;
 use App\Models\MarketingOrderReturn;
+use App\Models\MitraMarketingOrder;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Line;
@@ -74,6 +75,66 @@ class MarketingOrderController extends Controller
 
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+
+        $mitra_code = $request->mitra_code ? CustomHelper::decrypt($request->mitra_code) : '';
+
+        $data_mitra = '';
+
+        if($mitra_code){
+            $data_mitra = MitraMarketingOrder::where('code',$mitra_code)->where('status','1')->first();
+            if($data_mitra){
+                $data_mitra['broker_name'] = $data_mitra->user->name;
+                $data_mitra['account_name'] = $data_mitra->account->name;
+                $data_mitra['province_name'] = $data_mitra->deliveryProvince->name;
+                $data_mitra['province_id'] = $data_mitra->deliveryProvince->id;
+                $data_mitra['city_name'] = $data_mitra->deliveryCity->name;
+                $data_mitra['city_id'] = $data_mitra->deliveryCity->id;
+                $data_mitra['district_name'] = $data_mitra->deliveryDistrict->name;
+                $data_mitra['district_id'] = $data_mitra->deliveryDistrict->id;
+                $data_mitra['total'] = number_format($data_mitra->total,2,',','.');
+                $data_mitra['tax'] = number_format($data_mitra->tax,2,',','.');
+                $data_mitra['grandtotal'] = number_format($data_mitra->grandtotal,2,',','.');
+                $data_mitra['post_date'] = $data_mitra->post_date;
+                $data_mitra['valid_date'] = $data_mitra->valid_date;
+                $data_mitra['delivery_type'] = $data_mitra->deliveryType();
+                $data_mitra['delivery_date'] = $data_mitra->delivery_date;
+                $data_mitra['payment_type'] = $data_mitra->payment_type;
+                $data_mitra['percent_dp'] = number_format($data_mitra->percent_dp,2,',','.');
+                $data_mitra['user_data'] = $data_mitra->account->userDataDefault();
+                $data_mitra['top_internal'] = $data_mitra->account->top_internal;
+                $data_mitra['top_customer'] = $data_mitra->account->top;
+
+                $arr = [];
+
+                foreach($data_mitra->mitraMarketingOrderDetail()->orderBy('id')->get() as $row){
+                    $arr[] = [
+                        'id'                    => $row->id,
+                        'item_id'               => $row->item_id,
+                        'item_code'             => $row->item->code,
+                        'item_name'             => $row->item->name,
+                        'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                        'unit'                  => $row->item->uomUnit->code,
+                        'price'                 => number_format($row->price,2,',','.'),
+                        'percent_tax'           => number_format($row->percent_tax,2,',','.'),
+                        'final_price'           => number_format($row->final_price,2,',','.'),
+                        'total'                 => number_format($row->total,2,',','.'),
+                        'rawtotal'              => $row->total,
+                        'tax'                   => number_format($row->tax,2,',','.'),
+                        'rawtax'                => $row->tax,
+                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                        'rawgrandtotal'         => $row->grandtotal,
+                        'note'                  => $row->note,
+                        'qty_now'               => 0,
+                        'qty_commited'          => 0,
+                        'qty_conversion'        => CustomHelper::formatConditionalQty(round($row->qty / $row->item->sellConversion(),3)),
+                        'arr_sell_unit'         => $row->item->arrSellUnits(),
+                    ];
+                }
+
+                $data_mitra['details'] = $arr;
+            }
+        }
+
         $data = [
             'title'         => 'Sales Order',
             'content'       => 'admin.sales.order',
@@ -83,6 +144,8 @@ class MarketingOrderController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'mitra_code'    => $mitra_code,
+            'mitra_data'    => $data_mitra,
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
@@ -373,15 +436,6 @@ class MarketingOrderController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
 				$dis = '';
-                // if($val->isOpenPeriod()){
-
-                //     $dis = 'style="cursor: default;
-                //     pointer-events: none;
-                //     color: #9f9f9f !important;
-                //     background-color: #dfdfdf !important;
-                //     box-shadow: none;"';
-
-                // }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -874,6 +928,14 @@ class MarketingOrderController extends Controller
                         ]);
                     }
 
+                    $mitraData = MitraMarketingOrder::where('code',$query->document_no)->first();
+
+                    if($mitraData){
+                        $mitraData->update([
+                            'status'    => '2',
+                        ]);
+                    }
+
                     CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
@@ -1198,6 +1260,12 @@ class MarketingOrderController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+                
+                /* if($query->mitraMarketingOrder()->exists()){
+                    $query->mitraMarketingOrder->update([
+                        'status'    => '5'
+                    ]);
+                } */
 
                 activity()
                     ->performedOn(new MarketingOrder())

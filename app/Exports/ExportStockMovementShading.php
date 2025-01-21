@@ -31,6 +31,8 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
     {
         $arr = [];
 
+        DB::statement("SET SQL_MODE=''");
+
         if($this->shading_id){
             $shading = ItemShading::find($this->shading_id);
         }elseif($this->item){

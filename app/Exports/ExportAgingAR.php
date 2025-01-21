@@ -55,12 +55,22 @@ class ExportAgingAR implements FromView, WithEvents
                 WHERE 
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
-                    AND moi.status IN ('2','3')
+                    AND moi.status IN ('2','3','8')
+                    AND IFNULL((SELECT
+                        1
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date5
+                            AND cd.lookable_type = 'marketing_order_invoices'
+                            AND cd.lookable_id = moi.id
+                            AND cd.deleted_at IS NULL
+                    ),0) = 0
             ", array(
             'date1' => $this->date,
             'date2' => $this->date,
             'date3' => $this->date,
             'date4' => $this->date,
+            'date5' => $this->date,
         ));
 
         $query_data2 = DB::select("
@@ -75,7 +85,7 @@ class ExportAgingAR implements FromView, WithEvents
                         ipd.lookable_id = moi.id 
                         AND ipd.lookable_type = 'marketing_order_memos'
                         AND ip.post_date <= :date1
-                        AND ip.status IN ('2','3')
+                        AND ip.status IN ('2','3','8')
                 ),0) AS total_payment,
                 IFNULL((SELECT 
                     gr.name 
@@ -95,9 +105,19 @@ class ExportAgingAR implements FromView, WithEvents
                     moi.post_date <= :date2
                     AND moi.grandtotal > 0
                     AND moi.status IN ('2','3')
+                    AND IFNULL((SELECT
+                        1
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date3
+                            AND cd.lookable_type = 'marketing_order_memos'
+                            AND cd.lookable_id = moi.id
+                            AND cd.deleted_at IS NULL
+                    ),0) = 0
             ", array(
             'date1' => $this->date,
             'date2' => $this->date,
+            'date3' => $this->date,
         ));
 
         $countPeriod = 1;

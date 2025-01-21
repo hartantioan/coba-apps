@@ -10,6 +10,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Facades\DB;
 
 class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkReading
 {
@@ -106,6 +107,79 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             $total,
                         ];
                     }
+
+                    $arr[] = [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                    ];
+
+                    #detail per batch
+                    foreach($shading as $key => $rowshading){
+                        $datadetail = DB::select("
+                            SELECT 
+                                rs.batch_code,
+                                rs.shading_code,
+                                rs.item_code,
+                                rs.item_name,
+                                rs.place_code,
+                                rs.total_qty_in,
+                                rs.total_qty_out,
+                                (rs.total_qty_in - rs.total_qty_out) AS balance_qty,
+                                rs.total_in,
+                                rs.total_out,
+                                (rs.total_in - rs.total_out) AS balance_nominal
+                                FROM (
+                                    SELECT 
+                                        IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_qty_in,
+                                        IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out,
+                                        IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
+                                        IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out,
+                                        pb.code AS batch_code,
+                                        is.code AS shading_code,
+                                        i.code AS item_code,
+                                        i.name AS item_name,
+                                        p.code AS place_code
+                                    FROM item_cogs ic
+                                        LEFT JOIN production_batches pb
+                                            ON pb.id = ic.production_batch_id
+                                        LEFT JOIN item_shadings is
+                                            ON is.id = ic.item_shading_id
+                                        LEFT JOIN items i
+                                            ON i.id = ic.item_id
+                                        LEFT JOIN places p
+                                            ON p.id = ic.place_id
+                                    WHERE 
+                                        ic.date <= :date 
+                                        AND ic.item_shading_id = :item_shading_id
+                                        AND ic.deleted_at IS NULL
+                                    GROUP BY ic.production_batch_id
+                                ) AS rs
+                            WHERE (rs.total_qty_in - rs.total_qty_out) > 0
+                        ", array(
+                            'date'              => $this->finish_date,
+                            'item_shading_id'   => $rowshading->id,
+                        ));
+
+                        foreach($datadetail as $key => $rowdetail){
+                            $arr[] = [
+                                $key + 1,
+                                $rowdetail->place_code,
+                                $rowdetail->item_code,
+                                $rowdetail->item_name,
+                                'M2',
+                                $rowdetail->shading_code,
+                                $rowdetail->balance_qty,
+                                $rowdetail->balance_nominal,
+                            ];
+                        }
+                    }
+                    
                 }
             }
 

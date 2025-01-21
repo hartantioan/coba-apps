@@ -996,7 +996,9 @@ class MarketingOrderInvoiceController extends Controller
 
         if($pr){
 
-            if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+            if(date('Y-m-d',strtotime($pr->created_at)) >= '2025-02-01'){
+                $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual_after_feb_25',$menuUser->mode);
+            }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
                 $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual_after_3',$menuUser->mode);
             }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                 $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual_after_18',$menuUser->mode);
@@ -1026,7 +1028,9 @@ class MarketingOrderInvoiceController extends Controller
         $pr = MarketingOrderInvoice::where('code',CustomHelper::decrypt($id))->first();
 
         if($pr){
-            if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+            if(date('Y-m-d',strtotime($pr->created_at)) >= '2025-02-01'){
+                $pdf = PrintHelper::print($pr,'Print ARIN','a5','landscape','admin.print.sales.order_invoice_individual_full_after_feb_25',$menuUser->mode);
+            }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
                 $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_3',$menuUser->mode);
             }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                 $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18',$menuUser->mode);
@@ -1066,7 +1070,9 @@ class MarketingOrderInvoiceController extends Controller
                 $pr = MarketingOrderInvoice::where('code',$row)->first();
 
                 if($pr){
-                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2025-02-01'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_feb_25');
+                    }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
                         $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_3');
                     }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                         $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_after_18');
@@ -1122,7 +1128,9 @@ class MarketingOrderInvoiceController extends Controller
                 $pr = MarketingOrderInvoice::where('code',$row)->first();
 
                 if($pr){
-                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
+                    if(date('Y-m-d',strtotime($pr->created_at)) >= '2025-02-01'){
+                        $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_feb_25');
+                    }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-12-03'){
                         $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_3');
                     }elseif(date('Y-m-d',strtotime($pr->created_at)) >= '2024-11-18'){
                         $pdf = PrintHelper::print($pr,'Print Invoice','a5','landscape','admin.print.sales.order_invoice_individual_full_after_18');

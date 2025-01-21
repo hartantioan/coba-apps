@@ -116,11 +116,10 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                             $hscode = ' ' . $row_detail->getHSCode();
                         }
                         
-                        if ($row_detail->is_include_tax == 1) {
+                        if ($row_detail->is_include_tax == 1 && date('Y-m-d',strtotime($row_detail->getMarketingOrder->created_at)) < '2024-12-24') {
                             $percentTax = ($row_detail->getMarketingOrder->percent_tax + 100) / 100;
                         }
 
-                        //  $price_satuan = $row_detail->getMarketingOrder->priceWTax();
                         $price_satuan = round($row_detail->priceBeforeTax(), 7);
                         $jumlah_barang = $row_detail->getQtyM2();
 
@@ -133,7 +132,6 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
 
                         $dpp_total += $dpp_total_detail;
 
-                        // $total_detail = round($row_detail->getMarketingOrder->total / $percentTax, 2);
                         $total_detail = round($row_detail->total, 2);
                         $total_all += $total_detail;
 
@@ -142,7 +140,6 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         $ppn_fp_detail = $row_detail->tax;
                         $ppn_fp_total += $ppn_fp_detail;
 
-                        // $price_dpp_detail = round((($row_detail->getMarketingOrder->price_after_discount * $row_detail->getMarketingOrder->qty_uom) - $dpp_discount_detail) / $percentTax, 2);
                         $price_dpp_detail = round((($row_detail->getMarketingOrder->price_after_discount / $percentTax)), 7);
                         $price_dpp_total += $price_dpp_detail;
                     }

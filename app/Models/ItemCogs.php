@@ -127,7 +127,6 @@ class ItemCogs extends Model
 
     public function totalByShadingBeforeIncludeDate(){
 
-        info($this->date);
         $data_in = DB::select("
                 SELECT 
                     IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in

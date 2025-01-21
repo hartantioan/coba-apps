@@ -247,6 +247,12 @@
     /* $('#export_button').hide(); */
 
     function filter() {
+        if($('#type').val() == 'final'){
+            M.toast({
+                html: 'Untuk tipe FINAL silahkan pilih Excel karena akan memakan waktu sehingga akan dijalankan dibackground.'
+            });
+            return false;
+        }
         if(!$('#item_id').val()){
             M.toast({
                 html: 'Silahkan pilih item.'
@@ -327,12 +333,12 @@
     }
 
     function exportExcel() {
-        if(!$('#item_id').val()){
+        /* if(!$('#item_id').val()){
             M.toast({
                 html: 'Silahkan pilih item.'
             });
             return false;
-        }
+        } */
         if($('#batch_id').val() && $('#shading_id').val()){
             M.toast({
                 html: 'Silahkan pilih salah satu batch atau shading.'

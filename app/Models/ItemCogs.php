@@ -90,76 +90,65 @@ class ItemCogs extends Model
 
     public function totalByShadingBefore(){
 
-        $data_in = DB::select("
+        $data = DB::select("
                 SELECT 
-                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in
-                FROM item_cogs ic
-                WHERE 
-                    ic.date < :date 
-                    AND ic.item_shading_id = :item_shading_id
-                    AND ic.deleted_at IS NULL
-                    AND ic.type = 'IN'
-            ", array(
-                'date'              => $this->date,
-                'item_shading_id'   => $this->item_shading_id,
-            ));
-
-        $total_in = round($data_in[0]->total_in,3);
-
-        $data_out = DB::select("
-                SELECT 
+                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in,
                     IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_out
                 FROM item_cogs ic
                 WHERE 
                     ic.date < :date 
                     AND ic.item_shading_id = :item_shading_id
                     AND ic.deleted_at IS NULL
-                    AND ic.type = 'OUT'
             ", array(
                 'date'              => $this->date,
                 'item_shading_id'   => $this->item_shading_id,
             ));
 
-        $total_out = round($data_out[0]->total_out,3);
+        $total = round($data[0]->total_in - $data[0]->total_out,3);
 
-        return round($total_in,3) - round($total_out,3);
+        return $total;
     }
 
     public function totalByShadingBeforeIncludeDate(){
 
-        $data_in = DB::select("
+        $data = DB::select("
                 SELECT 
-                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in
-                FROM item_cogs ic
-                WHERE 
-                    ic.date <= :date 
-                    AND ic.item_shading_id = :item_shading_id
-                    AND ic.deleted_at IS NULL
-                    AND ic.type = 'IN'
-            ", array(
-                'date'              => $this->date,
-                'item_shading_id'   => $this->item_shading_id,
-            ));
-
-        $total_in = round($data_in[0]->total_in,3);
-
-        $data_out = DB::select("
-                SELECT 
+                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in,
                     IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_out
                 FROM item_cogs ic
                 WHERE 
                     ic.date <= :date 
                     AND ic.item_shading_id = :item_shading_id
                     AND ic.deleted_at IS NULL
-                    AND ic.type = 'OUT'
             ", array(
                 'date'              => $this->date,
                 'item_shading_id'   => $this->item_shading_id,
             ));
 
-        $total_out = round($data_out[0]->total_out,3);
+        $total = round($data[0]->total_in,3) - round($data[0]->total_out,3);
 
-        return round($total_in,3) - round($total_out,3);
+        return $total;
+    }
+
+    public function totalNominalByShadingBeforeIncludeDate(){
+
+        $data = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
+                    IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out
+                FROM item_cogs ic
+                WHERE 
+                    ic.date <= :date 
+                    AND ic.item_shading_id = :item_shading_id
+                    AND ic.deleted_at IS NULL
+            ", array(
+                'date'              => $this->date,
+                'item_shading_id'   => $this->item_shading_id,
+            ));
+
+        $total = round($data[0]->total_in - $data[0]->total_out,2);
+
+        return $total;
     }
 
     public function infoFg(){

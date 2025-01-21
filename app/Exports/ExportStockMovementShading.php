@@ -32,8 +32,10 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
 
         if($this->shading_id){
             $shading = ItemShading::find($this->shading_id);
-        }else{
+        }elseif($this->item){
             $shading = ItemShading::where('item_id',$this->item)->get();
+        }else{
+            $shading = ItemShading::get();
         }
 
         $place = Place::find($this->plant);
@@ -47,7 +49,8 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                 'Nama Item',
                 'Satuan',
                 'Shading',
-                'Balance',
+                'Balance Qty',
+                'Balance Nominal',
             ];
 
             if($this->shading_id){
@@ -60,8 +63,10 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         }
                     })->orderByDesc('date')->orderByDesc('id')->first();
                     $qty = 0;
+                    $total = 0;
                     if($data){
                         $qty = round($data->totalByShadingBeforeIncludeDate(),3);
+                        $total = round($data->totalNominalByShadingBeforeIncludeDate(),2);
                     }
                     $arr[] = [
                         '1',
@@ -71,6 +76,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         $shading->item->uomUnit->code,
                         $shading->code,
                         $qty,
+                        $total,
                     ];
                 }
 
@@ -84,8 +90,10 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             }
                         })->orderByDesc('date')->orderByDesc('id')->first();
                         $qty = 0;
+                        $total = 0;
                         if($data){
                             $qty = round($data->totalByShadingBeforeIncludeDate(),3);
+                            $total = round($data->totalNominalByShadingBeforeIncludeDate(),3);
                         }
                         $arr[] = [
                             ($key + 1),
@@ -95,6 +103,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             $rowshading->item->uomUnit->code,
                             $rowshading->code,
                             $qty,
+                            $total,
                         ];
                     }
                 }

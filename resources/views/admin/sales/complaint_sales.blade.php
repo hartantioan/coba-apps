@@ -673,7 +673,6 @@
         $('.row_item').remove();
         $('#percentage_value').text('0%');
         $('#grandtotal_detail').text('0');
-        $('#grandtotal_detail').text('0');
         if ($('#lookable_id').val()) {
             $('#grand-total').text('0');
             $.ajax({
@@ -709,8 +708,9 @@
                                     <tr class="row_item" data-id="` + data.id + `" style="background-color:` + getRandomColor() + `;">
                                         <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
-                                        <input type="hidden" name="arr_box_conversion[]" id="arr_box_conversion` + count + `" value="` + val.arr_box_conversion + `">
-                                        <input type="hidden" name="arr_m2_conversion[]" id="arr_m2_conversion` + count + `" value="` + val.arr_m2_conversion + `">
+                                        <input type="hidden" name="arr_box_conversion[]" id="arr_box_conversion` + count + `" value="` + val.box_conversion + `">
+                                        <input type="hidden" name="arr_m2_conversion[]" id="arr_m2_conversion` + count + `" value="` + val.m2_conversion + `">
+                                        <input type="hidden" name="arr_sale_conversion[]" id="arr_sale_conversion` + count + `" value="` + val.sale_conversion + `">
                                         <td class="center" >
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
@@ -723,24 +723,44 @@
                                             ` + val.item + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty_color_mistake[]" class="browser-default qty-input" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_color_mistake` + count + `">
+                                            <input name="arr_qty_color_mistake[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_color_mistake` + count + `" >
                                             <span> m²</span>
+                                            <div>
+                                                <span id="color_mistake_box` + count + `">Box: 0 </span>
+                                                <span id="color_mistake_m2` + count + `"> pcs: 0</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            <input name="arr_qty_motif_mistake[]" class="browser-default qty-input" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_motif_mistake` + count + `">
+                                            <input name="arr_qty_motif_mistake[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_motif_mistake` + count + `" >
                                             <span> m²</span>
+                                            <div>
+                                                <span id="motif_mistake_box` + count + `">Box: 0 </span>
+                                                <span id="motif_mistake_m2` + count + `"> pcs: 0</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            <input name="arr_qty_size_mistake[]" class="browser-default qty-input" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_size_mistake` + count + `">
+                                            <input name="arr_qty_size_mistake[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_size_mistake` + count + `" >
                                             <span> m²</span>
+                                            <div>
+                                                <span id="size_mistake_box` + count + `">Box: 0 </span>
+                                                <span id="size_mistake_m2` + count + `"> pcs: 0</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            <input name="arr_qty_broken[]" class="browser-default qty-input" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_broken` + count + `">
+                                            <input name="arr_qty_broken[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_broken` + count + `" >
                                             <span> m²</span>
+                                            <div>
+                                                <span id="broken_box` + count + `">Box: 0 </span>
+                                                <span id="broken_m2` + count + `"> pcs: 0</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            <input name="arr_qty_mistake[]" class="browser-default qty-input" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_mistake` + count + `">
+                                            <input name="arr_qty_mistake[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_mistake` + count + `" >
                                             <span> m²</span>
+                                            <div>
+                                                <span id="mistake_box` + count + `">Box: 0 </span>
+                                                <span id="mistake_m2` + count + `"> pcs: 0</span>
+                                            </div>
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ">
@@ -1731,38 +1751,48 @@
     }
 
     function countRow(id){
-        if($('#arr_item' + id).val() || $('#arr_coa' + id).val()){
-            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")),
-                price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion')) : 1;
-            if($('#inventory_type').val() === '1'){
-                if(qtylimit > 0){
-                    if(qty > qtylimit){
-                        qty = qtylimit;
-                        $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
-                    }
-                }
-            }
+        if($('#arr_lookable_id' + id).val()){
+            var qtyColorMistake = parseFloat($('#qty_color_mistake' + id).val().replace(/\./g, '').replace(',', '.'));
+            var qtyMotifMistake = parseFloat($('#qty_motif_mistake' + id).val().replace(/\./g, '').replace(',', '.'));
+            var qtySizeMistake = parseFloat($('#qty_size_mistake' + id).val().replace(/\./g, '').replace(',', '.'));
+            var qtyBrokenMistake = parseFloat($('#qty_broken' + id).val().replace(/\./g, '').replace(',', '.'));
+            var qtyMistake = parseFloat($('#qty_mistake' + id).val().replace(/\./g, '').replace(',', '.'));
 
+            var boxConversion = parseFloat($('#arr_box_conversion' + id).val()) || 0;
 
-            let qtyConversion = qty * conversion;
+            var m2Conversion = parseFloat($('#arr_m2_conversion' + id).val()) || 0;
 
-            /* $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))); */
+            var saleConversion = parseFloat($('#arr_sale_conversion' + id).val()) || 0;
 
-            var finalpricedisc1 = price - (price * (disc1 / 100));
-            var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
-            var finalpricedisc3 = finalpricedisc2 - disc3;
+            var totalColorBox = qtyColorMistake /saleConversion * boxConversion;
+            var totalColorM2 = qtyColorMistake / m2Conversion;
 
-            if((finalpricedisc3 * qty).toFixed(2) >= 0){
-                $('#arr_subtotal' + id).text(formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
-            }else{
-                $('#arr_subtotal' + id).text('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
-            }
+            var totalMotifBox = qtyMotifMistake/saleConversion * boxConversion;
+            var totalMotifM2 = qtyMotifMistake / m2Conversion;
 
+            var totalSizeBox = qtySizeMistake /saleConversion* boxConversion;
+            var totalSizeM2 = qtySizeMistake / m2Conversion;
+
+            var totalBrokenBox = qtyBrokenMistake/saleConversion * boxConversion;
+            var totalBrokenM2 = qtyBrokenMistake / m2Conversion;
+
+            var totalMistakeBox = qtyMistake/saleConversion * boxConversion;
+            var totalMistakeM2 = qtyMistake / m2Conversion;
+
+            $('#color_mistake_box' + id).text('Box: ' + totalColorBox.toFixed(2));
+            $('#color_mistake_m2' + id).text('pcs: ' + totalColorM2.toFixed(2));
+
+            $('#motif_mistake_box' + id).text('Box: ' + totalMotifBox.toFixed(2));
+            $('#motif_mistake_m2' + id).text('pcs: ' + totalMotifM2.toFixed(2));
+
+            $('#size_mistake_box' + id).text('Box: ' + totalSizeBox.toFixed(2));
+            $('#size_mistake_m2' + id).text('pcs: ' + totalSizeM2.toFixed(2));
+
+            $('#broken_box' + id).text('Box: ' + totalBrokenBox.toFixed(2));
+            $('#broken_m2' + id).text('pcs: ' + totalBrokenM2.toFixed(2));
+
+            $('#mistake_box' + id).text('Box: ' + totalMistakeBox.toFixed(2));
+            $('#mistake_m2' + id).text('pcs: ' + totalMistakeM2.toFixed(2));
         }
     }
 

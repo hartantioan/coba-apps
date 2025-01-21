@@ -141,15 +141,15 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                         IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
                                         IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out,
                                         pb.code AS batch_code,
-                                        is.code AS shading_code,
+                                        ish.code AS shading_code,
                                         i.code AS item_code,
                                         i.name AS item_name,
                                         p.code AS place_code
                                     FROM item_cogs ic
                                         LEFT JOIN production_batches pb
                                             ON pb.id = ic.production_batch_id
-                                        LEFT JOIN item_shadings is
-                                            ON is.id = ic.item_shading_id
+                                        LEFT JOIN item_shadings ish
+                                            ON ish.id = ic.item_shading_id
                                         LEFT JOIN items i
                                             ON i.id = ic.item_id
                                         LEFT JOIN places p

@@ -107,6 +107,7 @@
                                                     <tr>
                                                         <th class="center-align">{{ __('translations.no') }}.</th>
                                                         <th class="center-align">No.FREQ</th>
+                                                        <th class="center-align">Status</th>
                                                         <th class="center-align">Karyawan</th>
                                                         <th class="center-align">Tgl.Pengajuan</th>
                                                         <th class="center-align">Tgl.Req.Bayar</th>
@@ -116,7 +117,7 @@
                                                 </thead>
                                                 <tbody id="detail-result">
                                                     <tr>
-                                                        <td class="center-align" colspan="7">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -207,25 +208,26 @@
                                     <td class="center-align" rowspan="2">` + (i+1) + `</td>
                                     <td>` + val.code + `</td>
                                     <td>` + val.employee_name + `</td>
+                                    <td>` + val.status + `</td>
                                     <td>` + val.post_date + `</td>
                                     <td>` + val.required_date + `</td>
                                     <td>` + val.note + `</td>
                                     <td class="right-align">` + val.grandtotal + `</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6">` + detail + `</td>
+                                    <td colspan="7">` + detail + `</td>
                                 </tr
                             `);
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="center-align" colspan="7">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="8">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                     }else{
                         $('#detail-result').append(`
                             <tr>
-                                <td class="center-align" colspan="7">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="8">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }

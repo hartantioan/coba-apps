@@ -99,6 +99,7 @@ class HistoryEmployeeReceivableController extends Controller
             $results[] = [
                 'code'          => $row->code,
                 'employee_name' => $row->account->name,
+                'status'        => $row->status(),
                 'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                 'required_date' => date('d/m/Y',strtotime($row->required_date)),
                 'note'          => $row->note,

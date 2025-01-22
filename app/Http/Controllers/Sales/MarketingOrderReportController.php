@@ -127,9 +127,10 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            ->where('code','ARIN-25P1-00000003')
-            // ->where('code', '=', 'ARIN-25P1-00000002')
+          
+             ->where('code', '=', 'ARIN-25P1-00000173')
             ->get();
+
 
 
         $dom = new \DOMDocument();

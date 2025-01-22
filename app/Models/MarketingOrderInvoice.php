@@ -64,10 +64,11 @@ class MarketingOrderInvoice extends Model
         return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();
     }
 
-    public function getlistSO(){
+    public function getlistSO()
+    {
         $arr = [];
         $mod = $this->marketingOrderDeliveryProcess->marketingOrderDelivery ?? null;
-        if($mod){
+        if ($mod) {
             foreach ($mod->marketingOrderDeliveryDetail as $key => $row) {
                 $arr[] = $row->marketingOrderDetail->marketingOrder->code;
             }
@@ -90,16 +91,15 @@ class MarketingOrderInvoice extends Model
     //bedain perorangan ambil 15 digit, selain itu 16 digit
     {
 
-        $npwp='';
+        $npwp = '';
 
-        if ($this->account->type_body==3)
-        {
-            $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+        if ($this->account->type_body == 3) {
 
-        }
-        else
-        {
-            $npwp=str_replace('.','',str_replace('-','',$this->userData->npwp));
+            //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+            //coretax pakai 16 digit
+            $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
+        } else {
+            $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         }
 
         return $npwp;
@@ -116,25 +116,28 @@ class MarketingOrderInvoice extends Model
         return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
     }
 
-    public function account(){
-        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    public function account()
+    {
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
-    public function type(){
+    public function type()
+    {
         $type = match ($this->type) {
-          '1' => 'DP',
-          '2' => 'Credit',
-          default => 'Invalid',
+            '1' => 'DP',
+            '2' => 'Credit',
+            default => 'Invalid',
         };
 
         return $type;
     }
 
-    public function invoiceType(){
+    public function invoiceType()
+    {
         $type = match ($this->invoice_type) {
-          '1' => 'Surat Jalan',
-          '2' => 'Manual',
-          default => 'Invalid',
+            '1' => 'Surat Jalan',
+            '2' => 'Manual',
+            default => 'Invalid',
         };
 
         return $type;
@@ -145,8 +148,9 @@ class MarketingOrderInvoice extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function used(){
-        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    public function used()
+    {
+        return $this->hasOne('App\Models\UsedData', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
     public function marketingOrderInvoiceDetail()
@@ -156,12 +160,12 @@ class MarketingOrderInvoice extends Model
 
     public function marketingOrderInvoiceDeliveryProcessDetail()
     {
-        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details');
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details');
     }
 
     public function marketingOrderInvoiceDeliveryDetail()
     {
-        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details');
     }
 
     public function marketingOrderInvoiceDetailManual()
@@ -171,26 +175,28 @@ class MarketingOrderInvoice extends Model
 
     public function marketingOrderInvoiceDownPayment()
     {
-        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_down_payments');
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_down_payments');
     }
 
-    public function status(){
+    public function status()
+    {
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
-          '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
-          '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
-          '8' => '<span class="pink darken-4 medium-small white-text padding-3">Ditutup Balik</span>',
-          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+            '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+            '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+            '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+            '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+            '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
+            '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+            '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
+            '8' => '<span class="pink darken-4 medium-small white-text padding-3">Ditutup Balik</span>',
+            default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
         return $status;
     }
 
-    public function statusRaw(){
+    public function statusRaw()
+    {
         $status = match ($this->status) {
             '1' => 'Menunggu',
             '2' => 'Proses',
@@ -208,7 +214,7 @@ class MarketingOrderInvoice extends Model
 
     public function attachment()
     {
-        if($this->document !== NULL && Storage::exists($this->document)) {
+        if ($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
             $document = asset('website/empty.png');
@@ -217,15 +223,16 @@ class MarketingOrderInvoice extends Model
         return $document;
     }
 
-    public function deleteFile(){
-		if(Storage::exists($this->document)) {
+    public function deleteFile()
+    {
+        if (Storage::exists($this->document)) {
             Storage::delete($this->document);
         }
-	}
+    }
 
     public static function generateCode($prefix)
     {
-        $cek = substr($prefix,0,7);
+        $cek = substr($prefix, 0, 7);
         $query = MarketingOrderInvoice::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
@@ -234,7 +241,7 @@ class MarketingOrderInvoice extends Model
             ->limit(1)
             ->get();
 
-        if($query->count() > 0) {
+        if ($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
             $code = '00000001';
@@ -242,23 +249,25 @@ class MarketingOrderInvoice extends Model
 
         $no = str_pad($code, 8, 0, STR_PAD_LEFT);
 
-        return substr($prefix,0,9).'-'.$no;
+        return substr($prefix, 0, 9) . '-' . $no;
     }
 
-    public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
-        if($source){
+    public function approval()
+    {
+        $source = ApprovalSource::where('lookable_type', $this->table)->where('lookable_id', $this->id)->whereHas('approvalMatrix')->get();
+        if ($source) {
             return $source;
-        }else{
+        } else {
             return '';
         }
     }
 
-    public function hasDetailMatrix(){
+    public function hasDetailMatrix()
+    {
         $ada = false;
-        if($this->approval()){
-            foreach($this->approval() as $row){
-                if($row->approvalMatrix()->exists()){
+        if ($this->approval()) {
+            foreach ($this->approval() as $row) {
+                if ($row->approvalMatrix()->exists()) {
                     $ada = true;
                 }
             }
@@ -267,16 +276,18 @@ class MarketingOrderInvoice extends Model
         return $ada;
     }
 
-    public function getAge(){
+    public function getAge()
+    {
         $age = time() -  strtotime($this->post_date);
 
         return round($age / (60 * 60 * 24));
     }
 
-    public function hasChildDocument(){
+    public function hasChildDocument()
+    {
         $hasRelation = false;
 
-        if($this->incomingPaymentDetail()->exists()){
+        if ($this->incomingPaymentDetail()->exists()) {
             $hasRelation = true;
         }
 
@@ -291,30 +302,30 @@ class MarketingOrderInvoice extends Model
         return $hasRelation;
     }
 
-    public function totalSales(){
+    public function totalSales()
+    {
         $total = 0;
         foreach ($this->marketingOrderInvoiceDetail as $key => $row) {
-            if($row->lookable_type == null){
-                if($row->is_include_tax == '1') {
+            if ($row->lookable_type == null) {
+                if ($row->is_include_tax == '1') {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
-                }else{
+                } else {
                     $price = $row->price;
                 }
-                $pricefirst=$row->price;
+                $pricefirst = $row->price;
                 $discount = 0;
                 $total += $row->total;
-            }
-            else{
+            } else {
 
-                if($row->is_include_tax == '1') {
+                if ($row->is_include_tax == '1') {
                     $price = $row->price / (($row->percent_tax + 100) / 100);
-                }else{
+                } else {
                     $price = $row->price;
                 }
 
-                if($row->is_include_tax == 1) {
+                if ($row->is_include_tax == 1) {
                     $pricefirst = $row->getMoDetail()->price ?? 0;
-                }else{
+                } else {
                     $pricefirst = $row->getMoDetail()->price ?? 0;
                     // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
                 }
@@ -326,15 +337,17 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
-    public function journal(){
-        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    public function journal()
+    {
+        return $this->hasOne('App\Models\Journal', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
-    public function balance(){
+    public function balance()
+    {
         $total = $this->isExport() ? $this->total : $this->grandtotal;
 
-        foreach($this->marketingOrderInvoiceDetail as $row){
-            foreach($row->marketingOrderMemoDetail as $momd){
+        foreach ($this->marketingOrderInvoiceDetail as $row) {
+            foreach ($row->marketingOrderMemoDetail as $momd) {
                 $total -= $this->grandtotal;
             }
         }
@@ -342,11 +355,12 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
-    public function totalMemo(){
+    public function totalMemo()
+    {
         $total = 0;
 
-        foreach($this->marketingOrderInvoiceDetail as $row){
-            foreach($row->marketingOrderMemoDetail as $momd){
+        foreach ($this->marketingOrderInvoiceDetail as $row) {
+            foreach ($row->marketingOrderMemoDetail as $momd) {
                 $total += $momd->grandtotal;
             }
         }
@@ -354,13 +368,16 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
-    public function totalMemoByDate($date){
+    public function totalMemoByDate($date)
+    {
         $total = 0;
 
-        foreach($this->marketingOrderInvoiceDetail as $row){
-            foreach($row->marketingOrderMemoDetail()->whereHas('marketingOrderMemo',function($query)use($date){
-                $query->whereDate('post_date','<=',$date);
-            })->get() as $momd){
+        foreach ($this->marketingOrderInvoiceDetail as $row) {
+            foreach (
+                $row->marketingOrderMemoDetail()->whereHas('marketingOrderMemo', function ($query) use ($date) {
+                    $query->whereDate('post_date', '<=', $date);
+                })->get() as $momd
+            ) {
                 $total += $momd->grandtotal;
             }
         }
@@ -368,7 +385,8 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
-    public function arrBalanceMemo(){
+    public function arrBalanceMemo()
+    {
         $arr = [
             'total'             => 0,
             'tax'               => 0,
@@ -379,7 +397,7 @@ class MarketingOrderInvoice extends Model
             'balance'           => 0,
         ];
 
-        foreach($this->marketingOrderInvoiceDetail as $row){
+        foreach ($this->marketingOrderInvoiceDetail as $row) {
             $arrNominal = $row->arrBalanceMemo();
             $arr['balance'] += $arrNominal['balance'];
         }
@@ -387,43 +405,46 @@ class MarketingOrderInvoice extends Model
         return $arr;
     }
 
-    public function incomingPaymentDetail(){
-        return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
-            $query->whereIn('status',['2','3']);
+    public function incomingPaymentDetail()
+    {
+        return $this->hasMany('App\Models\IncomingPaymentDetail', 'lookable_id', 'id')->where('lookable_type', $this->table)->whereHas('incomingPayment', function ($query) {
+            $query->whereIn('status', ['2', '3']);
         });
     }
 
-    public function marketingOrderHandoverInvoiceDetail(){
-        return $this->hasMany('App\Models\MarketingOrderHandoverInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderHandoverInvoice',function($query){
-            $query->whereIn('status',['1','2','3']);
+    public function marketingOrderHandoverInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderHandoverInvoiceDetail', 'lookable_id', 'id')->where('lookable_type', $this->table)->whereHas('marketingOrderHandoverInvoice', function ($query) {
+            $query->whereIn('status', ['1', '2', '3']);
         });
     }
 
-    public function marketingOrderReceiptDetail(){
-        return $this->hasMany('App\Models\MarketingOrderReceiptDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('MarketingOrderReceipt',function($query){
-            $query->whereIn('status',['1','2','3']);
+    public function marketingOrderReceiptDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderReceiptDetail', 'lookable_id', 'id')->where('lookable_type', $this->table)->whereHas('MarketingOrderReceipt', function ($query) {
+            $query->whereIn('status', ['1', '2', '3']);
         });
     }
 
-    public function latestHandoverInvoice(){
+    public function latestHandoverInvoice()
+    {
         $code = '-';
-        foreach($this->marketingOrderHandoverInvoiceDetail as $row){
+        foreach ($this->marketingOrderHandoverInvoiceDetail as $row) {
             $code = $row->marketingOrderHandoverInvoice->code;
         }
         return $code;
     }
 
-    public function soType(){
+    public function soType()
+    {
         $type = '';
-        foreach($this->marketingOrderInvoiceDetail as $row){
+        foreach ($this->marketingOrderInvoiceDetail as $row) {
             if ($row->lookable_type == 'marketing_order_delivery_process_details') {
-                if($type == ''){
+                if ($type == '') {
                     $type = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->soType();
                 }
-
-
             } else if ($row->lookable_type == 'marketing_order_delivery_details') {
-                if($type == ''){
+                if ($type == '') {
                     $type = $row->lookable->marketingOrderDelivery->soType();
                 }
             }
@@ -431,31 +452,36 @@ class MarketingOrderInvoice extends Model
         return $type;
     }
 
-    public function latestReceipt(){
+    public function latestReceipt()
+    {
         $code = '-';
-        foreach($this->marketingOrderReceiptDetail as $row){
+        foreach ($this->marketingOrderReceiptDetail as $row) {
             $code = $row->marketingOrderReceipt->code;
         }
         return $code;
     }
 
-    public function latestHandoverReceipt(){
+    public function latestHandoverReceipt()
+    {
         $code = '-';
-        foreach($this->marketingOrderReceiptDetail as $row){
-            foreach($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row){
+        foreach ($this->marketingOrderReceiptDetail as $row) {
+            foreach ($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row) {
                 $code = $row->marketingOrderHandoverReceipt->code;
             }
         }
         return $code;
     }
 
-    public function listTrackingCollector(){
+    public function listTrackingCollector()
+    {
         $arr = [];
 
-        foreach($this->marketingOrderReceiptDetail()->whereHas('marketingOrderReceipt',function($query){
-            $query->whereHas('marketingOrderHandoverReceiptDetail');
-        })->get() as $row){
-            foreach($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row){
+        foreach (
+            $this->marketingOrderReceiptDetail()->whereHas('marketingOrderReceipt', function ($query) {
+                $query->whereHas('marketingOrderHandoverReceiptDetail');
+            })->get() as $row
+        ) {
+            foreach ($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row) {
                 $arr[] = [
                     'code'      => $row->marketingOrderHandoverReceipt->code,
                     'receipt'   => $row->marketingOrderReceipt->code,
@@ -470,46 +496,52 @@ class MarketingOrderInvoice extends Model
         return $arr;
     }
 
-    public function balancePaymentIncoming(){
-        if($this->isExport()){
+    public function balancePaymentIncoming()
+    {
+        if ($this->isExport()) {
             $total = $this->total - $this->totalPayMemo();
-        }else{
+        } else {
             $total = $this->grandtotal - $this->totalPayMemo();
         }
-        
+
         return $total;
     }
 
-    public function balancePaymentIncomingByDate($date){
-        if($this->isExport()){
+    public function balancePaymentIncomingByDate($date)
+    {
+        if ($this->isExport()) {
             $total = $this->total - $this->totalPayByDate($date);
-        }else{
+        } else {
             $total = $this->grandtotal - $this->totalPayByDate($date);
         }
         return $total;
     }
 
-    public function totalPay(){
+    public function totalPay()
+    {
         $total = 0;
 
-        foreach($this->incomingPaymentDetail as $row){
+        foreach ($this->incomingPaymentDetail as $row) {
             $total += $row->subtotal;
         }
 
         return $total;
     }
 
-    public function totalPayByDate($date){
+    public function totalPayByDate($date)
+    {
         $total = 0;
 
-        foreach($this->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
-            $query->whereDate('post_date','<=',$date);
-        })->get() as $row){
+        foreach (
+            $this->incomingPaymentDetail()->whereHas('incomingPayment', function ($query) use ($date) {
+                $query->whereDate('post_date', '<=', $date);
+            })->get() as $row
+        ) {
             $total += $row->subtotal;
         }
 
-        if($this->cancelDocument()->exists()){
-            if($this->cancelDocument->post_date <= $date){
+        if ($this->cancelDocument()->exists()) {
+            if ($this->cancelDocument->post_date <= $date) {
                 $total += $this->grandtotal;
             }
         }
@@ -517,15 +549,17 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
-    public function totalPayMemo(){
+    public function totalPayMemo()
+    {
         $total = $this->totalPay() + $this->totalMemo();
         return $total;
     }
 
-    public function getPercentPayment(){
-        if($this->isExport()){
+    public function getPercentPayment()
+    {
+        if ($this->isExport()) {
             $total = $this->total - $this->totalMemo();
-        }else{
+        } else {
             $total = $this->grandtotal - $this->totalMemo();
         }
         $percent = $total > 0 ? round(($this->totalPay() / $total) * 100) : 0;
@@ -534,33 +568,36 @@ class MarketingOrderInvoice extends Model
 
     public function printCounter()
     {
-        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\PrintCounter', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
-    public function isOpenPeriod(){
+    public function isOpenPeriod()
+    {
         $monthYear = substr($this->post_date, 0, 7); // '2023-02'
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', ['2','3'])
-                        ->get();
+            ->whereIn('status_closing', ['2', '3'])
+            ->get();
 
-        if(count($see)>0){
+        if (count($see) > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    public function isExport(){
+    public function isExport()
+    {
         $ya = false;
-        if(substr($this->tax_no,0,3) == '070'){
+        if (substr($this->tax_no, 0, 3) == '070') {
             $ya = true;
         }
         return $ya;
     }
 
-    public function cancelDocument(){
-        return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
+    public function cancelDocument()
+    {
+        return $this->hasOne('App\Models\CancelDocument', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 }

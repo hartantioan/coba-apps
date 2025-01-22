@@ -128,7 +128,7 @@ class MarketingOrderReportController extends Controller
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
           
-             ->where('code', '=', 'ARIN-25P1-00000173')
+            // ->where('code', '=', 'ARIN-25P1-00000173')
             ->get();
 
 
@@ -163,9 +163,9 @@ class MarketingOrderReportController extends Controller
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
             $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
-            $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
+            $BuyerDocument = $dom->createElement('BuyerDocument', $row->getBuyerDocCoreTax());
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
-            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
+            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber',  $row->getBuyerDocNumberCoreTax());
             $BuyerName = $dom->createElement('BuyerName', $row->account->userDataDefault()->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->account->userDataDefault()->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
@@ -254,9 +254,9 @@ class MarketingOrderReportController extends Controller
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
             $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
-            $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
+            $BuyerDocument = $dom->createElement('BuyerDocument', $row->getBuyerDocCoreTax());
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
-            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
+            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', $row->getBuyerDocNumberCoreTax());
             $BuyerName = $dom->createElement('BuyerName', $row->userData->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->userData->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');

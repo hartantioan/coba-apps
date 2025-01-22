@@ -114,7 +114,7 @@ class MarketingOrderInvoice extends Model
 
             //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
             //coretax pakai 16 digit
-            $npwp = $this->account->id_card;
+            $npwp = '0000000000000000';
            
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
@@ -139,6 +139,42 @@ class MarketingOrderInvoice extends Model
         }
 
         return $nitku;
+    }
+
+    public function getBuyerDocCoreTax()
+   
+    {
+
+        $doc = '';
+
+        if ($this->account->type_body == 3) {
+
+            
+            //perorangan gk punya nitku
+            $doc = 'NIK';
+        } else {
+            $doc = 'TIN';
+        }
+
+        return $doc;
+    }
+
+    public function getBuyerDocNumberCoreTax()
+   
+    {
+
+        $doc = '';
+
+        if ($this->account->type_body == 3) {
+
+            
+            //perorangan gk punya nitku
+            $doc = $this->account->id_card;
+        } else {
+            $doc = '-';
+        }
+
+        return $doc;
     }
 
 

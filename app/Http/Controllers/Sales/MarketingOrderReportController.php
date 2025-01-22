@@ -159,14 +159,14 @@ class MarketingOrderReportController extends Controller
             $RefDesc = $dom->createElement('RefDesc', $row->code);
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
-            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
+            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
             $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
             $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
             $BuyerName = $dom->createElement('BuyerName', $row->account->userDataDefault()->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->account->userDataDefault()->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp() . '000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax() );
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 
@@ -250,14 +250,14 @@ class MarketingOrderReportController extends Controller
             $RefDesc = $dom->createElement('RefDesc', $row->code);
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
-            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
+            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
             $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
             $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
             $BuyerName = $dom->createElement('BuyerName', $row->userData->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->userData->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp() . '000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax());
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 

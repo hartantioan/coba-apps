@@ -95,15 +95,51 @@ class MarketingOrderInvoice extends Model
 
         if ($this->account->type_body == 3) {
 
-            //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
-            //coretax pakai 16 digit
-            $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
+            $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+        
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         }
 
         return $npwp;
     }
+
+    public function getNpwpCoreTax()
+    //bedain perorangan ambil 15 digit, selain itu 16 digit
+    {
+
+        $npwp = '';
+
+        if ($this->account->type_body == 3) {
+
+            //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+            //coretax pakai 16 digit
+            $npwp = '0'.str_replace('.', '', str_replace('-', '', $this->userData->npwp));
+        } else {
+            $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
+        }
+
+        return $npwp;
+    }
+
+    public function getNitkuCoreTax()
+   
+    {
+
+        $nitku = '';
+
+        if ($this->account->type_body == 3) {
+
+            
+            //perorangan gk punya nitku
+            $nitku = '000000';
+        } else {
+            $nitku = str_replace('.', '', str_replace('-', '', $this->userData->npwp)).'000000';
+        }
+
+        return $nitku;
+    }
+
 
 
     public function voidUser()

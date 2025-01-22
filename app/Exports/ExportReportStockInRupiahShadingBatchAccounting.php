@@ -37,6 +37,7 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromArray, With
             'Nama Item',
             'Satuan',
             'Shading',
+            'Batch',
             'Balance Qty',
             'Balance Nominal',
         ];
@@ -76,8 +77,8 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromArray, With
                             ON p.id = ic.place_id
                     WHERE 
                         ic.date <= :date
-                        ic.place_id = :place_id
-                        ic.warehouse_id = :warehouse_id
+                        AND ic.place_id = :place_id
+                        AND ic.warehouse_id = :warehouse_id
                         AND ic.deleted_at IS NULL
                     GROUP BY ic.production_batch_id
                 ) AS rs
@@ -89,6 +90,7 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromArray, With
 
         foreach($datadetail as $key => $rowdetail){
             $arr[] = [
+                $key + 1,
                 $rowdetail->place_code,
                 $rowdetail->item_code,
                 $rowdetail->item_name,

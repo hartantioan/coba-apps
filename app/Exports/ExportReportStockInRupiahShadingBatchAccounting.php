@@ -76,11 +76,15 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromArray, With
                             ON p.id = ic.place_id
                     WHERE 
                         ic.date <= :date
+                        ic.place_id = :place_id
+                        ic.warehouse_id = :warehouse_id
                         AND ic.deleted_at IS NULL
                     GROUP BY ic.production_batch_id
                 ) AS rs
         ", array(
-            'date'              => $this->finish_date,
+            'date'              => $this->start_date,
+            'place_id'          => $this->place_id,
+            'warehouse_id'      => $this->warehouse_id,
         ));
 
         foreach($datadetail as $key => $rowdetail){

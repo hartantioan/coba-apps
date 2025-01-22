@@ -173,7 +173,6 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                         AND ic.deleted_at IS NULL
                                     GROUP BY ic.production_batch_id
                                 ) AS rs
-                            WHERE (rs.total_in - rs.total_out) > 0
                         ", array(
                             'date'              => $this->finish_date,
                             'item_shading_id'   => $rowshading->id,

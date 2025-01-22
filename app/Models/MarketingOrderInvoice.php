@@ -151,7 +151,7 @@ class MarketingOrderInvoice extends Model
 
             
             //perorangan gk punya nitku
-            $doc = 'NIK';
+            $doc = 'National ID';
         } else {
             $doc = 'TIN';
         }

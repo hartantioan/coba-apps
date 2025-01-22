@@ -114,7 +114,7 @@ class MarketingOrderInvoice extends Model
 
             //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
             //coretax pakai 16 digit
-            $npwp = '0'.str_replace('.', '', str_replace('-', '', $this->userData->npwp));
+            $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         }

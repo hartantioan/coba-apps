@@ -839,12 +839,12 @@ class MarketingOrderDeliveryController extends Controller
                 'delivery_date'     => $request->delivery_date,
                 'note_internal'     => $request->note,
                 'note_external'     => $request->note2,
-                'transportation_id' => $request->transportation_id,
+                'transportation_id' => $request->transportation_id ?? $query->transportation_id,
             ]);
 
             foreach($query->marketingOrderDeliveryDetail as $rowdt){
                 $rowdt->marketingOrderDetail->marketingOrder->update([
-                    'transportation_id' => $request->transportation_id,
+                    'transportation_id' => $request->transportation_id ?? $query->transportation_id,
                 ]);
             }
 

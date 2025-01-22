@@ -48,7 +48,7 @@ class HistoryEmployeeReceivableController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereHas('hasPaymentRequestDetail',function($query)use($start_date,$end_date){
+        $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->whereIn('document_status',['2','3'])->whereHas('hasPaymentRequestDetail',function($query)use($start_date,$end_date){
             $query->whereHas('paymentRequest',function($query){
                 $query->whereHas('outgoingPayment');
             });
@@ -56,6 +56,9 @@ class HistoryEmployeeReceivableController extends Controller
         ->whereDate('post_date','<=',$end_date)
         ->whereDate('post_date','>=',$start_date)
         ->where(function($query)use($request){
+            $query->whereHas('account',function($query){
+                $query->where('type','1');
+            });
             if($request->account_id){
                 $query->whereIn('account_id',$request->account_id);
             }

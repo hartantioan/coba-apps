@@ -49,7 +49,7 @@
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="card-alert card red">
                                                 <div class="card-content white-text">
-                                                    <p>Info Penting! : Data yang ditampilkan disini hanya FREQ dengan tipe <b>PEMBAYARAN</b> dan tipe Dokumen <b>TIDAK LENGKAP</b>. Karena itu yang merupakan syarat BS Karyawan terjadi.</p>
+                                                    <p>Info Penting! : Data yang ditampilkan disini hanya FREQ dengan tipe <b>PEMBAYARAN</b> dan tipe Dokumen <b>LENGKAP & TIDAK LENGKAP</b>. Karena itu yang merupakan syarat BS Karyawan terjadi.</p>
                                                 </div>
                                             </div>
                                             <div class="col s12">

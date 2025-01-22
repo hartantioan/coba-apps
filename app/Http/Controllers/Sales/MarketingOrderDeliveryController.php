@@ -43,6 +43,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use App\Models\UsedData;
+use App\Models\Transportation;
+
 class MarketingOrderDeliveryController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -70,7 +72,8 @@ class MarketingOrderDeliveryController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'transportation'=> Transportation::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -836,7 +839,14 @@ class MarketingOrderDeliveryController extends Controller
                 'delivery_date'     => $request->delivery_date,
                 'note_internal'     => $request->note,
                 'note_external'     => $request->note2,
+                'transportation_id' => $request->transportation_id,
             ]);
+
+            foreach($query->marketingOrderDeliveryDetail as $rowdt){
+                $rowdt->marketingOrderDetail->marketingOrder->update([
+                    'transportation_id' => $request->transportation_id,
+                ]);
+            }
 
             if($request->detail_id){
                 foreach($request->detail_id as $key => $row){

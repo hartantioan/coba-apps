@@ -281,7 +281,7 @@
                                                     <th class="center">Viskositas (detik)</th>
                                                     <th class="center">Residu (gr)</th>
                                                     <th class="center">Limit (%)</th>
-                                                    <th class="center">Selisih</th>
+                                                    <th class="center">Total Penerimaan (Kg)</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
                                                     <th class="center">{{ __('translations.engine') }}</th>
@@ -1700,6 +1700,8 @@
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `"  value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
+
                                         <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                         <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
@@ -1746,7 +1748,7 @@
                                             <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td>
-                                            <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);adjustPercentageModifier(this)" style="text-align:right;width:100px;" data-count="` + count + `" >
+                                            <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);adjustPercentageModifier(this)" style="text-align:right;width:100px;" data-count="` + count + `">
                                         </td>
                                         <td>
                                             <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
@@ -1880,7 +1882,7 @@
 
         var water_content = parseNumber($('#arr_water_content' + count).val());
         var percent_mod = parseNumber($('#arr_percentage_modifier' + count).val());
-        var qty_balance = parseNumber($('#arr_qty' + count).val());
+        var qty_balance = parseNumber($('#arr_netto' + count).val());
         if(percent_mod > 0){
             var kadar_air = 0;
             var finance_kg = 0;
@@ -1909,6 +1911,7 @@
             $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
             $('#arr_residue' + code).val($('#arr_scale' + code).select2('data')[0].residue);
             $('#arr_percentage_modifier' + code).val($('#arr_scale' + code).select2('data')[0].percentage_modifier);
+            $('#arr_netto' + code).val($('#arr_scale' + code).select2('data')[0].netto);
             hitungSelisih(code);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);

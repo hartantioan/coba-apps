@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodScale;
 use App\Models\GoodScaleDetail;
@@ -128,9 +127,6 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             ->where('item_id',$this->item_id)
             ->whereIn('status',["2","3"]);
         })->get();
-        info($this->item_id);
-        info($this->start_date);
-        info($this->finish_date);
 
         $arr = [];
         $no = 1;
@@ -147,7 +143,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             $finance_kadar_air = 0;
             $finance_kg = 0;
             if($row->goodScale->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
-                $finance_kadar_air = $row->goodScale->water_content - $take_item_rule_percent;
+                $finance_kadar_air = $row->water_content - $take_item_rule_percent;
             }
             if($finance_kadar_air > 0){
                 $finance_kg = ($finance_kadar_air*$row->goodScale->qty_balance) / 100;
@@ -156,7 +152,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             if($finance_kadar_air > 0){
                 $total_bayar = $total_bayar-$finance_kg;
             }
-            $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->goodScale->water_content/100));
+            $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->water_content/100));
             $price = $row->goodScale->purchaseOrderDetail->price;
             $finance_price = $price*$total_bayar;
 
@@ -189,7 +185,31 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             $no++;
         }
 
+
+
+
         $avg = $all_finance_price / (($all_penerimaan != 0) ? $all_penerimaan : 1);
+
+        // $arr[] = [
+        //     'no' => '',
+        //     'PLANT' => '',
+        //     'NO PO' => '',
+        //     'NAMA ITEM' => '',
+        //     'NO SJ' => '',
+        //     'TGL MASUK' => '',
+        //     'NO. KENDARAAN' => '',
+        //     'NETTO JEMBATAN TIMBANG' => '',
+        //     'HASIL QC' => '',
+        //     'STD POTONGAN QC' => '',
+        //     'FINANCE Kadar air' => '',
+        //     'FINANCE Kg' => '',
+        //     'TOTAL BAYAR KG' => '',
+        //     'TOTAL PENERIMAAN' => $all_penerimaan,
+        //     'HARGA PO' => '',
+        //     'HARGA FINANCE' => $all_finance_price,
+        //     'No GS' => $avg,
+        //     'HARGA OP/BBM' => '',
+        // ];
 
         foreach ($arr as &$row_arr) {
             $row_arr['HARGA OP/BBM'] = $row_arr['TOTAL PENERIMAAN'] * $avg;

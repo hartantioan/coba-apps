@@ -188,7 +188,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                 $rowdetail->shading_code,
                                 $rowdetail->batch_code,
                                 $rowdetail->balance_qty,
-                                $rowdetail->balance_nominal,
+                                number_format($rowdetail->balance_nominal,2,',','.'),
                             ];
                         }
                     }

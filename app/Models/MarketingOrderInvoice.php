@@ -132,7 +132,7 @@ class MarketingOrderInvoice extends Model
 
             
             //perorangan gk punya nitku
-            $nitku = '000000';
+            $nitku = '0000000000000000';
         } else {
             $nitku = str_replace('.', '', str_replace('-', '', $this->userData->npwp)).'000000';
         }

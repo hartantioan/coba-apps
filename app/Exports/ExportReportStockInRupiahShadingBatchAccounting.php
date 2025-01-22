@@ -7,12 +7,13 @@ use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\ProductionBatch;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Facades\DB;
 
-class ExportReportStockInRupiahShadingBatchAccounting implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
+class ExportReportStockInRupiahShadingBatchAccounting implements FromArray, WithTitle, ShouldAutoSize
 {
     protected $start_date, $finish_date,$place_id,$warehouse_id;
 
@@ -23,50 +24,79 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromCollection,
         $this->warehouse_id = $warehouse_id ? $warehouse_id : '';
     }
 
-    private $headings = [
-        'No',
-        'Code',
-        'Nama Item',
-        'Batch',
-        'Unit',
-        'Shading',
-        'Qty',
-        'Total',
-    ];
-
-
-    public function collection()
+    public function array(): array
     {
         $arr = [];
-        ProductionBatch::join('items', 'production_batches.item_id', '=', 'items.id')
-        ->whereHas('item', function ($query) {
-            $query->whereNull('deleted_at');
-        })
-        ->where('place_id', $this->place_id)
-        ->where('warehouse_id', $this->warehouse_id)
-        ->orderBy('items.code')
-        ->orderBy('items.id')
-        ->select('production_batches.*')
-        ->chunk(1000, function ($items) use (&$arr) {
-            $keys = count($arr) + 1; // Continue numbering from where you left off
-            foreach ($items as $row) {
-                $itemstock = ItemStock::where('item_shading_id', $row->item_shading_id)->first();
+        
+        DB::statement("SET SQL_MODE=''");
 
-                $arr[] = [
-                    'no' => $keys,
-                    'item_code' => $row->item->code,
-                    'item_name' => $row->item->name,
-                    'unit' => $row->item->uomUnit->code,
-                    'batch' => $row->code,
-                    'shading' => $row->itemShading->code ?? ' ',
-                    'total' => $itemstock->stockByDate($this->start_date),
-                    'rp_total' => $itemstock->priceFgNow($this->start_date)
-                ];
-                $keys++;
-            }
-        });
+        $arr[] = [
+            'No.',
+            'Plant',
+            'Kode Item',
+            'Nama Item',
+            'Satuan',
+            'Shading',
+            'Balance Qty',
+            'Balance Nominal',
+        ];
+        
+        $datadetail = DB::select("
+            SELECT 
+                rs.batch_code AS batch_code,
+                rs.shading_code AS shading_code,
+                rs.item_code AS item_code,
+                rs.item_name AS item_name,
+                rs.place_code AS place_code,
+                rs.total_qty_in AS total_qty_in,
+                rs.total_qty_out AS total_qty_out,
+                (rs.total_qty_in - rs.total_qty_out) AS balance_qty,
+                rs.total_in AS total_in,
+                rs.total_out AS total_out,
+                (rs.total_in - rs.total_out) AS balance_nominal
+                FROM (
+                    SELECT 
+                        IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_qty_in,
+                        IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out,
+                        IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
+                        IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out,
+                        pb.code AS batch_code,
+                        ish.code AS shading_code,
+                        i.code AS item_code,
+                        i.name AS item_name,
+                        p.code AS place_code
+                    FROM item_cogs ic
+                        LEFT JOIN production_batches pb
+                            ON pb.id = ic.production_batch_id
+                        LEFT JOIN item_shadings ish
+                            ON ish.id = ic.item_shading_id
+                        LEFT JOIN items i
+                            ON i.id = ic.item_id
+                        LEFT JOIN places p
+                            ON p.id = ic.place_id
+                    WHERE 
+                        ic.date <= :date
+                        AND ic.deleted_at IS NULL
+                    GROUP BY ic.production_batch_id
+                ) AS rs
+        ", array(
+            'date'              => $this->finish_date,
+        ));
 
-        return collect($arr);
+        foreach($datadetail as $key => $rowdetail){
+            $arr[] = [
+                $rowdetail->place_code,
+                $rowdetail->item_code,
+                $rowdetail->item_name,
+                'M2',
+                $rowdetail->shading_code,
+                $rowdetail->batch_code,
+                $rowdetail->balance_qty,
+                number_format($rowdetail->balance_nominal,2,',','.'),
+            ];
+        }
+
+        return $arr;
     }
 
     public function title(): string
@@ -74,8 +104,8 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromCollection,
         return 'Report Stock In Rupiah - Batch & Shading';
     }
 
-    public function headings(): array
+    public function chunkSize(): int
     {
-        return $this->headings;
+        return 1000;  // Process in chunks of 1000 rows
     }
 }

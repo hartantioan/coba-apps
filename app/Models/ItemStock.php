@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class ItemStock extends Model
 {
@@ -43,14 +44,30 @@ class ItemStock extends Model
 
     public function stockByDate($date){
         $qty = 0;
-        $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('area_id',$this->area_id)->where('date','<=',$date)->orderBy('date')->orderBy('id')->get();
-        foreach($cogs as $row){
-            if($row->type == 'IN'){
-                $qty += round($row->qty_in,3);
-            }elseif($row->type == 'OUT'){
-                $qty -= round($row->qty_out,3);
-            }
-        }
+        
+        $data_in = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_qty_in,
+                    IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out
+                FROM item_cogs ic
+                WHERE 
+                    ic.date <= :date 
+                    AND ic.item_id = :item_id
+                    AND ic.place_id = :place_id
+                    AND ic.warehouse_id = :warehouse_id
+                    AND ic.item_shading_id ".($this->item_shading_id ? "= ".$this->item_shading_id : "IS NULL")."
+                    AND ic.production_batch_id ".($this->production_batch_id ? "= ".$this->production_batch_id : "IS NULL")."
+                    AND ic.area_id ".($this->area_id ? "= ".$this->area_id : "IS NULL")."
+                    AND ic.deleted_at IS NULL
+            ", array(
+                'date'              => $date,
+                'item_id'           => $this->item_id,
+                'place_id'          => $this->place_id,
+                'warehouse_id'      => $this->warehouse_id,
+            ));
+
+        $qty = round($data_in[0]->total_qty_in,3) - round($data_in[0]->total_qty_out,3);
+        
         return $qty;
     }
 

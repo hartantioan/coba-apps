@@ -2819,7 +2819,7 @@
                     </select>
                 </td>
                 <td class="center">
-                    <select class="browser-default project_need" id="arr_project` + count + `" name="arr_project[]"></select>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
             </tr>
         `);
@@ -3179,21 +3179,6 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                let isValid = true;
-                $('.project_need').each(function() {
-                    console.log('sini2');
-                    if ($(this).val() === '' || $(this).val() === null) {
-                        isValid = false;
-                        $(this).addClass('highlight-empty');
-
-                        alert('Please select a project!');
-                    } else {
-                        $(this).removeClass('highlight-empty');
-                    }
-                });
-                if(isValid == false){
-                    return;
-                }
                 var formData = new FormData($('#form_data')[0]), passedQty = true, passed = true, passedProject = true;
 
                 if($('#type_detail').val() == '1'){

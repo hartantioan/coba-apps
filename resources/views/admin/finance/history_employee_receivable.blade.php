@@ -207,8 +207,8 @@
                                 <tr class="row_detail" style="background-color:` + getRandomColor() + `;font-weight:700;">
                                     <td class="center-align" rowspan="2">` + (i+1) + `</td>
                                     <td>` + val.code + `</td>
-                                    <td>` + val.employee_name + `</td>
                                     <td>` + val.status + `</td>
+                                    <td>` + val.employee_name + `</td>
                                     <td>` + val.post_date + `</td>
                                     <td>` + val.required_date + `</td>
                                     <td>` + val.note + `</td>

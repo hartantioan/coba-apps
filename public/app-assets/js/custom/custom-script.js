@@ -289,7 +289,7 @@ function cekNotif(url){
 	let currentUrl = window.location.href;
     let lastSegment = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
 	$.ajax({
-		url: url + '/admin/setting/announcement/refresh',
+		url: url + '/admin/personal/notification/announcement',
 		type: 'POST',
 		dataType: 'JSON',
 		data: {lastSegment: currentUrl},

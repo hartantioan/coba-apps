@@ -151,6 +151,30 @@ class ItemCogs extends Model
         return $total;
     }
 
+    public function lastStockByWarehouseAndDate($date){
+        $data = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in,
+                    IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_out
+                FROM item_cogs ic
+                WHERE 
+                    ic.date <= :date 
+                    AND ic.place_id = :place_id
+                    AND ic.item_id = :item_id
+                    AND ic.warehouse_id = :warehouse_id
+                    AND ic.deleted_at IS NULL
+            ", array(
+                'date'          => $date,
+                'place_id'      => $this->place_id,
+                'item_id'       => $this->item_id,
+                'warehouse_id'  => $this->warehouse_id,
+            ));
+
+        $total = round($data[0]->total_in,3) - round($data[0]->total_out,3);
+
+        return $total;
+    }
+
     public function infoFg(){
         $qty = 0;
         $total = 0;

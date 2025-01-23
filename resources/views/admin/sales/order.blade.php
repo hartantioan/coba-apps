@@ -1589,6 +1589,8 @@
                             );
                         }
                     }
+
+                    countRow(nil);
                 },
                 error: function() {
                     loadingClose('#modal1');

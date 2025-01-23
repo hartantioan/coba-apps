@@ -320,7 +320,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -371,7 +371,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -408,11 +408,62 @@
                                                         </td>
                                                     </tr>
                                                 @endforeach
+                                                <tr>
+                                                    <td colspan="9"><h6>C. PIB</h6></td>
+                                                </tr>
+                                                @foreach ($landedcostfee->where('type','3') as $key => $row)
+                                                    <tr>
+                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                        <td class="center-align">
+                                                            {{ $loop->iteration }}.
+                                                        </td>
+                                                        <td>
+                                                            {{ $row->name }}
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input class="special" id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
+                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEachSpecial({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <div class="switch mb-1">
+                                                                <label>
+                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});" disabled>
+                                                                    <span class="lever"></span>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEachSpecial({{ $row->id }});">
+                                                                <option value="0.00000" data-id="0">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row1)
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEachSpecial({{ $row->id }});">
+                                                                <option value="0.00000" data-id="0">-- Non-PPh --</option>
+                                                                @foreach ($wtax as $row2)
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                             <tfoot>
                                                 <tr>
                                                     <td class="center" colspan="2">
-                                                        Total
+                                                        Total Masuk ke STOCK
                                                     </td>
                                                     <td class="center">
                                                         <input id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
@@ -1995,32 +2046,34 @@
     function countEach(val){
         let rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
 
-        if(rowpercenttax !== 0){
-            if($('#arr_fee_include_tax' + val).is(':checked')){
-                rowtotal = rowtotal / (1 + (rowpercenttax / 100));
-                if($(":focus").attr('name') !== 'arr_fee_nominal[]'){
-                    $('#arr_fee_nominal' + val).val(
-                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-                    );
+        if(!$('#arr_temp_nominal' + val).hasClass('special')){
+            if(rowpercenttax !== 0){
+                if($('#arr_fee_include_tax' + val).is(':checked')){
+                    rowtotal = rowtotal / (1 + (rowpercenttax / 100));
+                    if($(":focus").attr('name') !== 'arr_fee_nominal[]'){
+                        $('#arr_fee_nominal' + val).val(
+                            (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                        );
+                    }
+                }else{
+                    if(parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",",".")) > 0){
+                        $('#arr_fee_nominal' + val).val(
+                            $('#arr_temp_nominal' + val).val()
+                        );
+                        rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
+                    }
                 }
+                rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
             }else{
-                if(parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                    $('#arr_fee_nominal' + val).val(
-                        $('#arr_temp_nominal' + val).val()
-                    );
-                    rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
-                }
+                /* $('#arr_fee_nominal' + val).val(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                ); */
             }
-            rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
-        }else{
-            /* $('#arr_fee_nominal' + val).val(
-                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-            ); */
-        }
 
-        if(rowpercentwtax !== 0){
-            rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100));
-            /* rowwtax = rowtotal * (rowpercentwtax / 100); */
+            if(rowpercentwtax !== 0){
+                rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100));
+                /* rowwtax = rowtotal * (rowpercentwtax / 100); */
+            }
         }
 
         rowgrandtotal = rowtotal + rowtax - rowwtax;
@@ -2040,14 +2093,28 @@
         countAll();
     }
 
+    function countEachSpecial(val){
+        let rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",",".")), rowgrandtotal = 0, rowwtax = parseFloat($('#arr_fee_wtax_rp' + val).val().replaceAll(".", "").replaceAll(",","."));
+
+        rowgrandtotal = rowtotal + rowtax - rowwtax;
+
+        $('#arr_fee_grandtotal' + val).val(
+            (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+        );
+
+        countAll();
+    }
+
     function countAll(){
         var total = 0, tax = 0, wtax = 0, grandtotal = 0;
 
         $('input[name^="arr_fee_nominal"]').each(function(index){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            tax += parseFloat($('input[name^="arr_fee_tax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            wtax += parseFloat($('input[name^="arr_fee_wtax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            grandtotal += parseFloat($('input[name^="arr_fee_grandtotal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            if(!$(this).hasClass('no-stock')){
+                total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                tax += parseFloat($('input[name^="arr_fee_tax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                wtax += parseFloat($('input[name^="arr_fee_wtax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                grandtotal += parseFloat($('input[name^="arr_fee_grandtotal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            }
         });
 
         $('#total').val(
@@ -2162,20 +2229,20 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'supplier_id', className: 'center-align' },
-                { name: 'vendor_id', className: 'center-align' },
+                { name: 'supplier_id', className: '' },
+                { name: 'vendor_id', className: '' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'no_reference', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'document', className: 'center-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: '' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

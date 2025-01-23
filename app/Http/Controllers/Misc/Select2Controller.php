@@ -5714,7 +5714,9 @@ class Select2Controller extends Controller {
         $search   = $request->search;
 
         $data = TruckQueue::where(function($query) use($search,$request){
-            $query->where('code', 'like', "%$search%")
+            $query->where('code_barcode', 'like', "%$search%")
+            ->orWhere('name', 'like', "%$search%")
+            ->orWhere('no_pol', 'like', "%$search%")
             ->whereNotIn('status',['3','4','5','6']);
             if($request->type){
                 $query->where('type',$request->type);
@@ -5725,7 +5727,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'    => $d->id,
-                'text'  => $d->code.'-'.$d->code_barcode,
+                'text'  => $d->code_barcode.' |No Pol: '.$d->no_pol.' - SUPIR: '.$d->name,
             ];
         }
 

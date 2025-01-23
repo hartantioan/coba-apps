@@ -948,6 +948,7 @@ class LandedCostController extends Controller
                             <tr>
                                 <th class="center-align">No</th>
                                 <th class="center-align">Deskripsi</th>
+                                <th class="center-align">Masuk Stock</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPh</th>
@@ -959,6 +960,7 @@ class LandedCostController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->landedCostFee->name.'</td>
+                <td>'.$row->landedCostFee->toStock().'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>

@@ -20,6 +20,7 @@ class LandedCostFee extends Model
         'name',
         'coa_id',
         'type',
+        'to_stock',
         'status',
     ];
 
@@ -52,10 +53,21 @@ class LandedCostFee extends Model
         $type = match ($this->type) {
           '1' => 'Local',
           '2' => 'Impor',
+          '3' => 'PIB',
           default => 'Invalid',
         };
 
         return $type;
+    }
+
+    public function toStock(){
+        $to_stock = match ($this->to_stock) {
+          '1'   => 'Yes',
+          '2'   => 'No',
+          default => 'Invalid',
+        };
+
+        return $to_stock;
     }
 
     public function printCounter()

@@ -34,6 +34,7 @@ class LandedCostFeeController extends Controller
             'name',
             'coa_id',
             'type',
+            'to_stock',
         ];
 
         $start  = $request->start;
@@ -87,6 +88,7 @@ class LandedCostFeeController extends Controller
                     $val->coa_id ? $val->coa->name : '-',
                     $val->coa->company->name,
                     $val->type(),
+                    $val->toStock(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -147,11 +149,13 @@ class LandedCostFeeController extends Controller
             'code' 				=> $request->temp ? ['required', Rule::unique('landed_cost_fees', 'code')->ignore($request->temp)] : 'required|unique:landed_cost_fees,code',
             'name'              => 'required',
             'coa_id'            => 'required',
+            'to_stock'          => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai.',
             'name.required'                 => 'Nama tidak boleh kosong.',
             'coa_id.required'               => 'Coa tidak boleh kosong.',
+            'to_stock.required'             => 'Opsi masuk persediaan atau tidak. Tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -169,6 +173,7 @@ class LandedCostFeeController extends Controller
                     $query->name	        = $request->name;
                     $query->coa_id          = $request->coa_id ? $request->coa_id : NULL;
                     $query->type            = $request->type;
+                    $query->to_stock        = $request->to_stock;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                 }else{
@@ -178,6 +183,7 @@ class LandedCostFeeController extends Controller
                         'name'			=> $request->name,
                         'coa_id'        => $request->coa_id ? $request->coa_id : NULL,
                         'type'          => $request->type,
+                        'to_stock'      => $request->to_stock,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                 }

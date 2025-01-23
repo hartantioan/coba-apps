@@ -86,6 +86,7 @@
                                                         <th>Coa</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>{{ __('translations.type') }}</th>
+                                                        <th>Masuk Persediaan</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -132,8 +133,16 @@
                             <select id="type" name="type" class="browser-default">
                                 <option value="1">{{ __('translations.local') }}</option>
                                 <option value="2">Impor</option>
+                                <option value="3">PIB</option>
                             </select>
                             <label for="type" class="active">{{ __('translations.type') }}</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <select id="to_stock" name="to_stock" class="browser-default">
+                                <option value="1">Ya</option>
+                                <option value="2">Tidak</option>
+                            </select>
+                            <label for="to_stock" class="active">Masuk Persediaan</label>
                         </div>
                         <div class="input-field col s4">
                             <div class="switch mb-1">
@@ -307,6 +316,7 @@
                 { name: 'coa_id', className: 'center-align' },
                 { name: 'company', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'type', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'to_stock', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -415,6 +425,7 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#type').val(response.type);
+                $('#to_stock').val(response.to_stock);
                 if(response.coa_name){
                     $('#coa_id').empty().append(`
                         <option value="` + response.coa_id + `">` + response.coa_name + `</option>

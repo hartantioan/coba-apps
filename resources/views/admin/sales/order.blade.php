@@ -1538,6 +1538,7 @@
                     district: $('#district_id').val(),
                     payment_type: $('#payment_type').val(),
                     transportation_id: $('#transportation_id').val(),
+                    type_delivery: $('#type_delivery').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

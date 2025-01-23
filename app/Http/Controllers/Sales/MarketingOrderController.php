@@ -179,6 +179,7 @@ class MarketingOrderController extends Controller
             ->where('city_id',$city)
             ->where('type_id',$item->type_id)
             ->where('variety_id',$item->variety_id)
+            ->where('type_delivery', $request->type_delivery)
             ->where('status','1')
             ->first() ?? 0;
 

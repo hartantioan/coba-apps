@@ -355,6 +355,7 @@ class MitraMarketingOrderController extends Controller
                                 <th class="center">Satuan Stok</th>
                                 <th class="center">Harga Satuan</th>
                                 <th class="center">% PPN</th>
+                                <th class="center">Harga Stlh PPN</th>
                                 <th class="center">Total</th>
                                 <th class="center">PPN</th>
                                 <th class="center">Grandtotal</th>
@@ -372,6 +373,7 @@ class MitraMarketingOrderController extends Controller
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->percent_tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->final_price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>

@@ -292,7 +292,7 @@ function cekNotif(url){
 		url: url + '/admin/setting/announcement/refresh',
 		type: 'POST',
 		dataType: 'JSON',
-		data: {lastSegment: lastSegment,},
+		data: {lastSegment: currentUrl},
 		headers: {
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},

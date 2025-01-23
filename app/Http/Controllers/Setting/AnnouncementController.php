@@ -228,7 +228,7 @@ class AnnouncementController extends Controller
     public function refresh(Request $request){
         $today = Carbon::today();
 
-        $menu = Menu::where('url', $request->lastSegment)->first();
+        $menu = Menu::where('url', explode('/',$request->lastSegment)[count(explode('/',$request->lastSegment)) - 1])->first();
         $arrnotif=[];
 
         if ($menu) {

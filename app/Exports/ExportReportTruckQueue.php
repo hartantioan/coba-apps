@@ -46,8 +46,8 @@ class ExportReportTruckQueue implements FromCollection, WithTitle, WithHeadings,
     public function collection()
     {
         $mo = TruckQueue::where(function($query) {
-            $query->where('date', '>=', $this->start_date)
-                ->where('date', '<=', $this->finish_date);
+            $query->whereDate('date', '>=', $this->start_date)
+                ->whereDate('date', '<=', $this->finish_date);
             if($this->status){
                 $arr = explode(',',$this->status);
                 if (in_array(7, $arr)) {

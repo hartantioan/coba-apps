@@ -46,8 +46,8 @@ class ReportTruckQueueController extends Controller
     public function filter(Request $request){
         $start_time = microtime(true);
         $query = TruckQueue::where(function($query) use($request) {
-            $query->where('date', '>=', $request->start_date)
-                ->where('date', '<=', $request->finish_date);
+            $query->whereDate('date', '>=', $request->start_date)
+                ->whereDate('date', '<=', $request->finish_date);
             if($request->status){
                 if (in_array(7, $request->status)) {
                     $query->where('status','!=',6);

@@ -21,7 +21,7 @@
             margin-left:-5px;
             margin-right:-5px;
             }
-            
+
             .column1 {
             float: left;
             width: 50%;
@@ -40,14 +40,14 @@
             display: table;
             }
 
-            
+
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.6;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.8;
@@ -80,17 +80,17 @@
                     font-size:0.9em !important;
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:13px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:15px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -98,33 +98,33 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-info {
                     font-size:12px !important;
                 }
-        
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -135,22 +135,22 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 border:1px solid black;
                 min-height: auto;
@@ -158,11 +158,11 @@
 
             @page { margin: 6em 3em 6em 3em; }
             header { position: fixed; top: -95px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
+
             td {
                 vertical-align: top !important;
             }
-           
+
         </style>
     </head>
     <body>
@@ -180,7 +180,7 @@
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
-                
+
             </table>
             <hr style="border-top: 1px solid black; margin-top:-10px">
         </header>
@@ -207,6 +207,14 @@
                                             {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            No SJ
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->delivery_no  ?? '-'}}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="50%" class="left-align">
@@ -226,7 +234,7 @@
                         </tr>
                     </table>
                     <!-- product details table-->
-                    
+
                     <div class="invoice-product-details mt-2">
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
@@ -276,7 +284,7 @@
                                             Catatan : {{ $data->note }}
                                         </div>
                                     </td>
-                                    
+
                                 </tr>
                             </table>
                         </div>
@@ -317,7 +325,7 @@
                                     <div class="mt-6">{{ $data->receiver_name }}</div>
                                 </td>
                             </tr>
-                        </table>  
+                        </table>
                     </div>
                 </div>
             </div>

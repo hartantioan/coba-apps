@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportReportTruckQueue;
 use App\Http\Controllers\Controller;
+use App\Models\GoodScale;
 use Illuminate\Http\Request;
 use DateTime;
 
@@ -45,6 +46,12 @@ class ReportTruckQueueController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
+        // $cobaIds = GoodScale::whereDoesntHave('TruckQueue')
+        //             ->whereDate('post_date', '>=', '2025-01-13')
+        //             ->pluck('id')
+        //             ->toArray();
+        //             $idsString = implode(',', $cobaIds);
+        // info($idsString);
         $query = TruckQueue::where(function($query) use($request) {
             $query->whereDate('date', '>=', $request->start_date)
                 ->whereDate('date', '<=', $request->finish_date);

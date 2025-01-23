@@ -302,7 +302,7 @@ class MarketingOrderReportController extends Controller
                 $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * (round($rowdetail->total, 2)), 2));
                 $VATRate = $dom->createElement('VATRate', '12');
                 //$VAT = $dom->createElement('VAT', $tax);
-                $VAT = $dom->createElement('VAT', round($rowdetail->tax,2));
+                $VAT = $dom->createElement('VAT', round(round($rowdetail->total, 2) * 0.11,2));
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail

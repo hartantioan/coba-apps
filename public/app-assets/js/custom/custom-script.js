@@ -287,8 +287,7 @@ function cekNotif(url){
 		}
 	});
 	let currentUrl = window.location.href;
-	let segments = currentUrl.split('/');
-    let lastSegment = segments.pop() || segments.pop();
+    let lastSegment = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
 	$.ajax({
 		url: url + '/admin/setting/announcement/refresh',
 		type: 'POST',

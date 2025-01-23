@@ -1634,7 +1634,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('timeline', [AnnouncementController::class, 'timeline']);
                     Route::post('create', [AnnouncementController::class, 'create']);
                     Route::post('show', [AnnouncementController::class, 'show']);
-                    Route::post('refresh', [AnnouncementController::class, 'refresh'])->withoutMiddleware('lock');
+                    Route::post('refresh', [AnnouncementController::class, 'refresh'])->withoutMiddleware('direct.access')->withoutMiddleware('operation.access')->withoutMiddleware('lock');
                     Route::post('destroy', [AnnouncementController::class, 'destroy'])->middleware('operation.access:change_log,delete');
                 });
 

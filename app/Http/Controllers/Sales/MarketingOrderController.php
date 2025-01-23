@@ -692,6 +692,8 @@ class MarketingOrderController extends Controller
                             ->where('city_id',$request->city_id)
                             ->where('type_id',$item->type_id)
                             ->where('status','1')
+                            ->where('variety_id',$item->variety_id)
+                            ->where('type_delivery', $request->type_delivery)
                             ->first() ?? 0;
                             if($cek_price){
                                 if($cek_price->sell_price != 0){

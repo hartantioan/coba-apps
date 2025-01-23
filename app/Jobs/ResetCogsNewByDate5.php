@@ -1594,11 +1594,13 @@ class ResetCogsNewByDate5 implements ShouldQueue, ShouldBeUnique
         }
       }
       CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
-      $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
-      if($itemstock){
-          $itemstock->update([
-              'qty' => $itemstock->stockByDate(date('Y-m-d')),
-          ]);
+      foreach($item->itemGroup->itemGroupWarehouse as $warehouse){
+        $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$warehouse->warehouse_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
+        if($itemstock){
+            $itemstock->update([
+                'qty'   => $itemstock->stockByDate(date('Y-m-d')),
+            ]);
+        }
       }
     }
 }

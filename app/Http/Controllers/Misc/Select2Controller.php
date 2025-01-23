@@ -91,7 +91,7 @@ use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
 use App\Models\IssueGlaze;
-use App\Models\RuleBPScale;
+use App\Models\RuleBpScale;
 use App\Models\CustomerDiscount;
 use App\Models\DeliveryCostStandard;
 use App\Models\Group;
@@ -3050,7 +3050,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $id_rules = null;
             $percentage_mod = 0;
-            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('effective_date','>=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
+            $getRules = RuleBpScale::where('account_id',$d->account_id)->whereDate('effective_date','>=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
             if($getRules){
                 $id_rules = $getRules->id;
                 $percentage_mod = $getRules->percentage_level;

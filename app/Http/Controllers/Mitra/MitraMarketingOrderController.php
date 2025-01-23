@@ -371,6 +371,7 @@ class MitraMarketingOrderController extends Controller
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->percent_tax,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>

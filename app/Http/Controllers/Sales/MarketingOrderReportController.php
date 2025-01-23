@@ -118,6 +118,7 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
+            
             ->get();
 
 
@@ -126,8 +127,10 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            // ->where('code', '=', 'ARIN-25P1-00000002')
+          
+            // ->where('code', '=', 'ARIN-25P1-00000173')
             ->get();
+
 
 
         $dom = new \DOMDocument();
@@ -159,14 +162,14 @@ class MarketingOrderReportController extends Controller
             $RefDesc = $dom->createElement('RefDesc', $row->code);
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
-            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
-            $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
+            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
+            $BuyerDocument = $dom->createElement('BuyerDocument', $row->getBuyerDocCoreTax());
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
-            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
+            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber',  $row->getBuyerDocNumberCoreTax());
             $BuyerName = $dom->createElement('BuyerName', $row->account->userDataDefault()->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->account->userDataDefault()->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp() . '000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax() );
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 
@@ -250,14 +253,14 @@ class MarketingOrderReportController extends Controller
             $RefDesc = $dom->createElement('RefDesc', $row->code);
             $FacilityStamp = $dom->createElement('FacilityStamp', '');
             $SellerIDTKU = $dom->createElement('SellerIDTKU', '0608293056618000000000');
-            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwp());
-            $BuyerDocument = $dom->createElement('BuyerDocument', 'TIN');
+            $BuyerTin = $dom->createElement('BuyerTin', $row->getNpwpCoreTax());
+            $BuyerDocument = $dom->createElement('BuyerDocument', $row->getBuyerDocCoreTax());
             $BuyerCountry = $dom->createElement('BuyerCountry', 'IDN');
-            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', '-');
+            $BuyerDocumentNumber = $dom->createElement('BuyerDocumentNumber', $row->getBuyerDocNumberCoreTax());
             $BuyerName = $dom->createElement('BuyerName', $row->userData->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->userData->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNpwp() . '000000');
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax());
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 

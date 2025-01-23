@@ -407,18 +407,26 @@
         <div class="row">
             <div class="col s12">
                 <h4>Form Update Keterangan Internal, Eksternal dan Detail Item <i id="text-update"></i></h4>
-                <div class="input-field col m4 s12">
+                <div class="input-field col m3 s12">
                     <input id="delivery_date_update" name="delivery_date_update" type="date" placeholder="Tgl. Pengiriman">
                     <label class="active" for="delivery_date_update">Tgl. Kirim</label>
                 </div>
-                <div class="input-field col m4 s12">
+                <div class="input-field col m3 s12">
                     <input type="hidden" id="temp_update" name="temp_update">
                     <textarea class="materialize-textarea" id="note_internal_update" name="note_internal_update" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
                     <label class="active" for="note_internal_update">Keterangan Internal</label>
                 </div>
-                <div class="input-field col m4 s12">
+                <div class="input-field col m3 s12">
                     <textarea class="materialize-textarea" id="note_external_update" name="note_external_update" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
                     <label class="active" for="note_external_update">Keterangan Eksternal</label>
+                </div>
+                <div class="input-field col m3 s12">
+                    <select class="browser-default" id="transportation_id_update" name="transportation_id_update">
+                        @foreach ($transportation as $row)
+                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+                    <label class="active" for="transportation_id_update">Tipe Kendaraan</label>
                 </div>
                 <div class="col m12 s12">
                     <table class="bordered" id="table-detail-update">
@@ -1929,6 +1937,7 @@ document.addEventListener('focusin', function (event) {
                             detail_qty : detail_qty,
                             detail_stock : detail_stock,
                             detail_conversion : detail_conversion,
+                            transportation_id : $('#transportation_id_update').val(),
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2426,6 +2435,13 @@ document.addEventListener('focusin', function (event) {
                     $('#delivery_date_update').val(response.delivery_date);
                     $('#note_internal_update').val(response.note_internal);
                     $('#note_external_update').val(response.note_external);
+                    if(response.type_delivery == '2'){
+                        $('#transportation_id_update').attr('disabled',true);
+                    }else{
+                        $('#transportation_id_update').attr('disabled',false);
+                    }
+                    
+                    $('#transportation_id_update').val(response.transportation_id);
 
                     $('#body-item-update').empty();
 
@@ -2515,7 +2531,7 @@ document.addEventListener('focusin', function (event) {
 
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
-                    M.updateTextFields();
+                    /* M.updateTextFields(); */
                 }
             },
             error: function() {

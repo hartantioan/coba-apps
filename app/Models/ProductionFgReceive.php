@@ -478,7 +478,7 @@ class ProductionFgReceive extends Model
                         $item = Item::find($rowbom->lookable_id);
                         if($item){
                             $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                             if($index >= 0){
                                 $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $price,2);
@@ -533,7 +533,7 @@ class ProductionFgReceive extends Model
                             if($item){
                                 $price = $item->priceNowProduction($this->place_id,$this->post_date);
                                 $nominal = $price;
-                                $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                                 $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                                 if($index >= 0){
                                     $arrDetail[$index]['total'] += round(round($rowbom->qty * $arrQty[$key],3) * $price,2);

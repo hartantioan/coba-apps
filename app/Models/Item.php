@@ -188,6 +188,11 @@ class Item extends Model
         return $warehouse->warehouse_id;
     }
 
+    public function warehouseSm(){
+        $warehouse = $this->itemGroup->itemGroupWarehouse()->latest()->first();
+        return $warehouse->warehouse_id;
+    }
+
     public function warehouseName(){
         $warehouse = $this->itemGroup->itemGroupWarehouse()->first();
         return $warehouse->warehouse->name;

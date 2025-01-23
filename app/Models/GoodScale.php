@@ -477,7 +477,7 @@ class GoodScale extends Model
                 $total += $row->total;
             }
         }
-        
+
         return $total;
     }
 
@@ -761,4 +761,10 @@ class GoodScale extends Model
             return false;
         }
     }
+
+    public function truckQueue()
+    {
+        return $this->hasOne('App\Models\TruckQueueDetail');
+    }
+
 }

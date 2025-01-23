@@ -1068,6 +1068,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#account_id').empty();
+                $('#no_queue').empty();
                 M.updateTextFields();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');

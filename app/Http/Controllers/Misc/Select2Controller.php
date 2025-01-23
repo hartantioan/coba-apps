@@ -3062,6 +3062,8 @@ class Select2Controller extends Controller {
                 'percentage_modifier'     => CustomHelper::formatConditionalQty($percentage_mod),
                 'netto'             => CustomHelper::formatConditionalQty($d->qty_balance),
                 'id_rules'          => $id_rules,
+                'vehicle_no'          => $d->vehicle_no,
+                'delivery_no'          => $d->delivery_no,
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
                 'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
                 'residue'           => CustomHelper::formatConditionalQty($d->residue),

@@ -2162,6 +2162,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}', [GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('unlock_procurement', [GoodReceiptPOController::class, 'unlockProcurement'])->middleware('operation.access:good_receipt_po,update');
+                    Route::post('edit_selected', [GoodReceiptPOController::class, 'editSelected'])->middleware('operation.access:good_receipt_po,update');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
                     Route::get('export_from_page', [GoodReceiptPOController::class, 'exportFromTransactionPage']);
                     Route::post('cancel_status', [GoodReceiptPOController::class, 'cancelStatus'])->middleware('operation.access:good_receipt_po,void');

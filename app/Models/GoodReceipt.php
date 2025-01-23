@@ -45,6 +45,7 @@ class GoodReceipt extends Model
         'done_date',
         'done_note',
         'status_lc',
+        'vehicle_no'
     ];
 
     public function deleteUser()

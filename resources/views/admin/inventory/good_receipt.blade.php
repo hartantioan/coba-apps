@@ -219,6 +219,10 @@
                                 <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Polisi">
+                                <label class="active" for="vehicle_no">No. Polisi</label>
+                            </div>
                             <div class="input-field col m3 s12 step9">
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Surat Jalan">
                                 <label class="active" for="delivery_no">No. Surat Jalan</label>
@@ -533,6 +537,99 @@
     </div>
 </div>
 
+<div id="modal_edit_grpo" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h5>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h5>
+                <form class="row" id="form_data_edit" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_edit" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="input-field col m2 s12 step1">
+                                <input id="code_edit" name="code_edit" type="text" value="{{ $newcode }}" readonly>
+                                <label class="active" for="code_edit">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12 div-account">
+                                <input type="hidden" id="temp_edit" name="temp_edit">
+                                <select class="browser-default" id="account_id_edit" name="account_id_edit" onchange="resetDetails();"></select>
+                                <label class="active" for="account_id_edit">Supplier</label>
+                            </div>
+                            <div class="col m12 s12"></div>
+                            <div class="input-field col m3 s12">
+                                <input id="receiver_name_edit" name="receiver_name_edit" type="text" placeholder="Nama Penerima">
+                                <label class="active" for="receiver_name_edit">Nama Penerima</label>
+                            </div>
+                            <div class="input-field col m3 s12 step9">
+                                <input id="vehicle_no_edit" name="vehicle_no_edit" type="text" placeholder="No. Polisi">
+                                <label class="active" for="vehicle_no_edit">No. Polisi</label>
+                            </div>
+                            <div class="input-field col m3 s12 step9">
+                                <input id="delivery_no_edit" name="delivery_no_edit" type="text" placeholder="No. Surat Jalan">
+                                <label class="active" for="delivery_no_edit">No. Surat Jalan</label>
+                            </div>
+                            <div class="col m12 s12 step12">
+                                <p class="mt-2 mb-2">
+                                    <h5>Detail Produk</h5>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" style="min-width:2500px !important;" id="table-detail_edit">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">{{ __('translations.delete') }}</th>
+                                                    <th class="center">Timbangan & QC</th>
+                                                    <th class="center">{{ __('translations.item') }}</th>
+                                                    <th class="center">Qty PO</th>
+                                                    <th class="center">Satuan PO</th>
+                                                    <th class="center">Qty Stok</th>
+                                                    <th class="center">Satuan Stok</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
+                                                    <th class="center">Remark</th>
+                                                    <th class="center">Kadar Air (%)</th>
+                                                    <th class="center">Viskositas (detik)</th>
+                                                    <th class="center">Residu (gr)</th>
+                                                    <th class="center">Limit (%)</th>
+                                                    <th class="center">Total Penerimaan (Kg)</th>
+                                                    <th class="center">{{ __('translations.plant') }}</th>
+                                                    <th class="center">{{ __('translations.line') }}</th>
+                                                    <th class="center">{{ __('translations.engine') }}</th>
+                                                    <th class="center">{{ __('translations.division') }}</th>
+                                                    <th class="center">{{ __('translations.warehouse') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item_edit">
+                                                <tr id="empty-item_edit">
+                                                    <td colspan="18" class="center">
+                                                        Pilih purchase order untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </p>
+                            </div>
+
+                            <div class="input-field col m4 s12 step14">
+                                <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note_edit">{{ __('translations.note') }}</label>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step15" onclick="saveFocused();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -732,6 +829,55 @@
                 $('#show_detail').empty();
             }
         });
+
+        $('#modal_edit_grpo').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+                clearButton.click();
+                $('#form_data')[0].reset();
+                $('#temp_edit').val('');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+                $('.row_item_serial').each(function(){
+                    $(this).remove();
+                });
+                if($('#empty-item_edit').length == 0){
+                    $('#body-item_edit').append(`
+                        <tr id="empty-item">
+                            <td colspan="18" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+
+                $('#account_id_edit').empty();
+                M.updateTextFields();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                window.onbeforeunload = function() {
+                    return null;
+                };
+            }
+        });
+
 
         $('#modal1').modal({
             dismissible: false,
@@ -1623,6 +1769,88 @@
         });
     }
 
+    function saveFocused(){
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data_edit')[0]), passedSerial = true;
+
+                $.ajax({
+                    url: '{{ Request::url() }}/edit_selected',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_edit').hide();
+                        $('#validation_alert_edit').html('');
+                        loadingOpen('#modal_edit_grpo');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal_edit_grpo');
+                        if(response.status == 200) {
+                            $('#modal_edit_grpo').modal('close');
+                            loadDataTable();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_edit').show();
+                            $('.modal-content').scrollTop(0);
+
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_edit').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('#modal_edit_grpo').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -1910,6 +2138,8 @@
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
             $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
             $('#arr_residue' + code).val($('#arr_scale' + code).select2('data')[0].residue);
+            $('#vehicle_no').val($('#arr_scale' + code).select2('data')[0].vehicle_no);
+            $('#delivery_no').val($('#arr_scale' + code).select2('data')[0].delivery_no);
             $('#arr_percentage_modifier' + code).val($('#arr_scale' + code).select2('data')[0].percentage_modifier);
             $('#arr_netto' + code).val($('#arr_scale' + code).select2('data')[0].netto);
             hitungSelisih(code);
@@ -2166,6 +2396,133 @@
         });
     }
 
+    function editGrpoNew(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal_edit_grpo').modal('open');
+                $('#temp_edit').val(id);
+                $('#code_edit').val(response.code);
+                $('#account_id_edit').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
+                $('#note_edit').val(response.note);
+                $('#receiver_name_edit').val(response.receiver_name);
+                $('#vehicle_no_edit').val(response.vehicle_no_edit);
+                $('#delivery_no_edit').val(response.delivery_no);
+
+                if(response.details.length > 0){
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-item_edit').append(`
+                            <tr class="row_item">
+                                <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
+                                <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
+                                <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
+                                <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
+                                <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `','` + val.qty + `');"></select>
+                                </td>
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.unit + `</span>
+                                </td>
+                                <td class="center" id="qty_stock` + count + `">
+                                    ` + val.qty_stock + `
+                                </td>
+                                <td class="center" id="unit_stock` + count + `" >
+                                    ` + val.unit_stock + `
+                                </td>
+                                <td>
+                                    <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_note2[]" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_viscosity[]" id="arr_viscosity` + count + `" class="browser-default" type="text" value="` + val.viscosity + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="` + val.residue + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="` + val.percent_modifier + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.place_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.line_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.machine_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.department_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.warehouse_name + `</span>
+                                </td>
+                            </tr>
+                        `);
+
+                    });
+                }
+                $('#empty-item_edit').remove();
+
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function voidStatus(id){
         var msg = '';
         swal({
@@ -2206,6 +2563,7 @@
             }
         });
     }
+
 
     function unlockProcurement(id){
         var msg = '';

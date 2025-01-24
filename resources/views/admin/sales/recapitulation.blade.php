@@ -52,6 +52,10 @@
                                                         <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
+                                                    <div class="col m3 s6 ">
+                                                        <label for="invoice_no" style="font-size:1rem;">No Invoice:</label>
+                                                        <input type="text" id="invoice_no" name="invoice_no" value="">
+                                                    </div>
                                                     <div class="col m7 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
@@ -163,8 +167,9 @@
 
     function exportXml() {
         var start_date = $('#start_date').val(),
-            end_date = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export_xml?start_date=" + start_date + "&end_date=" + end_date;
+            end_date = $('#end_date').val(),
+            invoice_no = $('#invoice_no').val();
+        window.location = "{{ Request::url() }}/export_xml?start_date=" + start_date + "&end_date=" + end_date + "&invoice_no=" + invoice_no;
     }
 
     function filterByDate() {

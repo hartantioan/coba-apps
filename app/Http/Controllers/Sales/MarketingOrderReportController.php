@@ -112,13 +112,14 @@ class MarketingOrderReportController extends Controller
 
         $start_date = $request->start_date ? $request->start_date : '';
         $finish_date = $request->end_date ? $request->end_date : '';
+        $invoice_no = $request->invoice_no ? $request->invoice_no : '';
 
         $ardp = MarketingOrderDownPayment::whereIn('status', ['2', '3'])
             ->whereDate('post_date', '>=', $start_date)
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            
+            ->where('code', 'like', '%' . $invoice_no . '%')
             ->get();
 
 
@@ -127,7 +128,7 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-          
+            ->where('code', 'like', '%' . $invoice_no . '%')
             // ->where('code', '=', 'ARIN-25P1-00000173')
             ->get();
 
@@ -169,7 +170,7 @@ class MarketingOrderReportController extends Controller
             $BuyerName = $dom->createElement('BuyerName', $row->account->userDataDefault()->title);
             $BuyerAdress = $dom->createElement('BuyerAdress', $row->account->userDataDefault()->address);
             $BuyerEmail = $dom->createElement('BuyerEmail', '');
-            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax() );
+            $BuyerIDTKU = $dom->createElement('BuyerIDTKU', $row->getNitkuCoreTax());
             //header
             $ListOfGoodService = $dom->createElement('ListOfGoodService');
 
@@ -190,45 +191,45 @@ class MarketingOrderReportController extends Controller
             $TaxInvoice->appendChild($BuyerEmail);
             $TaxInvoice->appendChild($BuyerIDTKU);
             $TaxInvoice->appendChild($ListOfGoodService);
-          
-            
 
-              
 
-                $GoodService = $dom->createElement('GoodService');
-                $ListOfGoodService->appendChild($GoodService);
-                //detail
-                $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '000000');
-                $Name = $dom->createElement('Name',   $row->note);
-                $Unit = $dom->createElement('Unit', 'UM.0033');
-                $Price = $dom->createElement('Price', round($row->total, 2));
-                $Qty = $dom->createElement('Qty', 1);
-                $TotalDiscount = $dom->createElement('TotalDiscount',0);
-                $TaxBase = $dom->createElement('TaxBase', round($row->total, 2));
-                $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * ( round($row->total, 2)), 2));
-                $VATRate = $dom->createElement('VATRate', '12');
-                //$VAT = $dom->createElement('VAT', $tax);
-                $VAT = $dom->createElement('VAT', Round((round($row->total, 2)) * 0.11, 2));
-                $STLGRate = $dom->createElement('STLGRate', '0');
-                $STLG = $dom->createElement('STLG', '0');
-                //detail
-                $GoodService->appendChild($Opt);
-                $GoodService->appendChild($Code);
-                $GoodService->appendChild($Name);
-                $GoodService->appendChild($Unit);
-                $GoodService->appendChild($Price);
-                $GoodService->appendChild($Qty);
-                $GoodService->appendChild($TotalDiscount);
-                $GoodService->appendChild($TaxBase);
-                //$GoodService->appendChild($TaxBase);
-                $GoodService->appendChild($OtherTaxBase);
-                $GoodService->appendChild($VATRate);
-                $GoodService->appendChild($VAT);
-                $GoodService->appendChild($STLGRate);
-                $GoodService->appendChild($STLG);
-               
-          
+
+
+
+            $GoodService = $dom->createElement('GoodService');
+            $ListOfGoodService->appendChild($GoodService);
+            //detail
+            $Opt = $dom->createElement('Opt', 'A');
+            $Code = $dom->createElement('Code', '000000');
+            $Name = $dom->createElement('Name',   $row->note);
+            $Unit = $dom->createElement('Unit', 'UM.0033');
+            $Price = $dom->createElement('Price', round($row->total, 2));
+            $Qty = $dom->createElement('Qty', 1);
+            $TotalDiscount = $dom->createElement('TotalDiscount', 0);
+            $TaxBase = $dom->createElement('TaxBase', round($row->total, 2));
+            $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * (round($row->total, 2)), 2));
+            $VATRate = $dom->createElement('VATRate', '12');
+            //$VAT = $dom->createElement('VAT', $tax);
+            $VAT = $dom->createElement('VAT', Round((round($row->total, 2)) * 0.11, 2));
+            $STLGRate = $dom->createElement('STLGRate', '0');
+            $STLG = $dom->createElement('STLG', '0');
+            //detail
+            $GoodService->appendChild($Opt);
+            $GoodService->appendChild($Code);
+            $GoodService->appendChild($Name);
+            $GoodService->appendChild($Unit);
+            $GoodService->appendChild($Price);
+            $GoodService->appendChild($Qty);
+            $GoodService->appendChild($TotalDiscount);
+            $GoodService->appendChild($TaxBase);
+            //$GoodService->appendChild($TaxBase);
+            $GoodService->appendChild($OtherTaxBase);
+            $GoodService->appendChild($VATRate);
+            $GoodService->appendChild($VAT);
+            $GoodService->appendChild($STLGRate);
+            $GoodService->appendChild($STLG);
+
+
             $List->appendChild($TaxInvoice);
 
 
@@ -287,7 +288,7 @@ class MarketingOrderReportController extends Controller
                 $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
 
-                
+
                 $GoodService = $dom->createElement('GoodService');
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
@@ -302,7 +303,7 @@ class MarketingOrderReportController extends Controller
                 $OtherTaxBase = $dom->createElement('OtherTaxBase', round(11 / 12 * (round($rowdetail->total, 2)), 2));
                 $VATRate = $dom->createElement('VATRate', '12');
                 //$VAT = $dom->createElement('VAT', $tax);
-                $VAT = $dom->createElement('VAT', round(round($rowdetail->total, 2) * 0.11,2));
+                $VAT = $dom->createElement('VAT', round(round($rowdetail->total, 2) * 0.11, 2));
                 $STLGRate = $dom->createElement('STLGRate', '0');
                 $STLG = $dom->createElement('STLG', '0');
                 //detail
@@ -320,7 +321,6 @@ class MarketingOrderReportController extends Controller
                 $GoodService->appendChild($VAT);
                 $GoodService->appendChild($STLGRate);
                 $GoodService->appendChild($STLG);
-                
             }
 
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {

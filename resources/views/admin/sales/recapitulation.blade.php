@@ -57,7 +57,7 @@
                                                         <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
-                                                    <div class="col m7 s6 pt-2">
+                                                    <div class="col m12 s12 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
                                                             <span class="hide-on-small-onl">Filter</span>

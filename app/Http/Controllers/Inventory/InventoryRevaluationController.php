@@ -506,7 +506,7 @@ class InventoryRevaluationController extends Controller
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
-                td class="center-align">'.($row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-').'</td>
+                <td class="center-align">'.($row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-').'</td>
                 <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>

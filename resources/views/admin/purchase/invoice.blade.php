@@ -3622,6 +3622,7 @@
                     $('#account_id').append(`
                         <option value="` + response.account_id + `">` + response.account_name + `</option>
                     `);
+                    $('#balance_bs').text(response.balance_bs);
                     $('#type').val(response.type).formSelect();
                     $('#company_id').val(response.company_id).formSelect();
                     $('#post_date').val(response.post_date);

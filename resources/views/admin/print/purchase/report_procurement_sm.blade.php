@@ -184,7 +184,7 @@
                     </td>
 
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:15%;right:0;">
                     </td>
                 </tr>
 
@@ -197,16 +197,16 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
-                                <th  >NO</th>
-                                <th  >PLANT</th>
-                                <th  >NO PO</th>
-                                <th  >NAMA ITEM</th>
-                                <th  >NO SJ</th>
-                                <th  >TGL MASUK</th>
-                                <th  >NO. KENDARAAN</th>
-                                <th  >NETTO SJ<br>M</th>
-                                <th  style="background-color: green;">NETTO SPS<br> M</th>
-                                <th  style="background-color: green;">SELISIH</th>
+                                <th >NO</th>
+                                <th >PLANT</th>
+                                <th >NO PO</th>
+                                <th >NAMA ITEM</th>
+                                <th >NO SJ</th>
+                                <th >TGL MASUK</th>
+                                <th >NO. KENDARAAN</th>
+                                <th >NETTO SJ<br>M</th>
+                                <th >NETTO SPS<br> M</th>
+                                <th >SELISIH</th>
                                 <th >TOTAL BAYAR<br>KG</th>
                                 <th >TOTAL PENERIMAAN<br>KG</th>
                             </tr>
@@ -234,6 +234,20 @@
                                     $keys+=1;
                                 @endphp
                             @endforeach
+                            <tr align="center">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>{{$data['total_netto']}}</td>
+                                <td></td>
+                                <td>{{$data['total_all_bayar']}}</td>
+                                <td>{{$data['total_all_penerimaan']}}</td>
+                            </tr>
                         </tbody>
 
                     </table>

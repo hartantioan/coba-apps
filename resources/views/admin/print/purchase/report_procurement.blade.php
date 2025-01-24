@@ -184,7 +184,7 @@
                     </td>
 
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
+                        <img src="{{ $image }}" width="45%" style="position: absolute; top:5px; width:15%;right:0;">
                     </td>
                 </tr>
 
@@ -205,8 +205,8 @@
                                 <th rowspan="2" >TGL MASUK</th>
                                 <th rowspan="2" >NO. KENDARAAN</th>
                                 <th rowspan="2" >NETTO JEMBATAN TIMBANG<br>KG</th>
-                                <th rowspan="2" style="background-color: green;">HASIL QC<br> Kadar Air %</th>
-                                <th rowspan="2" style="background-color: green;">STD POTONGAN QC</th>
+                                <th rowspan="2" >HASIL QC<br> Kadar Air %</th>
+                                <th rowspan="2" >STD POTONGAN QC</th>
                                 <th colspan="2" >FINANCE</th>
                                 <th rowspan="2">TOTAL BAYAR<br>KG</th>
                                 <th rowspan="2">TOTAL PENERIMAAN<br>KG</th>
@@ -241,6 +241,22 @@
                                     $keys+=1;
                                 @endphp
                             @endforeach
+                                <tr align="center">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{$data['total_netto']}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{$data['total_all_bayar']}}</td>
+                                    <td>{{$data['total_all_penerimaan']}}</td>
+                                </tr>
                         </tbody>
 
                     </table>

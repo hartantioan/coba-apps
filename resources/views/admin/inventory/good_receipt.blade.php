@@ -285,7 +285,7 @@
                                                     <th class="center">Viskositas (detik)</th>
                                                     <th class="center">Residu (gr)</th>
                                                     <th class="center">Limit (%)</th>
-                                                    <th class="center">Total Penerimaan (Kg)</th>
+                                                    <th class="center">Total Pembayaran</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
                                                     <th class="center">{{ __('translations.engine') }}</th>
@@ -591,7 +591,7 @@
                                                     <th class="center">Viskositas (detik)</th>
                                                     <th class="center">Residu (gr)</th>
                                                     <th class="center">Limit (%)</th>
-                                                    <th class="center">Total Penerimaan (Kg)</th>
+                                                    <th class="center">Total Pembayaran</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
                                                     <th class="center">{{ __('translations.engine') }}</th>
@@ -1979,7 +1979,7 @@
                                             <input name="arr_percentage_modifier[]" id="arr_percentage_modifier` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);adjustPercentageModifier(this)" style="text-align:right;width:100px;" data-count="` + count + `">
                                         </td>
                                         <td>
-                                            <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
+                                            <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
@@ -2111,22 +2111,24 @@
         var water_content = parseNumber($('#arr_water_content' + count).val());
         var percent_mod = parseNumber($('#arr_percentage_modifier' + count).val());
         var qty_balance = parseNumber($('#arr_netto' + count).val());
-        if(percent_mod > 0){
-            var kadar_air = 0;
-            var finance_kg = 0;
-            var total_bayar = qty_balance;
-            if(percent_mod < water_content){
-                kadar_air = water_content-percent_mod;
-            }
-            if(kadar_air > 0){
-                finance_kg = (kadar_air*qty_balance) / 100;
-                total_bayar = total_bayar-finance_kg;
-            }
+        if($('#arr_scale' + code).val()){
+            if(percent_mod > 0){
+                var kadar_air = 0;
+                var finance_kg = 0;
+                var total_bayar = qty_balance;
+                if(percent_mod < water_content){
+                    kadar_air = water_content-percent_mod;
+                }
+                if(kadar_air > 0){
+                    finance_kg = (kadar_air*qty_balance) / 100;
+                    total_bayar = total_bayar-finance_kg;
+                }
 
-            $('#arr_qty_balance' + count).val(formatNumber(total_bayar));
-        }else{
+                $('#arr_qty_balance' + count).val(formatNumber(total_bayar));
+            }else{
 
-            $('#arr_qty_balance' + count).val(formatNumber(qty_balance));
+                $('#arr_qty_balance' + count).val(formatNumber(qty_balance));
+            }
         }
 
     }

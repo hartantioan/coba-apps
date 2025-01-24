@@ -124,7 +124,9 @@ class ReportProcurementController extends Controller
                     $arr = [];
                     $no = 1;
                     $all_penerimaan = 0;
+                    $all_bayar = 0;
                     $all_finance_price = 0;
+                    $all_netto= 0;
                     $account = '';
                     if($type == 2){
                         foreach($row as $detail_gs){
@@ -153,12 +155,14 @@ class ReportProcurementController extends Controller
 
                             $all_penerimaan += $total_penerimaan;
                             $all_finance_price += $finance_price;
+                            $all_bayar += $total_bayar;
+                            $all_netto += $detail_gs->goodScale->qty_balance;
 
 
 
                             $arr[] = [
                                 'no'                => $no,
-                                'PLANT'=> $detail_gs->place->name,
+                                'PLANT'=> $detail_gs->place->code,
                                 'NO PO'=> $detail_gs->goodScale->purchaseOrderDetail->purchaseOrder->code,
                                 'NAMA ITEM'=> $detail_gs->goodScale->item->name,
                                 'NO SJ'=> $detail_gs->goodReceipt->delivery_no,
@@ -189,9 +193,12 @@ class ReportProcurementController extends Controller
                         $data = [
                             'title' => 'Report Procurement',
                             'data'  => $arr,
+                            'total_netto'=>number_format($all_netto,2,',','.'),
+                            'total_all_bayar'=>number_format($all_bayar,2,',','.'),
+                            'total_all_penerimaan'=>number_format($all_penerimaan,2,',','.'),
                             'supplier'  => $account,
                         ];
-                        $pdf = PrintHelper::print($data,'Report Procurement','a4','portrait','admin.print.purchase.report_procurement','all');
+                        $pdf = PrintHelper::print($data,'Report Procurement','a4','landscape','admin.print.purchase.report_procurement','all');
                         $content = $pdf->download()->getOriginalContent();
                         $randomString = Str::random(10);
                     }else{
@@ -215,6 +222,8 @@ class ReportProcurementController extends Controller
 
                             $all_penerimaan += $total_bayar;
                             $all_finance_price += $finance_price;
+                            $all_bayar += $total_bayar;
+                            $all_netto +=$total_bayar;
 
 
 
@@ -249,9 +258,12 @@ class ReportProcurementController extends Controller
                         $data = [
                             'title' => 'Report Procurement',
                             'data'  => $arr,
+                            'total_netto'=>number_format($all_netto,2,',','.'),
+                            'total_all_bayar'=>number_format($all_bayar,2,',','.'),
+                            'total_all_penerimaan'=>number_format($all_penerimaan,2,',','.'),
                             'supplier'  => $account,
                         ];
-                        $pdf = PrintHelper::print($data,'Report Procurement','a4','portrait','admin.print.purchase.report_procurement_sm','all');
+                        $pdf = PrintHelper::print($data,'Report Procurement','a4','landscape','admin.print.purchase.report_procurement_sm','all');
                         $content = $pdf->download()->getOriginalContent();
 
                         $randomString = Str::random(10);

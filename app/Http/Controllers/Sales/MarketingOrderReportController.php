@@ -107,6 +107,67 @@ class MarketingOrderReportController extends Controller
         return Excel::download(new ExportCsvFromFile($import), 'sales_csv_'.uniqid().'.csv', \Maatwebsite\Excel\Excel::CSV); */
     }
 
+    public function create(Request $request){
+        $uniqueArrCode = [];
+        $uniqueArrSerial = [];
+        foreach($request->arr_multi_code as $key => $row){
+            if($row){
+                if(!in_array($row,$uniqueArrCode) && $row){
+                    $uniqueArrCode[] = $row;
+                    $uniqueArrSerial[] = $request->arr_multi_serial[$key];
+                }
+            }
+        }
+
+        foreach($uniqueArrCode as $keymain => $rowunique){
+            $document_code = substr($rowunique,0,4);
+            if($document_code == 'ARIN'){
+                $data = MarketingOrderInvoice::where('code',$rowunique)->first();
+                if($data){
+                    if($data->tax > 0){
+                        $data->update([
+                            'tax_no'    => $uniqueArrSerial[$keymain],
+                        ]);
+                        if($data->journalDetail()->exists()){
+                            $data->journalDetail()->where('coa_id',$data->taxMaster->coaSale->id)->update([
+                                'note'  => 'No Seri Pajak : '.$uniqueArrSerial[$keymain],
+                            ]);
+                        }
+                    }
+                }
+            }elseif($document_code == 'ARDP'){
+                $data = MarketingOrderDownPayment::where('code',$rowunique)->first();
+                if($data){
+                    if($data->tax > 0){
+                        $data->update([
+                            'tax_no'    => $uniqueArrSerial[$keymain],
+                        ]);
+                        if($data->incomingPaymentDetail()->exists()){
+                            foreach($data->incomingPaymentDetail as $row){
+                                if($row->journalDetail()->exists()){
+                                    $row->journalDetail()->where('coa_id',$data->taxId->coaSale->id)->update([
+                                        'note'  => 'No Seri Pajak : '.$uniqueArrSerial[$keymain],
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            
+        activity()
+            ->causedBy(session('bo_id'))
+            ->log('Update serial faktur pajak.');
+
+        $response = [
+            'status'    => 200,
+            'message'   => 'Data successfully saved.',
+        ];
+
+        return response()->json($response);
+    }
+
     public function exportXml(Request $request)
     {
 

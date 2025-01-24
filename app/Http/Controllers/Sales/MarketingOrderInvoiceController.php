@@ -531,7 +531,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->tax_no = $request->tax_no ? $request->tax_no : NULL;
+                        $query->tax_no = $request->tax_no ?? NULL;
                         $query->note = $request->note;
 
                         $query->save();
@@ -550,7 +550,7 @@ class MarketingOrderInvoiceController extends Controller
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    $taxno = '';
+                    /* $taxno = '';
                     if($request->tempTaxId > 0){
                         $no = TaxSeries::getTaxCode($request->company_id,$request->post_date,$request->prefix_tax);
                         if($no['status'] == 200){
@@ -561,7 +561,7 @@ class MarketingOrderInvoiceController extends Controller
                                 'message' => 'Nomor seri pajak sudah habis terpakai.'
                             ]);
                         }
-                    }
+                    } */
 
                     $query = MarketingOrderInvoice::create([
                         'code'			                => $newCode,
@@ -584,7 +584,7 @@ class MarketingOrderInvoiceController extends Controller
                         'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
-                        'tax_no'                        => $request->tax_no ? $taxno : NULL,
+                        'tax_no'                        => $request->tax_no ?? NULL,
                         'note'                          => $request->note,
 
                     ]);

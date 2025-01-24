@@ -3172,6 +3172,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('sales_report')->middleware('direct.access')->group(function () {
                     Route::prefix('sales_recap')->middleware('operation.access:sales_recap,view')->group(function () {
                         Route::get('/', [MarketingOrderReportController::class, 'index']);
+                        Route::post('create', [MarketingOrderReportController::class, 'create'])->middleware('operation.access:sales_recap,update');
                         Route::post('filter_by_date', [MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export', [MarketingOrderReportController::class, 'export']);
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);

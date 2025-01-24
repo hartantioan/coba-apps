@@ -483,6 +483,7 @@ class InventoryRevaluationController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
+                                <th class="center-align">Batch</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
@@ -505,6 +506,7 @@ class InventoryRevaluationController extends Controller
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
+                td class="center-align">'.($row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-').'</td>
                 <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
@@ -518,7 +520,7 @@ class InventoryRevaluationController extends Controller
         }
 
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="10"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;" colspan="2"></td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalnominal, 2, ',', '.') . '</td>

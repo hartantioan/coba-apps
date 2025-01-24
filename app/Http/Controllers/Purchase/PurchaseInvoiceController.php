@@ -450,6 +450,8 @@ class PurchaseInvoiceController extends Controller
         $details = [];
         $downpayments = [];
 
+        $user = User::find($request->account_id);
+
         foreach($request->arr_type as $key => $row){
             if($row == 'purchase_down_payments'){
                 $datadp = PurchaseDownPayment::find(intval($request->arr_id[$key]));
@@ -728,6 +730,7 @@ class PurchaseInvoiceController extends Controller
 
         $result['details'] = $details;
         $result['downpayments'] = $downpayments;
+        $result['balance_bs'] = $user ? CustomHelper::formatConditionalQty($user->balanceBsVendor()) : '0,00';
 
         return response()->json($result);
     }

@@ -220,14 +220,14 @@ class ProductionIssueController extends Controller
                         )
                     ),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">close</i></button>
                         '.$btn_jurnal.'
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -268,7 +268,7 @@ class ProductionIssueController extends Controller
 
             if($request->temp_edit){
 
-                $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp_edit))->first();
+                $query = ProductionIssue::find(CustomHelper::decrypt($request->temp_edit));
 
                 $approved = false;
                 $revised = false;
@@ -311,8 +311,8 @@ class ProductionIssueController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -395,7 +395,7 @@ class ProductionIssueController extends Controller
                 }
 
                 if($request->temp){
-                    $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = ProductionIssue::find(CustomHelper::decrypt($request->temp));
 
                     $approved = false;
                     $revised = false;
@@ -606,10 +606,10 @@ class ProductionIssueController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
 		return response()->json($response);
     }
@@ -617,7 +617,7 @@ class ProductionIssueController extends Controller
     public function show(Request $request){
         $detail_issue = [];
 
-        $po = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = ProductionIssue::find(CustomHelper::decrypt($request->id));
 
         foreach($po->productionIssueDetail()->orderBy('id')->get() as $key => $row){
             $arrBatch = [];
@@ -789,7 +789,7 @@ class ProductionIssueController extends Controller
     }
     public function rowDetail(Request $request)
     {
-        $data   = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionIssue::find(CustomHelper::decrypt($request->id));
 
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
@@ -914,7 +914,7 @@ class ProductionIssueController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionIssue::find(CustomHelper::decrypt($request->id));
 
         if($query) {
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -995,7 +995,7 @@ class ProductionIssueController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionIssue::find(CustomHelper::decrypt($request->id));
 
         $approved = false;
         $revised = false;
@@ -1253,7 +1253,7 @@ class ProductionIssueController extends Controller
 
 
     public function viewStructureTree(Request $request){
-        $query = ProductionIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionIssue::find(CustomHelper::decrypt($request->id));
 
         $data_go_chart=[];
         $data_link=[];
@@ -1321,7 +1321,7 @@ class ProductionIssueController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionIssue::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionIssue::find(CustomHelper::decrypt($id));
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

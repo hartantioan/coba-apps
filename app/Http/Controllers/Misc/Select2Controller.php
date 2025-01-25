@@ -5657,22 +5657,26 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
 
-        $data = ProductionBatch::where(function($query) use($search,$request){
-            $query->where('code', 'like', "%$search%");
-            if($request->item_id){
-                $query->whereHas('item',function($query)use($request){
-                    $query->where('id',$request->item_id);
-                    // $query->whereHas('parentFg',function($query)use($request) {
-                    //     $query->where('parent_id',$request->item_id);
-                    // });
-                });
-            }
-        })->paginate(10);
+        if($request->item_id){
+            $data = ProductionBatch::where(function($query) use($search,$request){
+                $query->where('code', 'like', "%$search%");
+                if($request->item_id){
+                    $query->whereHas('item',function($query)use($request){
+                        $query->where('id',$request->item_id);
+                    });
+                }
+            })->paginate(10);
 
-        foreach($data as $d) {
+            foreach($data as $d) {
+                $response[] = [
+                    'id'    => $d->id,
+                    'text'  => $d->code.'-'.$d->item->name,
+                ];
+            }
+        }else{
             $response[] = [
-                'id'    => $d->id,
-                'text'  => $d->code.'-'.$d->item->name,
+                'id'    => '',
+                'text'  => 'PILIH ITEM DULU YA.',
             ];
         }
 

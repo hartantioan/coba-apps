@@ -308,6 +308,7 @@ class InventoryTransferOutController extends Controller
             'warehouse_from'            => 'required',
             'place_to'                  => 'required',
             'warehouse_to'              => 'required',
+            'note'                      => 'required',
             'arr_item_stock'            => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -332,6 +333,7 @@ class InventoryTransferOutController extends Controller
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
             'arr_area.required'                 => 'Area item tidak boleh kosong',
             'arr_area.array'                    => 'Area item harus dalam bentuk array',
+            'note.required' 				    => 'Keterangan utama tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {

@@ -341,6 +341,7 @@ class InventoryTransferInController extends Controller
              */'company_id'                => 'required',
             'inventory_transfer_out_id' => 'required',
 			'post_date'		            => 'required',
+            'note'                      => 'required',
 		], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -350,6 +351,7 @@ class InventoryTransferInController extends Controller
              */'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'inventory_transfer_out_id.required'=> 'Inventori Transfer Asal tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
+            'note.required' 				    => 'Keterangan utama tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {

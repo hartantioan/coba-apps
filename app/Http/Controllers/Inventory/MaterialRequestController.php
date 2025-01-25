@@ -640,8 +640,8 @@ class MaterialRequestController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = MaterialRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -683,19 +683,19 @@ class MaterialRequestController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        //DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status Item Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MaterialRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -710,16 +710,16 @@ class MaterialRequestController extends Controller
                         'document'      => $request->file('file') ? $request->file('file')->store('public/material_requests') : NULL,
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 
 			if($query) {
 
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $grandtotal = 0;
                     foreach($request->arr_item as $key => $row){
                         $item = Item::find(intval($row));
@@ -752,10 +752,10 @@ class MaterialRequestController extends Controller
                     MaterialRequest::find($query->id)->update([
                         'grandtotal'    => $grandtotal,
                     ]);
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Item Request No. '.$query->code,$query->note,session('bo_id'));

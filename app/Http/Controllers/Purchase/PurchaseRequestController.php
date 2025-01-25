@@ -666,8 +666,8 @@ class PurchaseRequestController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -710,19 +710,19 @@ class PurchaseRequestController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        //DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status purchase request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=PurchaseRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -738,16 +738,16 @@ class PurchaseRequestController extends Controller
                         'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 
 			if($query) {
 
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     foreach($request->arr_item as $key => $row){
                         $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         PurchaseRequestDetail::create([
@@ -770,10 +770,10 @@ class PurchaseRequestController extends Controller
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
                     }
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));

@@ -591,8 +591,8 @@ class PurchaseOrderController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             if($request->inventory_type == '1'){
                 $validation = Validator::make($request->all(), [
                     'code'                      => 'required',
@@ -1098,11 +1098,11 @@ class PurchaseOrderController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             info($e->getMessage());
             DB::rollback();
-        }
+        } */
         return response()->json($response);
     }
 

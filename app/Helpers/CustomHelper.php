@@ -3714,6 +3714,10 @@ class CustomHelper {
 				);
 			}
 
+			$iti->inventoryTransferOut->update([
+				'status'	=> '3'
+			]);
+
 		}elseif($table_name == 'depreciations'){
 
 			$dpr = Depreciation::find($table_id);

@@ -255,7 +255,7 @@ class ReportAccountingSummaryStockController extends Controller
                                 LEFT JOIN (select distinct marketing_order_delivery_process_id from marketing_order_delivery_process_tracks where status=2 and deleted_at is null)mo ON mo.marketing_order_delivery_process_id=a.id 
                             LEFT JOIN item_shadings k ON k.id=l.item_shading_id
                                 WHERE a.void_date is null AND a.deleted_at is NULL AND c.item_group_id=7  AND a.post_date>='" . $start_date . "' AND a.post_date<='" . $finish_date . "'
-                        and a.id in (select  marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and created_at <= '" . $finish_date . " 23:59:59' and deleted_at is null)
+                        and a.id in (select  marketing_order_delivery_process_id from  marketing_order_delivery_process_tracks where status='2' and deleted_at is null)
                                     GROUP BY c.`code`,c.name,k.code
                                 )i ON i.code=a.code and i.shading=a.shading 
                                 LEFT JOIN items it ON it.code=a.code

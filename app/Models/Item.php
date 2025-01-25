@@ -464,6 +464,26 @@ class Item extends Model
         return $arrData;
     }
 
+    public function currentStockPlaceWarehouseMoreThanZero($place,$warehouse){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place)->where('warehouse_id',$warehouse)->where('qty','>',0)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => 'Plant : '.$detail->place->code.' - Gudang : '.$detail->warehouse->name.' - Area : '.($detail->area()->exists() ? $detail->area->name : '').' - Shading : '.($detail->itemShading()->exists() ? $detail->itemShading->code : '-'),
+                'warehouse_id'  => $detail->warehouse_id,
+                'area'          => $detail->area()->exists() ? $detail->area->name : '',
+                'area_id'       => $detail->area_id ? $detail->area_id : '',
+                'place_id'      => $detail->place_id,
+                'qty'           => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
+            ];
+        }
+
+        return $arrData;
+    }
+
     public function currentStockPerPlace($place_id){
         $arrData = [];
 

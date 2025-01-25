@@ -2732,7 +2732,8 @@ class Select2Controller extends Controller {
         })
         ->whereHas('itemStock', function($query) use($place, $warehouse) {
             $query->where('place_id', $place)
-                ->where('warehouse_id', $warehouse);
+                ->where('warehouse_id', $warehouse)
+                ->where('qty','>',0);
         })
         ->where('status', '1')
         ->paginate(10);
@@ -2746,7 +2747,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStockPlaceWarehouse($place, $warehouse),
+                'stock_list'        => $d->currentStockPlaceWarehouseMoreThanZero($place, $warehouse),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',

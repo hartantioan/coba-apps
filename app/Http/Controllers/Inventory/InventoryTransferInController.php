@@ -701,6 +701,10 @@ class InventoryTransferInController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
+                $query->inventoryTransferOut->update([
+                    'status'    => '2'
+                ]);
+
                 foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){
                     $row->itemSerialIn()->delete();
                 }

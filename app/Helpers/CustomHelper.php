@@ -3634,6 +3634,10 @@ class CustomHelper {
 
 			$iti = InventoryTransferIn::find($table_id);
 
+			$iti->update([
+				'status'	=> '3'
+			]);
+
 			/* if(($iti->inventoryTransferOut->place_from !== $iti->InventoryTransferOut->place_to) || ($iti->inventoryTransferOut->place_from == $iti->inventoryTransferOut->place_to && $iti->inventoryTransferOut->warehouse_from !== $iti->inventoryTransferOut->warehouse_to)){ */
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),

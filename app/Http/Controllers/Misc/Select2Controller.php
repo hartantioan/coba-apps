@@ -2835,7 +2835,7 @@ class Select2Controller extends Controller {
 
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->code.' - '.$d->user->name,
+                    'text' 			    => $d->code.' - '.$d->user->name.' - '.$d->note,
                     'details'           => $details,
                 ];
             }
@@ -5666,8 +5666,7 @@ class Select2Controller extends Controller {
                     // });
                 });
             }
-        })
-        ->get();
+        })->paginate(10);
 
         foreach($data as $d) {
             $response[] = [
@@ -5676,7 +5675,12 @@ class Select2Controller extends Controller {
             ];
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
     }
 
     public function shadingIdMovement(Request $request)

@@ -76,6 +76,7 @@ class ReportStockMovementPerShadingController extends Controller
                     <th class="center-align">Nama Item</th>
                     <th class="center-align">Satuan</th>
                     <th class="center-align">Shading</th>
+                    <th class="center-align">Batch</th>
                     <th class="center-align">Balance Qty</th>
                     <th class="center-align">Balance Nominal</th>
                 </tr><thead><tbody>';
@@ -101,10 +102,36 @@ class ReportStockMovementPerShadingController extends Controller
                         <td class="center-align">'.$shading->item->name.'</td>
                         <td class="center-align">'.$shading->item->uomUnit->code.'</td>
                         <td class="center-align">'.$shading->code.'</td>
+                        <td class="center-align">-</td>
                         <td class="right-align">'.CustomHelper::formatConditionalQty($qty).'</td>
                         <td class="right-align">'.CustomHelper::formatConditionalQty($total).'</td>
                     </tr>';   
                 }
+            }elseif($request->batch_id){
+                $data = ItemCogs::where('production_batch_id',$request->batch_id)->where(function($query)use($request){
+                    $query->where('date','<=',$request->finish_date);
+                    if($request->plant){
+                        $query->where('place_id',$request->plant);
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
+                $qty = 0;
+                $total = 0;
+                if($data){
+                    $qty = $data->totalByBatchBeforeIncludeDate();
+                    $total = $data->totalNominalByBatchBeforeIncludeDate();
+                    $html .= '<tr>
+                        <td class="center-align">1.</td>
+                        <td class="center-align">'.$place->code.'</td>
+                        <td class="center-align">'.$data->item->code.'</td>
+                        <td class="center-align">'.$data->item->name.'</td>
+                        <td class="center-align">'.$data->item->uomUnit->code.'</td>
+                        <td class="center-align">'.$data->itemShading->code.'</td>
+                        <td class="center-align">'.$data->productionBatch->code.'</td>
+                        <td class="right-align">'.CustomHelper::formatConditionalQty($qty).'</td>
+                        <td class="right-align">'.CustomHelper::formatConditionalQty($total).'</td>
+                    </tr>';
+                }
+                
             }else{
                 if(count($shading) > 0){
                     foreach($shading as $key => $rowshading){
@@ -127,6 +154,7 @@ class ReportStockMovementPerShadingController extends Controller
                             <td class="center-align">'.$rowshading->item->name.'</td>
                             <td class="center-align">'.$rowshading->item->uomUnit->code.'</td>
                             <td class="center-align">'.$rowshading->code.'</td>
+                            <td class="center-align">-</td>
                             <td class="right-align">'.CustomHelper::formatConditionalQty($qty).'</td>
                             <td class="right-align">'.CustomHelper::formatConditionalQty($total).'</td>
                         </tr>';
@@ -194,6 +222,47 @@ class ReportStockMovementPerShadingController extends Controller
                             <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
                         </tr>';
                     }
+                }
+            }elseif($request->batch_id){
+                $data = ItemCogs::where('production_batch_id',$request->batch_id)->where(function($query)use($request){
+                    $query->where('date','<=',$request->finish_date)->where('date','>=',$request->start_date);
+                    if($request->plant){
+                        $query->where('place_id',$request->plant);
+                    }
+                })->orderBy('date')->orderBy('id')->get();
+                $dataBefore = ItemCogs::where('production_batch_id',$request->batch_id)->where(function($query)use($request){
+                    $query->where('date','<',$request->start_date);
+                    if($request->plant){
+                        $query->where('place_id',$request->plant);
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
+                $balance = 0;
+                if($dataBefore){
+                    $balance += $dataBefore->totalByBatchBeforeIncludeDate();
+                }
+                $html .= '<tr>
+                        <td class="center-align"></td>
+                        <td class="center-align">'.($dataBefore ? $dataBefore->item->code : '-').'</td>
+                        <td class="center-align">'.($dataBefore ? $dataBefore->item->name : '-').'</td>
+                        <td class="center-align">'.($dataBefore ? $dataBefore->itemShading->code : '-').'</td>
+                        <td class="center-align" colspan="6">SALDO PERIODE SEBELUMNYA</td>
+                        <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
+                    </tr>';
+                foreach($data as $key => $row){
+                    $balance += $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out;
+                    $html .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="center-align">'.$row->item->code.'</td>
+                        <td class="center-align">'.$row->item->name.'</td>
+                        <td class="center-align">'.$place->code.'</td>
+                        <td class="center-align">'.$row->itemShading->code.'</td>
+                        <td class="center-align">'.$row->productionBatch->code.'</td>
+                        <td class="center-align">'.$row->area->code.'</td>
+                        <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->date)).'</td>
+                        <td class="right-align">'.($row->type == 'IN' ? CustomHelper::formatConditionalQty($row->qty_in) : CustomHelper::formatConditionalQty(-1 * $row->qty_out)).'</td>
+                        <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
+                    </tr>';
                 }
             }else{
                 if(count($shading) > 0){

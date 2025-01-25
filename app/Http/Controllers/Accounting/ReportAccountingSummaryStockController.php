@@ -95,6 +95,14 @@ class ReportAccountingSummaryStockController extends Controller
                 LEFT JOIN good_receive_details b ON a.id=b.good_receive_id
                 LEFT JOIN items d ON d.id=b.item_id
                 LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+                        WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7
+                        UNION ALL
+                        SELECT d.code,d.name,k.code
+                FROM marketing_order_memos a
+                LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id
+                LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                LEFT JOIN items d ON d.id=c.item_id
+                LEFT JOIN item_shadings k ON k.id=c.item_shading_id
                         WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  )a
                             )a
             LEFT JOIN (
@@ -131,6 +139,16 @@ class ReportAccountingSummaryStockController extends Controller
                             LEFT JOIN good_receive_details b ON a.id=b.good_receive_id and b.deleted_at is null
                             LEFT JOIN items d ON d.id=b.item_id
                             LEFT JOIN item_shadings k ON k.id=b.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $start_date . "'
+                            GROUP BY d.code,d.name,k.code
+                            UNION ALL
+                            SELECT d.code,d.name,k.code, coalesce(SUM(b.qty),0) AS RM, coalesce(e.nominal,0) AS total
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN journal_details e ON e.detailable_id = b.id and e.detailable_type = 'marketing_order_memo_details' and e.deleted_at is null and e.type = '1'
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date<'" . $start_date . "'
                             GROUP BY d.code,d.name,k.code
                             UNION ALL
@@ -191,6 +209,17 @@ class ReportAccountingSummaryStockController extends Controller
                                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $start_date . "' AND a.post_date<='" . $finish_date . "'
                             GROUP BY d.code,d.name,k.code
                                 )f ON f.code=a.code AND f.shading=a.shading
+                                LEFT JOIN (
+                                    SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0) AS RM,coalesce(e.nominal,0) AS totalrm
+                            FROM marketing_order_memos a
+                            LEFT JOIN marketing_order_memo_details b ON a.id=b.marketing_order_memo_id and b.deleted_at is null
+                            LEFT JOIN journal_details e ON e.detailable_id = b.id and e.detailable_type = 'marketing_order_memo_details' and e.deleted_at is null and e.type = '1'
+                            LEFT JOIN item_stocks c ON c.id=b.item_stock_id
+                            LEFT JOIN items d ON d.id=c.item_id
+                            LEFT JOIN item_shadings k ON k.id=c.item_shading_id
+                                WHERE a.void_date IS NULL AND a.deleted_at IS NULL AND d.item_group_id=7  AND a.post_date>='" . $start_date . "' AND a.post_date<='" . $finish_date . "'
+                            GROUP BY d.code,d.name,k.code
+                                )j ON j.code=a.code AND j.shading=a.shading
                                 LEFT JOIN (
                                 SELECT d.code,d.name,k.code AS shading, coalesce(SUM(b.qty),0)*-1 AS GI,coalesce(SUM(b.total)*-1,0) AS totalgi
                             FROM good_issues a

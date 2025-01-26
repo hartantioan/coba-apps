@@ -764,6 +764,47 @@ class ResetCogsNewByDate10 implements ShouldQueue
         }
 
         #gas
+        $revaluation = InventoryRevaluationDetail::whereHas('inventoryRevaluation',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
+            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
+        })->get();
+
+        foreach($revaluation as $row){
+            $total = $row->nominal;
+            $qty = 0;
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([
+            'lookable_type'		    => $row->inventoryRevaluation->getTable(),
+            'lookable_id'		      => $row->inventoryRevaluation->id,
+            'detailable_type'	    => $row->getTable(),
+            'detailable_id'		    => $row->id,
+            'company_id'		      => $row->inventoryRevaluation->company_id,
+            'place_id'			      => $row->place_id,
+            'warehouse_id'		    => $row->warehouse_id,
+            'item_id'			        => $row->item_id,
+            'qty_in'			        => 0,
+            'price_in'			      => 0,
+            'total_in'			      => $total,
+            'qty_final'			      => $qty_final,
+            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+            'total_final'		      => $total_final,
+            'date'				        => $dateloop,
+            'type'				        => 'IN',
+            'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+            'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+            'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+            ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => $total < 0 ? -1 * $total : $total,
+                    'nominal'     => $total < 0 ? -1 * $total : $total,
+                ]);
+            }
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
 
         $goodreturn = GoodReturnPODetail::whereHas('goodReturnPO',function($query)use($dateloop,$item_id){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
@@ -1546,48 +1587,6 @@ class ResetCogsNewByDate10 implements ShouldQueue
                     self::dispatch($rowmemo->marketingOrderMemo->post_date,$rowmemo->marketingOrderMemo->company_id,$rowmemo->itemStock->place_id,$rowmemo->itemStock->item_id,$rowmemo->itemStock->area_id,$rowmemo->itemStock->item_shading_id,$rowmemo->itemStock->production_batch_id,$end_date);
                 }
             }
-        }
-
-        $revaluation = InventoryRevaluationDetail::whereHas('inventoryRevaluation',function($query)use($dateloop){
-            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-        })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
-            $query->where('item_id',$item_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
-        })->get();
-
-        foreach($revaluation as $row){
-            $total = $row->nominal;
-            $qty = 0;
-            $total_final = $totalBefore + $total;
-            $qty_final = $qtyBefore + $qty;
-            ItemCogs::create([
-            'lookable_type'		    => $row->inventoryRevaluation->getTable(),
-            'lookable_id'		      => $row->inventoryRevaluation->id,
-            'detailable_type'	    => $row->getTable(),
-            'detailable_id'		    => $row->id,
-            'company_id'		      => $row->inventoryRevaluation->company_id,
-            'place_id'			      => $row->place_id,
-            'warehouse_id'		    => $row->warehouse_id,
-            'item_id'			        => $row->item_id,
-            'qty_in'			        => 0,
-            'price_in'			      => 0,
-            'total_in'			      => $total,
-            'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
-            'total_final'		      => $total_final,
-            'date'				        => $dateloop,
-            'type'				        => 'IN',
-            'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
-            'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
-            'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
-            ]);
-            foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total < 0 ? -1 * $total : $total,
-                    'nominal'     => $total < 0 ? -1 * $total : $total,
-                ]);
-            }
-            $qtyBefore = $qty_final;
-            $totalBefore = $total_final;
         }
       }
       //CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);

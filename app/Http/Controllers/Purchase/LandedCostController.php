@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Jobs\ResetCogs;
+use App\Jobs\SendApproval;
 use App\Jobs\ResetStock;
 use App\Models\Coa;
 use App\Models\Company;
@@ -844,7 +845,7 @@ class LandedCostController extends Controller
 
                     }
 
-                    CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
+                    SendApproval::dispatch('landed_costs',$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

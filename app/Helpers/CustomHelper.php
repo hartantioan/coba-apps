@@ -5,6 +5,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetCogsNew;
+use App\Jobs\ResetCogsNewForProduction;
 use App\Jobs\ResetCogsNewNonAccumulate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -161,6 +162,10 @@ class CustomHelper {
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
+	}
+
+	public static function sendCogsForProduction($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
+		ResetCogsNewForProduction::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
 	}
 
 	public static function sendCogsNonAccumulate($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
@@ -5482,7 +5487,7 @@ class CustomHelper {
 								'detailable_id'	=> $row->id,
 							]);
 
-							self::sendCogs($table_name,
+							self::sendCogsForProduction($table_name,
 								$pir->id,
 								$pir->company_id,
 								$row->itemStock->place_id,
@@ -5636,7 +5641,7 @@ class CustomHelper {
 										'detailable_id'	=> $rowbatchusage->id,
 									]);
 
-									self::sendCogs($table_name,
+									self::sendCogsForProduction($table_name,
 										$pir->id,
 										$pir->company_id,
 										$rowbatchusage->productionBatch->place_id,
@@ -5689,7 +5694,7 @@ class CustomHelper {
 											'detailable_id'	=> $rowbatchusage->id,
 										]);
 
-										self::sendCogs($table_name,
+										self::sendCogsForProduction($table_name,
 											$pir->id,
 											$pir->company_id,
 											$rowbatchusage->productionBatch->place_id,
@@ -5736,7 +5741,7 @@ class CustomHelper {
 										'detailable_id'	=> $row->id,
 									]);
 
-									self::sendCogs($table_name,
+									self::sendCogsForProduction($table_name,
 										$pir->id,
 										$pir->company_id,
 										$row->itemStock->place_id,
@@ -5937,7 +5942,7 @@ class CustomHelper {
 							'detailable_id'	=> $rowbatch->id,
 						]);
 
-						self::sendCogs($table_name,
+						self::sendCogsForProduction($table_name,
 							$pir->id,
 							$pir->company_id,
 							$row->place_id,
@@ -5983,7 +5988,7 @@ class CustomHelper {
 						'detailable_id'	=> $row->id,
 					]);
 
-					self::sendCogs($table_name,
+					self::sendCogsForProduction($table_name,
 						$pir->id,
 						$pir->company_id,
 						$row->place_id,
@@ -6014,7 +6019,7 @@ class CustomHelper {
 
 				if($row->qty_reject > 0){
 					if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
-						self::sendCogs($table_name,
+						self::sendCogsForProduction($table_name,
 							$pir->id,
 							$pir->company_id,
 							$pir->place_id,
@@ -6118,7 +6123,7 @@ class CustomHelper {
 				'lookable_id'	=> $table_id,
 			]);
 
-			self::sendCogs($table_name,
+			self::sendCogsForProduction($table_name,
 				$pir->id,
 				$pir->company_id,
 				$pir->place_id,
@@ -6148,7 +6153,7 @@ class CustomHelper {
 
 			if($pir->qty_reject > 0){
 				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
-					self::sendCogs($table_name,
+					self::sendCogsForProduction($table_name,
 						$pir->id,
 						$pir->company_id,
 						$pir->place_id,
@@ -6225,7 +6230,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pir->id,
 					$pir->company_id,
 					$row->place_id,
@@ -6274,7 +6279,7 @@ class CustomHelper {
 				'detailable_id'	=> NULL,
 			]);
 
-			self::sendCogs($table_name,
+			self::sendCogsForProduction($table_name,
 				$pir->id,
 				$pir->company_id,
 				$pir->productionFgReceive->place_id,
@@ -6348,7 +6353,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pr->id,
 					$pr->company_id,
 					$row->itemStock->place_id,
@@ -6394,7 +6399,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pr->id,
 					$pr->company_id,
 					$row->place_id,

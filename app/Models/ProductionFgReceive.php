@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Jobs\SendApproval;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -362,7 +363,7 @@ class ProductionFgReceive extends Model
                 'lookable_id'       => $querydetail->id,
             ]);
             if($query){
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
     
                 activity()
@@ -438,7 +439,7 @@ class ProductionFgReceive extends Model
             }
 
             if($query){
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
 
                 activity()

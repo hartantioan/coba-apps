@@ -60,6 +60,8 @@ use App\Models\ItemBuffer;
 use App\Models\ItemUnit;
 use App\Models\MenuUser;
 use App\Models\UsedData;
+use App\Jobs\SendApproval;
+
 class PurchaseRequestController extends Controller
 {
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
@@ -775,7 +777,7 @@ class PurchaseRequestController extends Controller
                     DB::rollback();
                 } */
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Production;
+use App\Jobs\SendApproval;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Menu;
@@ -760,7 +761,7 @@ class ProductionFgReceiveController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive FG No. '.$query->code);
+                    SendApproval::dispatch($query->getTable(),$query->id,'Production Receive FG No. '.$query->code,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Receive FG No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
                     activity()

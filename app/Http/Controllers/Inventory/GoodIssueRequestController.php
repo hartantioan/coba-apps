@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Jobs\SendApproval;
 use App\Exports\ExportGoodIssueRequest;
 use App\Exports\ExportGoodIssueRequestTransactionPage;
 use App\Exports\ExportOutstandingGoodIssueRequest;
@@ -677,7 +678,7 @@ class GoodIssueRequestController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Good Issue Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

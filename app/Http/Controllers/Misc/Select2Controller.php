@@ -3553,6 +3553,10 @@ class Select2Controller extends Controller {
             $arrDetail = [];
 
             foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                $priceBeforeDiscount = number_format($row->marketingOrderDetail->price,2,',','.');
+                $disc1 = number_format($row->marketingOrderDetail->percent_discount_1,2,',','.');
+                $disc2 = number_format($row->marketingOrderDetail->percent_discount_2,2,',','.');
+                $disc3 = number_format($row->marketingOrderDetail->discount_3,2,',','.');
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
                 if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
@@ -3586,6 +3590,10 @@ class Select2Controller extends Controller {
                     'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDetail->qty_conversion),
                     'price'             => number_format($price,2,',','.'),
                     'note'              => '',
+                    'price_before_disc' => $priceBeforeDiscount,
+                    'discount_1'        => $disc1,
+                    'discount_2'        => $disc2,
+                    'discount_3'        => $disc3,    
                 ];
                 $totalAll += $total;
                 $taxAll += $tax;

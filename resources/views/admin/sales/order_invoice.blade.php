@@ -356,7 +356,7 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
                                     <legend>4. Surat Jalan</legend>
-                                    <div class="col m12 s12" style="width:2500px !important;" id="table-item">
+                                    <div class="col m12 s12" style="width:3000px !important;" id="table-item">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" id="table-detail">
                                                 <thead>
@@ -367,7 +367,11 @@
                                                         <th class="center">Qty Retur</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
-                                                        <th class="center">Harga@</th>
+                                                        <th class="center">Harga Sebelum Diskon</th>
+                                                        <th class="center">Diskon 1 (%)</th>
+                                                        <th class="center">Diskon 2 (%)</th>
+                                                        <th class="center">Diskon 3 (Rp)</th>
+                                                        <th class="center">Harga Final</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">PPN (%)</th>
                                                         <th class="center">Termasuk PPN</th>
@@ -378,14 +382,14 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="13">
+                                                        <td colspan="17">
                                                             Silahkan tambahkan Surat Jalan...
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                                 <tfoot class="hide" id="div-manual">
                                                     <tr>
-                                                        <td colspan="13">
+                                                        <td colspan="17">
                                                             <a class="waves-effect waves-light green btn-small" onclick="addItem();" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Item
                                                             </a>
@@ -1284,6 +1288,18 @@
                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                 </td>
                 <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
                     <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                 </td>
                 <td class="right-align">
@@ -1402,6 +1418,18 @@
                                     </td>
                                     <td class="center-align">
                                         ` + val.unit + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.price_before_disc + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_1 + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_2 + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_3 + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `
@@ -2571,6 +2599,18 @@
                                     <td class="center-align">
                                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                                     </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
                                     <td class="right-align">
                                         <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                                     </td>
@@ -2639,6 +2679,18 @@
                                     </td>
                                     <td class="center-align">
                                         ` + val.unit + `
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `

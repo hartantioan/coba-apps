@@ -5779,7 +5779,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   	        => $d->id,
-                'text' 	        => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name.' - NO INVOICE : '.$d->marketingOrderInvoice->code,
+                'text' 	        => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name.' - NO INVOICE : '.($d->marketingOrderInvoice()->exists() ? $d->marketingOrderInvoice->code : 'TIDAK ADA'),
                 'account_id'    => $d->marketingOrderDelivery->customer_id,
                 'account_name'  => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
             ];

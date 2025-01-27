@@ -189,7 +189,7 @@ class ProductionIssueController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->user->name,
+                    $val->user()->exists() ? $val->user->name : '-',
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,

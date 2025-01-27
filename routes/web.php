@@ -401,6 +401,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
                 Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
                 Route::get('good_issue_return', [Select2Controller::class, 'goodIssueReturn']);
+                Route::get('good_issue_gr', [Select2Controller::class, 'goodIssueReceive']);
                 Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
                 Route::get('vendor', [Select2Controller::class, 'vendor']);
                 Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);

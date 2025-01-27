@@ -209,7 +209,11 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiahNominal(this)">
                                 <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                             </div>
-                            <div class="col m4 s12 step7">
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="good_issue_id" name="good_issue_id" onchange="applyGoodIssue();"></select>
+                                <label class="active" for="good_issue_id">Link Good Issue (Jika ada)</label>
+                            </div>
+                            <div class="col m3 s12 step7">
                                 <label class="">Bukti Upload</label>
                                 <br>
                                 <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -222,11 +226,17 @@
                                    Clear
                                 </a>
                             </div>
-                            <div class="col m4 s12">
+                            <div class="col m3 s12">
                                 <div id="fileName"></div>
                                 <img src="" alt="Preview" id="imagePreview" style="display: none;">
                             </div>
-
+                            <div class="col m12 s12">
+                                <div class="card-alert card green">
+                                    <div class="card-content white-text">
+                                        <p>INFO PENTING : Link Good Issue hanya digunakan untuk perhitungan otomatis yang mengambil nilai dari Good Issue dan di transfer secara proporsional berdasarkan qty barang di Good Receive. Hati-hati, karena proporsional, tidak disarankan (contoh) menggabungkan qty satuan M2 dengan Box di dalam Good Receive jika fitur ini diaktifkan. 1 Good Issue hanya bisa ditarik ke 1 Good Receive, nominal akan otomatis ter-proporsional.</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col m12 s12 step8">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
@@ -292,6 +302,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <span class="mr-1">Nilai Issue (Jika Link Issue dipilih) : <b id="balance-issue">0,00</b></span>
         <button class="btn waves-effect waves-light purple mr-1 btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light submit step10 mr-1" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
@@ -702,6 +713,8 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#good_issue_id').empty();
+                $('#balance-issue').text('0,00');
             }
         });
 
@@ -763,11 +776,52 @@
             });
             $('#total_display').text(formatRupiahIni(totalRupiah.toFixed(2).toString().replace('.', ',')));
         });
+
+        select2ServerSide('#good_issue_id', '');
+        
+        $('#good_issue_id').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/good_issue_gr") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
     });
 
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
+
+    function applyGoodIssue(){
+        $('#balance-issue').text('0,00');
+        if($('#good_issue_id').val()){
+            let datakuy = $('#good_issue_id').select2('data')[0];
+            $('#balance-issue').text(datakuy.nominal);
+        }
+    }
 
     function getCode(val){
         if(val){
@@ -1100,7 +1154,7 @@
                     <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1">
                 </td>
                 <td class="center">
-                    <span id="arr_price` + count + `">0,00</span>
+                    <span id="arr_price` + count + `" class="arr_price">0,00</span>
                 </td>
                 <td class="right-align">
                     <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default total_rupiah" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
@@ -1213,22 +1267,47 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), total = parseFloat($('#arr_total' + id).val().replaceAll(".", "").replaceAll(",","."));
+        if($('#good_issue_id').val()){
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), totalQty = 0, totalRupiah = parseFloat($('#balance-issue').text().replaceAll(".", "").replaceAll(",","."));
+            
+            $('input[name^="arr_qty[]"]').each(function(){
+                totalQty += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            });
 
-        if((total / qty).toFixed(2) >= 0){
-            $('#arr_price' + id).text(formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
+            $('input[name^="arr_qty[]"]').each(function(index){
+                let rowqty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                let totalnew = ((rowqty / totalQty) * totalRupiah).toFixed(2);
+
+                $('input[name^="arr_total[]"]').eq(index).val(
+                    formatRupiahIni(totalnew.toString().replace('.', ','))
+                );
+
+                if((totalnew / rowqty).toFixed(2) >= 0){
+                    $('.arr_price').eq(index).text(formatRupiahIni((totalnew / rowqty).toFixed(2).toString().replace('.',',')));
+                }else{
+                    $('.arr_price').eq(index).text('-' + formatRupiahIni((totalnew / rowqty).toFixed(2).toString().replace('.',',')));
+                }
+            });
+            
+            $('#total_display').text(formatRupiahIni(totalRupiah.toFixed(2).toString().replace('.', ',')));
         }else{
-            $('#arr_price' + id).text('-' + formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
-        }
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), total = parseFloat($('#arr_total' + id).val().replaceAll(".", "").replaceAll(",","."));
 
-        var totalRupiah = 0;
-        $('.total_rupiah').each(function() {
-            var value = parseFloat($(this).val().replaceAll(".", "").replaceAll(",", "."));
-            if (!isNaN(value)) {
-                totalRupiah += value;
+            if((total / qty).toFixed(2) >= 0){
+                $('#arr_price' + id).text(formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
+            }else{
+                $('#arr_price' + id).text('-' + formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
             }
-        });
-        $('#total_display').text(formatRupiahIni(totalRupiah.toFixed(2).toString().replace('.', ',')));
+
+            var totalRupiah = 0;
+            $('.total_rupiah').each(function() {
+                var value = parseFloat($(this).val().replaceAll(".", "").replaceAll(",", "."));
+                if (!isNaN(value)) {
+                    totalRupiah += value;
+                }
+            });
+            $('#total_display').text(formatRupiahIni(totalRupiah.toFixed(2).toString().replace('.', ',')));
+        }
     }
 
     function save(){
@@ -1433,6 +1512,12 @@
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').removeAttr('min');
+                if(response.good_issue_name){
+                    $('#good_issue_id').empty().append(`
+                        <option value="` + response.good_issue_id + `">` + response.good_issue_name + `</option>
+                    `);
+                }
+                $('#balance-issue').text(response.balance_issue);
                 if(response.document){
                     const baseUrl = '{{ URL::to("/") }}/storage/';
                     const filePath = response.document.replace('public/', '');
@@ -1468,7 +1553,7 @@
                                     <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1" value="` + val.list_serial + `">
                                 </td>
                                 <td class="center">
-                                    <span id="arr_price` + count + `">` + val.price + `</span>
+                                    <span id="arr_price` + count + `" class="arr_price">` + val.price + `</span>
                                 </td>
                                 <td class="right-align">
                                     <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default total_rupiah" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">

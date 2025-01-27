@@ -182,8 +182,17 @@ class ResetCogsNewByDate11 implements ShouldQueue
             }
         })->get();
 
+        $goodReceiveId = [];
+        
         foreach($goodreceive as $row){
-            $total = $row->total;
+            if($row->goodReceive->goodIssue()->exists()){
+                if(!in_array($row->good_receive_id,$goodReceiveId)){
+                    $goodReceiveId[] = $row->good_receive_id;
+                }
+                $total = $row->totalProportionalFromIssue();
+            }else{
+                $total = $row->total;
+            }
             $qty = $row->qty;
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
@@ -210,7 +219,6 @@ class ResetCogsNewByDate11 implements ShouldQueue
                     'item_shading_id'           => $row->item_shading_id ?? NULL,
                     'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
                 ]);
-
                 if($row->journalDetail()->exists()){
                     if($row->journalDetail()->where('type','2')->count() > 1){
                         $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
@@ -245,8 +253,20 @@ class ResetCogsNewByDate11 implements ShouldQueue
                     }
                 }
             }
+            $row->update([
+                'total' => $total,
+            ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+        }
+
+        if(count($goodReceiveId) > 0){
+            foreach($goodReceiveId as $rowreceive){
+                $rcupdate = GoodReceive::find($rowreceive);
+                if($rcupdate){
+                    $rcupdate->updateGrandtotal();
+                }
+            }
         }
 
         $issueglazeheader = IssueGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){
@@ -901,11 +921,20 @@ class ResetCogsNewByDate11 implements ShouldQueue
         })->get();
 
         $tempgiprice = 0;
+        $goodIssueId = [];
         foreach($goodissue as $row){
+            if(!in_array($row->good_issue_id,$goodIssueId)){
+                $goodIssueId[] = $row->good_issue_id;
+            }
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
-                $price = round($totalBefore,2) / round($qtyBefore,3);
+                $price = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
+                /* if($tempgiprice > 0){
+                   $price = $tempgiprice;
+                }else{
+                    $tempgiprice = $price;
+                } */
             }
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
@@ -932,6 +961,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
                 'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
             ]);
+
             if($row->journalDetail()->where('type','1')->count() > 1){
                 $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
                 $accumulation = 0;
@@ -977,9 +1007,17 @@ class ResetCogsNewByDate11 implements ShouldQueue
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
-            $gi = GoodIssue::find($row->good_issue_id);
-            if($gi){
-                $gi->updateGrandtotal();
+        }
+
+        if(count($goodIssueId) > 0){
+            foreach($goodIssueId as $rowissue){
+                $gi = GoodIssue::find($rowissue);
+                if($gi){
+                    $gi->updateGrandtotal();
+                    if($gi->goodReceive()->exists()){
+                        $gi->goodReceive->upgradeDetail();
+                    }
+                }
             }
         }
 

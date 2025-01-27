@@ -179,8 +179,17 @@ class ResetCogsNewNonAccumulate implements ShouldQueue
             }
         })->get();
 
+        $goodReceiveId = [];
+        
         foreach($goodreceive as $row){
-            $total = $row->total;
+            if($row->goodReceive->goodIssue()->exists()){
+                if(!in_array($row->good_receive_id,$goodReceiveId)){
+                    $goodReceiveId[] = $row->good_receive_id;
+                }
+                $total = $row->totalProportionalFromIssue();
+            }else{
+                $total = $row->total;
+            }
             $qty = $row->qty;
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
@@ -208,16 +217,53 @@ class ResetCogsNewNonAccumulate implements ShouldQueue
                     'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
                 ]);
                 if($row->journalDetail()->exists()){
-                    foreach($row->journalDetail as $rowjournal){
-                        $rowjournal->update([
-                            'nominal_fc'  => $total,
-                            'nominal'     => $total,
-                        ]);
+                    if($row->journalDetail()->where('type','2')->count() > 1){
+                        $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+                        $accumulation = 0;
+                        $totalrow = $total;
+                        $datacost  = $row->costDistribution->costDistributionDetail;
+                        foreach($row->journalDetail()->where('type','2')->get() as $key => $rowjournal){
+                            if($key == $lastIndex){
+                                $nominal = $totalrow - $accumulation;
+                            }else{
+                                $nominal = round(($datacost[$key]->percentage / 100) * $totalrow,2);
+                                $accumulation += $nominal;
+                            }
+                            $rowjournal->update([
+                                'nominal_fc'  => $nominal,
+                                'nominal'     => $nominal,
+                            ]);
+                        }
+                        foreach($row->journalDetail()->where('type','1')->get() as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $total,
+                                'nominal'     => $total,
+                            ]);
+                        }
+                    }else{
+                        foreach($row->journalDetail as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $total,
+                                'nominal'     => $total,
+                            ]);
+                        }
                     }
                 }
             }
+            $row->update([
+                'total' => $total,
+            ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+        }
+
+        if(count($goodReceiveId) > 0){
+            foreach($goodReceiveId as $rowreceive){
+                $rcupdate = GoodReceive::find($rowreceive);
+                if($rcupdate){
+                    $rcupdate->updateGrandtotal();
+                }
+            }
         }
 
         $issueglazeheader = IssueGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){

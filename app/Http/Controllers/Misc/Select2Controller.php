@@ -1529,6 +1529,52 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function goodIssueReceive(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = GoodIssue::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('goodIssueDetail',function($query) use($search){
+                                $query->whereHas('itemStock',function($query) use($search){
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereDoesntHave('goodReceive')
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->paginate(10);
+
+        foreach($data as $d) {
+            if($d->goodReceive()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                    'nominal'       => CustomHelper::formatConditionalQty($d->grandtotal),
+                ];
+            }
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
     public function purchaseOrder(Request $request)
     {
 

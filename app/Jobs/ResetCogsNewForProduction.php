@@ -180,8 +180,17 @@ class ResetCogsNewForProduction implements ShouldQueue
             }
         })->get();
 
+        $goodReceiveId = [];
+        
         foreach($goodreceive as $row){
-            $total = $row->total;
+            if($row->goodReceive->goodIssue()->exists()){
+                if(!in_array($row->good_receive_id,$goodReceiveId)){
+                    $goodReceiveId[] = $row->good_receive_id;
+                }
+                $total = $row->totalProportionalFromIssue();
+            }else{
+                $total = $row->total;
+            }
             $qty = $row->qty;
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
@@ -242,8 +251,20 @@ class ResetCogsNewForProduction implements ShouldQueue
                     }
                 }
             }
+            $row->update([
+                'total' => $total,
+            ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
+        }
+
+        if(count($goodReceiveId) > 0){
+            foreach($goodReceiveId as $rowreceive){
+                $rcupdate = GoodReceive::find($rowreceive);
+                if($rcupdate){
+                    $rcupdate->updateGrandtotal();
+                }
+            }
         }
 
         $issueglazeheader = IssueGlaze::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->whereHas('itemStock',function($query)use($item_id){

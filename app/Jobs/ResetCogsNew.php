@@ -897,7 +897,11 @@ class ResetCogsNew implements ShouldQueue
         })->get();
 
         $tempgiprice = 0;
+        $goodIssueId = [];
         foreach($goodissue as $row){
+            if(!in_array($row->good_issue_id,$goodIssueId)){
+                $goodIssueId[] = $row->good_issue_id;
+            }
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
@@ -979,9 +983,17 @@ class ResetCogsNew implements ShouldQueue
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
-            $gi = GoodIssue::find($row->good_issue_id);
-            if($gi){
-                $gi->updateGrandtotal();
+        }
+
+        if(count($goodIssueId) > 0){
+            foreach($goodIssueId as $rowissue){
+                $gi = GoodIssue::find($rowissue);
+                if($gi){
+                    $gi->updateGrandtotal();
+                    if($gi->goodReceive()->exists()){
+                        $gi->goodReceive->upgradeDetail();
+                    }
+                }
             }
         }
 

@@ -45,6 +45,10 @@ class GoodIssue extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function goodReceive(){
+        return $this->hasOne('App\Models\GoodReceive','good_issue_id','id')->whereIn('status',['2','3']);
+    }
+
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
@@ -200,7 +204,7 @@ class GoodIssue extends Model
         $total = 0;
 
         foreach($this->goodIssueDetail as $row){
-            $total += $row->total;
+            $total += round($row->total,2);
         }
 
         $gi = GoodIssue::find($this->id)->update([
@@ -219,6 +223,10 @@ class GoodIssue extends Model
             if($row->goodReturnIssueDetail()->exists()){
                 $hasRelation = true;
             }
+        }
+
+        if($this->goodReceive()->exists()){
+            $hasRelation = true;
         }
 
         return $hasRelation;

@@ -323,7 +323,7 @@ class ProductionFgReceive extends Model
 
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
-                'user_id'		            => session('bo_id'),
+                'user_id'		            => $this->user_id,
                 'company_id'                => $this->company_id,
                 'production_order_detail_id'=> $this->production_order_detail_id,
                 'production_fg_receive_id'  => $this->id,
@@ -364,11 +364,11 @@ class ProductionFgReceive extends Model
             ]);
             if($query){
                 SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,$this->user_id);
     
                 activity()
                     ->performedOn(new ProductionIssue())
-                    ->causedBy(session('bo_id'))
+                    ->causedBy($this->user_id)
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
             }
@@ -400,7 +400,7 @@ class ProductionFgReceive extends Model
         
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
-                'user_id'		            => session('bo_id'),
+                'user_id'		            => $this->user_id,
                 'company_id'                => $this->company_id,
                 'production_order_detail_id'=> $this->production_order_detail_id,
                 'production_fg_receive_id'  => $this->id,
@@ -440,11 +440,11 @@ class ProductionFgReceive extends Model
 
             if($query){
                 SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,$this->user_id);
 
                 activity()
                     ->performedOn(new ProductionIssue())
-                    ->causedBy(session('bo_id'))
+                    ->causedBy($this->user_id)
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
             }

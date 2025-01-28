@@ -51,6 +51,13 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+
+    .text-wrap{
+        white-space:normal;
+    }
+    .width-300{
+        width:300px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -2247,6 +2254,14 @@
                 { name: 'status', searchable: false, orderable: false, className: '' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            columnDefs: [
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='text-wrap width-300'>" + data + "</div>";
+                    },
+                    targets: 16
+                }
             ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

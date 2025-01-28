@@ -684,10 +684,20 @@ class LandedCostController extends Controller
                 ];
             } else {
 
-                $total = str_replace(',','.',str_replace('.','',$request->total));
+                /* $total = str_replace(',','.',str_replace('.','',$request->total));
                 $tax = str_replace(',','.',str_replace('.','',$request->tax));
                 $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
-                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal)); */
+                $total = 0;
+                $tax = 0;
+                $wtax = 0;
+                $grandtotal = 0;
+                foreach($request->arr_fee_id as $key => $row){
+                    $total += str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key]));
+                    $tax += str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key]));
+                    $wtax += str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key]));
+                    $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key]));
+                }
 
                 /* if($grandtotal <= 0){
                     return response()->json([

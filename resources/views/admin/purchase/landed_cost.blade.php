@@ -2260,7 +2260,7 @@
                     render: function (data, type, full, meta) {
                         return "<div class='text-wrap width-300'>" + data + "</div>";
                     },
-                    targets: 16
+                    targets: 16,10
                 }
             ],
         });

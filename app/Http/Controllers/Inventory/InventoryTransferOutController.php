@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Item;
 use App\Models\ItemGroup;
 use App\Models\ItemCogs;
@@ -616,7 +617,7 @@ class InventoryTransferOutController extends Controller
 
                     }
 
-                    CustomHelper::sendApproval('inventory_transfer_outs',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('inventory_transfer_outs',$query->id,'Barang Transfer - Keluar No. '.$query->code,$query->note,session('bo_id'));
 
                     DB::commit();

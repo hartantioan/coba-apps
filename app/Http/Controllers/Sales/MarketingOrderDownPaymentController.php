@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExporMarketingDownPaymentTransactionPage;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
 use App\Models\IncomingPayment;
@@ -530,7 +531,7 @@ class MarketingOrderDownPaymentController extends Controller
                     }
                 }
 
-                CustomHelper::sendApproval('marketing_order_down_payments',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'Pengajuan AR Down Payment No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

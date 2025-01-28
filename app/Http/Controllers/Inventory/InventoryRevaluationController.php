@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Inventory;
+use App\Jobs\SendApproval;
 use Illuminate\Support\Str;
 use App\Exports\ExportInventoryRevaluation;
 use App\Http\Controllers\Controller;
@@ -431,7 +432,7 @@ class InventoryRevaluationController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval('inventory_revaluations',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('inventory_revaluations',$query->id,'Revaluasi Inventori No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

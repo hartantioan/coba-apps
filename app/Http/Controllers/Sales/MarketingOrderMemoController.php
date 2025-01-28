@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
 use Maatwebsite\Excel\Facades\Excel;
@@ -728,7 +729,7 @@ class MarketingOrderMemoController extends Controller
                     }
 
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR MEMO No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Currency;
 use App\Models\Item;
 use App\Models\ItemStock;
@@ -458,7 +459,7 @@ class InventoryTransferInController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('inventory_transfer_ins',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('inventory_transfer_ins',$query->id,'Barang Transfer - Masuk No. '.$query->code,$query->note,session('bo_id'));
                         
                     activity()

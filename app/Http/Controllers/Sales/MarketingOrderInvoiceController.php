@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
@@ -668,8 +669,8 @@ class MarketingOrderInvoiceController extends Controller
                             ]);
                         }
                     }
-
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

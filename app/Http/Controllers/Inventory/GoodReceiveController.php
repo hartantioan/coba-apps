@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Currency;
 use App\Models\Item;
 use App\Models\Place;
@@ -614,7 +615,7 @@ class GoodReceiveController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('good_receives',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
 
                     /* DB::commit();

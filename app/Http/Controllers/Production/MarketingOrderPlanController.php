@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\MarketingOrderPlan;
 use App\Models\MarketingOrderPlanDetail;
@@ -417,7 +418,7 @@ class MarketingOrderPlanController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Produksi No. '.$query->code,'Pengajuan Marketing Order Produksi No. '.$query->code,session('bo_id'));
 
                 activity()

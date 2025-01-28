@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\MaterialRequest;
 use App\Models\Place;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -413,7 +414,7 @@ class GoodReturnIssueController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Barang Kembali No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

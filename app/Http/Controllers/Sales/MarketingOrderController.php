@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\TreeHelper;
@@ -939,7 +940,7 @@ class MarketingOrderController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                     activity()

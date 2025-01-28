@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\GoodIssueRequest;
@@ -690,7 +691,7 @@ class GoodIssueController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('good_issues',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

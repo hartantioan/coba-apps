@@ -297,20 +297,40 @@ class AdjustRateController extends Controller
             }
 
             foreach($dataapdp as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceInvoiceByDate($request->post_date);
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coauangmukapembelian->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'APDP UANG MUKA',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '1',
-                    ];
+                if($row->post_date < '2025-02-01'){
+                    $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                    $total = $row->balanceInvoiceByDate($request->post_date);
+                    if($total > 0){
+                        $result[] = [
+                            'coa_id'        => $coauangmukapembelian->id,
+                            'lookable_type' => $row->getTable(),
+                            'lookable_id'   => $row->id,
+                            'code'          => $row->code,
+                            'type_document' => 'APDP UANG MUKA',
+                            'nominal_fc'    => number_format($total,2,',','.'),
+                            'latest_rate'   => number_format($latest_rate,2,',','.'),
+                            'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
+                            'type'          => '1',
+                        ];
+                    }
+                }else{
+                    if($row->status == '3'){
+                        $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                        $total = $row->balanceInvoiceByDate($request->post_date);
+                        if($total > 0){
+                            $result[] = [
+                                'coa_id'        => $coauangmukapembelian->id,
+                                'lookable_type' => $row->getTable(),
+                                'lookable_id'   => $row->id,
+                                'code'          => $row->code,
+                                'type_document' => 'APDP UANG MUKA',
+                                'nominal_fc'    => number_format($total,2,',','.'),
+                                'latest_rate'   => number_format($latest_rate,2,',','.'),
+                                'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
+                                'type'          => '1',
+                            ];
+                        }
+                    }
                 }
             }
 

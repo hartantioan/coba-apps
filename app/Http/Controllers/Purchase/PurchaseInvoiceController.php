@@ -317,7 +317,8 @@ class PurchaseInvoiceController extends Controller
         $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datadp as $row){
-            if($row->balanceInvoice() > 0){
+            $balance = round($row->balanceInvoice(),2);
+            if($balance > 0){
                 $downpayments[] = [
                     'type'          => 'purchase_down_payments',
                     'id'            => $row->id,
@@ -328,7 +329,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'balance'       => $row->currency->symbol.' '.number_format($row->balanceInvoice(),2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($balance,2,',','.'),
                 ];
             }
         }
@@ -355,7 +356,7 @@ class PurchaseInvoiceController extends Controller
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             $code_sj = '';
             if($row->goodscale()->exists()){
                 $code_sj = $row->goodScale->getSalesSuratJalan();
@@ -383,7 +384,7 @@ class PurchaseInvoiceController extends Controller
             if($row->goodscale()->exists()){
                 $code_sj = $row->goodScale->getSalesSuratJalan();
             }
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             if(($row->grandtotal - $invoice) > 0 && $row->goodScale->sjHasReturnDocument()){
                 $details[] = [
                     'type'          => 'purchase_orders',
@@ -403,8 +404,8 @@ class PurchaseInvoiceController extends Controller
         $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->whereDoesntHave('cancelDocument')->get();
 
         foreach($datagr as $row){
-            $invoice = $row->totalInvoice();
-            $adjust = $row->totalAdjust();
+            $invoice = round($row->totalInvoice(),2);
+            $adjust = round($row->totalAdjust(),2);
             if(round($row->total - $invoice - $adjust,2) > 0){
                 $details[] = [
                     'type'          => 'good_receipts',
@@ -424,7 +425,7 @@ class PurchaseInvoiceController extends Controller
         $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             if(($row->grandtotal - $invoice) > 0 && !$row->hasLandedCost()){
                 $details[] = [
                     'type'          => 'landed_costs',

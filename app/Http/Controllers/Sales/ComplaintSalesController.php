@@ -222,7 +222,6 @@ class ComplaintSalesController extends Controller
 
                 ];
             }
-            info($detail);
 
             $so = [];
 
@@ -392,11 +391,11 @@ class ComplaintSalesController extends Controller
                             'complaint_sales_id'=> $query->id,
                             'lookable_type'=> $request->arr_lookable_type[$key],
                             'lookable_id'=> $request->arr_lookable_id[$key],
-                            'qty_color_mistake'=> $request->arr_qty_color_mistake[$key],
-                            'qty_motif_mistake'=> $request->arr_qty_motif_mistake[$key],
-                            'qty_size_mistake'=> $request->arr_qty_size_mistake[$key],
-                            'qty_broken'=> $request->arr_qty_broken[$key],
-                            'qty_mistake'=> $request->arr_qty_mistake[$key],
+                            'qty_color_mistake'=> str_replace('.',',',$request->arr_qty_color_mistake[$key]),
+                            'qty_motif_mistake'=> str_replace('.',',',$request->arr_qty_motif_mistake[$key]),
+                            'qty_size_mistake'=> str_replace('.',',',$request->arr_qty_size_mistake[$key]),
+                            'qty_broken'=> str_replace('.',',',$request->arr_qty_broken[$key]),
+                            'qty_mistake'=> str_replace('.',',',$request->arr_qty_mistake[$key]),
                             'note'=> $request->arr_note[$key],
                         ]);
                     }

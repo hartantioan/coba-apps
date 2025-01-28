@@ -592,6 +592,7 @@ class LandedCostController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    $val->getReference(),
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :

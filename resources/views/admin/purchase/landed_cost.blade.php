@@ -175,6 +175,7 @@
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
                                                         <th rowspan="2">{{ __('translations.wtax') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
+                                                        <th rowspan="2">Reference</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -2242,6 +2243,7 @@
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
+                { name: 'reference', searchable: false, orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: '' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

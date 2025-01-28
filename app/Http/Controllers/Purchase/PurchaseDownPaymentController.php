@@ -1075,7 +1075,7 @@ class PurchaseDownPaymentController extends Controller
                 ];
             }else{
 
-                CustomHelper::removeDeposit($query->account_id,$query->total);
+                //CustomHelper::removeDeposit($query->account_id,$query->total);
                 CustomHelper::removeApproval('purchase_down_payments',$query->id);
                 CustomHelper::removeJournal('purchase_down_payments',$query->id);
 

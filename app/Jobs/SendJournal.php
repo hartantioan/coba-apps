@@ -1045,6 +1045,9 @@ class SendJournal implements ShouldQueue
 								}
 							}
 						}
+						if($row->lookable->post_date >= '2025-02-01'){
+							CustomHelper::addDeposit($row->lookable->account_id,$row->lookable->grandtotal * $row->lookable->currency_rate);
+						}
 					}elseif($row->lookable_type == 'marketing_order_memos'){
 						$rowtotal = $row->lookable->balance();
 						$mustpay = $rowtotal;

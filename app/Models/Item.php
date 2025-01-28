@@ -189,7 +189,7 @@ class Item extends Model
     }
 
     public function warehouseSm(){
-        $warehouse = $this->itemGroup->itemGroupWarehouse()->latest()->first();
+        $warehouse = $this->itemGroup->itemGroupWarehouse()->orderByDesc('id')->first();
         return $warehouse->warehouse_id;
     }
 

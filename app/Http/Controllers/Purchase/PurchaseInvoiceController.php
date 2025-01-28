@@ -315,7 +315,7 @@ class PurchaseInvoiceController extends Controller
         $details = [];
         $downpayments = [];
 
-        $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
+        $datadp = PurchaseDownPayment::where('account_id',$request->id)->where('status','3')->get();
 
         foreach($datadp as $row){
             $balance = round($row->balanceInvoice(),2);

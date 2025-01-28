@@ -5354,45 +5354,47 @@ class CustomHelper {
 		}elseif($table_name == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($table_id);
 
-			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
-			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+			if($pdp->post_date < '2025-02-01'){
+				$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
+				$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
 
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'company_id'	=> $pdp->company_id,
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($pdp->post_date)).'00'),
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-				'currency_id'	=> isset($pdp->currency_id) ? $pdp->currency_id : NULL,
-				'currency_rate'	=> isset($pdp->currency_rate) ? $pdp->currency_rate : NULL,
-				'post_date'		=> $pdp->post_date,
-				'note'			=> $pdp->note,
-				'status'		=> '3'
-			]);
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $pdp->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($pdp->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'currency_id'	=> isset($pdp->currency_id) ? $pdp->currency_id : NULL,
+					'currency_rate'	=> isset($pdp->currency_rate) ? $pdp->currency_rate : NULL,
+					'post_date'		=> $pdp->post_date,
+					'note'			=> $pdp->note,
+					'status'		=> '3'
+				]);
 
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coauangmuka->id,
-				'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
-				'type'			=> '1',
-				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+					'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
 
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coahutangusaha->id,
-				'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-				'type'			=> '2',
-				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+					'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
 
-			CustomHelper::addDeposit($account_id,$pdp->grandtotal * $pdp->currency_rate);
+				CustomHelper::addDeposit($account_id,$pdp->grandtotal * $pdp->currency_rate);
+			}
 
 		}elseif($table_name == 'employee_transfers'){
 			$transfer = EmployeeTransfer::find($table_id);
@@ -6922,43 +6924,48 @@ class CustomHelper {
 		if($data->lookable_type == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($data->lookable_id);
 
-			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
-			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+			if($pdp->post_date < '2025-02-01'){
+				$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
+				$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+	
+				$currency_rate = $pdp->currency_rate;
+	
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $pdp->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
+					'lookable_type'	=> $data->getTable(),
+					'lookable_id'	=> $data->id,
+					'currency_id'	=> $pdp->currency_id,
+					'currency_rate'	=> $currency_rate,
+					'post_date'		=> $date,
+					'note'			=> 'VOID CANCEL '.$pdp->code,
+					'status'		=> '3'
+				]);
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $pdp->account_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+					'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+					'note'			=> $pdp->code
+				]);
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $pdp->account_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+					'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+					'note'			=> $pdp->code
+				]);
 
-			$currency_rate = $pdp->currency_rate;
-
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'company_id'	=> $pdp->company_id,
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
-				'lookable_type'	=> $data->getTable(),
-				'lookable_id'	=> $data->id,
-				'currency_id'	=> $pdp->currency_id,
-				'currency_rate'	=> $currency_rate,
-				'post_date'		=> $date,
-				'note'			=> 'VOID CANCEL '.$pdp->code,
-				'status'		=> '3'
-			]);
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coahutangusaha->id,
-				'account_id'	=> $coahutangusaha->bp_journal ? $pdp->account_id : NULL,
-				'type'			=> '1',
-				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
-				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> $pdp->code
-			]);
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coauangmuka->id,
-				'account_id'	=> $coauangmuka->bp_journal ? $pdp->account_id : NULL,
-				'type'			=> '2',
-				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
-				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> $pdp->code
-			]);
+				CustomHelper::removeDeposit($pdp->account_id,$pdp->grandtotal * $pdp->currency_rate);
+			}
+			
 		}elseif($data->lookable_type == 'marketing_order_invoices'){
 			$moi = MarketingOrderInvoice::find($data->lookable_id);
 

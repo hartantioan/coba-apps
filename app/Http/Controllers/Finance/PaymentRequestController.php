@@ -740,7 +740,11 @@ class PaymentRequestController extends Controller
                     if($data){
                         if(!$data->used()->exists() && $data->balancePaymentRequest() > 0){
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
-                            $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                            if($data->post_date < '2025-02-01'){
+                                $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                            }else{
+                                $coa = Coa::where('code','100.01.07.01.01')->where('company_id',$data->company_id)->first();
+                            }
                             $total = $data->balancePaymentRequest();
                             $is_reimburse = '';
                             $name_account = '';

@@ -278,7 +278,7 @@ class AdjustRateController extends Controller
                 }
             }
 
-            foreach($dataapdp as $row){
+            foreach($dataapdp->where('post_date','<','2025-02-01') as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
                 $total = $row->balancePaymentByDate($request->post_date);
                 if($total > 0){

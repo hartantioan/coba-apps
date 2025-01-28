@@ -467,6 +467,7 @@
                                                 <th class="center" >Tipe Pajak</th>
                                                 <th class="center">{{ __('translations.note') }}</th>
                                                 <th class="center">NPWP</th>
+                                                <th class="center">NITKU</th>
                                                 <th class="center">{{ __('translations.address') }}</th>
                                                 <th class="center">Negara</th>
                                                 <th class="center">{{ __('translations.province') }}</th>
@@ -478,7 +479,7 @@
                                         </thead>
                                         <tbody id="body-info">
                                             <tr id="last-row-info">
-                                                <td colspan="11" class="center">
+                                                <td colspan="12" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addInfo()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
@@ -2158,6 +2159,9 @@
                     <input autocomplete="off" name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" class="npwp">
                 </td>
                 <td class="center">
+                    <input autocomplete="off" name="arr_nitku[]" type="text" placeholder="Nomor NITKU" style="width:200px !important;">
+                </td>
+                <td class="center">
                     <input autocomplete="off" name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;">
                 </td>
                 <td class="center">
@@ -2704,6 +2708,9 @@
                                 </td>
                                 <td class="center">
                                     <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" value="` + val.npwp + `" class="npwp">
+                                </td>
+                                <td class="center">
+                                    <input autocomplete="off" name="arr_nitku[]" type="text" placeholder="Nomor NITKU" style="width:200px !important;" value="` + val.nitku + `">
                                 </td>
                                 <td class="center">
                                     <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;" value="` + val.address + `">

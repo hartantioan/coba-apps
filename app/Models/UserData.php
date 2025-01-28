@@ -19,6 +19,7 @@ class UserData extends Model
         'title',
         'content',
         'npwp',
+        'nitku',
         'tax_type',
         'address',
         'country_id',

@@ -265,6 +265,7 @@ class handleUserData implements OnEachRow, WithHeadingRow
                                 'content' => $row['catatan'],
                                 'tax_type' => $row['tipe_pajak'],
                                 'npwp' => $row['npwp'],
+                                'nitku' => $row['nitku'],
                                 'address'   => $row['alamat'],
                                 'province_id'       => $province_id,
                                 'city_id'           => $city_id,

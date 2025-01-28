@@ -336,7 +336,7 @@ class PurchaseInvoiceController extends Controller
         $datafr = FundRequest::where('account_id',$request->id)->whereIn('status',['2','3'])->where('document_status','2')->where('type','1')->get();
 
         foreach($datafr as $row){
-            $balanceInvoice = $row->balanceInvoice();
+            $balanceInvoice = round($row->balanceInvoice(),2);
             if($balanceInvoice > 0){
                 $details[] = [
                     'type'          => 'fund_requests',

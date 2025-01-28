@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\CancelDocument;
 use App\Models\Company;
 use App\Models\GoodReceipt;
@@ -820,7 +821,7 @@ class GoodReceiptPOController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('good_receipts',$query->id,$query->note);
+                    SendApproval::dispatch('good_receipts',$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('good_receipts',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
 
                     /* DB::commit();

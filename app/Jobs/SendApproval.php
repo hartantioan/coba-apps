@@ -30,12 +30,13 @@ class SendApproval implements ShouldQueue
 
     protected $table_name, $table_id, $note, $user_id;
 
-    public function __construct(string $table_name, int $table_id, string $note, int $user_id)
+    public function __construct(string $table_name = NULL, int $table_id = NULL, string $note = NULL, int $user_id = NULL)
     {
         $this->table_name = $table_name;
         $this->table_id = $table_id;
         $this->queue = 'approval';
         $this->user_id = $user_id;
+		$this->note = $note;
     }
 
     public function handle()

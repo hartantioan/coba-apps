@@ -123,7 +123,7 @@ class MitraMarketingOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderDetail',function($query) use ($search, $request){
+                            ->orWhereHas('mitraMarketingOrderDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");

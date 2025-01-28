@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Exports\ExportDepreciation;
 use App\Exports\ExportDepreciationTransactionPage;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Place;
 use App\Models\User;
@@ -330,7 +331,7 @@ class DepreciationController extends Controller
                     ]);
                 }
 
-                CustomHelper::sendApproval('depreciations',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('depreciations',$query->id,'Pengajuan Depresiasi No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

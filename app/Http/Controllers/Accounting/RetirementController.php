@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Company;
@@ -331,7 +332,7 @@ class RetirementController extends Controller
                     ]);
                 }
 
-                CustomHelper::sendApproval('retirements',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('retirements',$query->id,'Pengajuan retirement No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\Currency;
@@ -489,7 +490,7 @@ class JournalController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('journals',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

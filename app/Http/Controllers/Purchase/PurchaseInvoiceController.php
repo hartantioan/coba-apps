@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReturnPO;
@@ -1411,7 +1412,7 @@ class PurchaseInvoiceController extends Controller
                     DB::rollback();
                 } */
 
-                CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan A/P Invoice No. '.$query->code,$query->note,session('bo_id'));
                 CustomHelper::removeDeposit($query->account_id,$query->downpayment);
 

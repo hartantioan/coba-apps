@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
+use App\Jobs\SendJournal;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReceipt;
@@ -1254,7 +1256,7 @@ class PaymentRequestController extends Controller
                     }
                 }
 
-                CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
@@ -2326,7 +2328,7 @@ class PaymentRequestController extends Controller
                 if($query) {
 
                     CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas Bank Out / Kas Keluar No. '.$query->code,$query->note,session('bo_id'));
-                    CustomHelper::sendJournal('outgoing_payments',$query->id,$query->account_id);
+                    SendJournal::dispatch($query->getTable(),$query->id,$query->account_id,session('bo_id'));
 
                     activity()
                         ->performedOn(new OutgoingPayment())

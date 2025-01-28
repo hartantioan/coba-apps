@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Finance;
 use App\Exports\ExportListBGCheck;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
@@ -273,7 +274,7 @@ class ListBgCheckController extends Controller
 
 			if($query) {
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan List BG/Check No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

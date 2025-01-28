@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\CloseBill;
 use App\Models\FundRequest;
@@ -934,7 +935,7 @@ class CloseBillController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval('close_bills',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS Karyawan No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

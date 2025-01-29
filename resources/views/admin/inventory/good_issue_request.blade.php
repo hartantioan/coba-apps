@@ -643,7 +643,7 @@
         });
 
         $('#arr_place0,#arr_department0').formSelect();
-        $('arr_item0').select2({
+        $('#arr_item0').select2({
             placeholder: '-- Pilih ya --',
             minimumInputLength: 4,
             allowClear: true,

@@ -1351,7 +1351,35 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/inventory_item") }}');
+                        $('#arr_item' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 4,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/inventory_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                delay: 250,
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
                         $('#arr_place' + count).val(val.place_id);
                         
                         if(val.line_id){
@@ -1898,7 +1926,35 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/inventory_item") }}');
+        $('#arr_item' + count).select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/inventory_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 

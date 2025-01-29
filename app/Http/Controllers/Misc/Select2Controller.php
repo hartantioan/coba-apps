@@ -637,7 +637,8 @@ class Select2Controller extends Controller {
                     $query->whereHas('itemGroupWarehouse',function($query){
                         $query->whereIn('warehouse_id', $this->datawarehouses);
                     });
-                })->where('status','1')->get();
+                })->where('status','1')
+                ->paginate(10);
 
         foreach($data as $d) {
             $response[] = [
@@ -652,7 +653,12 @@ class Select2Controller extends Controller {
             ];
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
     }
 
     public function itemReceive(Request $request)

@@ -553,6 +553,11 @@ class Item extends Model
         return $this->hasOne('App\Models\FgGroup','item_id','id');
     }
 
+    public function toleranceScale()
+    {
+        return $this->hasOne('App\Models\ToleranceScale','item_id','id');
+    }
+
     public function itemWeightFg()
     {
         return $this->hasOne('App\Models\ItemWeightFg','item_id','id');

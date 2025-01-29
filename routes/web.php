@@ -135,6 +135,7 @@ use App\Http\Controllers\MasterData\PatternController;
 use App\Http\Controllers\MasterData\ColorController;
 use App\Http\Controllers\MasterData\GradeController;
 use App\Http\Controllers\MasterData\BrandController;
+use App\Http\Controllers\MasterData\ToleranceScaleController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -1518,6 +1519,20 @@ Route::prefix('admin')->group(function () {
                         Route::post('import', [DeliveryCostController::class, 'import'])->middleware('operation.access:delivery_cost,update');
                         Route::post('create', [DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
                         Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
+                    });
+
+                    Route::prefix('tolerance_scale')->middleware('operation.access:tolerance_scale,view')->group(function () {
+                        Route::get('/', [ToleranceScaleController::class, 'index']);
+                        Route::get('datatable', [ToleranceScaleController::class, 'datatable']);
+                        Route::get('row_detail', [ToleranceScaleController::class, 'rowDetail']);
+                        Route::post('show', [ToleranceScaleController::class, 'show']);
+                        Route::post('print', [ToleranceScaleController::class, 'print']);
+                        Route::get('export', [ToleranceScaleController::class, 'export']);
+                        Route::get('export_from_page', [ToleranceScaleController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [ToleranceScaleController::class, 'import'])->middleware('operation.access:tolerance_scale,update');
+                        Route::get('get_import_excel', [ToleranceScaleController::class, 'getImportExcel']);
+                        Route::post('create', [ToleranceScaleController::class, 'create'])->middleware('operation.access:tolerance_scale,update');
+                        Route::post('destroy', [ToleranceScaleController::class, 'destroy'])->middleware('operation.access:tolerance_scale,delete');
                     });
                 });
 

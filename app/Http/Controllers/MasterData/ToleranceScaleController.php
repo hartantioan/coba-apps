@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Exports\ExportTemplateToleranceScale;
+use App\Imports\ImportToleranceScale;
+use App\Models\ToleranceScale;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-use App\Models\ItemWeightFg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,13 +16,13 @@ use App\Exports\ExportItemWeight;
 use App\Exports\ExportTemplateItemWeight;
 use App\Imports\ImportItemWeight;
 
-class ItemWeightController extends Controller
+class ToleranceScaleController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'             => 'Berat Item FG',
-            'content'           => 'admin.master_data.item_weight',
+            'title'             => 'Toleransi Timbang',
+            'content'           => 'admin.master_data.tolerance_scale',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -31,8 +33,7 @@ class ItemWeightController extends Controller
             'code',
             'user_id',
             'item_id',
-            'gross_weight',
-            'netto_weight',
+            'percentage',
         ];
 
         $start  = $request->start;
@@ -41,48 +42,29 @@ class ItemWeightController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ItemWeightFg::count();
-
-        $query_data = ItemWeightFg::where(function($query) use ($search, $request) {
+        $data = ToleranceScale::where(function($query) use ($search, $request) {
             if($search) {
                 $query->where(function($query) use ($search, $request) {
-                    $query->orWhere('code','like',"%$search%")
-                    ->orWhereHas('item',function($query) use ($search) {
+                    $query->whereHas('item',function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%");
                     });
                 });
             }
-        })
-        ->offset($start)
-        ->limit($length)
-        ->orderBy($order, $dir)
-        ->get();
-
-        $total_filtered = ItemWeightFg::where(function($query) use ($search, $request) {
-            if($search) {
-                $query->where(function($query) use ($search, $request) {
-                    $query->orWhere('code','like',"%$search%")
-                    ->orWhereHas('item',function($query) use ($search) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
-                    });
-                });
-            }
-        })
-        ->count();
+        });
+        $total_data = ToleranceScale::count();
+        $query_data = $data->offset($start)->limit($length)->orderBy($order, $dir)->get();
+        $total_filtered = $data->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-
                 $response['data'][] = [
                     $nomor,
-                    $val->code,
-                    $val->item->name,
-                    number_format($val->gross_weight,3,',','.'),
-                    number_format($val->netto_weight,2,',','.'),
+                    $val->user->name,
+                    $val->item->code.' - '.$val->item->name,
+                    number_format($val->percentage,3,',','.'),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -109,12 +91,10 @@ class ItemWeightController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'item_id'               => 'required',
-            'gross_weight'            => 'required',
-            'netto_weight'              => 'required',
+            'percentage'            => 'required',
         ], [
-            'item_id.required'                 => 'Nama tidak boleh kosong.',
-            'gross_weight.required'           => 'Gross Weight Tidak boleh kosong.',
-            'netto_weight.required'             => 'Berat Netto Tidak Boleh kosong.',
+            'item_id.required'      => 'Item tidak boleh kosong.',
+            'percentage.required'   => 'Prosentase tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -126,32 +106,27 @@ class ItemWeightController extends Controller
 
             DB::beginTransaction();
             try {
-
-                if($request->temp){
-                    $query = ItemWeightFg::find($request->temp);
+                $query = ToleranceScale::where('item_id',$request->item_id)->first();
+                if($query){
                     $query->user_id             = session('bo_id');
                     $query->item_id             = $request->item_id;
-                    $query->netto_weight        = str_replace(',','.',str_replace('.','',$request->netto_weight));
-                    $query->gross_weight	    = str_replace(',','.',str_replace('.','',$request->gross_weight));
+                    $query->percentage          = str_replace(',','.',str_replace('.','',$request->percentage));
                     $query->save();
                 }else{
-                    $query = ItemWeightFg::create([
-                        'code'                      => strtoupper(Str::random(15)),
+                    $query = ToleranceScale::create([
                         'user_id'                   => session('bo_id'),
-                        'netto_weight'              => str_replace(',','.',str_replace('.','',$request->netto_weight)),
-                        'gross_weight'              => str_replace(',','.',str_replace('.','',$request->gross_weight)),
                         'item_id'			        => $request->item_id,
-
+                        'percentage'                => str_replace(',','.',str_replace('.','',$request->percentage)),
                     ]);
                 }
 
                 if($query) {
 
                     activity()
-                        ->performedOn(new ItemWeightFg())
+                        ->performedOn(new ToleranceScale())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit Item Weight.');
+                        ->log('Add / edit Tolerance Scale.');
 
                     $response = [
                         'status'  => 200,
@@ -173,22 +148,22 @@ class ItemWeightController extends Controller
     }
 
     public function show(Request $request){
-        $dc = ItemWeightFg::find($request->id);
-        $dc['item'] = $dc->item;
-        $dc['gross_weight'] = number_format($dc->gross_weight,2,',','.');
-        $dc['netto_weight'] = number_format($dc->netto_weight,2,',','.');
+        $dc = ToleranceScale::find($request->id);
+        $dc['item_name'] = $dc->item->name;
+        $dc['item_code'] = $dc->item->code;
+        $dc['percentage'] = number_format($dc->percentage,2,',','.');
 		return response()->json($dc);
     }
 
     public function destroy(Request $request){
-        $query = ItemWeightFg::find($request->id);
+        $query = ToleranceScale::find($request->id);
 
         if($query->delete()) {
             activity()
-                ->performedOn(new ItemWeightFg())
+                ->performedOn(new ToleranceScale())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the delivery cost');
+                ->log('Delete the tolerance scale');
 
             $response = [
                 'status'  => 200,
@@ -207,7 +182,7 @@ class ItemWeightController extends Controller
     public function import(Request $request)
     {
         try {
-            Excel::import(new ImportItemWeight, $request->file('file'));
+            Excel::import(new ImportToleranceScale, $request->file('file'));
             return response()->json(['status' => 200, 'message' => 'Import successful']);
         } catch (RowImportException $e) {
             return response()->json([
@@ -223,7 +198,7 @@ class ItemWeightController extends Controller
     }
 
     public function getImportExcel(){
-        return Excel::download(new ExportTemplateItemWeight(), 'format_template_item_weight_'.uniqid().'.xlsx');
+        return Excel::download(new ExportTemplateToleranceScale(), 'format_template_tolerance_scale_'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){

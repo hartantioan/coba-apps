@@ -513,9 +513,7 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
-                })->whereHas('itemShading',function($query){
-
-                })
+                })->whereHas('itemShading')
                 ->where('is_sales_item','1')
                 ->where('status','1')->get();
 

@@ -1393,7 +1393,7 @@
                         if(val.stock_list.length > 0){
                             let html = `<div>`;
                             $.each(val.stock_list, function(i, value) {
-                                html += value.warehouse + ` Qty Stock : ` + value.qty;
+                                html += `<br>` + value.warehouse + ` Qty Stock : ` + value.qty;
                             });
                             html += `</div>`;
                             $('#arr_stock' + count).append(html);
@@ -1687,7 +1687,7 @@
             if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
                 let html = `<div>`;
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    html += value.warehouse + ` Qty Stock: ` + value.qty;
+                    html += `<br>` + value.warehouse + ` Qty Stock: ` + value.qty;
                 });
                 html += `</div>`;
                 $('#arr_stock' + val).append(html);

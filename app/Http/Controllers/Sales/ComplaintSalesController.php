@@ -345,7 +345,7 @@ class ComplaintSalesController extends Controller
                         $query->note = $request->note;
                         $query->note_complaint = $request->note_complaint;
                         $query->lookable_id = $request->lookable_id;
-                        $query->lookable_type = $request->lookable_type;
+                        $query->lookable_type = 'marketing_order_delivery_processes';
                         $query->solution = $request->solution;
 
                         $query->status = '1';
@@ -386,7 +386,7 @@ class ComplaintSalesController extends Controller
                         'note_complaint'       => $request->note_complaint,
                         'solution'             => $request->solution,
                         'lookable_id'          => $request->lookable_id,
-                        'lookable_type'        => $request->lookable_type,
+                        'lookable_type'        => 'marketing_order_delivery_processes',
                         'marketing_order_id_complaint'             => $request->marketing_order_id_complaint,
                         'status'                    => '1',
                     ]);

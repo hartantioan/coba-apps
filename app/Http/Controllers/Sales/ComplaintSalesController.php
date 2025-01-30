@@ -163,7 +163,7 @@ class ComplaintSalesController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->complaint_date)),
                     $val->attachments(),
-                    $val->lookable->code ?? '-',
+                    $val->lookable?->code ?? '-',
                     $val->note,
                     $val->note_complaint,
                     $val->solution,

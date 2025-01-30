@@ -156,7 +156,7 @@ class ComplaintSalesController extends Controller
 
             foreach($query_data as $val) {
 				$dis = '';
-                if($val->lookable_type ='undefined'){
+                if($val->lookable_type == 'undefined'){
                     $code = '';
                 }else{
                     $code = $val->lookable->code;

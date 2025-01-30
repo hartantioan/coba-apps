@@ -153,8 +153,14 @@ class ComplaintSalesController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
+
             foreach($query_data as $val) {
 				$dis = '';
+                if($val->lookable_type ='undefined'){
+                    $code = '';
+                }else{
+                    $code = $val->lookable->code;
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -163,7 +169,7 @@ class ComplaintSalesController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->complaint_date)),
                     $val->attachments(),
-                    $val->lookable?->code ?? '-',
+                    $code,
                     $val->note,
                     $val->note_complaint,
                     $val->solution,

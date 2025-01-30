@@ -180,7 +180,7 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            ->where('code', 'like', '%' . $invoice_no . '%')
+          //  ->where('code', 'like', '%' . $invoice_no . '%')
             ->get();
 
 
@@ -189,7 +189,7 @@ class MarketingOrderReportController extends Controller
             ->whereDate('post_date', '<=', $finish_date)
             ->whereNotNull('tax_no')
             ->where('tax_no', '!=', '')
-            ->where('code', 'like', '%' . $invoice_no . '%')
+           // ->where('code', 'like', '%' . $invoice_no . '%')
             // ->where('code', '=', 'ARIN-25P1-00000173')
             ->get();
 

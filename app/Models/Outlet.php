@@ -69,6 +69,16 @@ class Outlet extends Model
         return $status;
     }
 
+    public function statusRaw(){
+        $status = match ($this->status) {
+          '1' => 'Aktif',
+          '2' => 'Tidak Aktif',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
+
     public function type(){
         $type = match ($this->type) {
           '1'   => 'Supermarket',

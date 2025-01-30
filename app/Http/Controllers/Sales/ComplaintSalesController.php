@@ -153,8 +153,14 @@ class ComplaintSalesController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
+
             foreach($query_data as $val) {
 				$dis = '';
+                if($val->lookable_type == 'undefined'){
+                    $code = '';
+                }else{
+                    $code = $val->lookable->code;
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -163,7 +169,7 @@ class ComplaintSalesController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->complaint_date)),
                     $val->attachments(),
-                    $val->lookable->code ?? '-',
+                    $code,
                     $val->note,
                     $val->note_complaint,
                     $val->solution,
@@ -339,7 +345,7 @@ class ComplaintSalesController extends Controller
                         $query->note = $request->note;
                         $query->note_complaint = $request->note_complaint;
                         $query->lookable_id = $request->lookable_id;
-                        $query->lookable_type = $request->lookable_type;
+                        $query->lookable_type = 'marketing_order_delivery_processes';
                         $query->solution = $request->solution;
 
                         $query->status = '1';
@@ -380,7 +386,7 @@ class ComplaintSalesController extends Controller
                         'note_complaint'       => $request->note_complaint,
                         'solution'             => $request->solution,
                         'lookable_id'          => $request->lookable_id,
-                        'lookable_type'        => $request->lookable_type,
+                        'lookable_type'        => 'marketing_order_delivery_processes',
                         'marketing_order_id_complaint'             => $request->marketing_order_id_complaint,
                         'status'                    => '1',
                     ]);
@@ -391,11 +397,11 @@ class ComplaintSalesController extends Controller
                             'complaint_sales_id'=> $query->id,
                             'lookable_type'=> $request->arr_lookable_type[$key],
                             'lookable_id'=> $request->arr_lookable_id[$key],
-                            'qty_color_mistake'=> str_replace('.',',',$request->arr_qty_color_mistake[$key]),
-                            'qty_motif_mistake'=> str_replace('.',',',$request->arr_qty_motif_mistake[$key]),
-                            'qty_size_mistake'=> str_replace('.',',',$request->arr_qty_size_mistake[$key]),
-                            'qty_broken'=> str_replace('.',',',$request->arr_qty_broken[$key]),
-                            'qty_mistake'=> str_replace('.',',',$request->arr_qty_mistake[$key]),
+                            'qty_color_mistake'=> str_replace(',', '.',$request->arr_qty_color_mistake[$key]),
+                            'qty_motif_mistake'=> str_replace(',', '.',$request->arr_qty_motif_mistake[$key]),
+                            'qty_size_mistake'=> str_replace(',', '.',$request->arr_qty_size_mistake[$key]),
+                            'qty_broken'=> str_replace(',', '.', $request->arr_qty_broken[$key]),
+                            'qty_mistake'=> str_replace(',', '.',$request->arr_qty_mistake[$key]),
                             'note'=> $request->arr_note[$key],
                         ]);
                     }

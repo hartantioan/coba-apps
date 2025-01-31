@@ -125,10 +125,10 @@ class MarketingOrderController extends Controller
                         'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                         'rawgrandtotal'         => $row->grandtotal,
                         'note'                  => $row->note,
-                        'qty_now'               => 0,
-                        'qty_commited'          => 0,
                         'qty_conversion'        => CustomHelper::formatConditionalQty(round($row->qty / $row->item->sellConversion(),3)),
                         'arr_sell_unit'         => $row->item->arrSellUnits(),
+                        'stock_now'             => CustomHelper::formatConditionalQty($row->item->getStockArrayPlace($this->dataplaces)),
+                        'stock_com'             => CustomHelper::formatConditionalQty($row->item->getQtySalesNotSent($this->dataplaces)),
                     ];
                 }
 

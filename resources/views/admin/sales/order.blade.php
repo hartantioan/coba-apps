@@ -1005,8 +1005,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="right-align" id="arr_qty_now` + count + `">{{ $row['qty_now'] }}</td>
-                            <td class="right-align" id="arr_qty_temporary` + count + `">{{ $row['qty_commited'] }}</td>
+                            <td class="right-align" id="arr_qty_now` + count + `">{{ $row['stock_now'] }}</td>
+                            <td class="right-align" id="arr_qty_temporary` + count + `">{{ $row['stock_com'] }}</td>
                             <td class="center">
                                 <input name="arr_qty_uom[]" type="text" value="{{ $row['qty'] }}" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
                             </td>

@@ -253,6 +253,106 @@ class ComplaintSalesController extends Controller
         return response()->json($response);
     }
 
+    public function rowDetail(Request $request)
+    {
+        $data   = ComplaintSales::where('code',CustomHelper::decrypt($request->id))->first();
+        $x="";
+        if (isset($data->void_date)) {
+            $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
+        }if($data->status == 3){
+            $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
+           $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.' - '.$data->account->name.$x.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="23">Daftar Item</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th>Item</th>
+                                <th>Ketidaksesuaian Warna</th>
+                                <th>Ketidaksesuaian Motif</th>
+                                <th>Ketidaksesuaian Ukuran</th>
+                                <th>Patah/Rusak</th>
+                                <th>Ketidaksesuaian Qty</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead><tbody>';
+        foreach($data->complaintSalesDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.($row->lookable->item->name).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_color_mistake).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_motif_mistake).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_size_mistake).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_broken).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_mistake).'</td>
+            </tr>';
+        }
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="5">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                                <th class="center-align">Tanggal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
+                $string .= '<tr>
+                    <td class="center-align" colspan="5"><h6>'.$detail->getTemplateName().'</h6></td>
+                </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">' . ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') . '</td>
+                    </tr>';
+                }
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="5">Approval tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>
+            ';
+        $string.= '<div class="col s12 mt-2" style="font-weight:bold;">List Pengguna Dokumen :</div><ol class="col s12">';
+        if($data->used()->exists()){
+            $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
+        }
+        $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
+
+        return response()->json($string);
+    }
+
     public function create(Request $request){
         DB::beginTransaction();
         try {

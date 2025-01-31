@@ -110,7 +110,7 @@ class MitraMarketingOrderController extends Controller
 
         $total_data = MitraMarketingOrder::count();
 
-        $query = MitraMarketingOrder::where(function($query) use ($search, $request) {
+        $query_data = MitraMarketingOrder::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -145,11 +145,46 @@ class MitraMarketingOrderController extends Controller
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
-            });
+            })
+            ->offset($start)->limit($length)->orderBy($order, $dir)->get();
         
-        $query_data = $query->offset($start)->limit($length)->orderBy($order, $dir)->get();
 
-        $total_filtered = count($query_data);
+        $total_filtered = MitraMarketingOrder::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('mitraMarketingOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('item',function($query) use ($search, $request){
+                                    $query->where('code','like',"%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->whereIn('status', $request->status);
+                }
+
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
+            })->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {

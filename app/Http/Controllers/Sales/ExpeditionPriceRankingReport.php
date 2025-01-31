@@ -122,7 +122,7 @@ class ExpeditionPriceRankingReport extends Controller
         })
         ->offset($start)
         ->limit($length)
-        ->orderBy($order, $dir)
+        ->orderBy('tonnage', 'asc')
         ->get();
         $total_filtered = DeliveryCost::where(function($query) use ($search, $request) {
             if($search) {

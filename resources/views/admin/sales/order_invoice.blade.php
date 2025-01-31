@@ -2541,6 +2541,9 @@
                         <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
                     `);
                 }
+                if(response.prefix_tax){
+                    $('#prefix_tax').val(response.prefix_tax);
+                }
                 $('#invoice_type').val(response.invoice_type).trigger('change');
                 $('#rounding').val(response.rounding);
 

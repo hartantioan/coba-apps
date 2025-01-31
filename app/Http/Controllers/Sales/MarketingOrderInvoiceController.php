@@ -1423,6 +1423,7 @@ class MarketingOrderInvoiceController extends Controller
         $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
         $po['user_datas'] = $po->account->getBillingAddress();
+        $po['prefix_tax'] = $po->tax_no ? substr($po->tax_no,0,3) : '';
 
         /* if($po->tax_no){
             $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];

@@ -3158,6 +3158,51 @@
         });
     }
 
+    function sendMail(id){
+		swal({
+            title: "Apakah anda yakin ingin mengirim email ke vendor?",
+            text: "Silahkan cek kembali dokumen, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/send_email',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id : id,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main-display');
+                    },
+                    success: function(response) {
+                        loadingClose('#main-display');
+                        M.toast({
+                            html: response.message
+                        });
+                    },
+                    error: function() {
+                        $('#main-display').scrollTop(0);
+                        loadingClose('#main-display');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function destroy(id){
         var msg = '';
         swal({

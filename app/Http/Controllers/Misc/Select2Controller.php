@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\SampleType;
 use App\Models\TruckQueue;
 use App\Models\RuleProcurement;
 use App\Models\Area;
@@ -3643,7 +3644,7 @@ class Select2Controller extends Controller {
                     'price_before_disc' => $priceBeforeDiscount,
                     'discount_1'        => $disc1,
                     'discount_2'        => $disc2,
-                    'discount_3'        => $disc3,    
+                    'discount_3'        => $disc3,
                 ];
                 $totalAll += $total;
                 $taxAll += $tax;
@@ -5841,5 +5842,24 @@ class Select2Controller extends Controller {
                 'more' => $data->hasMorePages()
             ]
         ]);
+    }
+
+    public function sampleType(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = SampleType::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
     }
 }

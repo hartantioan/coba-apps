@@ -87,6 +87,19 @@ class ComplaintSales extends Model
         return $this->hasMany('App\Models\ComplaintSalesDetail');
     }
 
+    public function hasDetailMatrix(){
+        $ada = false;
+        if($this->approval()){
+            foreach($this->approval() as $row){
+                if($row->approvalMatrix()->exists()){
+                    $ada = true;
+                }
+            }
+        }
+
+        return $ada;
+    }
+
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
         if($source){

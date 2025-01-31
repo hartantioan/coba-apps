@@ -84,6 +84,9 @@ class MarketingOrderController extends Controller
         if($mitra_code){
             $data_mitra = MitraMarketingOrder::where('code',$mitra_code)->where('status','1')->first();
             if($data_mitra){
+                $sales = User::where('employee_no','324115')->first();
+                $data_mitra['sales_id'] = $sales ? $sales->id : '';
+                $data_mitra['sales_name'] = $sales ? $sales->employee_no.' - '.$sales->name : '';
                 $data_mitra['broker_name'] = $data_mitra->user->name;
                 $data_mitra['account_name'] = $data_mitra->account->name;
                 $data_mitra['province_name'] = $data_mitra->deliveryProvince->name;
@@ -541,7 +544,7 @@ class MarketingOrderController extends Controller
                 'delivery_date'             => 'required',
                 'delivery_schedule'         => 'required',
                 'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
-                'document_so'               => 'required',
+                'document_so'               => substr($request->document_no,0,4) == 'SMRD' ? '' : 'required',
                 'billing_address'           => 'required',
                 'destination_address'       => 'required',
                 'province_id'               => 'required',

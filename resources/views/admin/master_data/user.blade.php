@@ -167,11 +167,11 @@
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                {{-- <div class="card-alert card blue">
+                <div class="card-alert card red">
                     <div class="card-content white-text">
-                        <p>Info : Untuk penambahan BP Supplier & Ekspedisi dibuka akses hanya pak Sandi.</p>
+                        <p style="font-size:25px;">PENTING!!! SELALU CEK DATA YANG SUDAH ADA. PASTIKAN DATA CUSTOMER BENAR-BENAR BELUM DIINPUT. TERIMA KASIH</p>
                     </div>
-                </div> --}}
+                </div>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>

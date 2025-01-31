@@ -328,7 +328,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light right submit" onclick="save();">Pindahkan ke SO <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -1031,7 +1031,7 @@
 
     function save(){
 		swal({
-            title: "Apakah anda yakin ingin simpan?",
+            title: "Apakah anda yakin ingin memindahkan data?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
             dangerMode: true,

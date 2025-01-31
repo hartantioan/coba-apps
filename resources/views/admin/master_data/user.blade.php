@@ -127,6 +127,11 @@
                                     <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p style="font-size:25px;">PENTING!!! SELALU CEK DATA YANG SUDAH ADA. PASTIKAN DATA CUSTOMER BENAR-BENAR BELUM DIINPUT. TERIMA KASIH</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -167,11 +172,6 @@
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                <div class="card-alert card red">
-                    <div class="card-content white-text">
-                        <p style="font-size:25px;">PENTING!!! SELALU CEK DATA YANG SUDAH ADA. PASTIKAN DATA CUSTOMER BENAR-BENAR BELUM DIINPUT. TERIMA KASIH</p>
-                    </div>
-                </div>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>

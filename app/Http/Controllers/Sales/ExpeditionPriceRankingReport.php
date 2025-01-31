@@ -6,6 +6,7 @@ use App\Exports\ExportExpeditionRanking;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCost;
 use App\Models\Region;
+use App\Models\Transportation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -27,6 +28,7 @@ class ExpeditionPriceRankingReport extends Controller
     {
         $data = [
             'title'         => 'Rekapitulasi',
+            'transport'         => Transportation::where('status','1')->get(),
             'content'       => 'admin.sales.expedition_price_ranking_report',
         ];
 
@@ -102,6 +104,10 @@ class ExpeditionPriceRankingReport extends Controller
                 $query->where('account_id', $request->account_id);
             }
 
+            if($request->filter_transportation){
+                $query->where('transportation_id', $request->filter_transportation);
+            }
+
             if($request->start_date && $request->finish_date) {
                 $query->where(function($query) use ($request) {
                     $query->whereDate('valid_from', '>=', $request->start_date)
@@ -171,6 +177,10 @@ class ExpeditionPriceRankingReport extends Controller
                 $query->where('account_id', $request->account_id);
             }
 
+            if($request->filter_transportation){
+                $query->where('transportation_id', $request->filter_transportation);
+            }
+
             if($request->start_date && $request->finish_date) {
                 $query->where(function($query) use ($request) {
                     $query->whereDate('valid_from', '>=', $request->start_date)
@@ -200,13 +210,11 @@ class ExpeditionPriceRankingReport extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->account->name ?? '',
                     $val->transportation->name ?? '',
                     $val->toCity->name,
                     $val->toSubdistrict->name,
                     number_format($val->qty_tonnage,3,',','.'),
                     number_format($val->tonnage,2,',','.'),
-                    number_format($val->ritage,2,',','.'),
                     $val->status(),
                 ];
 
@@ -242,6 +250,7 @@ class ExpeditionPriceRankingReport extends Controller
         $filter_province = $request->filter_province? $request->filter_province : '';
         $filter_city = $request->filter_city ? $request->filter_city : '';
         $filter_district = $request->filter_district ? $request->filter_district : '';
-		return Excel::download(new ExportExpeditionRanking($search,$post_date,$end_date,$status,$account,$filter_province,$filter_city,$filter_district), 'delivery_cost_'.uniqid().'.xlsx');
+        $filter_transportation = $request->filter_transportation ? $request->filter_transportation : '';
+		return Excel::download(new ExportExpeditionRanking($search,$post_date,$end_date,$status,$account,$filter_province,$filter_city,$filter_district,$filter_transportation), 'delivery_cost_'.uniqid().'.xlsx');
     }
 }

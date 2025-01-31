@@ -14,9 +14,9 @@ use App\Models\Region;
 
 class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-    protected $start_date, $end_date,$search,$status,$account,$filter_province,$filter_city,$filter_district;
+    protected $start_date, $end_date,$search,$status,$account,$filter_province,$filter_city,$filter_district,$filter_transportation;
 
-    public function __construct(string $search ,string $start_date, string $end_date,string $status,string $account,string $filter_province,string $filter_city,string $filter_district)
+    public function __construct(string $search ,string $start_date, string $end_date,string $status,string $account,string $filter_province,string $filter_city,string $filter_district,string $filter_transportation)
     {
         $this->search = $search ? $search : '';
         $this->end_date = $end_date ? $end_date : '';
@@ -25,6 +25,7 @@ class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings
         $this->account = $account ? $account : '';
 
 
+        $this->filter_transportation = $filter_transportation ? $filter_transportation : '';
         $this->filter_province = $filter_province ? $filter_province : '';
         $this->filter_city = $filter_city ? $filter_city : '';
         $this->filter_district = $filter_district ? $filter_district : '';
@@ -35,11 +36,9 @@ class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings
         'No. Dokumen',
         'Status',
         'Nama',
-        'Mitra Bisnis',
         'Jenis Kendaraan',
         'Tonase',
         'Harga/Kg',
-        'Harga/Ritase',
         'Kota Tujuan',
         'Kecamatan Tujuan',
     ];
@@ -73,12 +72,14 @@ class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings
             }
 
             if($this->filter_province&& !$this->filter_city && !$this->filter_district){
-
+                info($this->filter_province);
                 $region = Region::find($this->filter_province);
+                if($region){
 
-                $query->whereHas('toCity', function($query) use ($region) {
-                    $query->whereRaw('substr(code, 1, 2) = ?', [substr($region->code, 0, 2)]);
-                });
+                    $query->whereHas('toCity', function($query) use ($region) {
+                        $query->whereRaw('substr(code, 1, 2) = ?', [substr($region->code, 0, 2)]);
+                    });
+                }
             }
 
             if($this->filter_city && !$this->filter_district ){
@@ -90,6 +91,10 @@ class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings
 
             if($this->account){
                 $query->where('account_id', $this->account);
+            }
+
+            if($this->filter_transportation){
+                $query->where('transportation_id', $this->filter_transportation);
             }
 
             if($this->start_date && $this->end_date) {
@@ -121,14 +126,11 @@ class ExportExpeditionRanking implements FromCollection, WithTitle, WithHeadings
                 'No. Dokumen'=> $row->code,
                 'Status'=> $row->statusRaw(),
                 'Nama'=> $row->name,
-                'Mitra Bisnis'=> $row->account->name,
                 'Jenis Kendaraan'=> $row->transportation->name ?? '',
                 'Tonase'=> $row->qty_tonnage,
                 'Harga/Kg'=> $row->tonnage,
-                'Harga/Ritase'=> $row->ritage,
                 'Kota Tujuan'=>  $row->toCity->name,
                 'Kecamatan Tujuan'=>  $row->toSubdistrict->name,
-
             ];
         }
         return collect($array_filter);

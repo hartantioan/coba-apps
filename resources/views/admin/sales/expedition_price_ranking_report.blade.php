@@ -68,6 +68,17 @@
                                                 <label class="active" for="filter_district">{{ __('translations.district') }}</label>
                                             </div>
                                             <div class="col m4 s6 ">
+                                                <label for="filter_transportation" style="font-size:1rem;">Tipe Transportasi :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_transportation" onchange="loadDataTable()">
+                                                        <option value="">Pilih</option>
+                                                        @foreach ($transport as $row)
+                                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
@@ -82,6 +93,8 @@
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_account" name="filter_account" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
+                                            </div>
+                                            <div class="col m12 s12 l12">
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
@@ -116,13 +129,11 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
-                                                        <th>{{ __('translations.bussiness_partner') }}</th>
                                                         <th>Tipe Transport</th>
                                                         <th>{{ __('translations.destination_city') }}</th>
                                                         <th>{{ __('translations.destination_subdistrict') }}</th>
                                                         <th>{{ __('translations.tonnage') }} (KG)</th>
                                                         <th> Harga/Kg(Rp.) </th>
-                                                        <th> Harga/Ritase(Rp.) </th>
                                                         <th>{{ __('translations.status') }}</th>
                                                     </tr>
                                                 </thead>
@@ -344,6 +355,7 @@
                     account_id : $('#filter_account').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    filter_transportation : $('#filter_transportation').val(),
                     filter_province : $('#filter_province').val(),
                     filter_city : $('#filter_city').val(),
                     filter_district : $('#filter_district').val(),
@@ -367,13 +379,11 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'to_city', className: 'center-align' },
                 { name: 'to_subdistrict', className: 'center-align' },
                 { name: 'qty_tonnage', className: 'center-align' },
                 { name: 'tonnage', className: 'center-align' },
-                { name: 'ritage', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -436,7 +446,8 @@
         var filter_province = $('#filter_province').val();
         var filter_city = $('#filter_city').val();
         var filter_district= $('#filter_district').val();
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&account=" + account_id +"&da_date=" + end_date + "&filter_province=" + filter_province+ "&filter_city=" + filter_city+ "&filter_district=" + filter_district;
+        var filter_transportation= $('#filter_transportation').val();
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&account=" + account_id +"&da_date=" + end_date + "&filter_province=" + filter_province+ "&filter_city=" + filter_city+ "&filter_district=" + filter_district+ "&filter_transportation=" + filter_transportation;
 
     }
 

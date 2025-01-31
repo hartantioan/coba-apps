@@ -3009,12 +3009,7 @@
 
         tax = Math.floor(total * (percentTax / 100));
 
-        console.log(total);
-        console.log(tax);
-
         grandtotal = total + tax;
-
-        console.log(grandtotal);
 
         $('#subtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(subtotal).toString().replace('.',','))
@@ -3038,7 +3033,7 @@
 
         /* if(total > 0){ */
             $('#textTax').show();
-            getTaxSeries();
+            /* getTaxSeries(); */
         /* }else{
             $('#textTax').hide();
             $('#tax_no').val('');

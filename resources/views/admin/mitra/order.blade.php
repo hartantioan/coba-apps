@@ -194,6 +194,10 @@
                                         <label class="active" for="broker">Broker</label>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <b id="customer">-</b>
+                                        <label class="active" for="customer">Customer</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <b id="post_date">-</b>
                                         <label class="active" for="post_date">Tgl.Post</label>
                                     </div>
@@ -542,7 +546,7 @@
                 $('#temp').val('');
                 $('.row_item').remove();
                 $('#code').text('-');
-                $('#broker').text('-');
+                $('#broker,#customer').text('-');
                 $('#type').text('-');
                 $('#post_date').text('-');
                 $('#valid_date').text('-');
@@ -1109,6 +1113,7 @@
                 $('#temp').val(id);
                 $('#code').text(response.code);
                 $('#broker').text(response.broker_name);
+                $('#customer').text(response.account_name);
                 $('#post_date').text(response.post_date);
                 $('#valid_date').text(response.valid_date);
                 $('#document_no').text(response.document_no);

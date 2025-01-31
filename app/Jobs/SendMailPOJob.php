@@ -51,7 +51,7 @@ class SendMailPOJob implements ShouldQueue
             $ccEmails = [
                 'livia@superior.co.id',
                 'david@superior.co.id',
-                'rmpurch@superiorprocurement.co.id'
+                'rmpurch@superiorporcelain.co.id'
             ];
             $img_path = public_path('website/logo_web_fix.png');
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);

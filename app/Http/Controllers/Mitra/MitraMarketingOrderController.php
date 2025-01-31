@@ -149,7 +149,7 @@ class MitraMarketingOrderController extends Controller
         
         $query_data = $query->offset($start)->limit($length)->orderBy($order, $dir)->get();
 
-        $total_filtered = $query->count();
+        $total_filtered = $query_data->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {

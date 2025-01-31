@@ -147,6 +147,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                 'Batch',
                 'Area',
                 'Satuan',
+                'Dokumen',
                 'Mutasi',
                 'Balance',
             ];
@@ -178,6 +179,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         '',
                         '',
                         '',
+                        '',
                         'SALDO',
                         $balance,
                     ];
@@ -192,6 +194,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             $row->productionBatch->code,
                             $row->area->code,
                             $row->item->uomUnit->code,
+                            $row->lookable->code,
                             $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
                             $balance,
                         ];
@@ -223,6 +226,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                     '',
                     '',
                     '',
+                    '',
                     'SALDO',
                     $balance,
                 ];
@@ -237,6 +241,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         $row->productionBatch->code,
                         $row->area->code,
                         $row->item->uomUnit->code,
+                        $row->lookable->code,
                         $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
                         $balance,
                     ];
@@ -269,6 +274,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             '',
                             '',
                             '',
+                            '',
                             'SALDO',
                             $balance,
                         ];
@@ -283,6 +289,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                 $row->productionBatch->code,
                                 $row->area->code,
                                 $row->item->uomUnit->code,
+                                $row->lookable->code,
                                 $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
                                 $balance,
                             ];

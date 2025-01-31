@@ -175,6 +175,7 @@ class ReportStockMovementPerShadingController extends Controller
                     <th class="center-align">Batch</th>
                     <th class="center-align">Area</th>
                     <th class="center-align">Satuan</th>
+                    <th class="center-align">Dokumen</th>
                     <th class="center-align">Tanggal</th>
                     <th class="center-align">Mutasi</th>
                     <th class="center-align">Balance</th>
@@ -203,7 +204,7 @@ class ReportStockMovementPerShadingController extends Controller
                             <td class="center-align">'.$shading->item->code.'</td>
                             <td class="center-align">'.$shading->item->name.'</td>
                             <td class="center-align">'.$place->code.'</td>
-                            <td class="center-align" colspan="6">SALDO PERIODE SEBELUMNYA</td>
+                            <td class="center-align" colspan="7">SALDO PERIODE SEBELUMNYA</td>
                             <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
                         </tr>';
                     foreach($data as $key => $row){
@@ -217,6 +218,7 @@ class ReportStockMovementPerShadingController extends Controller
                             <td class="center-align">'.$row->productionBatch->code.'</td>
                             <td class="center-align">'.$row->area->code.'</td>
                             <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                            <td class="center-align">'.$row->lookable->code.'</td>
                             <td class="center-align">'.date('d/m/Y',strtotime($row->date)).'</td>
                             <td class="right-align">'.($row->type == 'IN' ? CustomHelper::formatConditionalQty($row->qty_in) : CustomHelper::formatConditionalQty(-1 * $row->qty_out)).'</td>
                             <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
@@ -245,7 +247,7 @@ class ReportStockMovementPerShadingController extends Controller
                         <td class="center-align">'.($dataBefore ? $dataBefore->item->code : '-').'</td>
                         <td class="center-align">'.($dataBefore ? $dataBefore->item->name : '-').'</td>
                         <td class="center-align">'.($dataBefore ? $dataBefore->itemShading->code : '-').'</td>
-                        <td class="center-align" colspan="6">SALDO PERIODE SEBELUMNYA</td>
+                        <td class="center-align" colspan="7">SALDO PERIODE SEBELUMNYA</td>
                         <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
                     </tr>';
                 foreach($data as $key => $row){
@@ -259,6 +261,7 @@ class ReportStockMovementPerShadingController extends Controller
                         <td class="center-align">'.$row->productionBatch->code.'</td>
                         <td class="center-align">'.$row->area->code.'</td>
                         <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                        <td class="center-align">'.$row->lookable->code.'</td>
                         <td class="center-align">'.date('d/m/Y',strtotime($row->date)).'</td>
                         <td class="right-align">'.($row->type == 'IN' ? CustomHelper::formatConditionalQty($row->qty_in) : CustomHelper::formatConditionalQty(-1 * $row->qty_out)).'</td>
                         <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
@@ -289,7 +292,7 @@ class ReportStockMovementPerShadingController extends Controller
                                 <td class="center-align">'.$rowshading->item->name.'</td>
                                 <td class="center-align">'.$place->code.'</td>
                                 <td class="center-align">'.$rowshading->code.'</td>
-                                <td class="center-align" colspan="5">SALDO PERIODE SEBELUMNYA</td>
+                                <td class="center-align" colspan="6">SALDO PERIODE SEBELUMNYA</td>
                                 <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>
                             </tr>';
                         foreach($data as $key => $row){
@@ -303,6 +306,7 @@ class ReportStockMovementPerShadingController extends Controller
                                 <td class="center-align">'.$row->productionBatch->code.'</td>
                                 <td class="center-align">'.$row->area->code.'</td>
                                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                                <td class="center-align">'.$row->lookable->code.'</td>
                                 <td class="center-align">'.date('d/m/Y',strtotime($row->date)).'</td>
                                 <td class="right-align">'.($row->type == 'IN' ? CustomHelper::formatConditionalQty($row->qty_in) : CustomHelper::formatConditionalQty(-1 * $row->qty_out)).'</td>
                                 <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>

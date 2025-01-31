@@ -3005,7 +3005,7 @@
             downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        total = subtotal - downpayment + rounding;
+        total = (subtotal - downpayment + rounding).toFixed(2);
 
         tax = Math.floor(total * (percentTax / 100));
 

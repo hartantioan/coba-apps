@@ -3102,7 +3102,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $id_rules = null;
             $percentage_mod = 0;
-            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('effective_date','>=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
+            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('start_effective_date','>=',date('Y-m-d'))->whereDate('effective_date','<=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
             if($getRules){
                 $id_rules = $getRules->id;
                 $percentage_mod = $getRules->percentage_level;

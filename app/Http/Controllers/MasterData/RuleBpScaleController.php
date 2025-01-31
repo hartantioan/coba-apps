@@ -32,6 +32,7 @@ class RuleBpScaleController extends Controller
             'account_id',
             'item_id',
             'rule_procurement_id',
+            'start_effective_date',
             'effective_date',
         ];
 
@@ -73,10 +74,16 @@ class RuleBpScaleController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                if($val->start_effective_date){
+                    $start_date =date('d/m/Y',strtotime($val->start_effective_date));
+                }else{
+                    $start_date = '-';
+                }
                 $response['data'][] = [
                     $nomor,
                     $val->account->name,
                     $val->ruleProcurement->name,
+                    $start_date,
                     date('d/m/Y',strtotime($val->effective_date)),
                     $val->item->name,
                     CustomHelper::formatConditionalQty($val->water_percent).'%',
@@ -150,6 +157,7 @@ class RuleBpScaleController extends Controller
                         'rule_procurement_id'	=> $request->rule_procurement_id,
                         'water_percent'	=> $request->water_percent,
                         'item_id'       => $request->item_id,
+                        'start_effective_date'       => $request->start_effective_date,
                         'effective_date'       => $request->effective_date,
                     ]);
                     DB::commit();
@@ -165,6 +173,7 @@ class RuleBpScaleController extends Controller
                         'rule_procurement_id'	=> $request->rule_procurement_id,
                         'water_percent'	=> $request->water_percent,
                         'item_id'       => $request->item_id,
+                        'start_effective_date'       => $request->start_effective_date,
                         'effective_date'       => $request->effective_date,
 
                     ]);

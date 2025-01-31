@@ -2939,6 +2939,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [MitraMarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MitraMarketingOrderController::class, 'voidStatus'])->middleware('operation.access:mitra_marketing_order,void');
                     Route::post('destroy', [MitraMarketingOrderController::class, 'destroy'])->middleware('operation.access:mitra_marketing_order,delete');
+                    Route::get('export_from_page', [MitraMarketingOrderController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {

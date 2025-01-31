@@ -47,7 +47,7 @@ class SendMailPOJob implements ShouldQueue
                 "verify_peer_name"=>false,
                 ),
             );
-            $po_array = explode(',',$po->account->email);
+            $po_array = array_map('trim', explode(';', $po->account->email));
             $ccEmails = [
                 'livia@superior.co.id',
                 'david@superior.co.id',

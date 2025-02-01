@@ -3005,13 +3005,11 @@
             downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        total = (subtotal - downpayment + rounding).toFixed(2);
+        total = parseFloat((subtotal - downpayment + rounding).toFixed(2));
 
         tax = Math.floor(total * (percentTax / 100));
 
         grandtotal = total + tax;
-
-        alert(grandtotal);
 
         $('#subtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(subtotal).toString().replace('.',','))

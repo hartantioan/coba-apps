@@ -2727,8 +2727,8 @@
                     });
                 }
             }
-        });
-    } */
+        }); */
+    }
 
     function success(){
         loadDataTable();

@@ -295,7 +295,7 @@
                                         </select>
                                         <label class="" for="type">Tipe Penjualan</label>
                                     </div>
-                                    <div class="col m4 s12 step10">
+                                    {{-- <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -311,7 +311,7 @@
                                     <div class="col m4 s12">
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
-                                    </div>
+                                    </div> --}}
                                     <div class="input-field col m4 s12 step2">
                                         <table border="0" style="border: none;border-collapse: collapse;max-width:100%" id="table_deposit">
                                             <tr>
@@ -508,6 +508,66 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modalEmail" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>Upload Bukti dan Email ke Customer</h4>
+                <form class="row" id="form_data_email" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_email" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input type="hidden" id="tempEmail" name="tempEmail">
+                                        <b id="codeEmail">-</b>
+                                        <label class="active" for="codeEmail">No. Dokumen</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="account_name">-</b>
+                                        <label class="active" for="account_name">{{ __('translations.customer') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="marketing_order_delivery_process_code">-</b>
+                                        <label class="active" for="marketing_order_delivery_process_code">Surat Jalan</label>
+                                    </div>
+                                    <div class="col m4 s12 step10">
+                                        <label class="">Bukti Upload</label>
+                                        <br>
+                                        <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                        <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                            Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                            <br>
+
+                                        </div>
+                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                                           Clear
+                                        </a>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <div id="fileName"></div>
+                                        <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step18" onclick="saveUpdateEmail();">Simpan & Kirim <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -1000,6 +1060,31 @@
                         </td>
                     </tr>
                 `);
+            }
+        });
+
+        $('#modalEmail').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_email').hide();
+                $('#validation_alert_email').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+                clearButton.click();
+                $('#form_data_email')[0].reset();
+                $('#tempEmail').val('');
+                $('#codeEmail,#account_name,#marketing_order_delivery_process_code').text('-');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -2487,6 +2572,164 @@
         });
     }
 
+    function saveUpdateEmail(){
+        alert('coming soon lagi!');
+		/* swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]), passed = true, passedTax = true;
+
+                $('input[name^="arr_qty"]').each(function(index){
+                    if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) == 0){
+                        passed = false;
+                    }
+                });
+
+                if($('#invoice_type').val() == '2'){
+                    let passedManual = true;
+                    $('input[name^="arr_note[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedManual = false;
+                        }
+                        if(!$('input[name^="arr_description[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_qty[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(!$('select[name^="arr_unit[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_price[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_price[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_tax[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                        if(parseFloat($('input[name^="arr_total_after_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total_after_tax[]"]').eq(index).val()){
+                            passedManual = false;
+                        }
+                    });
+
+                    if(!passedManual){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Untuk tipe Invoice Manual silahkan cek kembali form detail anda.',
+                            icon: 'error'
+                        });
+                        return false;
+                    }
+                }
+
+                if(passed){
+                    if(passedTax){
+                        var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+
+
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+
+                    formData.append('lastsegment',lastSegment);
+
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('#modal1');
+                            },
+                            success: function(response) {
+                                loadingClose('#modal1');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                } else if(response.status == 422) {
+                                    $('input').css('border', 'none');
+                                    $('input').css('border-bottom', '0.5px solid black');
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    $.each(response.error, function(field, errorMessage) {
+                                        $('#' + field).addClass('error-input');
+                                        $('#' + field).css('border', '1px solid red');
+
+                                    });
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('#modal1');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Nomor seri tidak boleh kosong, ketika nominal PPN diatas 0.',
+                            icon: 'warning'
+                        });
+                    }
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Qty tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
+    } */
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -3225,7 +3468,8 @@
     }
 
     function uploadAndEmail(id){
-        alert('coming soon!');
+        /* alert('coming soon!'); */
+        $('#modalEmail').modal('open');
         /* Swal.fire({
             title: "Pilih tanggal tutup!",
             input: "date",

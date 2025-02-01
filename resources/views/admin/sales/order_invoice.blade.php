@@ -3011,6 +3011,8 @@
 
         grandtotal = total + tax;
 
+        alert(grandtotal);
+
         $('#subtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(subtotal).toString().replace('.',','))
         );

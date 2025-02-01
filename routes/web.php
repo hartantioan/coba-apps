@@ -3123,6 +3123,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('update_and_email', [MarketingOrderInvoiceController::class, 'updateAndEmail'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_no_pjb', [MarketingOrderInvoiceController::class, 'updateNoPJB'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::get('approval/{id}', [MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');

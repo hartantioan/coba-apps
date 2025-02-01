@@ -536,13 +536,17 @@
                                         <label class="active" for="account_name">{{ __('translations.customer') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <b id="account_email">-</b>
+                                        <label class="active" for="account_email">Email (Master BP)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <b id="marketing_order_delivery_process_code">-</b>
                                         <label class="active" for="marketing_order_delivery_process_code">Surat Jalan</label>
                                     </div>
                                     <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
-                                        <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                        <input type="file" name="file" id="fileInput" accept="image/*,application/pdf" style="display: none;">
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                             Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                             <br>
@@ -1080,7 +1084,7 @@
                 clearButton.click();
                 $('#form_data_email')[0].reset();
                 $('#tempEmail').val('');
-                $('#codeEmail,#account_name,#marketing_order_delivery_process_code').text('-');
+                $('#codeEmail,#account_name,#account_email,#marketing_order_delivery_process_code').text('-');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
@@ -2573,9 +2577,8 @@
     }
 
     function saveUpdateEmail(){
-        alert('coming soon lagi!');
-		/* swal({
-            title: "Apakah anda yakin ingin simpan?",
+		swal({
+            title: "Apakah anda yakin ingin update dan kirim email?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
             dangerMode: true,
@@ -2585,154 +2588,103 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passed = true, passedTax = true;
+                var formData = new FormData($('#form_data_email')[0]), passed = true;
 
-                $('input[name^="arr_qty"]').each(function(index){
-                    if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) == 0){
-                        passed = false;
-                    }
-                });
+                let email = $('#account_email').text();
 
-                if($('#invoice_type').val() == '2'){
-                    let passedManual = true;
-                    $('input[name^="arr_note[]"]').each(function(index){
-                        if(!$(this).val()){
-                            passedManual = false;
-                        }
-                        if(!$('input[name^="arr_description[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_qty[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(!$('select[name^="arr_unit[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(parseFloat($('input[name^="arr_price[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_price[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(parseFloat($('input[name^="arr_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_tax[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                        if(parseFloat($('input[name^="arr_total_after_tax[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) == 0 || !$('input[name^="arr_total_after_tax[]"]').eq(index).val()){
-                            passedManual = false;
-                        }
-                    });
-
-                    if(!passedManual){
-                        swal({
-                            title: 'Ups!',
-                            text: 'Untuk tipe Invoice Manual silahkan cek kembali form detail anda.',
-                            icon: 'error'
-                        });
-                        return false;
-                    }
+                if(!email.includes("@", 0)){
+                    passed = false;
                 }
 
                 if(passed){
-                    if(passedTax){
-                        var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
-
-
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-
-                    formData.append('lastsegment',lastSegment);
-
-                        $.ajax({
-                            url: '{{ Request::url() }}/create',
-                            type: 'POST',
-                            dataType: 'JSON',
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            cache: true,
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            beforeSend: function() {
-                                $('#validation_alert').hide();
-                                $('#validation_alert').html('');
-                                loadingOpen('#modal1');
-                            },
-                            success: function(response) {
-                                loadingClose('#modal1');
-                                if(response.status == 200) {
-                                    success();
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                } else if(response.status == 422) {
-                                    $('input').css('border', 'none');
-                                    $('input').css('border-bottom', '0.5px solid black');
-                                    $('#validation_alert').show();
-                                    $('.modal-content').scrollTop(0);
-                                    $.each(response.error, function(field, errorMessage) {
-                                        $('#' + field).addClass('error-input');
-                                        $('#' + field).css('border', '1px solid red');
-
-                                    });
-                                    swal({
-                                        title: 'Ups! Validation',
-                                        text: 'Check your form.',
-                                        icon: 'warning'
-                                    });
-
-                                    $.each(response.error, function(i, val) {
-                                        $.each(val, function(i, val) {
-                                            $('#validation_alert').append(`
-                                                <div class="card-alert card red">
-                                                    <div class="card-content white-text">
-                                                        <p>` + val + `</p>
-                                                    </div>
-                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">×</span>
-                                                    </button>
-                                                </div>
-                                            `);
-                                        });
-                                    });
-                                } else {
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                }
-                            },
-                            error: function() {
+                    $.ajax({
+                        url: '{{ Request::url() }}/update_and_email',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert_email').hide();
+                            $('#validation_alert_email').html('');
+                            loadingOpen('#modalEmail');
+                        },
+                        success: function(response) {
+                            loadingClose('#modalEmail');
+                            if(response.status == 200) {
+                                successEmail();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                $('#validation_alert_email').show();
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('#modal1');
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+
+                                });
                                 swal({
-                                    title: 'Ups!',
-                                    text: 'Check your internet connection.',
-                                    icon: 'error'
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert_email').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
                                 });
                             }
-                        });
-                    }else{
-                        swal({
-                            title: 'Ups!',
-                            text: 'Nomor seri tidak boleh kosong, ketika nominal PPN diatas 0.',
-                            icon: 'warning'
-                        });
-                    }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('#modalEmail');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Qty tidak boleh kosong.',
+                        text: 'Email tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }
             }
-        }); */
+        });
     }
 
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successEmail(){
+        loadDataTable();
+        $('#modalEmail').modal('close');
     }
 
     function show(id){
@@ -3467,48 +3419,13 @@
         });
     }
 
-    function uploadAndEmail(id){
-        /* alert('coming soon!'); */
+    function uploadAndEmail(id,user,email,invoice,sj){
         $('#modalEmail').modal('open');
-        /* Swal.fire({
-            title: "Pilih tanggal tutup!",
-            input: "date",
-            showCancelButton: true,
-            confirmButtonText: "Lanjut",
-            cancelButtonText: "Batal",
-            cancelButtonColor: "#d33",
-            confirmButtonColor: "#3085d6",
-        }).then((result) => {
-            if (result.value) {
-                $.ajax({
-                    url: '{{ Request::url() }}/cancel_status',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: { id : id, cancel_date : result.value },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        M.toast({
-                            html: response.message
-                        });
-                        loadDataTable();
-                    },
-                    error: function() {
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        }); */
+        $('#tempEmail').val(id);
+        $('#account_name').text(user);
+        $('#codeEmail').text(invoice);
+        $('#marketing_order_delivery_process_code').text(sj);
+        $('#account_email').text(email);
     }
 
     function exportExcel(){

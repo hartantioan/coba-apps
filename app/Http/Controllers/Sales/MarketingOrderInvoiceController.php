@@ -298,7 +298,7 @@ class MarketingOrderInvoiceController extends Controller
 
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment dan Email" onclick="uploadAndEmail(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">email</i></button>
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment dan Email" onclick="uploadAndEmail(`' . CustomHelper::encrypt($val->code) . '`,`'.($val->account->employee_no.' - '.$val->account->name).'`,`'.($val->account->email ?? '-').'`,`'.($val->code).'`,`'.($val->marketingOrderDeliveryProcess->code ?? '').'`)"><i class="material-icons dp48">email</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -671,6 +671,77 @@ class MarketingOrderInvoiceController extends Controller
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
                         ->log('Add / edit AR Invoice.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+            info($e->getMessage());
+        }
+
+		return response()->json($response);
+    }
+
+    public function updateAndEmail(Request $request){
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'tempEmail'                     => 'required',
+                'file'                          => 'required',
+            ], [
+                'tempEmail.required' 	                => 'Kode tidak boleh kosong.',
+                'file.required'                         => 'File harus dipilih.',
+            ]);
+
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+
+                $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->tempEmail))->first();
+
+                if(in_array($query->status,['2','3'])){
+                    if($request->has('file')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('file')->store('public/marketing_order_invoices');
+                    } else {
+                        $document = $query->document;
+                    }
+                    $query->document = $document;
+                    $query->save();
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Fitur update dan email hanya untuk ARIN dengan status PROSES / SELESAI.'
+                    ]);
+                }
+
+                if($query) {
+
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Update dan Email AR Invoice No. '.$query->code,'Email dan update telah dikirimkan ke customer.',session('bo_id'));
+
+                    activity()
+                        ->performedOn(new MarketingOrderInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Update and send email AR Invoice.');
 
                     $response = [
                         'status'    => 200,

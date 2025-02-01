@@ -3224,8 +3224,9 @@
         });
     }
 
-    function cancelStatus(id){
-        Swal.fire({
+    function uploadAndEmail(id){
+        alert('coming soon!');
+        /* Swal.fire({
             title: "Pilih tanggal tutup!",
             input: "date",
             showCancelButton: true,
@@ -3263,7 +3264,7 @@
                     }
                 });
             }
-        });
+        }); */
     }
 
     function exportExcel(){

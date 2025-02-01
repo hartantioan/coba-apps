@@ -236,15 +236,8 @@ class MarketingOrderInvoiceController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                $nodis = '';
                 if($val->isOpenPeriod()){
                     $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
-                }else{
-                    $nodis = 'style="cursor: default;
                     pointer-events: none;
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
@@ -305,7 +298,7 @@ class MarketingOrderInvoiceController extends Controller
 
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <!-- <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button> -->
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment dan Email" onclick="uploadAndEmail(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">email</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];

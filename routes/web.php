@@ -173,7 +173,7 @@ use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderMemoController;
 use App\Http\Controllers\Sales\MarketingOrderReportController;
-use App\Http\Controllers\Sales\ReportMarketingOrderDeliveryController;
+use App\Http\Controllers\Sales\ExpeditionPriceRankingReport;
 use App\Http\Controllers\Sales\ReportSalesOrderRecapController;
 use App\Http\Controllers\Sales\ReportMarketingDOScalesController;
 use App\Http\Controllers\Sales\ReportSalesOrderController;
@@ -3232,6 +3232,17 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [MarketingOrderReportController::class, 'export']);
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);
                         Route::get('export_xml', [MarketingOrderReportController::class, 'exportXml']);
+                    });
+
+                    Route::prefix('expedition_ranks')->middleware('operation.access:delivery_cost,view')->group(function () {
+                        Route::get('/', [ExpeditionPriceRankingReport::class, 'index']);
+                        Route::get('datatable', [ExpeditionPriceRankingReport::class, 'datatable']);
+                        Route::post('show', [ExpeditionPriceRankingReport::class, 'show']);
+                        Route::get('export_from_page', [ExpeditionPriceRankingReport::class, 'exportFromTransactionPage']);
+                        Route::get('get_import_excel', [ExpeditionPriceRankingReport::class, 'getImportExcel']);
+                        Route::post('import', [ExpeditionPriceRankingReport::class, 'import'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('create', [ExpeditionPriceRankingReport::class, 'create'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('destroy', [ExpeditionPriceRankingReport::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
 
                     // Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {

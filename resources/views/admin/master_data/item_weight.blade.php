@@ -104,8 +104,8 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Item</th>
-                                                        <th>Berat Gross (KG)</th>
-                                                        <th>Berat Netto (KG)</th>
+                                                        <th>Berat Gross (KG) / M2</th>
+                                                        <th>Berat Netto (KG) / M2</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>

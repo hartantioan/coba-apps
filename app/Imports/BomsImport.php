@@ -163,9 +163,10 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
             }else{
                 if ($row['kode_bom_header']) {
                     $check = Bom::where('code', $row['kode_bom_header'])->first();
-                    $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
+                    
                     if ($check) {
-        
+                        $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
+
                         $method = explode('#', $row['metode'])[1];
                     
                         if($row['type']=='items'){
@@ -216,6 +217,8 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                                 'cost_distribution_id'=> $cost_distribution_id,
                             ]);
                         }
+                    }else{
+                        $this->error = "Bom Header tidak ditemukan. Cek kode bom header anda.";
                     }
                 }
             }

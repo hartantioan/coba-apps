@@ -751,6 +751,28 @@ class GoodScaleController extends Controller
                     <div class="col s12">'.$data->code.$x.'</div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                    <thead>
+                        <tr>
+                            <th class="center-align" colspan="5">Approval</th>
+                        </tr>
+                        <tr>
+                            <th class="center-align">No</th>
+                            <th class="center-align">Dokumen</th>
+                            <th class="center-align">Berat</th>
+                        </tr>
+                    </thead><tbody>';
+
+        foreach($data->goodScaleDetail as $key => $detail){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$detail->lookable->marketingOrderDeliveryProcess->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($detail->qty).'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>

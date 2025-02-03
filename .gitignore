@@ -21,3 +21,5 @@ storage/fonts/installed-fonts.json
 storage/fonts/installed-fonts.json
 storage/fonts/installed-fonts.json
 /storage/fonts
+app/Helpers/mbeng.php
+app/Helpers/s.php

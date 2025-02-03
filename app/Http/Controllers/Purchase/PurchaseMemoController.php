@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\GoodIssue;
@@ -727,7 +728,7 @@ class PurchaseMemoController extends Controller
                     }
                 }
 
-                CustomHelper::sendApproval('purchase_memos',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('purchase_memos',$query->id,'Pengajuan Purchase Memo No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

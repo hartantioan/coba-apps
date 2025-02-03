@@ -287,13 +287,12 @@ function cekNotif(url){
 		}
 	});
 	let currentUrl = window.location.href;
-	let segments = currentUrl.split('/');
-    let lastSegment = segments.pop() || segments.pop();
+    let lastSegment = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
 	$.ajax({
-		url: url + '/admin/setting/announcement/refresh',
+		url: url + '/admin/personal/notification/announcement',
 		type: 'POST',
 		dataType: 'JSON',
-		data: {lastSegment: lastSegment,},
+		data: {lastSegment: currentUrl},
 		headers: {
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},

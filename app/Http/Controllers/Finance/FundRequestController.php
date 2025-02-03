@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
 use App\Models\ChecklistDocumentList;
@@ -1323,7 +1324,7 @@ class FundRequestController extends Controller
                     CustomHelper::addCountLimitCredit($request->account_id,$query->grandtotal);
                 }
 
-                CustomHelper::sendApproval('fund_requests',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('fund_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

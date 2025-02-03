@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\JournalDetail;
@@ -277,7 +278,7 @@ class AdjustRateController extends Controller
                 }
             }
 
-            foreach($dataapdp as $row){
+            foreach($dataapdp->where('post_date','<','2025-02-01') as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
                 $total = $row->balancePaymentByDate($request->post_date);
                 if($total > 0){
@@ -296,20 +297,40 @@ class AdjustRateController extends Controller
             }
 
             foreach($dataapdp as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceInvoiceByDate($request->post_date);
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coauangmukapembelian->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'APDP UANG MUKA',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '1',
-                    ];
+                if($row->post_date < '2025-02-01'){
+                    $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                    $total = $row->balanceInvoiceByDate($request->post_date);
+                    if($total > 0){
+                        $result[] = [
+                            'coa_id'        => $coauangmukapembelian->id,
+                            'lookable_type' => $row->getTable(),
+                            'lookable_id'   => $row->id,
+                            'code'          => $row->code,
+                            'type_document' => 'APDP UANG MUKA',
+                            'nominal_fc'    => number_format($total,2,',','.'),
+                            'latest_rate'   => number_format($latest_rate,2,',','.'),
+                            'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
+                            'type'          => '1',
+                        ];
+                    }
+                }else{
+                    if($row->status == '3'){
+                        $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                        $total = $row->balanceInvoiceByDate($request->post_date);
+                        if($total > 0){
+                            $result[] = [
+                                'coa_id'        => $coauangmukapembelian->id,
+                                'lookable_type' => $row->getTable(),
+                                'lookable_id'   => $row->id,
+                                'code'          => $row->code,
+                                'type_document' => 'APDP UANG MUKA',
+                                'nominal_fc'    => number_format($total,2,',','.'),
+                                'latest_rate'   => number_format($latest_rate,2,',','.'),
+                                'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
+                                'type'          => '1',
+                            ];
+                        }
+                    }
                 }
             }
 
@@ -492,7 +513,7 @@ class AdjustRateController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Adjust Kurs No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

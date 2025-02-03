@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Jobs\SendApproval;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -322,7 +323,7 @@ class ProductionFgReceive extends Model
 
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
-                'user_id'		            => session('bo_id'),
+                'user_id'		            => $this->user_id,
                 'company_id'                => $this->company_id,
                 'production_order_detail_id'=> $this->production_order_detail_id,
                 'production_fg_receive_id'  => $this->id,
@@ -362,12 +363,12 @@ class ProductionFgReceive extends Model
                 'lookable_id'       => $querydetail->id,
             ]);
             if($query){
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+                SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,$this->user_id);
     
                 activity()
                     ->performedOn(new ProductionIssue())
-                    ->causedBy(session('bo_id'))
+                    ->causedBy($this->user_id)
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
             }
@@ -399,7 +400,7 @@ class ProductionFgReceive extends Model
         
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
-                'user_id'		            => session('bo_id'),
+                'user_id'		            => $this->user_id,
                 'company_id'                => $this->company_id,
                 'production_order_detail_id'=> $this->production_order_detail_id,
                 'production_fg_receive_id'  => $this->id,
@@ -438,12 +439,12 @@ class ProductionFgReceive extends Model
             }
 
             if($query){
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+                SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,$this->user_id);
 
                 activity()
                     ->performedOn(new ProductionIssue())
-                    ->causedBy(session('bo_id'))
+                    ->causedBy($this->user_id)
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
             }
@@ -478,7 +479,7 @@ class ProductionFgReceive extends Model
                         $item = Item::find($rowbom->lookable_id);
                         if($item){
                             $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                             if($index >= 0){
                                 $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $price,2);
@@ -533,7 +534,7 @@ class ProductionFgReceive extends Model
                             if($item){
                                 $price = $item->priceNowProduction($this->place_id,$this->post_date);
                                 $nominal = $price;
-                                $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                                 $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                                 if($index >= 0){
                                     $arrDetail[$index]['total'] += round(round($rowbom->qty * $arrQty[$key],3) * $price,2);

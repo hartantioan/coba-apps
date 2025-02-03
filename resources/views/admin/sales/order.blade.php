@@ -868,6 +868,7 @@
                 };
                 city = [];
                 resetTerm();
+                $('#document_no').attr('readonly',false);
             }
         });
 
@@ -942,7 +943,7 @@
 
         @if($mitra_data)
             $('#modal1').modal('open');
-            $('#document_no').val('{{ $mitra_data->code }}');
+            $('#document_no').val('{{ $mitra_data->code }}').attr('readonly',true);
             $('#account_id').empty();
             $('#account_id').append(`
                 <option value="{{ $mitra_data->account_id }}">{{ $mitra_data->account_name }}</option>
@@ -967,8 +968,11 @@
             $('#top_customer').val('{{ $mitra_data->top_customer }}');
             $('#percent_dp').val('{{ $mitra_data->percent_dp }}');
             $('#broker_id').empty().append(`<option value="{{ $mitra_data->user_id }}">{{ $mitra_data->broker_name }}</option>`);
-            $('#note_internal').val('');
-            $('#note_external').val('');
+            @if($mitra_data->sales_id)
+                $('#sales_id').empty().append(`<option value="{{ $mitra_data->sales_id }}">{{ $mitra_data->sales_name }}</option>`);
+            @endif
+            $('#note_internal').val('{{ $mitra_data->note }}');
+            $('#note_external').val('{{ $mitra_data->note }}');
             $('#phone').val('{{ $mitra_data->account->phone }}');
             $('#total').val('{{ $mitra_data->total }}');
             $('#tax').val('{{ $mitra_data->tax }}');
@@ -1005,8 +1009,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="right-align" id="arr_qty_now` + count + `">{{ $row['qty_now'] }}</td>
-                            <td class="right-align" id="arr_qty_temporary` + count + `">{{ $row['qty_commited'] }}</td>
+                            <td class="right-align" id="arr_qty_now` + count + `">{{ $row['stock_now'] }}</td>
+                            <td class="right-align" id="arr_qty_temporary` + count + `">{{ $row['stock_com'] }}</td>
                             <td class="center">
                                 <input name="arr_qty_uom[]" type="text" value="{{ $row['qty'] }}" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
                             </td>
@@ -1538,6 +1542,7 @@
                     district: $('#district_id').val(),
                     payment_type: $('#payment_type').val(),
                     transportation_id: $('#transportation_id').val(),
+                    type_delivery: $('#type_delivery').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1588,6 +1593,8 @@
                             );
                         }
                     }
+
+                    countRow(nil);
                 },
                 error: function() {
                     loadingClose('#modal1');

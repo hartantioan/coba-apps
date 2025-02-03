@@ -52,6 +52,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                 'Nama Item',
                 'Satuan',
                 'Shading',
+                'Batch',
                 'Balance Qty',
                 'Balance Nominal',
             ];
@@ -78,11 +79,35 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         $shading->item->name,
                         $shading->item->uomUnit->code,
                         $shading->code,
+                        '-',
                         $qty,
                         $total,
                     ];
                 }
-
+            }elseif($this->batch_id){
+                $data = ItemCogs::where('production_batch_id',$this->batch_id)->where(function($query){
+                    $query->where('date','<=',$this->finish_date);
+                    if($this->plant){
+                        $query->where('place_id',$this->plant);
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
+                $qty = 0;
+                $total = 0;
+                if($data){
+                    $qty = $data->totalByBatchBeforeIncludeDate();
+                    $total = $data->totalNominalByBatchBeforeIncludeDate();
+                    $arr[] = [
+                        '1',
+                        $place->code,
+                        $data->item->code,
+                        $data->item->name,
+                        $data->item->uomUnit->code,
+                        $data->itemShading->code,
+                        $data->productionBatch->code,
+                        $qty,
+                        $total,
+                    ];
+                }
             }else{
                 if(count($shading) > 0){
                     foreach($shading as $key => $rowshading){
@@ -122,6 +147,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                 'Batch',
                 'Area',
                 'Satuan',
+                'Dokumen',
                 'Mutasi',
                 'Balance',
             ];
@@ -153,6 +179,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                         '',
                         '',
                         '',
+                        '',
                         'SALDO',
                         $balance,
                     ];
@@ -167,10 +194,57 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             $row->productionBatch->code,
                             $row->area->code,
                             $row->item->uomUnit->code,
+                            $row->lookable->code,
                             $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
                             $balance,
                         ];
                     }
+                }
+            }elseif($this->batch_id){
+                $data = ItemCogs::where('production_batch_id',$this->batch_id)->where(function($query){
+                    $query->where('date','<=',$this->finish_date)->where('date','>=',$this->start_date);
+                    if($this->plant){
+                        $query->where('place_id',$this->plant);
+                    }
+                })->orderBy('date')->orderBy('id')->get();
+                $dataBefore = ItemCogs::where('production_batch_id',$this->batch_id)->where(function($query){
+                    $query->where('date','<',$this->start_date);
+                    if($this->plant){
+                        $query->where('place_id',$this->plant);
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
+                $balance = 0;
+                if($dataBefore){
+                    $balance += $dataBefore->totalByBatchBeforeIncludeDate();
+                }
+                $arr[] = [
+                    '',
+                    ($dataBefore ? $dataBefore->item->code : '-'),
+                    ($dataBefore ? $dataBefore->item->name : '-'),
+                    ($dataBefore ? $dataBefore->itemShading->code : '-'),
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'SALDO',
+                    $balance,
+                ];
+                foreach($data as $key => $row){
+                    $balance += $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out;
+                    $arr[] = [
+                        ($key + 1),
+                        $row->item->code,
+                        $row->item->name,
+                        $place->code,
+                        $row->itemShading->code,
+                        $row->productionBatch->code,
+                        $row->area->code,
+                        $row->item->uomUnit->code,
+                        $row->lookable->code,
+                        $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
+                        $balance,
+                    ];
                 }
             }else{
                 if(count($shading) > 0){
@@ -200,6 +274,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                             '',
                             '',
                             '',
+                            '',
                             'SALDO',
                             $balance,
                         ];
@@ -214,6 +289,7 @@ class ExportStockMovementShading implements FromArray,ShouldAutoSize, WithChunkR
                                 $row->productionBatch->code,
                                 $row->area->code,
                                 $row->item->uomUnit->code,
+                                $row->lookable->code,
                                 $row->type == 'IN' ? $row->qty_in : -1 * $row->qty_out,
                                 $balance,
                             ];

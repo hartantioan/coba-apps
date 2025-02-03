@@ -48,6 +48,12 @@ class DeliveryCost extends Model
         return $this->belongsTo('App\Models\Region','from_city_id','id')->withTrashed();
     }
 
+    public function fromProvince()
+    {
+        $data = Region::where('code', substr($this->fromCity->code, 0, 2))->first();
+        return $data;
+    }
+
     public function fromSubdistrict(){
         return $this->belongsTo('App\Models\Region','from_subdistrict_id','id')->withTrashed();
     }

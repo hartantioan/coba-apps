@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
@@ -235,15 +236,8 @@ class MarketingOrderInvoiceController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                $nodis = '';
                 if($val->isOpenPeriod()){
                     $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
-                }else{
-                    $nodis = 'style="cursor: default;
                     pointer-events: none;
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
@@ -304,7 +298,7 @@ class MarketingOrderInvoiceController extends Controller
 
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment dan Email" onclick="uploadAndEmail(`' . CustomHelper::encrypt($val->code) . '`,`'.($val->account->employee_no.' - '.$val->account->name).'`,`'.($val->account->email ?? '-').'`,`'.($val->code).'`,`'.($val->marketingOrderDeliveryProcess->code ?? '').'`)"><i class="material-icons dp48">email</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -531,7 +525,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->tax_no = $request->tax_no ? $request->tax_no : NULL;
+                        $query->tax_no = $request->tax_no ?? NULL;
                         $query->note = $request->note;
 
                         $query->save();
@@ -550,7 +544,7 @@ class MarketingOrderInvoiceController extends Controller
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    $taxno = '';
+                    /* $taxno = '';
                     if($request->tempTaxId > 0){
                         $no = TaxSeries::getTaxCode($request->company_id,$request->post_date,$request->prefix_tax);
                         if($no['status'] == 200){
@@ -561,7 +555,7 @@ class MarketingOrderInvoiceController extends Controller
                                 'message' => 'Nomor seri pajak sudah habis terpakai.'
                             ]);
                         }
-                    }
+                    } */
 
                     $query = MarketingOrderInvoice::create([
                         'code'			                => $newCode,
@@ -584,7 +578,7 @@ class MarketingOrderInvoiceController extends Controller
                         'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
-                        'tax_no'                        => $request->tax_no ? $taxno : NULL,
+                        'tax_no'                        => $request->tax_no ?? NULL,
                         'note'                          => $request->note,
 
                     ]);
@@ -668,8 +662,8 @@ class MarketingOrderInvoiceController extends Controller
                             ]);
                         }
                     }
-
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()
@@ -677,6 +671,77 @@ class MarketingOrderInvoiceController extends Controller
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
                         ->log('Add / edit AR Invoice.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+            info($e->getMessage());
+        }
+
+		return response()->json($response);
+    }
+
+    public function updateAndEmail(Request $request){
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'tempEmail'                     => 'required',
+                'file'                          => 'required',
+            ], [
+                'tempEmail.required' 	                => 'Kode tidak boleh kosong.',
+                'file.required'                         => 'File harus dipilih.',
+            ]);
+
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+
+                $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->tempEmail))->first();
+
+                if(in_array($query->status,['2','3'])){
+                    if($request->has('file')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('file')->store('public/marketing_order_invoices');
+                    } else {
+                        $document = $query->document;
+                    }
+                    $query->document = $document;
+                    $query->save();
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Fitur update dan email hanya untuk ARIN dengan status PROSES / SELESAI.'
+                    ]);
+                }
+
+                if($query) {
+
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Update dan Email AR Invoice No. '.$query->code,'Email dan update telah dikirimkan ke customer.',session('bo_id'));
+
+                    activity()
+                        ->performedOn(new MarketingOrderInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Update and send email AR Invoice.');
 
                     $response = [
                         'status'    => 200,
@@ -1422,6 +1487,7 @@ class MarketingOrderInvoiceController extends Controller
         $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
         $po['user_datas'] = $po->account->getBillingAddress();
+        $po['prefix_tax'] = $po->tax_no ? substr($po->tax_no,0,3) : '';
 
         /* if($po->tax_no){
             $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];

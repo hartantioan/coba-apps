@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,6 +20,7 @@ class GoodReceive extends Model
         'code',
         'user_id',
         'company_id',
+        'good_issue_id',
         'post_date',
         'currency_id',
         'currency_rate',
@@ -50,6 +52,11 @@ class GoodReceive extends Model
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
+
+    public function goodIssue()
+    {
+        return $this->belongsTo('App\Models\GoodIssue', 'good_issue_id', 'id');
     }
 
     public function used(){
@@ -208,5 +215,59 @@ class GoodReceive extends Model
         }
 
         return $hasRelation;
+    }
+
+    public function totalQty(){
+        $total = $this->goodReceiveDetail()->sum('qty');
+        return $total;
+    }
+
+    public function updateGrandtotal(){
+        $total = 0;
+
+        foreach($this->goodReceiveDetail as $row){
+            $total += round($row->total,2);
+        }
+
+        $this->update([
+            'grandtotal'    => $total
+        ]);
+    }
+
+    public function upgradeDetail(){
+        $total = $this->goodIssue()->exists() ? $this->goodIssue->grandtotal : $this->total;
+        $balance = $total;
+        foreach($this->goodReceiveDetail as $row){
+            $rowtotal = round(($row->qty / $this->totalQty()) * $total,2);
+            if(($balance - $rowtotal) >= 0){
+                $row->update([
+                    'total' => $rowtotal,
+                    'price' => round($rowtotal / $row->qty,5),
+                ]);
+            }else{
+                $row->update([
+                    'total' => $balance,
+                    'price' => round($balance / $row->qty,5),
+                ]);
+            }
+            $balance -= $rowtotal;
+            CustomHelper::sendCogs($this->table,
+                $this->id,
+                $row->place->company_id,
+                $row->place_id,
+                $row->warehouse_id,
+                $row->item_id,
+                $row->qty,
+                round($row->total * $this->currency_rate,2),
+                'IN',
+                $this->post_date,
+                $row->area_id,
+                $row->item_shading_id ? $row->item_shading_id : NULL,
+                $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
+                $row->getTable(),
+                $row->id,
+            );
+        }
+        $this->updateGrandtotal();
     }
 }

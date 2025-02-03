@@ -7,6 +7,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Helpers\TreeHelper;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\ItemCogs;
@@ -414,7 +415,7 @@ class ProductionReceiveGPController extends Controller
                     'qty'           => $qtyAll,
                 ]);
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Receive Glaze Prep No. '.$query->code);
+                SendApproval::dispatch($query->getTable(),$query->id,'Receive Glaze Prep No. '.$query->code,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Receive Glaze Prep No. '.$query->code,'Pengajuan Receive Glaze Prep No. '.$query->code,session('bo_id'));
 
                 activity()

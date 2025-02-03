@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Mitra;
+use App\Exports\ExportMitraMarketingOrderTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
@@ -109,7 +110,7 @@ class MitraMarketingOrderController extends Controller
 
         $total_data = MitraMarketingOrder::count();
 
-        $query = MitraMarketingOrder::where(function($query) use ($search, $request) {
+        $query_data = MitraMarketingOrder::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -123,7 +124,7 @@ class MitraMarketingOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderDetail',function($query) use ($search, $request){
+                            ->orWhereHas('mitraMarketingOrderDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -144,20 +145,46 @@ class MitraMarketingOrderController extends Controller
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
-
-                if($request->delivery_type){
-                    $query->where('type_delivery',$request->delivery_type);
-                }
-
-                if($request->payment_type){
-                    $query->where('payment_type',$request->payment_type);
-                }
-
-            });
+            })
+            ->offset($start)->limit($length)->orderBy($order, $dir)->get();
         
-        $query_data = $query->offset($start)->limit($length)->orderBy($order, $dir)->get();
 
-        $total_filtered = $query->count();
+        $total_filtered = MitraMarketingOrder::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('mitraMarketingOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('item',function($query) use ($search, $request){
+                                    $query->where('code','like',"%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->whereIn('status', $request->status);
+                }
+
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
+            })->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {
@@ -730,52 +757,9 @@ class MitraMarketingOrderController extends Controller
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
         $status = $request->status? $request->status : '';
-        $type_sales = $request->type_sales ? $request->type_sales : '';
-        $type_pay = $request->type_pay ? $request->type_pay : '';
-        $type_deliv = $request->type_deliv? $request->type_deliv : '';
-        $company = $request->company ? $request->company : '';
-        $customer = $request->customer? $request->customer : '';
-        $delivery = $request->delivery? $request->delivery : '';
-        $sales = $request->sales ? $request->sales : '';
-        $currency = $request->currency ? $request->currency : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
 
-		return Excel::download(new ExportMarketingOrderTransactionPage($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'sales_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportMitraMarketingOrderTransactionPage($search,$status,$end_date,$start_date), 'mitra_sales_order_'.uniqid().'.xlsx');
     }
-
-    public function exportFromTransactionPageDetail1(Request $request){
-        $search= $request->search? $request->search : '';
-        $status = $request->status? $request->status : '';
-        $type_sales = $request->type_sales ? $request->type_sales : '';
-        $type_pay = $request->type_pay ? $request->type_pay : '';
-        $type_deliv = $request->type_deliv? $request->type_deliv : '';
-        $company = $request->company ? $request->company : '';
-        $customer = $request->customer? $request->customer : '';
-        $delivery = $request->delivery? $request->delivery : '';
-        $sales = $request->sales ? $request->sales : '';
-        $currency = $request->currency ? $request->currency : '';
-        $end_date = $request->end_date ? $request->end_date : '';
-        $start_date = $request->start_date? $request->start_date : '';
-
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail1($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail1'.uniqid().'.xlsx');
-    }
-
-    public function exportFromTransactionPageDetail2(Request $request){
-        $search= $request->search? $request->search : '';
-        $status = $request->status? $request->status : '';
-        $type_sales = $request->type_sales ? $request->type_sales : '';
-        $type_pay = $request->type_pay ? $request->type_pay : '';
-        $type_deliv = $request->type_deliv? $request->type_deliv : '';
-        $company = $request->company ? $request->company : '';
-        $customer = $request->customer? $request->customer : '';
-        $delivery = $request->delivery? $request->delivery : '';
-        $sales = $request->sales ? $request->sales : '';
-        $currency = $request->currency ? $request->currency : '';
-        $end_date = $request->end_date ? $request->end_date : '';
-        $start_date = $request->start_date? $request->start_date : '';
-
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'report_sales_'.uniqid().'.xlsx');
-    }
-
 }

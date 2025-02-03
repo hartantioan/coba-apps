@@ -188,6 +188,11 @@ class Item extends Model
         return $warehouse->warehouse_id;
     }
 
+    public function warehouseSm(){
+        $warehouse = $this->itemGroup->itemGroupWarehouse()->orderByDesc('id')->first();
+        return $warehouse->warehouse_id;
+    }
+
     public function warehouseName(){
         $warehouse = $this->itemGroup->itemGroupWarehouse()->first();
         return $warehouse->warehouse->name;
@@ -446,7 +451,27 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => 'Plant : '.$detail->place->code.' - Gudang : '.$detail->warehouse->name.' - Area : '.($detail->area()->exists() ? $detail->area->name : '').' - Shading : '.($detail->itemShading()->exists() ? $detail->itemShading->code : '-'),
+                'warehouse'     => 'Plant : '.$detail->place->code.' - Gudang : '.$detail->warehouse->name.' - Area : '.($detail->area()->exists() ? $detail->area->name : '').' - Shading : '.($detail->itemShading()->exists() ? $detail->itemShading->code : '-').' - Batch : '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '-'),
+                'warehouse_id'  => $detail->warehouse_id,
+                'area'          => $detail->area()->exists() ? $detail->area->name : '',
+                'area_id'       => $detail->area_id ? $detail->area_id : '',
+                'place_id'      => $detail->place_id,
+                'qty'           => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
+            ];
+        }
+
+        return $arrData;
+    }
+
+    public function currentStockPlaceWarehouseMoreThanZero($place,$warehouse){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place)->where('warehouse_id',$warehouse)->where('qty','>',0)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => 'Plant : '.$detail->place->code.' - Gudang : '.$detail->warehouse->name.' - Area : '.($detail->area()->exists() ? $detail->area->name : '').' - Shading : '.($detail->itemShading()->exists() ? $detail->itemShading->code : '-').' - Batch : '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '-'),
                 'warehouse_id'  => $detail->warehouse_id,
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',
@@ -526,6 +551,11 @@ class Item extends Model
     public function parentFg()
     {
         return $this->hasOne('App\Models\FgGroup','item_id','id');
+    }
+
+    public function toleranceScale()
+    {
+        return $this->hasOne('App\Models\ToleranceScale','item_id','id');
     }
 
     public function itemWeightFg()

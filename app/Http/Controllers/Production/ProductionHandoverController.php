@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Menu;
 use App\Helpers\TreeHelper;
@@ -503,7 +504,7 @@ class ProductionHandoverController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code);
+                    SendApproval::dispatch($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Serah Terima Produksi No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
                     activity()

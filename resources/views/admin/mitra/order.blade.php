@@ -83,26 +83,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_payment" style="font-size:1rem;">Tipe Pembayaran :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_payment" onchange="loadDataTable()">
-                                                        <option value="">{{ __('translations.all') }}</option>
-                                                        <option value="1">DP</option>
-                                                        <option value="2">Credit</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_delivery" style="font-size:1rem;">Tipe Pengiriman :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_delivery" onchange="loadDataTable()">
-                                                        <option value="">{{ __('translations.all') }}</option>
-                                                        <option value="1">Loco</option>
-                                                        <option value="2">Franco</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
@@ -125,11 +105,6 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
-                                            <div class="card-alert card green">
-                                                <div class="card-content white-text">
-                                                    <p>Info : -</p>
-                                                </div>
-                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -217,6 +192,10 @@
                                     <div class="input-field col m3 s12">
                                         <b id="broker">-</b>
                                         <label class="active" for="broker">Broker</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="customer">-</b>
+                                        <label class="active" for="customer">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <b id="post_date">-</b>
@@ -349,7 +328,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light right submit" onclick="save();">Pindahkan ke SO <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -567,7 +546,7 @@
                 $('#temp').val('');
                 $('.row_item').remove();
                 $('#code').text('-');
-                $('#broker').text('-');
+                $('#broker,#customer').text('-');
                 $('#type').text('-');
                 $('#post_date').text('-');
                 $('#valid_date').text('-');
@@ -971,9 +950,6 @@
                 type: 'POST',
                 data: {
                     'status[]' : $('#filter_status').val(),
-                    type : $('#filter_type').val(),
-                    delivery_type : $('#filter_delivery').val(),
-                    payment_type : $('#filter_payment').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -1055,7 +1031,7 @@
 
     function save(){
 		swal({
-            title: "Apakah anda yakin ingin simpan?",
+            title: "Apakah anda yakin ingin memindahkan data?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
             dangerMode: true,
@@ -1137,6 +1113,7 @@
                 $('#temp').val(id);
                 $('#code').text(response.code);
                 $('#broker').text(response.broker_name);
+                $('#customer').text(response.account_name);
                 $('#post_date').text(response.post_date);
                 $('#valid_date').text(response.valid_date);
                 $('#document_no').text(response.document_no);
@@ -1235,19 +1212,11 @@
     function exportExcel(){
         var search = table.search();
         var status = $('#filter_status').val();
-        var type_buy = $('#filter_inventory').val();
-        var type_deliv = $('#filter_delivery').val();
-        var company = $('#filter_company').val();
-        var type_pay = $('#filter_payment').val();
-        var supplier = $('#filter_account').val();
-        var sender = $('#filter_sender').val();
-        var sales = $('#filter_sales').val();
-        var currency = $('#filter_currency').val();
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
 
     }
 </script>

@@ -290,6 +290,11 @@
                                     </select>
                                     <label class="" for="type">{{ __('translations.type') }}</label>
                                 </div>
+                                <div class="input-field col m4 s12 step5">
+                                    <h3 class="right-align" id="balance_bs" style="font-weight:900;color:red;background-color:rgb(255, 252, 85);">0,00</h3>
+                                    <label class="active" for="type">Saldo BS Supplier</label>
+                                </div>
+                                
                                 <div class="col s12 m12 l12"></div>
 
 
@@ -1068,7 +1073,7 @@
                 M.updateTextFields();
                 $('.row_detail,.row_detail_dp').remove();
                 $('#account_id').empty();
-                $('#total,#tax,#balance').text('0,00');
+                $('#total,#tax,#balance,#balance_bs').text('0,00');
                 $('#subtotal,#discount,#downpayment').val('0,00');
                 window.onbeforeunload = function() {
                     return null;
@@ -2099,6 +2104,7 @@
                             type: 'POST',
                             dataType: 'JSON',
                             data: {
+                                account_id: $('#account_id').val(),
                                 arr_id: arr_id,
                                 arr_type: arr_type,
                             },
@@ -2111,6 +2117,7 @@
                             success: function(response) {
                                 loadingClose('.modal-content');
                                 if(type == 'main'){
+                                    $('#balance_bs').text(response.balance_bs);
                                     /* $('.row_detail').remove(); */
                                     if(response.details.length > 0){
                                         $.each(response.details, function(i, val) {
@@ -2515,6 +2522,7 @@
                             text: 'Anda tidak boleh memilih tipe dokumen yang berbeda.',
                             icon: 'warning'
                         });
+                        $('#balance_bs').text('0,00');
                     }
                 }else{
                     swal({
@@ -2522,6 +2530,7 @@
                         text: 'Silahkan, pilih GRPO, LC, atau PO Jasa yang ingin anda masukkan.',
                         icon: 'warning'
                     });
+                    $('#balance_bs').text('0,00');
                 }
             }
         });
@@ -3613,6 +3622,7 @@
                     $('#account_id').append(`
                         <option value="` + response.account_id + `">` + response.account_name + `</option>
                     `);
+                    $('#balance_bs').text(response.balance_bs);
                     $('#type').val(response.type).formSelect();
                     $('#company_id').val(response.company_id).formSelect();
                     $('#post_date').val(response.post_date);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Jobs\ReportFinanceJob;
+use App\Jobs\SendApproval;
 use App\Models\ApprovalSource;
 use App\Models\CloseBill;
 use App\Models\CloseBillDetail;
@@ -1144,7 +1145,7 @@ class PersonalCloseBillController extends Controller
                     ]);
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Tutupan BS Personal No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

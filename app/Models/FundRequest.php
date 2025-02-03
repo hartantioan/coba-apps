@@ -72,7 +72,7 @@ class FundRequest extends Model
 
         foreach($this->fundRequestDetail as $row){
             foreach($row->purchaseInvoiceDetail as $rowinvoice){
-                $total -= $rowinvoice->grandtotal;
+                $total -= round($rowinvoice->grandtotal,2);
             }
         }
 
@@ -84,7 +84,7 @@ class FundRequest extends Model
 
         foreach($this->fundRequestDetail as $row){
             foreach($row->purchaseInvoiceDetail as $rowinvoice){
-                $total += $rowinvoice->grandtotal;
+                $total += round($rowinvoice->grandtotal,2);
             }
         }
 

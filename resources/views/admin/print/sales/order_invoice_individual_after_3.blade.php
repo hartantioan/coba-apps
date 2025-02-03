@@ -386,7 +386,12 @@
                                 <tr class="break-row">
                                     <td style="width: 20%"></td>
                                     <td>
-                                        <i><strong>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        
+                                        @if($data->isExport())
+                                            <i><strong>{{ CustomHelper::terbilangWithKoma($data->total) }} Rupiah
+                                        @else
+                                            <i><strong>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        @endif
                                     </td>
 
                                 </tr>

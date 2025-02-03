@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Setting;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendJournal;
 use App\Models\FundRequest;
 use App\Models\GoodReceipt;
 use App\Models\LandedCost;
@@ -529,7 +530,7 @@ class ApprovalController extends Controller
                                                 'status'    => '2'
                                             ]);
 
-                                            CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                            SendJournal::dispatch($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id,$query->approvalSource->user_id);
                                         }
                                     }
                                 }
@@ -726,7 +727,7 @@ class ApprovalController extends Controller
                                                 'status'    => '2'
                                             ]);
 
-                                            CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                            SendJournal::dispatch($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id,$query->approvalSource->user_id);
                                         }
                                     }
                                 }

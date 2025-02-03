@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
+
+use App\Jobs\SendMailPOJob;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\GoodIssue;
@@ -404,6 +407,8 @@ class PurchaseOrderController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
+                $btn_email = '';
+                $note_email = '';
                 // if($val->isOpenPeriod()){
 
                 //     $dis = 'style="cursor: default;
@@ -413,6 +418,12 @@ class PurchaseOrderController extends Controller
                 //     box-shadow: none;"';
 
                 // }
+                if($val->hasEmailSent()->exists()){
+                    $note_email = '<span title="Email has already been sent" style="font-size: 10px; font-weight: bold; color: green; text-transform: uppercase;"><sup>SENT</sup></span>';
+                }
+                if (in_array($val->status, ['2','3'])) {
+                    $btn_email = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light black accent-2 white-text btn-small" data-popup="tooltip" title="send/resend Mail" onclick="sendMail(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">contact_mail</i></button>';
+                }
                 $btn_close = /* $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' :  */'';
                 $btn_print = in_array($val->status,['2','3']) ? ' <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -420,7 +431,7 @@ class PurchaseOrderController extends Controller
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->code,
+                    $val->code.' '.$note_email,
                     $val->user->name ?? '',
                     $val->supplier->name ?? '',
                     $val->inventoryType(),
@@ -464,7 +475,7 @@ class PurchaseOrderController extends Controller
                     ),
                     $val->goodScale()->exists() ? ($val->goodScale->sjHasReturnDocument() ? 'Telah kembali' : 'Belum kembali') : '',
                     $btn_close.$btn_print.'
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>'.$btn_email.'
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -591,8 +602,8 @@ class PurchaseOrderController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             if($request->inventory_type == '1'){
                 $validation = Validator::make($request->all(), [
                     'code'                      => 'required',
@@ -1077,7 +1088,7 @@ class PurchaseOrderController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()
@@ -1098,11 +1109,11 @@ class PurchaseOrderController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             info($e->getMessage());
             DB::rollback();
-        }
+        } */
         return response()->json($response);
     }
 
@@ -1970,6 +1981,16 @@ class PurchaseOrderController extends Controller
 
 
 		return response()->json($response);
+    }
+
+    public function sendEmail(Request $request){
+
+        $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $user_id = session('bo_id');
+        SendMailPOJob::dispatch($po->id,$user_id );
+
+        return response()->json(['message' => 'Email Sedang dikirim ke vendor']);
     }
 
     public function export(Request $request){

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\TreeHelper;
@@ -83,6 +84,9 @@ class MarketingOrderController extends Controller
         if($mitra_code){
             $data_mitra = MitraMarketingOrder::where('code',$mitra_code)->where('status','1')->first();
             if($data_mitra){
+                $sales = User::where('employee_no','324115')->first();
+                $data_mitra['sales_id'] = $sales ? $sales->id : '';
+                $data_mitra['sales_name'] = $sales ? $sales->employee_no.' - '.$sales->name : '';
                 $data_mitra['broker_name'] = $data_mitra->user->name;
                 $data_mitra['account_name'] = $data_mitra->account->name;
                 $data_mitra['province_name'] = $data_mitra->deliveryProvince->name;
@@ -124,10 +128,10 @@ class MarketingOrderController extends Controller
                         'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                         'rawgrandtotal'         => $row->grandtotal,
                         'note'                  => $row->note,
-                        'qty_now'               => 0,
-                        'qty_commited'          => 0,
                         'qty_conversion'        => CustomHelper::formatConditionalQty(round($row->qty / $row->item->sellConversion(),3)),
                         'arr_sell_unit'         => $row->item->arrSellUnits(),
+                        'stock_now'             => CustomHelper::formatConditionalQty($row->item->getStockArrayPlace($this->dataplaces)),
+                        'stock_com'             => CustomHelper::formatConditionalQty($row->item->getQtySalesNotSent($this->dataplaces)),
                     ];
                 }
 
@@ -179,6 +183,7 @@ class MarketingOrderController extends Controller
             ->where('city_id',$city)
             ->where('type_id',$item->type_id)
             ->where('variety_id',$item->variety_id)
+            ->where('type_delivery', $request->type_delivery)
             ->where('status','1')
             ->first() ?? 0;
 
@@ -539,7 +544,7 @@ class MarketingOrderController extends Controller
                 'delivery_date'             => 'required',
                 'delivery_schedule'         => 'required',
                 'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
-                'document_so'               => 'required',
+                'document_so'               => substr($request->document_no,0,4) == 'SMRD' ? '' : 'required',
                 'billing_address'           => 'required',
                 'destination_address'       => 'required',
                 'province_id'               => 'required',
@@ -691,6 +696,8 @@ class MarketingOrderController extends Controller
                             ->where('city_id',$request->city_id)
                             ->where('type_id',$item->type_id)
                             ->where('status','1')
+                            ->where('variety_id',$item->variety_id)
+                            ->where('type_delivery', $request->type_delivery)
                             ->first() ?? 0;
                             if($cek_price){
                                 if($cek_price->sell_price != 0){
@@ -936,7 +943,7 @@ class MarketingOrderController extends Controller
                         ]);
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                     activity()

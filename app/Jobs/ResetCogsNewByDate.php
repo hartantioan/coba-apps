@@ -901,16 +901,20 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
         })->get();
 
         $tempgiprice = 0;
+        $goodIssueId = [];
         foreach($goodissue as $row){
+            if(!in_array($row->good_issue_id,$goodIssueId)){
+                $goodIssueId[] = $row->good_issue_id;
+            }
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
                 $price = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
-                if($tempgiprice > 0){
+                /* if($tempgiprice > 0){
                    $price = $tempgiprice;
-               }else{
-                   $tempgiprice = $price;
-               }
+                }else{
+                    $tempgiprice = $price;
+                } */
             }
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
@@ -937,6 +941,7 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
                 'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
                 'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
             ]);
+
             if($row->journalDetail()->where('type','1')->count() > 1){
                 $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
                 $accumulation = 0;
@@ -982,9 +987,17 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
-            $gi = GoodIssue::find($row->good_issue_id);
-            if($gi){
-                $gi->updateGrandtotal();
+        }
+
+        if(count($goodIssueId) > 0){
+            foreach($goodIssueId as $rowissue){
+                $gi = GoodIssue::find($rowissue);
+                if($gi){
+                    $gi->updateGrandtotal();
+                    if($gi->goodReceive()->exists()){
+                        $gi->goodReceive->upgradeDetail();
+                    }
+                }
             }
         }
 
@@ -1594,11 +1607,13 @@ class ResetCogsNewByDate implements ShouldQueue, ShouldBeUnique
         }
       }
       CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
-      $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
-      if($itemstock){
-          $itemstock->update([
-              'qty'   => $itemstock->stockByDate(date('Y-m-d')),
-          ]);
+      foreach($item->itemGroup->itemGroupWarehouse as $warehouse){
+        $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$warehouse->warehouse_id)->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id)->first();
+        if($itemstock){
+            $itemstock->update([
+                'qty'   => $itemstock->stockByDate(date('Y-m-d')),
+            ]);
+        }
       }
     }
 }

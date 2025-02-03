@@ -6,6 +6,7 @@ use App\Exports\ExportIssueGlaze;
 use App\Helpers\CustomHelper;
 use App\Helpers\TreeHelper;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\IssueGlaze;
 use App\Models\IssueGlazeDetail;
 use App\Models\Item;
@@ -412,7 +413,7 @@ class ProductionIssueGPController extends Controller
                     'qty'           => $qtyAll,
                 ]);
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Issue Glaze Prep No. '.$query->code);
+                SendApproval::dispatch($query->getTable(),$query->id,'Issue Glaze Prep No. '.$query->code,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Issue Glaze Prep No. '.$query->code,'Pengajuan Issue Glaze Prep No. '.$query->code,session('bo_id'));
 
                 activity()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Exports\ExportGoodScale;
 use App\Exports\ExportGoodScaleTransactionPage;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\GoodScale;
 use App\Models\TruckQueue;
@@ -708,7 +709,7 @@ class GoodScaleController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('good_scales',$query->id,$query->note);
+                    SendApproval::dispatch('good_scales',$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('good_scales',$query->id,'Pengajuan Timbangan Truk No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

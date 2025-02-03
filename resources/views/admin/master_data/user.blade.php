@@ -127,6 +127,11 @@
                                     <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p style="font-size:25px;">PENTING!!! SELALU CEK DATA YANG SUDAH ADA. PASTIKAN DATA CUSTOMER BENAR-BENAR BELUM DIINPUT. TERIMA KASIH</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -167,11 +172,6 @@
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                {{-- <div class="card-alert card blue">
-                    <div class="card-content white-text">
-                        <p>Info : Untuk penambahan BP Supplier & Ekspedisi dibuka akses hanya pak Sandi.</p>
-                    </div>
-                </div> --}}
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -211,7 +211,7 @@
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col s12 m3{{--  employee_inputs --}}">
-                            <input id="password" name="password" type="password" placeholder="Password">
+                            <input id="password" name="password" type="password" placeholder="Password" autocomplete="off">
                             <label class="active" for="password">Password</label>
                         </div>
                         <div class="input-field col s12 m3">
@@ -467,6 +467,7 @@
                                                 <th class="center" >Tipe Pajak</th>
                                                 <th class="center">{{ __('translations.note') }}</th>
                                                 <th class="center">NPWP</th>
+                                                <th class="center">NITKU</th>
                                                 <th class="center">{{ __('translations.address') }}</th>
                                                 <th class="center">Negara</th>
                                                 <th class="center">{{ __('translations.province') }}</th>
@@ -478,7 +479,7 @@
                                         </thead>
                                         <tbody id="body-info">
                                             <tr id="last-row-info">
-                                                <td colspan="11" class="center">
+                                                <td colspan="12" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addInfo()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
@@ -2158,6 +2159,9 @@
                     <input autocomplete="off" name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" class="npwp">
                 </td>
                 <td class="center">
+                    <input autocomplete="off" name="arr_nitku[]" type="text" placeholder="Nomor NITKU" style="width:200px !important;">
+                </td>
+                <td class="center">
                     <input autocomplete="off" name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;">
                 </td>
                 <td class="center">
@@ -2704,6 +2708,9 @@
                                 </td>
                                 <td class="center">
                                     <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" value="` + val.npwp + `" class="npwp">
+                                </td>
+                                <td class="center">
+                                    <input autocomplete="off" name="arr_nitku[]" type="text" placeholder="Nomor NITKU" style="width:200px !important;" value="` + val.nitku + `">
                                 </td>
                                 <td class="center">
                                     <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;" value="` + val.address + `">

@@ -496,4 +496,8 @@ class PurchaseOrder extends Model
 
         return implode(',', $arr);;
     }
+
+    public function hasEmailSent(){
+        return $this->hasMany('App\Models\TransactionEmail','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

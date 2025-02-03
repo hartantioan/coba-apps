@@ -316,7 +316,7 @@ class UserController extends Controller
             $province = $row->province()->exists() ? $row->province->name : '';
             $city = $row->city()->exists() ? $row->city->name : '';
             $district = $row->district()->exists() ? $row->district->name : '';
-            $infos[] = $row->title.' '.$row->content.' '.$row->npwp.' '.$row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
+            $infos[] = $row->title.' '.$row->content.' '.$row->npwp.' '.$row->nitku.' '.$row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
         }
 
         foreach($data->userDestination as $row){
@@ -808,6 +808,7 @@ class UserController extends Controller
                                 'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
                                 'tax_type'      => $request->arr_tax_type[$key] ,
                                 'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
+                                'nitku'         => $request->arr_nitku[$key] ? $request->arr_nitku[$key] : NULL,
                                 'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
                                 'country_id'    => $request->arr_country[$key] ? $request->arr_country[$key]: NULL,
                                 'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
@@ -822,6 +823,7 @@ class UserController extends Controller
                                 'tax_type'      => $request->arr_tax_type[$key] ,
                                 'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
                                 'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
+                                'nitku'         => $request->arr_nitku[$key] ? $request->arr_nitku[$key] : NULL,
                                 'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
                                 'country_id'    => $request->arr_country[$key] ? $request->arr_country[$key]: NULL,
                                 'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
@@ -1427,6 +1429,7 @@ class UserController extends Controller
                 'tax_type'          => $row->tax_type,
                 'content'           => $row->content,
                 'npwp'              => $row->npwp,
+                'nitku'             => $row->nitku,
                 'address'           => $row->address,
                 'country_id'        => $row->country_id ? $row->country_id : '',
                 'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',

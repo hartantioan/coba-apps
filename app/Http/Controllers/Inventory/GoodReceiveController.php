@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Currency;
 use App\Models\Item;
 use App\Models\Place;
@@ -478,6 +479,7 @@ class GoodReceiveController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
+                        $query->good_issue_id = $request->good_issue_id ?? NULL;
                         $query->post_date = $request->post_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -514,6 +516,7 @@ class GoodReceiveController extends Controller
                         'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
+                        'good_issue_id'         => $request->good_issue_id ?? NULL,
                         'post_date'             => $request->post_date,
                         'currency_id'           => $request->currency_id,
                         'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -612,7 +615,7 @@ class GoodReceiveController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('good_receives',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
 
                     /* DB::commit();
@@ -779,6 +782,8 @@ class GoodReceiveController extends Controller
         $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
         $gr['code_place_id'] = substr($gr->code,7,2);
         $gr['currency_rate'] = number_format($gr->currency_rate,2,',','.');
+        $gr['balance_issue'] = $gr->goodIssue()->exists() ? number_format($gr->goodIssue->grandtotal,2,',','.') : '0,00';
+        $gr['good_issue_name'] = $gr->goodIssue()->exists() ? $gr->goodIssue->code.' - '.$gr->goodIssue->note : '';
 
         $arr = [];
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
+use App\Jobs\SendJournal;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReceipt;
@@ -738,7 +740,11 @@ class PaymentRequestController extends Controller
                     if($data){
                         if(!$data->used()->exists() && $data->balancePaymentRequest() > 0){
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
-                            $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                            if($data->post_date < '2025-02-01'){
+                                $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                            }else{
+                                $coa = Coa::where('code','100.01.07.01.01')->where('company_id',$data->company_id)->first();
+                            }
                             $total = $data->balancePaymentRequest();
                             $is_reimburse = '';
                             $name_account = '';
@@ -1254,7 +1260,7 @@ class PaymentRequestController extends Controller
                     }
                 }
 
-                CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
@@ -2326,7 +2332,7 @@ class PaymentRequestController extends Controller
                 if($query) {
 
                     CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas Bank Out / Kas Keluar No. '.$query->code,$query->note,session('bo_id'));
-                    CustomHelper::sendJournal('outgoing_payments',$query->id,$query->account_id);
+                    SendJournal::dispatch($query->getTable(),$query->id,$query->account_id,session('bo_id'));
 
                     activity()
                         ->performedOn(new OutgoingPayment())

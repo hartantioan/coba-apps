@@ -179,6 +179,16 @@ class User extends Authenticatable
         return '<span class="avatar-status avatar-online" style="width:50px !important;"><img src="'.$this->photo().'" alt="avatar"></span>';
     }
 
+    public function balanceBsVendor(){
+        $data = PurchaseDownPayment::where('account_id',$this->id)->where('status','3')->get();
+        $total = 0;
+        foreach($data as $row){
+            $total += $row->totalPaid();
+            $total -= $row->totalInvoice();
+        }
+        return round($total,2);
+    }
+
     public function signature()
     {
         $path_img = '';

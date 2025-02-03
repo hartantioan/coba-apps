@@ -42,7 +42,7 @@ class SendMail extends Mailable
     public function build()
     {
         if($this->data['attachmentPath']){
-            return $this->subject($this->data['subject'])
+                 $email =$this->subject($this->data['subject'])
                 ->view($this->data['view'])
                 ->with([
                     'url'    => url('/'),
@@ -51,7 +51,11 @@ class SendMail extends Mailable
                 ])
                 ->attach($this->data['attachmentPath'], [
                     'as' => $this->data['attachmentName'],
+                ])->attach($this->data['newAttachmentPath'], [
+                    'as' => $this->data['newAttachmentName'],
                 ]);
+                $email->from(config('mail.from.address'), 'PT Superior Porcelain Sukses');
+                return $email;
         }else{
             return $this->subject($this->data['subject'])
                 ->view($this->data['view'])
@@ -61,6 +65,6 @@ class SendMail extends Mailable
                     'result' => $this->data['result'],
                 ]);
         }
-        
+
     }
 }

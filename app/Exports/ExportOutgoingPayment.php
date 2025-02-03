@@ -38,12 +38,16 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
         'Ket. Delete',
         'Partner Bisnis',
         'Tgl. Posting',
+        'Tgl. Bayar',
         'No. Rekening',
         'Rekening Penerima',
         'Bank Tujuan',
         'Kas / Bank',
         'Keterangan',
+        'Mata Uang',
+        'Kurs',
         'Total',
+        'GrandTotal RP',
         'Based On'
     ];
 
@@ -77,19 +81,23 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
                 'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
                 'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
                 'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
-                '4'                 => $row->account->name??'',
-                '3'                 => $row->post_date,
+                'account_name'                 => $row->account->name??'',
+                'post_date'                 => $row->post_date,
+                'pay_date'                 => $row->pay_date,
                 'no_rekening'       => $row->paymentRequest->account_no,
                 'rekening_penerima'       => $row->paymentRequest->account_name,
                 'bank_tujuan'       => $row->paymentRequest->account_bank,
                 'kas/bank'       => $row->coaSource->name,
-                '6'                 => $row->note,
+                'note'                 => $row->note,
+                'mata uang'                 => $row->currency->code,
+                'kurs'                 => $row->currency_rate,
                 '8'                 => $row->grandtotal,
+                'grandtotal_rp'                 => $row->grandtotal * $row->currency_rate,
                 'basedon'           => $row->paymentRequest->code
-               
-                
+
+
             ];
-            
+
         }
 
         activity()

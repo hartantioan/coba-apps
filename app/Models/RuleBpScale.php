@@ -18,6 +18,7 @@ class RuleBpScale extends Model
         'account_id',
         'item_id',
         'rule_procurement_id',
+        'start_effective_date',
         'effective_date',
         'percentage_level',
     ];

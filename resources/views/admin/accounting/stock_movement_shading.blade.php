@@ -94,19 +94,19 @@
                                         </div>
                                         <div class="col m12 s12">
                                         </div>
-                                        {{-- <div class="input-field col m6 s12">
-                                            <select class="select2 browser-default" id="batch_id" name="batch_id">
-
-                                            </select>
-                                            <label class="active" for="item">Batch</label>
-                                        </div> --}}
                                         <div class="input-field col m4 s12">
                                             <select class="select2 browser-default" id="shading_id" name="shading_id">
 
                                             </select>
                                             <label class="active" for="item">Shading</label>
                                         </div>
-                                        <div class="input-field col m12 s12 ">
+                                        <div class="input-field col m4 s12">
+                                            <select class="select2 browser-default" id="batch_id" name="batch_id">
+
+                                            </select>
+                                            <label class="active" for="item">Batch</label>
+                                        </div>
+                                        {{-- <div class="input-field col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
 
                                             <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">
@@ -149,7 +149,7 @@
                                                 @endforeach
                                             </select>
 
-                                        </div>
+                                        </div> --}}
                                         <div class="col m1">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
@@ -189,7 +189,7 @@
 
         select2ServerSide('#item_id', '{{ url("admin/select2/sales_item_child") }}');
 
-        /* $('#batch_id').select2({
+        $('#batch_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -206,13 +206,18 @@
                         item_id: $('#item_id').val(),
                     };
                 },
-                processResults: function(data) {
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
                     return {
-                        results: data.items
-                    }
-                }
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
             }
-        }); */
+        });
 
         $('#shading_id').select2({
             placeholder: '-- Kosong --',

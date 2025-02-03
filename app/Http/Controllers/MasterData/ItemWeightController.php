@@ -131,15 +131,15 @@ class ItemWeightController extends Controller
                     $query = ItemWeightFg::find($request->temp);
                     $query->user_id             = session('bo_id');
                     $query->item_id             = $request->item_id;
-                    $query->netto_weight        = $request->netto_weight;
-                    $query->gross_weight	    = $request->gross_weight;
+                    $query->netto_weight        = str_replace(',','.',str_replace('.','',$request->netto_weight));
+                    $query->gross_weight	    = str_replace(',','.',str_replace('.','',$request->gross_weight));
                     $query->save();
                 }else{
                     $query = ItemWeightFg::create([
                         'code'                      => strtoupper(Str::random(15)),
                         'user_id'                   => session('bo_id'),
-                        'netto_weight'              => $request->netto_weight,
-                        'gross_weight'              => $request->gross_weight,
+                        'netto_weight'              => str_replace(',','.',str_replace('.','',$request->netto_weight)),
+                        'gross_weight'              => str_replace(',','.',str_replace('.','',$request->gross_weight)),
                         'item_id'			        => $request->item_id,
 
                     ]);

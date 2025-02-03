@@ -51,6 +51,13 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+
+    .text-wrap{
+        white-space:normal;
+    }
+    .width-300{
+        width:300px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -175,6 +182,7 @@
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
                                                         <th rowspan="2">{{ __('translations.wtax') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
+                                                        <th rowspan="2">Reference</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -2242,9 +2250,18 @@
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
+                { name: 'reference', searchable: false, orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: '' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            columnDefs: [
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='text-wrap width-300'>" + data + "</div>";
+                    },
+                    targets: [16,10]
+                }
             ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

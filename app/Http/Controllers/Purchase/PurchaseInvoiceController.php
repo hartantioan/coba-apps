@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReturnPO;
@@ -314,10 +315,11 @@ class PurchaseInvoiceController extends Controller
         $details = [];
         $downpayments = [];
 
-        $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
+        $datadp = PurchaseDownPayment::where('account_id',$request->id)->where('status','3')->get();
 
         foreach($datadp as $row){
-            if($row->balanceInvoice() > 0){
+            $balance = round($row->balanceInvoice(),2);
+            if($balance > 0){
                 $downpayments[] = [
                     'type'          => 'purchase_down_payments',
                     'id'            => $row->id,
@@ -328,7 +330,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'balance'       => $row->currency->symbol.' '.number_format($row->balanceInvoice(),2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($balance,2,',','.'),
                 ];
             }
         }
@@ -336,7 +338,7 @@ class PurchaseInvoiceController extends Controller
         $datafr = FundRequest::where('account_id',$request->id)->whereIn('status',['2','3'])->where('document_status','2')->where('type','1')->get();
 
         foreach($datafr as $row){
-            $balanceInvoice = $row->balanceInvoice();
+            $balanceInvoice = round($row->balanceInvoice(),2);
             if($balanceInvoice > 0){
                 $details[] = [
                     'type'          => 'fund_requests',
@@ -355,7 +357,7 @@ class PurchaseInvoiceController extends Controller
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             $code_sj = '';
             if($row->goodscale()->exists()){
                 $code_sj = $row->goodScale->getSalesSuratJalan();
@@ -383,7 +385,7 @@ class PurchaseInvoiceController extends Controller
             if($row->goodscale()->exists()){
                 $code_sj = $row->goodScale->getSalesSuratJalan();
             }
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             if(($row->grandtotal - $invoice) > 0 && $row->goodScale->sjHasReturnDocument()){
                 $details[] = [
                     'type'          => 'purchase_orders',
@@ -403,8 +405,8 @@ class PurchaseInvoiceController extends Controller
         $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->whereDoesntHave('cancelDocument')->get();
 
         foreach($datagr as $row){
-            $invoice = $row->totalInvoice();
-            $adjust = $row->totalAdjust();
+            $invoice = round($row->totalInvoice(),2);
+            $adjust = round($row->totalAdjust(),2);
             if(round($row->total - $invoice - $adjust,2) > 0){
                 $details[] = [
                     'type'          => 'good_receipts',
@@ -424,7 +426,7 @@ class PurchaseInvoiceController extends Controller
         $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
-            $invoice = $row->totalInvoice();
+            $invoice = round($row->totalInvoice(),2);
             if(($row->grandtotal - $invoice) > 0 && !$row->hasLandedCost()){
                 $details[] = [
                     'type'          => 'landed_costs',
@@ -449,6 +451,8 @@ class PurchaseInvoiceController extends Controller
 
         $details = [];
         $downpayments = [];
+
+        $user = User::find($request->account_id);
 
         foreach($request->arr_type as $key => $row){
             if($row == 'purchase_down_payments'){
@@ -728,6 +732,7 @@ class PurchaseInvoiceController extends Controller
 
         $result['details'] = $details;
         $result['downpayments'] = $downpayments;
+        $result['balance_bs'] = $user ? CustomHelper::formatConditionalQty($user->balanceBsVendor()) : '0,00';
 
         return response()->json($result);
     }
@@ -1407,7 +1412,7 @@ class PurchaseInvoiceController extends Controller
                     DB::rollback();
                 } */
 
-                CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan A/P Invoice No. '.$query->code,$query->note,session('bo_id'));
                 CustomHelper::removeDeposit($query->account_id,$query->downpayment);
 
@@ -1773,6 +1778,7 @@ class PurchaseInvoiceController extends Controller
         $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
         $pi['rounding'] = number_format($pi->rounding,2,',','.');
         $pi['currency_rate'] = number_format($pi->currency_rate,2,',','.');
+        $pi['balance_bs'] = CustomHelper::formatConditionalQty($pi->account->balanceBsVendor());
         $pi['top'] = $pi->top();
         // if(!CustomHelper::checkLockAcc($pi->post_date)){
         //     return response()->json([

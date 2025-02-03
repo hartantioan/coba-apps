@@ -1,24 +1,32 @@
 <style>
     #modal2 {
-        top:0px !important;
+        top: 0px !important;
     }
+
     #text-grandtotal {
         font-size: 50px !important;
         font-weight: 800;
     }
-    .select-wrapper, .select2-container {
-        height:3rem !important;
+
+    .select-wrapper,
+    .select2-container {
+        height: 3rem !important;
     }
+
     .btn-small {
         padding: 0 1rem !important;
     }
-    #data_detail > table > tbody > td{
-        padding:2px !important;
+
+    #data_detail>table>tbody>td {
+        padding: 2px !important;
     }
+
     table {
         border-collapse: separate !important;
     }
-    table.bordered th, table.bordered td {
+
+    table.bordered th,
+    table.bordered td {
         padding: 5px !important;
     }
 </style>
@@ -61,7 +69,7 @@
                                                 <label for="company" style="font-size:1rem;">Perusahaan :</label>
                                                 <select class="form-control" id="company" name="company">
                                                     @foreach ($company as $rowcompany)
-                                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                                    <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -107,6 +115,9 @@
                                         <div class="col s12 center-align" id="result" style="overflow:auto;">
                                             Silahkan pilih bulan dan tekan tombol hijau.
                                         </div>
+                                        <div class="col" id="result2">
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -119,12 +130,15 @@
 </div>
 
 <script>
-    $(function(){
+    $(function() {
 
     });
 
-    function exportExcel(){
-        var month_start = $('#month_start').val(), month_end = $('#month_end').val(), level = $('#level').val(), company = $('#company').val();
+    function exportExcel() {
+        var month_start = $('#month_start').val(),
+            month_end = $('#month_end').val(),
+            level = $('#level').val(),
+            company = $('#company').val();
         swal({
             title: 'ALERT',
             text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
@@ -144,10 +158,10 @@
             type: 'POST',
             dataType: 'JSON',
             data: {
-                month_start : month_start,
+                month_start: month_start,
                 month_end: month_end,
-                level : level,
-                company : company,
+                level: level,
+                company: company,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -173,23 +187,23 @@
         });
     }
 
-    function reset(){
+    function reset() {
         $('#company').val($("#company option:first").val()).formSelect();
         $('#level').val($("#level option:first").val()).formSelect();
         $('#month_start,#month_end').val('{{ date("Y-m") }}');
         $('#result').html(' Silahkan pilih bulan dan tekan tombol hijau.');
     }
 
-    function process(){
+    function process() {
         $.ajax({
             url: '{{ Request::url() }}/process',
             type: 'POST',
             dataType: 'JSON',
             data: {
-                level : $('#level').val(),
-                company_id : $('#company').val(),
-                month_start : $('#month_start').val(),
-                month_end : $('#month_end').val(),
+                level: $('#level').val(),
+                company_id: $('#company').val(),
+                month_start: $('#month_start').val(),
+                month_end: $('#month_end').val(),
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -199,11 +213,12 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                if(response.status == 200) {
+                if (response.status == 200) {
                     M.toast({
                         html: response.message
                     });
                     $('#result').html(response.html);
+                    $('#result2').html(response.html2);
                 } else {
                     M.toast({
                         html: response.message

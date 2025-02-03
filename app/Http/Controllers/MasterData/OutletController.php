@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MasterData;
 
 use App\Exceptions\RowImportException;
+use App\Exports\ExportOutlet;
 use App\Exports\ExportTemplateOutlet;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportOutlet;
@@ -50,7 +51,7 @@ class OutletController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Outlet::count();
-        
+
         $query_data = Outlet::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -122,7 +123,7 @@ class OutletController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->user->name,
@@ -236,7 +237,7 @@ class OutletController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -256,7 +257,7 @@ class OutletController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -267,13 +268,13 @@ class OutletController extends Controller
         $unit['city_name'] = $unit->city->name;
         $unit['district_name'] = $unit->district->name;
         $unit['subdistrict_name'] = $unit->subdistrict->name;
-        				
+
 		return response()->json($unit);
     }
 
     public function destroy(Request $request){
         $query = Outlet::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Outlet())
@@ -315,5 +316,12 @@ class OutletController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
         }
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+        $status = $request->status ? $request->status : '';
+
+		return Excel::download(new ExportOutlet($search,$status), 'outlet_recap_'.uniqid().'.xlsx');
     }
 }

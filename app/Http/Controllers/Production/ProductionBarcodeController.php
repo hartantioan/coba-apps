@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Menu;
 use App\Helpers\TreeHelper;
@@ -587,7 +588,7 @@ class ProductionBarcodeController extends Controller
                             ]);
                         }
 
-                        CustomHelper::sendApproval($query->getTable(),$query->id,'Production Barcode No. '.$query->code);
+                        SendApproval::dispatch($query->getTable(),$query->id,'Production Barcode No. '.$query->code,session('bo_id'));
                         CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Barcode No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
                     }
 

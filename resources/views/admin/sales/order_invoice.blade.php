@@ -295,7 +295,7 @@
                                         </select>
                                         <label class="" for="type">Tipe Penjualan</label>
                                     </div>
-                                    <div class="col m4 s12 step10">
+                                    {{-- <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -311,7 +311,7 @@
                                     <div class="col m4 s12">
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
-                                    </div>
+                                    </div> --}}
                                     <div class="input-field col m4 s12 step2">
                                         <table border="0" style="border: none;border-collapse: collapse;max-width:100%" id="table_deposit">
                                             <tr>
@@ -356,7 +356,7 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
                                     <legend>4. Surat Jalan</legend>
-                                    <div class="col m12 s12" style="width:2500px !important;" id="table-item">
+                                    <div class="col m12 s12" style="width:3000px !important;" id="table-item">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" id="table-detail">
                                                 <thead>
@@ -367,7 +367,11 @@
                                                         <th class="center">Qty Retur</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
-                                                        <th class="center">Harga@</th>
+                                                        <th class="center">Harga Sebelum Diskon</th>
+                                                        <th class="center">Diskon 1 (%)</th>
+                                                        <th class="center">Diskon 2 (%)</th>
+                                                        <th class="center">Diskon 3 (Rp)</th>
+                                                        <th class="center">Harga Final</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">PPN (%)</th>
                                                         <th class="center">Termasuk PPN</th>
@@ -378,14 +382,14 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="13">
+                                                        <td colspan="17">
                                                             Silahkan tambahkan Surat Jalan...
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                                 <tfoot class="hide" id="div-manual">
                                                     <tr>
-                                                        <td colspan="13">
+                                                        <td colspan="17">
                                                             <a class="waves-effect waves-light green btn-small" onclick="addItem();" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Item
                                                             </a>
@@ -504,6 +508,70 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modalEmail" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>Upload Bukti dan Email ke Customer</h4>
+                <form class="row" id="form_data_email" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_email" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input type="hidden" id="tempEmail" name="tempEmail">
+                                        <b id="codeEmail">-</b>
+                                        <label class="active" for="codeEmail">No. Dokumen</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="account_name">-</b>
+                                        <label class="active" for="account_name">{{ __('translations.customer') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="account_email">-</b>
+                                        <label class="active" for="account_email">Email (Master BP)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <b id="marketing_order_delivery_process_code">-</b>
+                                        <label class="active" for="marketing_order_delivery_process_code">Surat Jalan</label>
+                                    </div>
+                                    <div class="col m4 s12 step10">
+                                        <label class="">Bukti Upload</label>
+                                        <br>
+                                        <input type="file" name="file" id="fileInput" accept="image/*,application/pdf" style="display: none;">
+                                        <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                            Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                            <br>
+
+                                        </div>
+                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                                           Clear
+                                        </a>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <div id="fileName"></div>
+                                        <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step18" onclick="saveUpdateEmail();">Simpan & Kirim <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -999,6 +1067,31 @@
             }
         });
 
+        $('#modalEmail').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_email').hide();
+                $('#validation_alert_email').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+                clearButton.click();
+                $('#form_data_email')[0].reset();
+                $('#tempEmail').val('');
+                $('#codeEmail,#account_name,#account_email,#marketing_order_delivery_process_code').text('-');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return null;
+                };
+            }
+        });
+
         $('#modal_update_pjb').modal({
             onOpenStart: function(modal,trigger) {
 
@@ -1284,6 +1377,18 @@
                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                 </td>
                 <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
                     <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                 </td>
                 <td class="right-align">
@@ -1402,6 +1507,18 @@
                                     </td>
                                     <td class="center-align">
                                         ` + val.unit + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.price_before_disc + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_1 + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_2 + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.discount_3 + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `
@@ -2459,9 +2576,115 @@
         });
     }
 
+    function saveUpdateEmail(){
+		swal({
+            title: "Apakah anda yakin ingin update dan kirim email?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data_email')[0]), passed = true;
+
+                let email = $('#account_email').text();
+
+                if(!email.includes("@", 0)){
+                    passed = false;
+                }
+
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/update_and_email',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert_email').hide();
+                            $('#validation_alert_email').html('');
+                            loadingOpen('#modalEmail');
+                        },
+                        success: function(response) {
+                            loadingClose('#modalEmail');
+                            if(response.status == 200) {
+                                successEmail();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                $('#validation_alert_email').show();
+                                $('.modal-content').scrollTop(0);
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+
+                                });
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert_email').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('#modalEmail');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Email tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successEmail(){
+        loadDataTable();
+        $('#modalEmail').modal('close');
     }
 
     function show(id){
@@ -2512,6 +2735,9 @@
                     $('#marketing_order_delivery_process_id').append(`
                         <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
                     `);
+                }
+                if(response.prefix_tax){
+                    $('#prefix_tax').val(response.prefix_tax);
                 }
                 $('#invoice_type').val(response.invoice_type).trigger('change');
                 $('#rounding').val(response.rounding);
@@ -2570,6 +2796,18 @@
                                     </td>
                                     <td class="center-align">
                                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
                                     </td>
                                     <td class="right-align">
                                         <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
@@ -2639,6 +2877,18 @@
                                     </td>
                                     <td class="center-align">
                                         ` + val.unit + `
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
+                                    </td>
+                                    <td class="center-align">
+                                        -
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `
@@ -2950,7 +3200,7 @@
             downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        total = subtotal - downpayment + rounding;
+        total = parseFloat((subtotal - downpayment + rounding).toFixed(2));
 
         tax = Math.floor(total * (percentTax / 100));
 
@@ -2978,7 +3228,7 @@
 
         /* if(total > 0){ */
             $('#textTax').show();
-            getTaxSeries();
+            /* getTaxSeries(); */
         /* }else{
             $('#textTax').hide();
             $('#tax_no').val('');
@@ -3169,46 +3419,13 @@
         });
     }
 
-    function cancelStatus(id){
-        Swal.fire({
-            title: "Pilih tanggal tutup!",
-            input: "date",
-            showCancelButton: true,
-            confirmButtonText: "Lanjut",
-            cancelButtonText: "Batal",
-            cancelButtonColor: "#d33",
-            confirmButtonColor: "#3085d6",
-        }).then((result) => {
-            if (result.value) {
-                $.ajax({
-                    url: '{{ Request::url() }}/cancel_status',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: { id : id, cancel_date : result.value },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        M.toast({
-                            html: response.message
-                        });
-                        loadDataTable();
-                    },
-                    error: function() {
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
+    function uploadAndEmail(id,user,email,invoice,sj){
+        $('#modalEmail').modal('open');
+        $('#tempEmail').val(id);
+        $('#account_name').text(user);
+        $('#codeEmail').text(invoice);
+        $('#marketing_order_delivery_process_code').text(sj);
+        $('#account_email').text(email);
     }
 
     function exportExcel(){

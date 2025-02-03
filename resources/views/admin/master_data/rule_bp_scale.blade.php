@@ -67,7 +67,8 @@
                                                         <th>#</th>
                                                         <th>Nama Vendor</th>
                                                         <th>Nama Rule</th>
-                                                        <th>Tanggal Valid</th>
+                                                        <th>Tanggal Mulai Valid</th>
+                                                        <th>Tanggal Akhir Valid</th>
                                                         <th>Nama Item</th>
                                                         <th>Kadar (%)</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -116,7 +117,12 @@
                             <label class="active" for="percentage_level">Kadar(%)</label>
                         </div>
                         <div class="col m6 s12 ">
-                            <label for="effective_date" style="font-size:1rem;">Tanggal Valid : </label>
+                            <label for="start_effective_date" style="font-size:1rem;">Tanggal Mulai Valid : </label>
+
+                            <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_effective_date" name="start_effective_date">
+                        </div>
+                        <div class="col m6 s12 ">
+                            <label for="effective_date" style="font-size:1rem;">Tanggal Akhir Valid : </label>
 
                             <input type="date" max="{{ date('9999'.'-12-31') }}" id="effective_date" name="effective_date">
                         </div>
@@ -385,6 +391,8 @@
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
+                { name: 'parent_id', className: '' },
+                { name: 'parent_id', className: '' },
                 { name: 'percentage_level', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -493,7 +501,8 @@
                 $('#rule_procurement_id').empty().append(`
                     <option value="` + response.rule_procurement_id + `">` + response.rule_procurement_name + `</option>
                 `);
-                $('#percentage_level').val(response.percentage_level);
+                $('#water_percent').val(response.water_percent);
+                $('#start_effective_date').val(response.start_effective_date);
                 $('#effective_date').val(response.effective_date);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();

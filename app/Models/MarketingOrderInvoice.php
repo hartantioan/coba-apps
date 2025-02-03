@@ -415,6 +415,11 @@ class MarketingOrderInvoice extends Model
         return $this->hasOne('App\Models\Journal', 'lookable_id', 'id')->where('lookable_type', $this->table);
     }
 
+    public function journalDetail()
+    {
+        return $this->hasMany('App\Models\JournalDetail', 'lookable_id', 'id')->where('lookable_type', $this->table);
+    }
+
     public function balance()
     {
         $total = $this->isExport() ? $this->total : $this->grandtotal;

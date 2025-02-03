@@ -19,10 +19,7 @@ class ExportTemplateItemWeight extends \PhpOffice\PhpSpreadsheet\Cell\StringValu
         $event->writer->getSheetByIndex(0); #header
         $event->writer->getSheetByIndex(1); #alternative
 
-        $Item =  Item::whereHas('itemShading',function($query){
-
-        })
-        ->where('is_sales_item','1')
+        $Item =  Item::where('is_sales_item','1')
         ->where('status','1')->get();
 
         $startRow = 2;

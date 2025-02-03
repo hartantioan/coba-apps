@@ -227,13 +227,13 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
-                                                <tfoot>
+                                                <tbody>
                                                     <tr>
                                                         <td colspan="7" class="center-align">
                                                             
                                                         </td>
                                                     </tr>
-                                                </tfoot>
+                                                </tbody>
                                             </table>
                                         </td>
                                     </tr>
@@ -551,7 +551,7 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot>
+                        <tbody>
                             <tr>
                                 <td colspan="7" class="center-align">
                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + count + `')" href="javascript:void(0);">
@@ -559,7 +559,7 @@
                                     </a>
                                 </td>
                             </tr>
-                        </tfoot>
+                        </tbody>
                     </table>
                 </td>
             </tr>
@@ -1018,7 +1018,7 @@
                                             <i>Silahkan tambahkan item...</i>
                                         </tr>
                                     </tbody>
-                                    <tfoot>
+                                    <tbody>
                                         <tr>
                                             <td colspan="7" class="center-align">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + val.code + `')" href="javascript:void(0);">
@@ -1026,7 +1026,7 @@
                                                 </a>
                                             </td>
                                         </tr>
-                                    </tfoot>
+                                    </tbody>
                                 </table>
                             </td>
                         </tr>

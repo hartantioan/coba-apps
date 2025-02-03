@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
@@ -431,7 +432,7 @@ class CapitalizationController extends Controller
                     ]);
                 }
 
-                CustomHelper::sendApproval('capitalizations',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('capitalizations',$query->id,'Pengajuan Kapitalisasi No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()

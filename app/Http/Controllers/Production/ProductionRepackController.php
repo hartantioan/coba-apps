@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Production;
 
 use App\Exports\ExportProductionRepacking;
 use App\Exports\ExportProductionWorkingHourTransactionPage;
+use App\Jobs\SendApproval;
 use iio\libmergepdf\Merger;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Date;
@@ -452,7 +453,7 @@ class ProductionRepackController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Repack No. '.$query->code);
+                    SendApproval::dispatch($query->getTable(),$query->id,'Production Repack No. '.$query->code,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Repack No. '.$query->code,'Pengajuan Production Repack No. '.$query->code,session('bo_id'));
 
                     activity()

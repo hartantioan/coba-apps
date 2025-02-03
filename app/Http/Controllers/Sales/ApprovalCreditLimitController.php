@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExporApprovalCreditLimitTransactionPage;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\ApprovalCreditLimit;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
@@ -363,7 +364,7 @@ class ApprovalCreditLimitController extends Controller
 			if($query) {
 
                 if($query->grandtotal > 0){
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 }else{
                     ApprovalCreditLimit::find($query->id)->update([
                         'status'    => '3'

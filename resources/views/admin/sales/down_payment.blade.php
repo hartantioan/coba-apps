@@ -1508,7 +1508,7 @@
         if(tax > 0){
             $('#textTax').show();
             if(!$('#tax_no').val()){
-                getTaxSeries();
+                /* getTaxSeries(); */
             }
         }else{
             $('#textTax').hide();
@@ -1561,7 +1561,7 @@
         if(tax > 0){
             $('#textTax').show();
             if(!$('#tax_no').val()){
-                getTaxSeries();
+                /* getTaxSeries(); */
             }
         }else{
             $('#textTax').hide();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Currency;
 use App\Models\Item;
 use App\Models\ItemStock;
@@ -146,6 +147,15 @@ class InventoryTransferInController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('inventoryTransferOut',function($query) use($search, $request){
+                                $query->whereHas('inventoryTransferOutDetail', function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                })
+                                ->orWhere('code', 'like', "%$search%");
+                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -196,11 +206,14 @@ class InventoryTransferInController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('inventoryTransferDetail', function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
+                            ->orWhereHas('inventoryTransferOut',function($query) use($search, $request){
+                                $query->whereHas('inventoryTransferOutDetail', function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                })
+                                ->orWhere('code', 'like', "%$search%");
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -329,6 +342,7 @@ class InventoryTransferInController extends Controller
              */'company_id'                => 'required',
             'inventory_transfer_out_id' => 'required',
 			'post_date'		            => 'required',
+            'note'                      => 'required',
 		], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -338,6 +352,7 @@ class InventoryTransferInController extends Controller
              */'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'inventory_transfer_out_id.required'=> 'Inventori Transfer Asal tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
+            'note.required' 				    => 'Keterangan utama tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -444,7 +459,7 @@ class InventoryTransferInController extends Controller
                         }
                     }
 
-                    CustomHelper::sendApproval('inventory_transfer_ins',$query->id,$query->note);
+                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('inventory_transfer_ins',$query->id,'Barang Transfer - Masuk No. '.$query->code,$query->note,session('bo_id'));
                         
                     activity()
@@ -699,6 +714,10 @@ class InventoryTransferInController extends Controller
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                $query->inventoryTransferOut->update([
+                    'status'    => '2'
                 ]);
 
                 foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){

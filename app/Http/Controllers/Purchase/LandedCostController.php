@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Jobs\ResetCogs;
+use App\Jobs\SendApproval;
 use App\Jobs\ResetStock;
 use App\Models\Coa;
 use App\Models\Company;
@@ -591,6 +592,7 @@ class LandedCostController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    $val->getReference(),
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -683,10 +685,20 @@ class LandedCostController extends Controller
                 ];
             } else {
 
-                $total = str_replace(',','.',str_replace('.','',$request->total));
+                /* $total = str_replace(',','.',str_replace('.','',$request->total));
                 $tax = str_replace(',','.',str_replace('.','',$request->tax));
                 $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
-                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal)); */
+                $total = 0;
+                $tax = 0;
+                $wtax = 0;
+                $grandtotal = 0;
+                foreach($request->arr_fee_id as $key => $row){
+                    $total += str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key]));
+                    $tax += str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key]));
+                    $wtax += str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key]));
+                    $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key]));
+                }
 
                 /* if($grandtotal <= 0){
                     return response()->json([
@@ -844,7 +856,7 @@ class LandedCostController extends Controller
 
                     }
 
-                    CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
+                    SendApproval::dispatch('landed_costs',$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()

@@ -259,6 +259,7 @@ class AgingAPController extends Controller
                     ON u.id = pi.account_id
                 WHERE 
                     pi.post_date <= :date8
+                    AND pi.post_date < '2025-02-01'
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
@@ -703,6 +704,7 @@ class AgingAPController extends Controller
                     ON u.id = pi.account_id
                 WHERE 
                     pi.post_date <= :date8
+                    AND pi.post_date < '2025-02-01'
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL

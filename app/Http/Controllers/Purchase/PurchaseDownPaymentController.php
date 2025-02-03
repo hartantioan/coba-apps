@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
@@ -798,7 +799,7 @@ class PurchaseDownPaymentController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('purchase_down_payments',$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan AP Down Payment No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
@@ -1074,7 +1075,7 @@ class PurchaseDownPaymentController extends Controller
                 ];
             }else{
 
-                CustomHelper::removeDeposit($query->account_id,$query->total);
+                //CustomHelper::removeDeposit($query->account_id,$query->total);
                 CustomHelper::removeApproval('purchase_down_payments',$query->id);
                 CustomHelper::removeJournal('purchase_down_payments',$query->id);
 

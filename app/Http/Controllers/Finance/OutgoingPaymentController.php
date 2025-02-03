@@ -780,6 +780,9 @@ class OutgoingPaymentController extends Controller
                                 ]);
                             }
                         }
+                        if($row->lookable->post_date >= '2025-02-01'){
+							CustomHelper::removeDeposit($row->lookable->account_id,$row->lookable->grandtotal * $row->lookable->currency_rate);
+						}
                     }
                     if($row->lookable_type == 'fund_requests'){
                         if($row->lookable->document_status == '2'){

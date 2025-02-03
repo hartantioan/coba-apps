@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\SampleType;
 use App\Models\TruckQueue;
 use App\Models\RuleProcurement;
 use App\Models\Area;
@@ -513,9 +514,7 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
-                })->whereHas('itemShading',function($query){
-
-                })
+                })/* ->whereHas('itemShading') */
                 ->where('is_sales_item','1')
                 ->where('status','1')->get();
 
@@ -639,7 +638,8 @@ class Select2Controller extends Controller {
                     $query->whereHas('itemGroupWarehouse',function($query){
                         $query->whereIn('warehouse_id', $this->datawarehouses);
                     });
-                })->where('status','1')->get();
+                })->where('status','1')
+                ->paginate(10);
 
         foreach($data as $d) {
             $response[] = [
@@ -654,7 +654,12 @@ class Select2Controller extends Controller {
             ];
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
     }
 
     public function itemReceive(Request $request)
@@ -1527,6 +1532,52 @@ class Select2Controller extends Controller {
         }
 
         return response()->json(['items' => $response]);
+    }
+
+    public function goodIssueReceive(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = GoodIssue::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('goodIssueDetail',function($query) use($search){
+                                $query->whereHas('itemStock',function($query) use($search){
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereDoesntHave('goodReceive')
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->paginate(10);
+
+        foreach($data as $d) {
+            if($d->goodReceive()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                    'nominal'       => CustomHelper::formatConditionalQty($d->grandtotal),
+                ];
+            }
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
     }
 
     public function purchaseOrder(Request $request)
@@ -2732,7 +2783,8 @@ class Select2Controller extends Controller {
         })
         ->whereHas('itemStock', function($query) use($place, $warehouse) {
             $query->where('place_id', $place)
-                ->where('warehouse_id', $warehouse);
+                ->where('warehouse_id', $warehouse)
+                ->where('qty','>',0);
         })
         ->where('status', '1')
         ->paginate(10);
@@ -2746,7 +2798,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStockPlaceWarehouse($place, $warehouse),
+                'stock_list'        => $d->currentStockPlaceWarehouseMoreThanZero($place, $warehouse),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
@@ -2835,7 +2887,7 @@ class Select2Controller extends Controller {
 
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->code.' - '.$d->user->name,
+                    'text' 			    => $d->code.' - '.$d->user->name.' - '.$d->note,
                     'details'           => $details,
                 ];
             }
@@ -3050,7 +3102,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $id_rules = null;
             $percentage_mod = 0;
-            $getRules = RuleBpScale::where('account_id',$d->account_id)->whereDate('effective_date','>=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
+            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('start_effective_date','>=',date('Y-m-d'))->whereDate('effective_date','<=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
             if($getRules){
                 $id_rules = $getRules->id;
                 $percentage_mod = $getRules->percentage_level;
@@ -3555,6 +3607,10 @@ class Select2Controller extends Controller {
             $arrDetail = [];
 
             foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                $priceBeforeDiscount = number_format($row->marketingOrderDetail->price,2,',','.');
+                $disc1 = number_format($row->marketingOrderDetail->percent_discount_1,2,',','.');
+                $disc2 = number_format($row->marketingOrderDetail->percent_discount_2,2,',','.');
+                $disc3 = number_format($row->marketingOrderDetail->discount_3,2,',','.');
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
                 if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
@@ -3588,6 +3644,10 @@ class Select2Controller extends Controller {
                     'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDetail->qty_conversion),
                     'price'             => number_format($price,2,',','.'),
                     'note'              => '',
+                    'price_before_disc' => $priceBeforeDiscount,
+                    'discount_1'        => $disc1,
+                    'discount_2'        => $disc2,
+                    'discount_3'        => $disc3,
                 ];
                 $totalAll += $total;
                 $taxAll += $tax;
@@ -5669,17 +5729,21 @@ class Select2Controller extends Controller {
                     // });
                 });
             }
-        })
-        ->get();
+        })->whereHas('itemShading')->paginate(10);
 
         foreach($data as $d) {
             $response[] = [
                 'id'    => $d->id,
-                'text'  => $d->code.'-'.$d->item->name,
+                'text'  => 'Batch : '.$d->code.' Shading : '.($d->itemShading->code ?? 'Kosong').' - '.$d->item->name,
             ];
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
     }
 
     public function shadingIdMovement(Request $request)
@@ -5763,13 +5827,13 @@ class Select2Controller extends Controller {
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','", $this->dataplacecode)."')")
-        ->whereIn('status', ['2', '3'])
+        ->whereIn('status', ['2', '3' ,'4' , '5'])
         ->paginate(10);
 
         foreach($data as $d) {
             $response[] = [
                 'id'   	        => $d->id,
-                'text' 	        => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name.' - NO INVOICE : '.$d->marketingOrderInvoice->code,
+                'text' 	        => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name.' - NO INVOICE : '.($d->marketingOrderInvoice()->exists() ? $d->marketingOrderInvoice->code : 'TIDAK ADA'),
                 'account_id'    => $d->marketingOrderDelivery->customer_id,
                 'account_name'  => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
             ];
@@ -5781,5 +5845,24 @@ class Select2Controller extends Controller {
                 'more' => $data->hasMorePages()
             ]
         ]);
+    }
+
+    public function sampleType(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = SampleType::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
     }
 }

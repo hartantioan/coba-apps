@@ -221,9 +221,9 @@
                             <div>
                                 <p>Regards,</p>
                                 <p class="sub" style="font-weight: bold">{{$data['user']->name}}</p>
-                                <p class="sub">{{$data['user']['position']->name}}</p>
+                                <p class="sub">{{$data['user']['position']->name ?? ''}}</p>
                                 <p class="sub">{{$data['company']->name}}</p>
-                                <p class="sub">{{$data['company']->address}}</p>  
+                                <p class="sub">{{$data['company']->address}}</p>
                             </div>
                             </td>
                         </tr>

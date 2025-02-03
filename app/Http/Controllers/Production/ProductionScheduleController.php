@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApproval;
 use App\Models\Company;
 use App\Models\MarketingOrderPlan;
 use App\Models\IncomingPayment;
@@ -421,7 +422,7 @@ class ProductionScheduleController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Jadwal Produksi No. '.$query->code,'Pengajuan Jadwal Produksi No. '.$query->code,session('bo_id'));
 
                 activity()

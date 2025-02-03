@@ -206,4 +206,11 @@ class GoodReceiveDetail extends Model
 
         return implode(',',$arr);
     }
+
+    public function totalProportionalFromIssue(){
+        $bobot = $this->qty / $this->goodReceive->totalQty();
+        $totalIssue = $this->goodReceive->goodIssue->grandtotal;
+        $cost = round($bobot * $totalIssue,2);
+        return $cost;
+    }
 }

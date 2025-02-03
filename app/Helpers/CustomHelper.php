@@ -5,6 +5,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetCogsNew;
+use App\Jobs\ResetCogsNewForProduction;
 use App\Jobs\ResetCogsNewNonAccumulate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -161,6 +162,10 @@ class CustomHelper {
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
+	}
+
+	public static function sendCogsForProduction($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
+		ResetCogsNewForProduction::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
 	}
 
 	public static function sendCogsNonAccumulate($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
@@ -1839,6 +1844,9 @@ class CustomHelper {
 									]);
 								}
 							}
+						}
+						if($row->lookable->post_date >= '2025-02-01'){
+							CustomHelper::addDeposit($row->lookable->account_id,$row->lookable->grandtotal * $row->lookable->currency_rate);
 						}
 					}elseif($row->lookable_type == 'marketing_order_memos'){
 						$rowtotal = $row->lookable->balance();
@@ -3634,6 +3642,10 @@ class CustomHelper {
 
 			$iti = InventoryTransferIn::find($table_id);
 
+			$iti->update([
+				'status'	=> '3'
+			]);
+
 			/* if(($iti->inventoryTransferOut->place_from !== $iti->InventoryTransferOut->place_to) || ($iti->inventoryTransferOut->place_from == $iti->inventoryTransferOut->place_to && $iti->inventoryTransferOut->warehouse_from !== $iti->inventoryTransferOut->warehouse_to)){ */
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -3713,6 +3725,10 @@ class CustomHelper {
 					$rowdetail->itemStock->production_batch_id,
 				);
 			}
+
+			$iti->inventoryTransferOut->update([
+				'status'	=> '3'
+			]);
 
 		}elseif($table_name == 'depreciations'){
 
@@ -4762,6 +4778,8 @@ class CustomHelper {
 
 			$type = '';
 
+			$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$pi->company_id)->where('status','1')->first();
+
 			foreach($pi->purchaseInvoiceDetail as $row){
 
 				if($row->lookable_type == 'coas'){
@@ -4951,10 +4969,11 @@ class CustomHelper {
 				}elseif($row->lookable_type == 'landed_cost_fee_details'){
 					$type = $pi->currency->type;
 					$currency_rate = $row->lookable->landedCost->currency_rate;
+					$rowcoa = $row->lookable->landedCostFee->type == '1' ? $row->lookable->landedCostFee->coa : $coabiayaharusdibayarkan;
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable->landedCostFee->coa_id,
-						'account_id'	=> $row->lookable->landedCostFee->coa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
+						'coa_id'		=> $rowcoa->id,
+						'account_id'	=> $rowcoa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->lookable->total * $currency_rate,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
@@ -5338,45 +5357,47 @@ class CustomHelper {
 		}elseif($table_name == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($table_id);
 
-			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
-			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+			if($pdp->post_date < '2025-02-01'){
+				$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
+				$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
 
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'company_id'	=> $pdp->company_id,
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($pdp->post_date)).'00'),
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-				'currency_id'	=> isset($pdp->currency_id) ? $pdp->currency_id : NULL,
-				'currency_rate'	=> isset($pdp->currency_rate) ? $pdp->currency_rate : NULL,
-				'post_date'		=> $pdp->post_date,
-				'note'			=> $pdp->note,
-				'status'		=> '3'
-			]);
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $pdp->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($pdp->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'currency_id'	=> isset($pdp->currency_id) ? $pdp->currency_id : NULL,
+					'currency_rate'	=> isset($pdp->currency_rate) ? $pdp->currency_rate : NULL,
+					'post_date'		=> $pdp->post_date,
+					'note'			=> $pdp->note,
+					'status'		=> '3'
+				]);
 
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coauangmuka->id,
-				'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
-				'type'			=> '1',
-				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+					'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
 
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coahutangusaha->id,
-				'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-				'type'			=> '2',
-				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+					'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
 
-			CustomHelper::addDeposit($account_id,$pdp->grandtotal * $pdp->currency_rate);
+				CustomHelper::addDeposit($account_id,$pdp->grandtotal * $pdp->currency_rate);
+			}
 
 		}elseif($table_name == 'employee_transfers'){
 			$transfer = EmployeeTransfer::find($table_id);
@@ -5471,7 +5492,7 @@ class CustomHelper {
 								'detailable_id'	=> $row->id,
 							]);
 
-							self::sendCogs($table_name,
+							self::sendCogsForProduction($table_name,
 								$pir->id,
 								$pir->company_id,
 								$row->itemStock->place_id,
@@ -5625,7 +5646,7 @@ class CustomHelper {
 										'detailable_id'	=> $rowbatchusage->id,
 									]);
 
-									self::sendCogs($table_name,
+									self::sendCogsForProduction($table_name,
 										$pir->id,
 										$pir->company_id,
 										$rowbatchusage->productionBatch->place_id,
@@ -5678,7 +5699,7 @@ class CustomHelper {
 											'detailable_id'	=> $rowbatchusage->id,
 										]);
 
-										self::sendCogs($table_name,
+										self::sendCogsForProduction($table_name,
 											$pir->id,
 											$pir->company_id,
 											$rowbatchusage->productionBatch->place_id,
@@ -5725,7 +5746,7 @@ class CustomHelper {
 										'detailable_id'	=> $row->id,
 									]);
 
-									self::sendCogs($table_name,
+									self::sendCogsForProduction($table_name,
 										$pir->id,
 										$pir->company_id,
 										$row->itemStock->place_id,
@@ -5926,7 +5947,7 @@ class CustomHelper {
 							'detailable_id'	=> $rowbatch->id,
 						]);
 
-						self::sendCogs($table_name,
+						self::sendCogsForProduction($table_name,
 							$pir->id,
 							$pir->company_id,
 							$row->place_id,
@@ -5972,7 +5993,7 @@ class CustomHelper {
 						'detailable_id'	=> $row->id,
 					]);
 
-					self::sendCogs($table_name,
+					self::sendCogsForProduction($table_name,
 						$pir->id,
 						$pir->company_id,
 						$row->place_id,
@@ -6003,7 +6024,7 @@ class CustomHelper {
 
 				if($row->qty_reject > 0){
 					if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
-						self::sendCogs($table_name,
+						self::sendCogsForProduction($table_name,
 							$pir->id,
 							$pir->company_id,
 							$pir->place_id,
@@ -6107,7 +6128,7 @@ class CustomHelper {
 				'lookable_id'	=> $table_id,
 			]);
 
-			self::sendCogs($table_name,
+			self::sendCogsForProduction($table_name,
 				$pir->id,
 				$pir->company_id,
 				$pir->place_id,
@@ -6137,7 +6158,7 @@ class CustomHelper {
 
 			if($pir->qty_reject > 0){
 				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
-					self::sendCogs($table_name,
+					self::sendCogsForProduction($table_name,
 						$pir->id,
 						$pir->company_id,
 						$pir->place_id,
@@ -6214,7 +6235,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pir->id,
 					$pir->company_id,
 					$row->place_id,
@@ -6263,7 +6284,7 @@ class CustomHelper {
 				'detailable_id'	=> NULL,
 			]);
 
-			self::sendCogs($table_name,
+			self::sendCogsForProduction($table_name,
 				$pir->id,
 				$pir->company_id,
 				$pir->productionFgReceive->place_id,
@@ -6337,7 +6358,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pr->id,
 					$pr->company_id,
 					$row->itemStock->place_id,
@@ -6383,7 +6404,7 @@ class CustomHelper {
 					'detailable_id'	=> $row->id,
 				]);
 
-				self::sendCogs($table_name,
+				self::sendCogsForProduction($table_name,
 					$pr->id,
 					$pr->company_id,
 					$row->place_id,
@@ -6906,43 +6927,48 @@ class CustomHelper {
 		if($data->lookable_type == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($data->lookable_id);
 
-			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
-			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+			if($pdp->post_date < '2025-02-01'){
+				$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
+				$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+	
+				$currency_rate = $pdp->currency_rate;
+	
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $pdp->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
+					'lookable_type'	=> $data->getTable(),
+					'lookable_id'	=> $data->id,
+					'currency_id'	=> $pdp->currency_id,
+					'currency_rate'	=> $currency_rate,
+					'post_date'		=> $date,
+					'note'			=> 'VOID CANCEL '.$pdp->code,
+					'status'		=> '3'
+				]);
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $pdp->account_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+					'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+					'note'			=> $pdp->code
+				]);
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $pdp->account_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+					'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+					'note'			=> $pdp->code
+				]);
 
-			$currency_rate = $pdp->currency_rate;
-
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'company_id'	=> $pdp->company_id,
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
-				'lookable_type'	=> $data->getTable(),
-				'lookable_id'	=> $data->id,
-				'currency_id'	=> $pdp->currency_id,
-				'currency_rate'	=> $currency_rate,
-				'post_date'		=> $date,
-				'note'			=> 'VOID CANCEL '.$pdp->code,
-				'status'		=> '3'
-			]);
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coahutangusaha->id,
-				'account_id'	=> $coahutangusaha->bp_journal ? $pdp->account_id : NULL,
-				'type'			=> '1',
-				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
-				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> $pdp->code
-			]);
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coauangmuka->id,
-				'account_id'	=> $coauangmuka->bp_journal ? $pdp->account_id : NULL,
-				'type'			=> '2',
-				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
-				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> $pdp->code
-			]);
+				CustomHelper::removeDeposit($pdp->account_id,$pdp->grandtotal * $pdp->currency_rate);
+			}
+			
 		}elseif($data->lookable_type == 'marketing_order_invoices'){
 			$moi = MarketingOrderInvoice::find($data->lookable_id);
 
@@ -7101,6 +7127,8 @@ class CustomHelper {
 			$realInvoice = 0;
 			$realDownPayment = 0;
 
+			$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$pi->company_id)->where('status','1')->first();
+
 			$type = '';
 
 			foreach($pi->purchaseInvoiceDetail as $row){
@@ -7257,10 +7285,12 @@ class CustomHelper {
 
 				}elseif($row->lookable_type == 'landed_cost_fee_details'){
 					$type = $pi->currency->type;
+
+					$rowcoa = $row->lookable->landedCostFee->type == '1' ? $row->lookable->landedCostFee->coa : $coabiayaharusdibayarkan;
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable->landedCostFee->coa_id,
-						'account_id'	=> $row->lookable->landedCostFee->coa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
+						'coa_id'		=> $rowcoa->id,
+						'account_id'	=> $rowcoa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->lookable->total * $currency_rate_invoice,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate_invoice : $row->lookable->total,
@@ -7493,6 +7523,7 @@ class CustomHelper {
 				$otherLc = NULL;
 
 				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
+				$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$lc->company_id)->where('status','1')->first();
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -7593,75 +7624,192 @@ class CustomHelper {
 						if($dataother){
 							$rowfc = round($dataother->total - $rowfee->total,2);
 							$rowtotal = round($dataother->total * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
-							$totalcost += $rowtotal;
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $dataother->landedCostFee->coa_id,
-								'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
-								'type'			=> '2',
-								'nominal'		=> -1 * $rowtotal,
-								'nominal_fc'	=> -1 * $rowfc,
-								'note'			=> $dataother->landedCostFee->name,
-								'lookable_type'	=> $data->lookable_type,
-								'lookable_id'	=> $data->lookable_id,
-								'detailable_type'=> $rowfee->getTable(),
-								'detailable_id'	=> $rowfee->id,
-							]);
-							$totalfccost += $rowfc;
+							if($dataother->landedCostFee->to_stock == '2'){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $dataother->landedCostFee->coa_id,
+									'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '1',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $dataother->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $dataother->getTable(),
+									'detailable_id'	=> $dataother->id,
+								]);
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $coabiayaharusdibayarkan->id,
+									'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '2',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $dataother->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $dataother->getTable(),
+									'detailable_id'	=> $dataother->id,
+								]);
+							}else{
+								$totalcost += $rowtotal;
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $dataother->landedCostFee->coa_id,
+									'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '2',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $dataother->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $rowfee->getTable(),
+									'detailable_id'	=> $rowfee->id,
+								]);
+								$totalfccost += $rowfc;
+							}
 						}else{
 							$rowfc = round(0 - $rowfee->total,2);
 							$rowtotal = round(0 * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
-							$totalcost += $rowtotal;
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $rowfee->landedCostFee->coa_id,
-								'account_id'	=> $rowfee->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
-								'type'			=> '2',
-								'nominal'		=> -1 * $rowtotal,
-								'nominal_fc'	=> -1 * $rowfc,
-								'note'			=> $rowfee->landedCostFee->name,
-								'lookable_type'	=> $data->lookable_type,
-								'lookable_id'	=> $data->lookable_id,
-								'detailable_type'=> $rowfee->getTable(),
-								'detailable_id'	=> $rowfee->id,
-							]);
-							$totalfccost += $rowfc;
+							if($rowfee->landedCostFee->to_stock == '2'){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $rowfee->landedCostFee->coa_id,
+									'account_id'	=> $rowfee->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '1',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $rowfee->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $rowfee->getTable(),
+									'detailable_id'	=> $rowfee->id,
+								]);
+								
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $coabiayaharusdibayarkan->id,
+									'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '2',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $rowfee->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $rowfee->getTable(),
+									'detailable_id'	=> $rowfee->id,
+								]);
+							}else{
+								$totalcost += $rowtotal;
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $rowfee->landedCostFee->coa_id,
+									'account_id'	=> $rowfee->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+									'type'			=> '2',
+									'nominal'		=> -1 * $rowtotal,
+									'nominal_fc'	=> -1 * $rowfc,
+									'note'			=> $rowfee->landedCostFee->name,
+									'lookable_type'	=> $data->lookable_type,
+									'lookable_id'	=> $data->lookable_id,
+									'detailable_type'=> $rowfee->getTable(),
+									'detailable_id'	=> $rowfee->id,
+								]);
+								$totalfccost += $rowfc;
+							}
 						}
 					}
 					foreach($lc->landedCostFeeDetail()->whereNotIn('landed_cost_fee_id',$arrFee)->get() as $rowdetail){
-						$totalcost += round($rowdetail->total * $lc->currency_rate,2);
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
-							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
-							'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
-							'note'			=> $rowdetail->landedCostFee->name,
-							'lookable_type'	=> $data->lookable_type,
-							'lookable_id'	=> $data->lookable_id,
-							'detailable_type'=> $rowdetail->getTable(),
-							'detailable_id'	=> $rowdetail->id,
-						]);
-						$totalfccost += $rowdetail->total;
+						if($rowdetail->landedCostFee->to_stock == '2'){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+								'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '1',
+								'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coabiayaharusdibayarkan->id,
+								'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+						}else{
+							$totalcost += round($rowdetail->total * $lc->currency_rate,2);
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+								'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+							$totalfccost += $rowdetail->total;
+						}
 					}
 				}else{
 					foreach($lc->landedCostFeeDetail as $rowdetail){
-						$totalcost += round($rowdetail->total * $lc->currency_rate,2);
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
-							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
-							'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
-							'note'			=> $rowdetail->landedCostFee->name,
-							'lookable_type'	=> $data->lookable_type,
-							'lookable_id'	=> $data->lookable_id,
-							'detailable_type'=> $rowdetail->getTable(),
-							'detailable_id'	=> $rowdetail->id,
-						]);
-						$totalfccost += $rowdetail->total;
+						if($rowdetail->landedCostFee->to_stock == '2'){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+								'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '1',
+								'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coabiayaharusdibayarkan->id,
+								'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+						}else{
+							$totalcost += round($rowdetail->total * $lc->currency_rate,2);
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+								'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> -1 * round($rowdetail->total * $lc->currency_rate,2),
+								'nominal_fc'	=> $lc->currency->type == '1' ? -1 * $rowdetail->total * $lc->currency_rate : -1 * $rowdetail->total,
+								'note'			=> $rowdetail->landedCostFee->name,
+								'lookable_type'	=> $data->lookable_type,
+								'lookable_id'	=> $data->lookable_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+							$totalfccost += $rowdetail->total;
+						}
 					}
 				}
 

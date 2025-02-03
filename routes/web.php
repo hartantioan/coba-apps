@@ -135,6 +135,7 @@ use App\Http\Controllers\MasterData\PatternController;
 use App\Http\Controllers\MasterData\ColorController;
 use App\Http\Controllers\MasterData\GradeController;
 use App\Http\Controllers\MasterData\BrandController;
+use App\Http\Controllers\MasterData\ToleranceScaleController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -145,6 +146,7 @@ use App\Http\Controllers\Finance\EmployeeReceivableController;
 
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
+use App\Http\Controllers\Purchase\SampleTestInputController;
 use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
 use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
@@ -171,7 +173,7 @@ use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderMemoController;
 use App\Http\Controllers\Sales\MarketingOrderReportController;
-use App\Http\Controllers\Sales\ReportMarketingOrderDeliveryController;
+use App\Http\Controllers\Sales\ExpeditionPriceRankingReport;
 use App\Http\Controllers\Sales\ReportSalesOrderRecapController;
 use App\Http\Controllers\Sales\ReportMarketingDOScalesController;
 use App\Http\Controllers\Sales\ReportSalesOrderController;
@@ -262,6 +264,7 @@ use App\Http\Controllers\Misc\OfficialReportController;
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
 use App\Http\Controllers\MasterData\BomMapController;
+use App\Http\Controllers\MasterData\SampleTypeController;
 use App\Http\Controllers\MasterData\BomStandardController;
 use App\Http\Controllers\MasterData\ItemWeightController;
 use App\Http\Controllers\MasterData\FgGroupController;
@@ -401,6 +404,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
                 Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
                 Route::get('good_issue_return', [Select2Controller::class, 'goodIssueReturn']);
+                Route::get('good_issue_gr', [Select2Controller::class, 'goodIssueReceive']);
                 Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
                 Route::get('vendor', [Select2Controller::class, 'vendor']);
                 Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
@@ -523,6 +527,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('shading_id_movement', [Select2Controller::class, 'shadingIdMovement']);
                 Route::get('truck_queue_good_scale', [Select2Controller::class, 'truckQueueGoodScale']);
                 Route::get('marketing_order_delivery_process_complaint', [Select2Controller::class, 'marketingOrderDeliveryProcessComplaint']);
+                Route::get('sample_type', [Select2Controller::class, 'sampleType']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -596,6 +601,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/', [NotificationController::class, 'index']);
                     Route::get('datatable', [NotificationController::class, 'datatable']);
                     Route::post('refresh', [NotificationController::class, 'refresh'])->withoutMiddleware('lock');
+                    Route::post('announcement', [AnnouncementController::class, 'refresh'])->withoutMiddleware('lock');
                     Route::post('update_notification', [NotificationController::class, 'updateNotification']);
                 });
 
@@ -727,6 +733,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('get_import_excel', [OutletController::class, 'getImportExcel']);
                         Route::get('datatable', [OutletController::class, 'datatable']);
                         Route::post('show', [OutletController::class, 'show']);
+                        Route::get('export', [OutletController::class, 'export']);
                         Route::post('create', [OutletController::class, 'create'])->middleware('operation.access:outlet,update');
                         Route::post('destroy', [OutletController::class, 'destroy'])->middleware('operation.access:outlet,delete');
                     });
@@ -1517,6 +1524,20 @@ Route::prefix('admin')->group(function () {
                         Route::post('create', [DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
                         Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
+
+                    Route::prefix('tolerance_scale')->middleware('operation.access:tolerance_scale,view')->group(function () {
+                        Route::get('/', [ToleranceScaleController::class, 'index']);
+                        Route::get('datatable', [ToleranceScaleController::class, 'datatable']);
+                        Route::get('row_detail', [ToleranceScaleController::class, 'rowDetail']);
+                        Route::post('show', [ToleranceScaleController::class, 'show']);
+                        Route::post('print', [ToleranceScaleController::class, 'print']);
+                        Route::get('export', [ToleranceScaleController::class, 'export']);
+                        Route::get('export_from_page', [ToleranceScaleController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [ToleranceScaleController::class, 'import'])->middleware('operation.access:tolerance_scale,update');
+                        Route::get('get_import_excel', [ToleranceScaleController::class, 'getImportExcel']);
+                        Route::post('create', [ToleranceScaleController::class, 'create'])->middleware('operation.access:tolerance_scale,update');
+                        Route::post('destroy', [ToleranceScaleController::class, 'destroy'])->middleware('operation.access:tolerance_scale,delete');
+                    });
                 });
 
 
@@ -1545,6 +1566,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('get_import_excel', [RuleProcurementController::class, 'getImportExcel']);
                         Route::get('export_from_page', [RuleProcurementController::class, 'exportFromTransactionPage']);
                         Route::post('import', [RuleProcurementController::class, 'import'])->middleware('operation.access:rule_procurement,update');
+                    });
+
+                    Route::prefix('sample_type')->middleware('operation.access:sample_type,view')->group(function () {
+                        Route::get('/', [SampleTypeController::class, 'index']);
+                        Route::get('datatable', [SampleTypeController::class, 'datatable']);
+                        Route::post('show', [SampleTypeController::class, 'show']);
+                        Route::post('create', [SampleTypeController::class, 'create'])->middleware('operation.access:sample_type,update');
+                        Route::post('destroy', [SampleTypeController::class, 'destroy'])->middleware('operation.access:sample_type,delete');
                     });
                 });
 
@@ -1634,7 +1663,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('timeline', [AnnouncementController::class, 'timeline']);
                     Route::post('create', [AnnouncementController::class, 'create']);
                     Route::post('show', [AnnouncementController::class, 'show']);
-                    Route::post('refresh', [AnnouncementController::class, 'refresh'])->withoutMiddleware('lock');
                     Route::post('destroy', [AnnouncementController::class, 'destroy'])->middleware('operation.access:change_log,delete');
                 });
 
@@ -1900,6 +1928,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree', [PurchaseOrderController::class, 'viewStructureTree']);
                     Route::get('simplestructuretree', [PurchaseOrderController::class, 'simpleStructrueTree']);
                     Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
+                    Route::post('send_email', [PurchaseOrderController::class, 'sendEmail']);
                     Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                     Route::post('create', [PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
                     Route::post('create_done', [PurchaseOrderController::class, 'createDone'])->middleware('operation.access:purchase_order,update');
@@ -1908,6 +1937,31 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual_chi/{id}', [PurchaseOrderController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
+                });
+
+                Route::prefix('sample_test_input')->middleware(['operation.access:sample_test_input,view', 'lockacc'])->group(function () {
+                    Route::get('/', [SampleTestInputController::class, 'index']);
+                    Route::get('datatable', [SampleTestInputController::class, 'datatable']);
+                    Route::get('row_detail', [SampleTestInputController::class, 'rowDetail']);
+                    Route::post('show', [SampleTestInputController::class, 'show']);
+                    Route::post('done', [SampleTestInputController::class, 'done'])->middleware('operation.access:sample_test_input,update');
+                    Route::post('get_items', [SampleTestInputController::class, 'getItems']);
+                    Route::post('get_code', [SampleTestInputController::class, 'getCode']);
+                    Route::post('print', [SampleTestInputController::class, 'print']);
+                    Route::post('print_by_range', [SampleTestInputController::class, 'printByRange']);
+                    Route::get('export_from_page', [SampleTestInputController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [SampleTestInputController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [SampleTestInputController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [SampleTestInputController::class, 'getDetails']);
+                    Route::post('send_email', [SampleTestInputController::class, 'sendEmail']);
+                    Route::post('remove_used_data', [SampleTestInputController::class, 'removeUsedData']);
+                    Route::post('create', [SampleTestInputController::class, 'create'])->middleware('operation.access:sample_test_input,update');
+                    Route::post('create_done', [SampleTestInputController::class, 'createDone'])->middleware('operation.access:sample_test_input,update');
+                    Route::get('approval/{id}', [SampleTestInputController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [SampleTestInputController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [SampleTestInputController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [SampleTestInputController::class, 'voidStatus'])->middleware('operation.access:sample_test_input,void');
+                    Route::post('destroy', [SampleTestInputController::class, 'destroy'])->middleware('operation.access:sample_test_input,delete');
                 });
 
                 #report
@@ -2886,6 +2940,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [MitraMarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MitraMarketingOrderController::class, 'voidStatus'])->middleware('operation.access:mitra_marketing_order,void');
                     Route::post('destroy', [MitraMarketingOrderController::class, 'destroy'])->middleware('operation.access:mitra_marketing_order,delete');
+                    Route::get('export_from_page', [MitraMarketingOrderController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('sales_order')->middleware(['operation.access:sales_order,view', 'lockacc'])->group(function () {
@@ -3069,6 +3124,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('update_and_email', [MarketingOrderInvoiceController::class, 'updateAndEmail'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_no_pjb', [MarketingOrderInvoiceController::class, 'updateNoPJB'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::get('approval/{id}', [MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -3173,10 +3229,22 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('sales_report')->middleware('direct.access')->group(function () {
                     Route::prefix('sales_recap')->middleware('operation.access:sales_recap,view')->group(function () {
                         Route::get('/', [MarketingOrderReportController::class, 'index']);
+                        Route::post('create', [MarketingOrderReportController::class, 'create'])->middleware('operation.access:sales_recap,update');
                         Route::post('filter_by_date', [MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export', [MarketingOrderReportController::class, 'export']);
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);
                         Route::get('export_xml', [MarketingOrderReportController::class, 'exportXml']);
+                    });
+
+                    Route::prefix('expedition_ranks')->middleware('operation.access:delivery_cost,view')->group(function () {
+                        Route::get('/', [ExpeditionPriceRankingReport::class, 'index']);
+                        Route::get('datatable', [ExpeditionPriceRankingReport::class, 'datatable']);
+                        Route::post('show', [ExpeditionPriceRankingReport::class, 'show']);
+                        Route::get('export_from_page', [ExpeditionPriceRankingReport::class, 'exportFromTransactionPage']);
+                        Route::get('get_import_excel', [ExpeditionPriceRankingReport::class, 'getImportExcel']);
+                        Route::post('import', [ExpeditionPriceRankingReport::class, 'import'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('create', [ExpeditionPriceRankingReport::class, 'create'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('destroy', [ExpeditionPriceRankingReport::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
 
                     // Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {

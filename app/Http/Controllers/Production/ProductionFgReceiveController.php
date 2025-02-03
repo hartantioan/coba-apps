@@ -570,8 +570,9 @@ class ProductionFgReceiveController extends Controller
                     $item = Item::find($row);
                     $itemstock = ItemCogs::where('item_id',$row)->where('place_id',$request->place_id)->where('warehouse_id',$item->warehouseSm())->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                     if($itemstock){
-                        if(round($itemstock->lastStockByWarehouseAndDate($request->post_date),3) < $arrQty[$key]){
-                            $arrItemMore[] = $itemstock->item->code.' - '.$itemstock->item->name.' Stok : '.CustomHelper::formatConditionalQty($itemstock->qty_final).' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
+                        $stockNow = round($itemstock->lastStockByWarehouseAndDate($request->post_date),3);
+                        if($stockNow < $arrQty[$key]){
+                            $arrItemMore[] = $itemstock->item->code.' - '.$itemstock->item->name.' Stok : '.CustomHelper::formatConditionalQty($stockNow).' di Gudang '.$itemstock->warehouse->name.' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
                             $passedStockMaterial = false;
                         }
                     }else{

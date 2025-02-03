@@ -28,7 +28,8 @@ class Outlet extends Model
         'district_id',
         'subdistrict_id',
         'link_gmap',
-        'status'
+        'status',
+        'location_type',//grouping
     ];
 
     public function user(){
@@ -74,6 +75,16 @@ class Outlet extends Model
           '1' => 'Aktif',
           '2' => 'Tidak Aktif',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
+
+    public function locationType(){
+        $status = match ($this->location_type) {
+          '1' => 'Toko',
+          '2' => 'Gudang',
+          default => '-',
         };
 
         return $status;

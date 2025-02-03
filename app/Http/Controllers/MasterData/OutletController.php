@@ -133,6 +133,7 @@ class OutletController extends Controller
                     $val->type(),
                     $val->address,
                     $val->phone,
+                    $val->locationType(),
                     $val->province->name,
                     $val->city->name,
                     $val->district->name,
@@ -208,6 +209,7 @@ class OutletController extends Controller
                     $query->district_id     = $request->district_id;
                     $query->subdistrict_id  = $request->subdistrict_id ?? NULL;
                     $query->link_gmap       = $request->link_gmap;
+                    $query->location_type   = $request->location_type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -230,6 +232,7 @@ class OutletController extends Controller
                         'district_id'       => $request->district_id,
                         'subdistrict_id'    => $request->subdistrict_id ?? NULL,
                         'link_gmap'         => $request->link_gmap,
+                        'location_type'     => $request->location_type,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

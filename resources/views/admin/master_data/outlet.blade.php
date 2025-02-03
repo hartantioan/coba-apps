@@ -94,6 +94,7 @@
                                                         <th>Tipe</th>
                                                         <th>{{ __('translations.address') }}</th>
                                                         <th>{{ __('translations.phone_number') }}</th>
+                                                        <th>Grouping</th>
                                                         <th>{{ __('translations.province') }}</th>
                                                         <th>{{ __('translations.city') }}</th>
                                                         <th>{{ __('translations.district') }}</th>
@@ -170,6 +171,13 @@
                         <div class="input-field col s3">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <select class="browser-default" id="location_type" name="location_type">
+                                <option value="1">Toko</option>
+                                <option value="2">Gudang</option>
+                            </select>
+                            <label class="active" for="location_type">Grouping</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="type" name="type">
@@ -544,6 +552,7 @@
                 { name: 'outlet_group_id', className: '' },
                 { name: 'type', className: '' },
                 { name: 'address', className: '' },
+                { name: 'loct_ype', className: '' },
                 { name: 'phone', className: '' },
                 { name: 'province', className: '' },
                 { name: 'city', className: '' },

@@ -3,6 +3,7 @@
 namespace App\Exports;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
+use App\Models\LandedCostFeeDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -40,18 +41,18 @@ class ExportLandedCostTransactionPage implements FromCollection, WithTitle, With
         'Kode Broker',
         'Nama Broker',
         'Keterangan',
-        'Kode Item',
-        'Nama Item',
-        'Plant',
-        'Qty',
-        'Satuan',
+        'Kode Biaya',
+        'Nama Biaya',
         'Total',
+        'PPN',
+        'PPh',
+        'Grandtotal',
         'Based On',
     ];
 
     public function collection()
     {
-        $data = LandedCostDetail::whereHas('landedCost',function ($query) {
+        $data = LandedCostFeeDetail::whereHas('landedCost',function ($query) {
                 if($this->search) {
                     $query->where(function($query) {
                         $query->where('code', 'like', "%$this->search%")
@@ -136,12 +137,12 @@ class ExportLandedCostTransactionPage implements FromCollection, WithTitle, With
                     'broker_code'   => $row->landedCost->account->employee_no,
                     'broker'        => $row->landedCost->account->name,
                     'note'          => $row->landedCost->note,
-                    'item_code'     => $row->item->code,
-                    'item_name'     => $row->item->name,
-                    'place'         => $row->place->code,
-                    'qty'           => $row->qty,
-                    'unit'          => $row->item->uomUnit->code,
-                    'total'         => number_format($row->nominal,2,',','.'),
+                    'item_code'     => $row->landedCostFee->code,
+                    'item_name'     => $row->landedCostFee->name,
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'based_on'      => $row->landedCost->getReference(),
                 ];
             }

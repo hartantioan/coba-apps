@@ -267,7 +267,7 @@ class OutletController extends Controller
         $unit['outlet_group_name'] = $unit->outletGroup()->exists() ? $unit->outletGroup->name : '';
         $unit['city_name'] = $unit->city->name;
         $unit['district_name'] = $unit->district->name;
-        $unit['subdistrict_name'] = $unit->subdistrict->name;
+        $unit['subdistrict_name'] = $unit->subdistrict()->exists() ? $unit->subdistrict->name : '';
 
 		return response()->json($unit);
     }

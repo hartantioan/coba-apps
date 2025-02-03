@@ -9,6 +9,8 @@ use App\Models\ItemShading;
 use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessDetail;
+use App\Models\MarketingOrderMemo;
+use App\Models\MarketingOrderMemoDetail;
 use App\Models\ProductionHandover;
 use App\Models\ProductionHandoverDetail;
 use App\Models\ProductionRepackDetail;
@@ -165,6 +167,21 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         $uniqueItems = [];
         foreach($item as $key=>$row){
 
+            $marketing_order_memo_awal = MarketingOrderMemoDetail::where('deleted_at',null)->whereHas('marketingOrderMemo',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date);
+            })->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })->get();
+            $total_memo_awal = 0;
+
+            if($marketing_order_memo_awal){
+                foreach ($marketing_order_memo_awal as $row_memo) {
+
+                    $total_memo_awal += $row_memo->qty;
+                }
+            }
+
 
             $handover_awal = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
@@ -259,7 +276,23 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 ->where('post_date', '<', $this->start_date);
             })->sum('qty') ?? 0;
 
-            $awal =($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal) - ( $total_sj_awal+$goodIssue_awal  + $repack_out_awal);
+            $awal =($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal + $total_memo_awal) - ( $total_sj_awal+$goodIssue_awal  + $repack_out_awal);
+
+            $marketing_order_memo = MarketingOrderMemoDetail::where('deleted_at',null)->whereHas('marketingOrderMemo',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);;
+            })->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })->get();
+            $total_memo = 0;
+
+            if($marketing_order_memo){
+                foreach ($marketing_order_memo as $row_memo) {
+
+                    $total_memo += $row_memo->qty;
+                }
+            }
 
             $handover = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
@@ -351,7 +384,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->sum('qty');
 
 
-            $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out));
+            $total = $awal + (($total_handover+ $goodReceive+$repack_in + $total_memo) - ( $total_sj+$goodIssue+$repack_out));
             $pallet_conversion=0;
             $box_conversion=0;
             $total_sum_sj_blm_terkirim=0;

@@ -299,7 +299,7 @@ class MarketingOrderAgingController extends Controller
         <tbody>';
 
         foreach ($newData as $key => $row) {
-            $html .= '<tr class="row_detail"><td class="center-align">' . ($key + 1) . '</td><td>' . $row['customer_code'] . '</td><td>' . $row['customer_name'] . '</td><td>' . $row['customer_group'] . '</td><td class="right-align">' . number_format($row['limit_credit'], 2, ',', '.') . '</td><td class="right-align">' . number_format($row['credit_balance'], 2, ',', '.') . '</td><td class="right-align">' . number_format($row['outstand_check'], 2, ',', '.') . '</td>';
+            $html .= '<tr class="row_detail"><td class="center-align" style="left: 0px;position: sticky;background-color:white;">' . ($key + 1) . '</td><td>' . $row['customer_code'] . '</td><td style="left: 50px;position: sticky;background-color:white;">' . $row['customer_name'] . '</td><td>' . $row['customer_group'] . '</td><td class="right-align">' . number_format($row['limit_credit'], 2, ',', '.') . '</td><td class="right-align">' . number_format($row['credit_balance'], 2, ',', '.') . '</td><td class="right-align">' . number_format($row['outstand_check'], 2, ',', '.') . '</td>';
 
             $html .= '<td class="right-align">' . number_format($row['total'], 2, ',', '.') . '</td>';
 

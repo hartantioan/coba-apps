@@ -762,15 +762,23 @@ class GoodScaleController extends Controller
                         </tr>
                     </thead><tbody>';
 
+        $total = 0;
+
         foreach($data->goodScaleDetail as $key => $detail){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$detail->lookable->marketingOrderDeliveryProcess->code.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($detail->qty).'</td>
             </tr>';
+            $total += round($detail->qty,3);
         }
 
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody><tfoot>
+            <tr>
+                <td colspan="2" class="right-align">TOTAL</td>\
+                <td class="right-align">'.CustomHelper::formatConditionalQty($total).'</td>
+            </tr>
+        </tfoot></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>

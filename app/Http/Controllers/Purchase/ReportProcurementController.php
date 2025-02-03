@@ -86,7 +86,7 @@ class ReportProcurementController extends Controller
                 ->whereIn('status',["2","3"]);
             })->whereHas('goodReceipt', function ($querysd) {
                 $querysd
-                ->whereIn('status',["2","3"]);
+                ->whereIn('status',["2","3","9"]);
             })->get();
 
         }
@@ -98,7 +98,6 @@ class ReportProcurementController extends Controller
             })
             ->where('item_id',$request->item_id)->get();
 
-            info($query_data);
         }
 
         $grouped_data = $query_data->groupBy(function($detail) {
@@ -128,15 +127,19 @@ class ReportProcurementController extends Controller
                     $all_finance_price = 0;
                     $all_netto= 0;
                     $account = '';
+                    $satuan = '';
                     if($type == 2){
                         foreach($row as $detail_gs){
                             if($account== ''){
                                 $account = $detail_gs->goodReceipt->account->name;
                             }
+                            if($satuan == ''){
+                                $satuan = $detail_gs->itemUnit->unit->code;
+                            }
 
                         $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)
-                        ->whereDate('start_effective_date','>=',$row->purchaseOrderDetail->purchaseOrder->post_date)
-                        ->whereDate('effective_date','<=',$row->purchaseOrderDetail->purchaseOrder->post_date)
+                        ->whereDate('start_effective_date','>=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
+                        ->whereDate('effective_date','<=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
                         ->where('account_id',$detail_gs->purchaseOrderDetail->purchaseOrder->account_id)->first()->water_percent ?? 0;
 
                             $finance_kadar_air = 0;
@@ -200,6 +203,7 @@ class ReportProcurementController extends Controller
                             'total_all_bayar'=>number_format($all_bayar,2,',','.'),
                             'total_all_penerimaan'=>number_format($all_penerimaan,2,',','.'),
                             'supplier'  => $account,
+                            'satuan'  => $satuan,
                         ];
                         $pdf = PrintHelper::print($data,'Report Procurement','a4','landscape','admin.print.purchase.report_procurement','all');
                         $content = $pdf->download()->getOriginalContent();
@@ -210,6 +214,9 @@ class ReportProcurementController extends Controller
                             $selisih = 0;
                             if($account== ''){
                                 $account = $row_2->goodReceipt->account->name;
+                            }
+                            if($satuan == ''){
+                                $satuan = $row_2->itemUnit->unit->code;
                             }
                             if($row_2->goodScale()->exists()){
                                 $netto_sj = $row_2->goodScale->qty_balance;
@@ -265,6 +272,7 @@ class ReportProcurementController extends Controller
                             'total_all_bayar'=>number_format($all_bayar,2,',','.'),
                             'total_all_penerimaan'=>number_format($all_penerimaan,2,',','.'),
                             'supplier'  => $account,
+                            'satuan'  => $satuan,
                         ];
                         $pdf = PrintHelper::print($data,'Report Procurement','a4','landscape','admin.print.purchase.report_procurement_sm','all');
                         $content = $pdf->download()->getOriginalContent();

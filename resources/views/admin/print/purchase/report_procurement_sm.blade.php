@@ -204,11 +204,11 @@
                                 <th >NO SJ</th>
                                 <th >TGL MASUK</th>
                                 <th >NO. KENDARAAN</th>
-                                <th >NETTO SJ<br>M</th>
-                                <th >NETTO SPS<br> M</th>
+                                <th >NETTO SJ<br>{{$data['satuan']}}</th>
+                                <th >NETTO SPS<br> {{$data['satuan']}}</th>
                                 <th >SELISIH</th>
-                                <th >TOTAL BAYAR<br>KG</th>
-                                <th >TOTAL PENERIMAAN<br>KG</th>
+                                <th >TOTAL BAYAR<br>{{$data['satuan']}}</th>
+                                <th >TOTAL PENERIMAAN<br>{{$data['satuan']}}</th>
                             </tr>
                         </thead>
                         <tbody>

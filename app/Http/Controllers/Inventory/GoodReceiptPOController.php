@@ -270,9 +270,9 @@ class GoodReceiptPOController extends Controller
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
                 }
-                if(($val->status =='9'&& session('bo_id') == 1079 )|| session('bo_id') == 313){
+                if(($val->status =='9'&& session('bo_id') == 1079 )){
                     $btn_unlock ='
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="editGrpoNew(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="unlockProcurement(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">lock_open</i></button>';
                 }else{
                     $btn_unlock ='

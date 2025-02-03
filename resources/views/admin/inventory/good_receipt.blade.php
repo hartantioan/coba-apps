@@ -559,7 +559,7 @@
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
-                                <input id="receiver_name_edit" name="receiver_name_edit" type="text" placeholder="Nama Penerima">
+                                <input id="receiver_name_edit" name="receiver_name_edit" type="text" placeholder="Nama Penerima" readonly>
                                 <label class="active" for="receiver_name_edit">Nama Penerima</label>
                             </div>
                             <div class="input-field col m3 s12 step9">
@@ -612,7 +612,7 @@
                             </div>
 
                             <div class="input-field col m4 s12 step14">
-                                <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3" readonly></textarea>
                                 <label class="active" for="note_edit">{{ __('translations.note') }}</label>
                             </div>
                             <div class="col s12 mt-3">
@@ -857,15 +857,8 @@
                 $('.row_item_serial').each(function(){
                     $(this).remove();
                 });
-                if($('#empty-item_edit').length == 0){
-                    $('#body-item_edit').append(`
-                        <tr id="empty-item">
-                            <td colspan="18" class="center">
-                                Pilih purchase order untuk memulai...
-                            </td>
-                        </tr>
-                    `);
-                }
+                $('#body-item_edit').empty();
+
 
                 $('#account_id_edit').empty();
                 M.updateTextFields();
@@ -2238,6 +2231,7 @@
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
                 $('#document_date').val(response.document_date);
+                $('#vehicle_no').val(response.vehicle_no);
                 $('#delivery_no').val(response.delivery_no);
 
                 if(response.details.length > 0){
@@ -2425,7 +2419,7 @@
                 `);
                 $('#note_edit').val(response.note);
                 $('#receiver_name_edit').val(response.receiver_name);
-                $('#vehicle_no_edit').val(response.vehicle_no_edit);
+                $('#vehicle_no_edit').val(response.vehicle_no);
                 $('#delivery_no_edit').val(response.delivery_no);
 
                 if(response.details.length > 0){

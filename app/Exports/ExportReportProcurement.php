@@ -135,7 +135,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             ->whereIn('status',["2","3"]);
         })->whereHas('goodReceipt', function ($querysd) {
             $querysd
-            ->whereIn('status',["2","3"]);
+            ->whereIn('status',["2","3","9"]);
         })->get();
         if($this->type == 3){
             $query_data = GoodReceiptDetail::whereHas('goodReceipt', function ($querysd) {
@@ -160,7 +160,14 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             ]);
 
             if($this->type == 2){
-                $take_item_rule_percent = $row->percent_modifier;
+                if($row->percent_modifier){
+                    $take_item_rule_percent = $row->percent_modifier;
+                }else{
+                    $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
+                    ->whereDate('start_effective_date','>=',$row->purchaseOrderDetail->purchaseOrder->post_date)
+                    ->whereDate('effective_date','<=',$row->purchaseOrderDetail->purchaseOrder->post_date)
+                    ->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
+                }
 
                 $finance_kadar_air = 0;
                 $finance_kg = 0;

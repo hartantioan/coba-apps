@@ -1571,26 +1571,33 @@ class GoodScaleController extends Controller
 
                     if($totalProportional > 0){
                         $totalCost = 0;
-                
+                        $totalQty = $query_done->qty_final;
                         foreach($gs->goodScaleDetail as $key => $row){
+                            $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                            if($key == ($gs->goodScaleDetail()->count() - 1)){
+                                $qty = $totalQty;
+                            }else{
+                                $qty = round($qty_final * $bobot,2);
+                            }
                             if($gs->hasRitase()){
                                 if($key == 0){
-                                    $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / round($totalProportional,3);
-                                    $qty = round($qty_final * $bobot,3);
                                     $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
                                 }
                             }else{
-                                $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / round($totalProportional,3);
-                                $qty = round($qty_final * $bobot,3);
                                 $totalCost += $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
                             }
+                            $totalQty -= $qty;
                         }
-
-                        foreach($gs->goodScaleDetail as $row){
+                        $totalQty = $query_done->qty_final;
+                        foreach($gs->goodScaleDetail as $key => $row){
                             if($row->lookable_type == 'marketing_order_deliveries'){
                                 if($row->lookable->marketingOrderDeliveryProcess()->exists()){
-                                    $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / round($totalProportional,3);
-                                    $qty = round($qty_final * $bobot,3);
+                                    $bobot = $row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional;
+                                    if($key == ($gs->goodScaleDetail()->count() - 1)){
+                                        $qty = $totalQty;
+                                    }else{
+                                        $qty = round($qty_final * $bobot,2);
+                                    }
                                     $total = round($totalCost * $bobot,2);
                                     $row->lookable->marketingOrderDeliveryProcess->update([
                                         'weight_netto' => $qty,
@@ -1599,6 +1606,7 @@ class GoodScaleController extends Controller
                                         'qty'   => $qty,
                                         'total' => $total,
                                     ]);
+                                    $totalQty -= $qty;
                                 }
                             }
                         }

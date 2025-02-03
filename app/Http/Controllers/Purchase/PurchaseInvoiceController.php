@@ -1810,7 +1810,7 @@ class PurchaseInvoiceController extends Controller
                 'qty_returned'  => 0,
                 'qty_balance'   => CustomHelper::formatConditionalQty($row->qty),
                 'price'         => number_format($row->price,2,',','.'),
-                'price_raw'     => number_format($row->total / $row->qty,11,',','.'),
+                'price_raw'     => $row->qty > 0 ? number_format($row->total / $row->qty,11,',','.') : 0,
                 'buy_unit'      => $row->getUnitCode(),
                 'rawcode'       => $row->getHeaderCode(),
                 'post_date'     => $row->getPostDate(),

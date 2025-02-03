@@ -392,7 +392,6 @@
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
-                { name: 'parent_id', className: '' },
                 { name: 'percentage_level', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendApproval;
 
-use App\Jobs\SendMailPOJob;
+use App\Jobs\SendMailWithAttachmenJob;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\GoodIssue;
@@ -1988,7 +1988,7 @@ class PurchaseOrderController extends Controller
         $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
 
         $user_id = session('bo_id');
-        SendMailPOJob::dispatch($po->id,$user_id );
+        SendMailWithAttachmenJob::dispatch($po->id,$user_id,$po->getTable());
 
         return response()->json(['message' => 'Email Sedang dikirim ke vendor']);
     }

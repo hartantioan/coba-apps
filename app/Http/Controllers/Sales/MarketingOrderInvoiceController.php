@@ -714,7 +714,14 @@ class MarketingOrderInvoiceController extends Controller
 
                 $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->tempEmail))->first();
 
-                if(in_array($query->status,['2','3'])){
+                if(!$request->has('file') && !$query->document){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Data upload kosong dan/atau data attachment kosong.'
+                    ]);
+                }
+
+                /* if(in_array($query->status,['2','3'])){
                     if($request->has('file')) {
                         if($query->document){
                             if(Storage::exists($query->document)){
@@ -755,7 +762,7 @@ class MarketingOrderInvoiceController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                }
+                } */
             }
 
             DB::commit();

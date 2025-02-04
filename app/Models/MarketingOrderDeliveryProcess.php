@@ -279,6 +279,25 @@ class MarketingOrderDeliveryProcess extends Model
         return implode(', ', $arr);
     }
 
+
+
+    public function getSalesModelUnique()
+    {
+        $arr = [];
+        foreach ($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row) {
+            $index = -1;
+            foreach($arr as $key => $cek){
+                if($cek->id == $row->marketingOrderDetail->marketing_order_id){
+                    $index = $key;
+                }
+            }
+            if($index < 0){
+                $arr[] = $row->marketingOrderDetail->marketingOrder;
+            }
+        }
+        return $arr;
+    }
+
     public function getGrandtotalSalesOrder()
     {
         $gt = 0;

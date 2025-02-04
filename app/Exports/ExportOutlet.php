@@ -66,7 +66,8 @@ class ExportOutlet implements FromArray,WithTitle, WithHeadings, ShouldAutoSize
                 'Kecamatan'=>$val->district->name,
                 'Kelurahan'=>$val->subdistrict->name ?? '-',
                 'Link Map'=>$val->link_gmap,
-                'Status'=>$val->statusRaw()
+                'Status'=>$val->statusRaw(),
+                'Grouping'=>$val->locationType()
             ];
             $nomor++;
         }
@@ -91,7 +92,8 @@ class ExportOutlet implements FromArray,WithTitle, WithHeadings, ShouldAutoSize
         'Kecamatan',
         'Kelurahan',
         'Link Map',
-        'Status'
+        'Status',
+        'Grouping'
     ];
 
     public function headings() : array

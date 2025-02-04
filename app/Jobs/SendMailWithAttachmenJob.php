@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\CustomHelper;
 use App\Mail\SendMail;
 use App\Models\HistoryEmailDocument;
+use App\Models\MarketingOrderInvoice;
 use Illuminate\Support\Str;
 use App\Models\PurchaseOrder;
 use App\Models\TransactionEmail;
@@ -22,22 +23,20 @@ use Illuminate\Support\Facades\Storage;
 class SendMailWithAttachmenJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $po_id, $item, $warehouse, $start_date, $finish_date,$type,$group,$tables;
+    protected $table_id,$table_name,$user_id;
 
-    protected $user_id;
-    public function __construct(string $po_id ,string $user_id,string $tables)
+    public function __construct(string $table_id = null,string $user_id = null,string $table_name = null)
     {
-        $this->po_id = $po_id ? $po_id : '';
+        $this->table_id = $table_id ? $table_id : '';
         $this->user_id = $user_id;
-        $this->tables = $tables;
-
+        $this->table_name = $table_name;
         $this->queue = 'email_transaction';
     }
 
     public function handle(): void
     {
-        if($this->tables == 'purchase_orders'){
-            $po = PurchaseOrder::find($this->po_id);
+        if($this->table_name == 'purchase_orders'){
+            $po = PurchaseOrder::find($this->table_id);
             if($po->account->email){
                 $data = [
                     'title'     => 'Print Purchase Order',
@@ -132,7 +131,79 @@ class SendMailWithAttachmenJob implements ShouldQueue
                     'note'			=> $po->note,
                 ]);
             }
+        }elseif($this->table_name == 'marketing_order_invoices'){
+            $moi = MarketingOrderInvoice::find($this->table_id);
+            if($moi){
+                if($moi->account->email){
+                    $data = [
+                        'title'     => 'Marketing Order Invoice',
+                        'data'      => $moi
+                    ];
+                    $opciones_ssl=array(
+                        "ssl"=>array(
+                        "verify_peer"=>false,
+                        "verify_peer_name"=>false,
+                        ),
+                    );
+                    $po_array = array_map('trim', explode(';', $moi->account->email));
+                    $ccEmails = [
+                        'windykuro@gmail.com',
+                    ];
+                    $fullPathRule = $moi->document ? storage_path('app/' . $moi->document) : '';
+                    $newAttachmentName = $moi->document ? 'dokumen_pajak.pdf' : '';
+                    $data = [
+                        'subject' 	=> 'Dokumen Invoice '.$moi->code,
+                        'view' 		=> 'admin.mail.sales_invoice',
+                        'result' 	=> $moi,
+                        'supplier' 	=> $moi->account->name,
+                        'user' 		=> $moi->user,
+                        'company' 	=> $moi->user->company,
+                        'attachmentPath' => $fullPathRule,
+                        'attachmentName' => $newAttachmentName,
+                        'newAttachmentPath' => '',
+                        'newAttachmentName' => '',
+                    ];
+                    $status_send = '1';
+                    try {
+                        Mail::to($po_array)->cc($ccEmails)->send(new SendMail($data));
+    
+                    } catch (\Exception $e) {
+                        $status_send = '2';
+    
+                        TransactionEmail::create([
+                            'user_id'		=> $moi->user_id,
+                            'account_id'	=> $moi->account_id,
+                            'lookable_type'	=> $moi->getTable(),
+                            'lookable_id'	=> $moi->id,
+                            'status'		=> $status_send,
+                            'email_to'		=> $moi->account->email,
+                            'cc_email_to'   => implode($ccEmails),
+                        ]);
+                        Log::error('Error sending email: ' . $e->getMessage());
+                        throw $e;
+                    }
+    
+                    TransactionEmail::create([
+                        'user_id'		=> $moi->user_id,
+                        'account_id'	=> $moi->account_id,
+                        'lookable_type'	=> $moi->getTable(),
+                        'lookable_id'	=> $moi->id,
+                        'status'		=> $status_send,
+                        'email_to'		=> $moi->account->email,
+                        'cc_email_to'   => implode($ccEmails),
+                    ]);
+    
+                    HistoryEmailDocument::create([
+                        'user_id'		=> $moi->user_id,
+                        'account_id'	=> $moi->account_id,
+                        'lookable_type'	=> $moi->getTable(),
+                        'lookable_id'	=> $moi->id,
+                        'status'		=> 1,
+                        'email'			=> $moi->account->email ?? '-',
+                        'note'			=> $moi->note,
+                    ]);
+                }
+            }
         }
-
     }
 }

@@ -42,18 +42,32 @@ class SendMail extends Mailable
     public function build()
     {
         if($this->data['attachmentPath']){
-                 $email =$this->subject($this->data['subject'])
-                ->view($this->data['view'])
-                ->with([
-                    'url'    => url('/'),
-                    'data'   => $this->data,
-                    'result' => $this->data['result'],
-                ])
-                ->attach($this->data['attachmentPath'], [
-                    'as' => $this->data['attachmentName'],
-                ])->attach($this->data['newAttachmentPath'], [
-                    'as' => $this->data['newAttachmentName'],
-                ]);
+                if($this->data['newAttachmentPath'] && $this->data['attachmentPath']){
+                    $email =$this->subject($this->data['subject'])
+                    ->view($this->data['view'])
+                    ->with([
+                        'url'    => url('/'),
+                        'data'   => $this->data,
+                        'result' => $this->data['result'],
+                    ])
+                    ->attach($this->data['attachmentPath'], [
+                        'as' => $this->data['attachmentName'],
+                    ])->attach($this->data['newAttachmentPath'], [
+                        'as' => $this->data['newAttachmentName'],
+                    ]);
+                }elseif($this->data['attachmentPath']){
+                    $email =$this->subject($this->data['subject'])
+                    ->view($this->data['view'])
+                    ->with([
+                        'url'    => url('/'),
+                        'data'   => $this->data,
+                        'result' => $this->data['result'],
+                    ])
+                    ->attach($this->data['attachmentPath'], [
+                        'as' => $this->data['attachmentName'],
+                    ]);
+                }
+                
                 $email->from(config('mail.from.address'), 'PT Superior Porcelain Sukses');
                 return $email;
         }else{

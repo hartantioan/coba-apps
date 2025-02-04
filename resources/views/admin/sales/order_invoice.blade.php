@@ -522,7 +522,7 @@
                         <div id="validation_alert_email" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        Silahkan kosongi file untuk email tanpa attachment (jika kosong file) atau silahkan isi file tapi akan menimpa data yang sudah ada.
+                        Silahkan kosongi file untuk email tanpa attachment (jika kosong file) atau silahkan isi file tapi akan menimpa data yang sudah ada. Data yang diupload adalah dokumen FP dan ARIN dengan tanda tangan basah + stempel.
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
@@ -547,7 +547,7 @@
                                     <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
-                                        <input type="file" name="file" id="fileInput" accept="image/*,application/pdf" style="display: none;">
+                                        <input type="file" name="file" id="fileInput" accept="application/pdf" style="display: none;">
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                             Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                             <br>
@@ -1489,7 +1489,7 @@
                                 `);
                             }
                         }
-                        
+
                         $('#user_data_id').val(datakuy.user_data_id).trigger('change');
                         $('#note').val(datakuy.note);
 

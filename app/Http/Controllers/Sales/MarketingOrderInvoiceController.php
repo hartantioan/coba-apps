@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendApproval;
+use App\Jobs\SendMailWithAttachmenJob;
 use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
@@ -698,10 +699,10 @@ class MarketingOrderInvoiceController extends Controller
         try {
             $validation = Validator::make($request->all(), [
                 'tempEmail'                     => 'required',
-                'file'                          => 'required',
+                /* 'file'                          => 'required', */
             ], [
                 'tempEmail.required' 	                => 'Kode tidak boleh kosong.',
-                'file.required'                         => 'File harus dipilih.',
+                /* 'file.required'                         => 'File harus dipilih.', */
             ]);
 
             if($validation->fails()) {
@@ -726,6 +727,8 @@ class MarketingOrderInvoiceController extends Controller
                     }
                     $query->document = $document;
                     $query->save();
+
+                    SendMailWithAttachmenJob::dispatch($query->id,session('bo_id'),$query->getTable());
                 }else{
                     return response()->json([
                         'status'  => 500,

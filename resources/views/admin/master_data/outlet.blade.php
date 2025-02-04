@@ -679,7 +679,9 @@
                 $('#subdistrict_id,#district_id,#city_id').empty();
                 $('#city_id').empty().append(`<option value="` + response.city_id + `">` + response.city_name + `</option>`);
                 $('#district_id').empty().append(`<option value="` + response.district_id + `">` + response.district_name + `</option>`);
-                $('#subdistrict_id').empty().append(`<option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>`);
+                if(response.subdistrict_id){
+                    $('#subdistrict_id').empty().append(`<option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>`);
+                }
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

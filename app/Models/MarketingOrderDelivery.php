@@ -488,6 +488,28 @@ class MarketingOrderDelivery extends Model
         return implode(', ',$arr);
     }
 
+    public function hasOverToleranceGoodScale(){
+        $has = false;
+        if($this->marketingOrderDeliveryProcess()->exists() && $this->marketingOrderDeliveryProcess->weight_netto > 0){
+            $totalM2 = $this->marketingOrderDeliveryProcess->totalQty();
+            $totalKg = $this->marketingOrderDeliveryProcess->weight_netto;
+            foreach($this->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessDetail as $row){
+                if($row->itemStock->item->toleranceScale()->exists() && $row->itemStock->item->itemWeightFg()->exists()){
+                    $tolerance = $row->itemStock->item->toleranceScale->percentage;
+                    $bobot = round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 3) / $totalM2;
+                    $weightReal = round($bobot * $totalKg,2);
+                    $weightNetto = $row->itemStock->item->itemWeightFg->netto_weight;
+                    $balance = $weightReal - $weightNetto;
+                    $percent = round($balance / $weightNetto,2);
+                    if($percent > $tolerance){
+                        $has = true;
+                    }
+                }
+            }
+        }
+        return $has;
+    }
+
     public function getInvoice(){
         $arr = [];
         if($this->marketingOrderDeliveryProcess()->exists()){

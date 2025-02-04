@@ -550,6 +550,17 @@ class CustomHelper {
 				$daysDueInvoiceMod = $mod->invoiceDueDate();
 			}
 		}
+		
+		$isGoodScale = false;
+
+		if($table_name == 'good_scales'){
+			$gs = GoodScale::find($table_id);
+			if($gs){
+				if($gs->qty_balance == 0){
+					$isGoodScale = true;
+				}
+			}
+		}
 
 		$count = 0;
 
@@ -566,7 +577,7 @@ class CustomHelper {
 				'note'			=> $note,
 			]);
 
-			$passed = true;
+			$passed = $isGoodScale ? false : true;
 
 			$isGroupItem = false;
 
@@ -1083,7 +1094,7 @@ class CustomHelper {
 			$gs = GoodScale::find($table_id);
 
 			if($gs){
-				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()){
+				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod() && !$gs->journal()->exists() && $gs->sjHasReturnDocument()){
 					$place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
 
 					$receive_date = '';

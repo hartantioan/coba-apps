@@ -120,10 +120,10 @@
     <div class="card-content invoice-print-area">
         <!-- header section -->
         <div class="row invoice-date-number">
-            <div class="col xl4 s5">
+            <div class="col xl4 s12">
                 <span class="invoice-number mr-1">{{ __('translations.good_scale') }} # {{ $data->code }}</span>
             </div>
-            <div class="col xl8 s7">
+            <div class="col xl8 s12">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>{{ __('translations.submitted') }}:</small>
@@ -147,76 +147,165 @@
             <div class="col m6 s6">
                 <h6 class="invoice-from">{{ __('translations.from') }}</h6>
                 <div class="row">
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.name') }}
                     </div>
-                    <div class="col s9">
+                    <div class="col s12 m7">
                         {{ $data->user->name }}
                     </div>
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.position') }}
                     </div>
-                    <div class="col s9">
+                    <div class="col s12 m7">
                         {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                     </div>
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.department') }}.
                     </div>
-                    <div class="col s9">
+                    <div class="col s12 m7">
                         {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                     </div>
-                    <div class="col s3">
-                        {{ __('translations.phone_number') }}
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->phone }}
-                    </div>
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.license_plate') }}
                     </div>
-                    <div class="col s9">
+                    <div class="col s12 m7">
                         {{ $data->vehicle_no }}
                     </div>
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.driver') }}
                     </div>
-                    <div class="col s9">
-                        {{ $data->driver }}
+                    <div class="col s12 m7">
+                        {{ $data->driver ?? '-' }}
+                    </div>
+                    <div class="col s12 m5">
+                        No.SJ
+                    </div>
+                    <div class="col s12 m7">
+                        {{ $data->delivery_no ?? '-' }}
+                    </div>
+                    <div class="col s12 m5">
+                        {{ __('translations.plant') }}
+                    </div>
+                    <div class="col s12 m7">
+                        {{ $data->place->code }}
                     </div>
                 </div>
             </div>
             <div class="col m6 s6">
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
-                    <div class="col s3">
-                        {{ __('translations.driver') }}
-                    </div>
-                    <div class="col s9">
-                        {{ $data->delivery_no }}
-                    </div>
-                    <div class="col s3">
-                        {{ __('translations.plant') }}
-                    </div>
-                    <div class="col s9">
-                        {{ $data->place->name }}
-                    </div>
-                    <div class="col s3">
-                        {{ __('translations.attachment') }}
-                    </div>
-                    <div class="col s9">
-                        <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
-                    </div>
-                    <div class="col s3">
+                    <div class="col s12 m5">
                         {{ __('translations.status') }}
                     </div>
-                    <div class="col s9">
-                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                    <div class="col s12 m7">
+                        {!! $data->statusRaw().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                    </div>
+                    <div class="col s12 m5">
+                        Berat Bruto (Kg)
+                    </div>
+                    <div class="col s12 m7">
+                        {{ $data->type == '2' ? CustomHelper::formatConditionalQty($data->qty_in) : CustomHelper::formatConditionalQty($data->qty_out) }}
+                    </div>
+                    <div class="col s12 m5">
+                        Berat Tara (Kg)
+                    </div>
+                    <div class="col s12 m7">
+                        {{ $data->type == '2' ? CustomHelper::formatConditionalQty($data->qty_out) : CustomHelper::formatConditionalQty($data->qty_in) }}
+                    </div>
+                    <div class="col s12 m5">
+                        Berat Netto (Kg)
+                    </div>
+                    <div class="col s12 m7">
+                        {{ CustomHelper::formatConditionalQty($data->qty_balance) }}
+                    </div>
+                    <div class="col s12 m5">
+                        Keterangan
+                    </div>
+                    <div class="col s12 m7">
+                        {{ $data->note }}
                     </div>
                 </div>
             </div>
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
+        <div class="row invoice-info">
+            <div class="col s12 m12" style="width:100%;overflow:auto;">
+                <h6><i>Detail Item/Dokumen Terhubung (Total ada di bawah)</i></h6>
+                <table class="bordered">
+                    <thead>
+                        <tr>
+                            <th class="center-align">{{ __('translations.no') }}.</th>
+                            <th class="center-align">No. MOD</th>
+                            <th class="center-align">No. SJ</th>
+                            <th class="center-align">Berat SJ (Kg)</th>
+                            <th class="center-align">Item</th>
+                            <th class="center-align">Berat Netto Standar (Kg/M2)</th>
+                            <th class="center-align">Berat Netto Real (Kg/M2)</th>
+                            <th class="center-align">Toleransi Standar (%)</th>
+                            <th class="center-align">Selisih Standar (Kg/M2)</th>
+                            <th class="center-align">Toleransi Real (%)</th>
+                            <th class="center-align">Selisih Real (Kg/M2)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $totalNettoStandar = 0;
+                            $totalNettoReal = 0;
+                            $totalBalanceStandar = 0;
+                            $totalBalanceReal = 0;
+                            $percentTolerance = 0;
+                            $totalBalance = 0;
+                            $no = 1;
+                        @endphp
+                        @foreach($data->goodScaleDetail->where('lookable_type','marketing_order_deliveries') as $key => $row)
+                            @foreach ($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessDetail as $rowdetail)
+                                @php
+                                    $weight = $rowdetail->weight();
+                                    $weightStandar = $rowdetail->itemStock->item->itemWeightFg()->exists() ? round($rowdetail->itemStock->item->itemWeightFg->netto_weight * $rowdetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3) : 0;
+                                    $balanceStandar = $rowdetail->itemStock->item->toleranceScale()->exists() ? round(($rowdetail->itemStock->item->toleranceScale->percentage / 100) * $weightStandar,2) : 0;
+                                    $balanceReal = $weight - $weightStandar;
+                                    $toleranceReal = round(($balanceReal / $weightStandar) * 100,2);
+                                    $totalNettoStandar += $weightStandar;
+                                    $totalNettoReal += $weight;
+                                    $totalBalanceReal += $balanceReal;
+                                    $totalBalanceStandar += $balanceStandar;
+                                @endphp
+                                <tr>
+                                    <td class="center-align">{{ $no }}</td>
+                                    <td>{{ $row->lookable->code }}</td>
+                                    <td>{{ $row->lookable->marketingOrderDeliveryProcess->code }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->marketingOrderDeliveryProcess->weight_netto,2,',','.') }}</td>
+                                    <td>{{ $rowdetail->itemStock->item->name.' - '.$rowdetail->itemStock->productionBatch->code }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($weightStandar) }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($weight) ?? 0 }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->itemStock->item->toleranceScale->percentage) ?? 0 }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($balanceStandar) }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($toleranceReal) }}</td>
+                                    <td class="right-align">{{ CustomHelper::formatConditionalQty($balanceReal) }}</td>
+                                </tr>
+                                @php
+                                    $no++;
+                                @endphp
+                            @endforeach
+                        @endforeach
+                        @php
+                            $totalBalance = $totalNettoReal - $totalNettoStandar;
+                            $percentTolerance = round(($totalBalance / $totalNettoStandar) * 100,2);
+                        @endphp
+                        <tr>
+                            <th class="center-align" colspan="5">TOTAL</th>
+                            <th class="right-align">{{ CustomHelper::formatConditionalQty($totalNettoStandar) }}</th>
+                            <th class="right-align">{{ CustomHelper::formatConditionalQty($totalNettoReal) ?? 0 }}</th>
+                            <th class="right-align">-</th>
+                            <th class="right-align">-</th>
+                            <th class="right-align">{{ CustomHelper::formatConditionalQty($percentTolerance) }}%</th>
+                            <th class="right-align">{{ CustomHelper::formatConditionalQty($totalBalance) }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

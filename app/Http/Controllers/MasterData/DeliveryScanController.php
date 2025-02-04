@@ -112,8 +112,10 @@ class DeliveryScanController extends Controller
         if($mop){
             $good_scale = '';
             $time_scale_out = '';
+            $status_approval = '';
             if($mop->marketingOrderDelivery->goodScaleDetail()->exists()){
                 $good_scale = $mop->marketingOrderDelivery->goodScaleDetail->goodScale->code;
+                $status_approval = $mop->marketingOrderDelivery->goodScaleDetail->goodScale->statusApproval();
                 $time_scale_out = $mop->marketingOrderDelivery->goodScaleDetail->goodScale->time_scale_out;
             }
             if($time_scale_out == ''){
@@ -150,6 +152,7 @@ class DeliveryScanController extends Controller
                 'good_scale'=> $good_scale ,
                 'time_out'       => $time_scale_out ,
                 'status_s'  => $status,
+                'status_a'  => $status_approval,
                 'detail'    => $detail,
                 'shipping_type'        => $mop->marketingOrderDelivery->deliveryType(),
                 'id'        => $mop->id,
@@ -221,9 +224,17 @@ class DeliveryScanController extends Controller
                 if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
                     $response = [
                         'status'  => 500,
-                        'message' => 'Dokumen belum memiliki Surat Jalan'
+                        'message' => 'Dokumen belum memiliki data Timbangan'
                     ];
                     return response()->json($response);
+                }else{
+                    if($query->marketingOrderDelivery->goodScaleDetail->goodScale->hasUnapprovedScale()){
+                        $response = [
+                            'status'  => 500,
+                            'message' => 'Dokumen Timbangan belum di approve.'
+                        ];
+                        return response()->json($response);
+                    }
                 }
 
                 if($query->status == '2'){

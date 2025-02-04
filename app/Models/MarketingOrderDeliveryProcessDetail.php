@@ -136,6 +136,12 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $total;
     }
 
+    public function weight(){
+        $bobot = round($this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3) / $this->marketingOrderDeliveryProcess->totalQty();
+        $weight = round($bobot * $this->marketingOrderDeliveryProcess->weight_netto,3);
+        return $weight;
+    }
+
     public function getPriceHpp(){
         $pricenow = 0;
         $cogs = ItemCogs::where('item_id',$this->itemStock->item_id)->where('place_id',$this->itemStock->place_id)->where('warehouse_id',$this->itemStock->warehouse_id)->where('item_shading_id',$this->itemStock->item_shading_id)->where('production_batch_id',$this->itemStock->production_batch_id)->where('date','<=',$this->marketingOrderDeliveryProcess->post_date)->orderBy('date')->orderBy('id')->get();

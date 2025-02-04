@@ -203,11 +203,31 @@ class GoodScale extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
-        if($source){
+        if(count($source) > 0){
             return $source;
         }else{
             return '';
         }
+    }
+
+    public function statusApproval(){
+        $text = $this->approval() !== '' ? ($this->hasUnapprovedScale() ? '<span class="amber medium-small white-text padding-3">BELUM DIAPPROVE</span>' : '<span class="green medium-small white-text padding-3">SUDAH DIAPPROVE</span>') : '<span class="green medium-small white-text padding-3">TIDAK ADA APPROVAL</span>';
+        return $text;
+    }
+
+    public function hasUnapprovedScale(){
+        $has = false;
+        if($this->approval()){
+            foreach($this->approval() as $row){
+                if($row->approvalMatrix()->exists()){
+                    $count = $row->approvalMatrix()->whereNull('approved')->count();
+                    if($count > 0){
+                        $has = true;
+                    }
+                }
+            }
+        }
+        return $has;
     }
 
     public function hasDetailMatrix(){

@@ -9,6 +9,7 @@ use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
 use App\Models\ApprovalTemplate;
 use App\Models\GoodIssueRequest;
+use App\Models\GoodScale;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MaterialRequest;
@@ -84,6 +85,29 @@ class SendApproval implements ShouldQueue
 			}
 		}
 
+		$isGoodScale = false;
+
+		if($table_name == 'good_scales'){
+			$gs = GoodScale::find($table_id);
+			if($gs){
+				if($gs->qty_balance == 0){
+					$isGoodScale = true;
+				}else{
+					if($gs->goodScaleDetail()->where('lookable_type','marketing_order_deliveries')->count() > 0){
+						$hasOverToleranceGs = false;
+						foreach($gs->goodScaleDetail->where('lookable_type','marketing_order_deliveries') as $row){
+							if($row->lookable->hasOverToleranceGoodScale()){
+								$hasOverToleranceGs = true;
+							}
+						}
+						if(!$hasOverToleranceGs){
+							$isGoodScale = true;
+						}
+					}
+				}
+			}
+		}
+
 		$count = 0;
 
 		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
@@ -99,7 +123,7 @@ class SendApproval implements ShouldQueue
 				'note'			=> $note,
 			]);
 
-			$passed = true;
+			$passed = $isGoodScale ? false : true;
 
 			$isGroupItem = false;
 

@@ -721,7 +721,7 @@ class MarketingOrderInvoiceController extends Controller
                     ]);
                 }
 
-                /* if(in_array($query->status,['2','3'])){
+                if(in_array($query->status,['2','3'])){
                     if($request->has('file')) {
                         if($query->document){
                             if(Storage::exists($query->document)){
@@ -762,7 +762,7 @@ class MarketingOrderInvoiceController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                } */
+                }
             }
 
             DB::commit();

@@ -276,7 +276,7 @@
                                         </td>
 
                                         <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                           {{ strtoupper($data->getOutlet()) ?? '-' }}
+                                           -
                                         </td>
                                     </tr>
                                     <tr>

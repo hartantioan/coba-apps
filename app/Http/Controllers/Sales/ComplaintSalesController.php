@@ -564,7 +564,7 @@ class ComplaintSalesController extends Controller
                     }
 
 
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Komplain Sales. '.$query->code,$query->note.' - '.$query->note_complaint,session('bo_id'));
 
                     activity()
                         ->performedOn(new ComplaintSales())

@@ -522,6 +522,7 @@
                         <div id="validation_alert_email" style="display:none;"></div>
                     </div>
                     <div class="col s12">
+                        Silahkan kosongi file untuk email tanpa attachment (jika kosong file) atau silahkan isi file tapi akan menimpa data yang sudah ada.
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
@@ -1474,6 +1475,21 @@
                             </div>
                         `);
 
+                        if($('#user_data_id option').length == 1 && !$('#user_data_id').val()){
+                            $('#user_data_id').empty();
+                            if(datakuy.billing_address.length > 0){
+                                $.each(datakuy.billing_address, function(i, val) {
+                                    $('#user_data_id').append(`
+                                        <option value="` + val.id + `">` + val.npwp + ` ` + val.address + `</option>
+                                    `);
+                                });
+                            }else{
+                                $('#user_data_id').append(`
+                                    <option value="">--Data tidak ditemukan--</option>
+                                `);
+                            }
+                        }
+                        
                         $('#user_data_id').val(datakuy.user_data_id).trigger('change');
                         $('#note').val(datakuy.note);
 

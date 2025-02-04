@@ -3673,6 +3673,7 @@ class Select2Controller extends Controller {
                 'top_internal'      => $d->marketingOrderDelivery->top_internal,
                 'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
                 'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
+                'billing_address'   => $d->marketingOrderDelivery->customer->getBillingAddress(),
                 'note'              => $d->getNote(),
             ];
         }

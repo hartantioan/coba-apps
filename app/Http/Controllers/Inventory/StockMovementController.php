@@ -333,8 +333,8 @@ class StockMovementController extends Controller
         if($request->warehouse != 'all' && $request->item_id){
             $cumulative = 0;
             foreach ($array_filter as $item) {
-                $cumulative += $item['cum_val'];
-                $item['cum_val'] = $cumulative;
+                $cumulative += floatval(str_replace(',','.',str_replace($item['cum_qty'])));
+                $item['cum_qty'] = CustomHelper::formatConditionalQty($cumulative);
                 $combinedArray[] = $item;
             }
         }else{

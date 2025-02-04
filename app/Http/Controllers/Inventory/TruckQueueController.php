@@ -60,16 +60,19 @@ class TruckQueueController extends Controller
 
     public function datatable(Request $request){
         $column = [
+            'id',
             'code',
+            'user_id',
             'name',
             'no_pol',
+            'expedition',
             'truck',
-            'document_status',
-            'code_barcode',
             'date',
+            'type',
+            'code_barcode',
+            'document_status',
             'status',
-            'user_id',
-            'date'];
+        ];
 
         $start  = $request->start;
         $length = $request->length;

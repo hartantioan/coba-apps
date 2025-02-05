@@ -153,6 +153,7 @@
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
+                                                        <th>Referensi</th>
                                                         <th>Operasi</th>
                                                     </tr>
                                                 </thead>
@@ -898,6 +899,7 @@
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'good_issue_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

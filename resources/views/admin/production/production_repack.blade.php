@@ -1012,6 +1012,7 @@
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item">
+                                <input type="hidden" data-stock="` + val.qty_raw + `" data-batch="` + val.batch_source + `" id="item_information` + count + `">
                                 <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -1021,9 +1022,7 @@
                                     <select class="browser-default" id="arr_item_source` + count + `" name="arr_item_source[]" onchange="getItemSourceData('` + count + `');"></select>
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;">
-                                        <option value="">--Silahkan pilih item--</option>    
-                                    </select>
+                                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;"></select>
                                 </td>
                                 <td>
                                     <input name="arr_qty_conversion_source[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_conversion_source + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty_conversion_source`+ count +`">
@@ -1062,18 +1061,38 @@
                             <option value="` + val.item_source_id + `">` + val.item_source_info + `</option>
                         `);
                         select2ServerSide('#arr_item_source' + count, '{{ url("admin/select2/sales_item_pallet_only") }}');
-                        $('#arr_item_stock' + count).empty();
-                        if(val.list_stock.length > 0){
-                            $.each(val.list_stock, function(i, value) {
-                                $('#arr_item_stock' + count).append(`
-                                    <option value="` + value.id + `" data-stock="` + value.qty_raw + `" data-batch="` + value.batch + `" ` + (value.id == val.item_stock_id ? `selected` : ``) + `>` + value.warehouse + `</option>
-                                `);
-                            });
-                        }else{
-                            $('#arr_item_stock' + count).empty().append(`
-                                <option value="">--Stock tidak ditemukan--</option>
-                            `);
-                        }
+                        $('#arr_item_stock' + count).empty().append(`
+                            <option value="` + val.item_stock_id + `">` + val.item_stock_information + `</option>
+                        `);
+                        $('#arr_item_stock' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/item_stock_repack") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: $('#arr_item_source' + count).val(),
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
                         if(val.unit_source_conversion.length > 0){
                             $('#arr_unit_conversion' + count).empty();
                             $.each(val.unit_source_conversion, function(i, value) {
@@ -1487,6 +1506,7 @@
         let count = makeid(10);
         $('#body-item').append(`
             <tr class="row_item">
+                <input type="hidden" data-stock="0" data-batch="-" id="item_information` + count + `">
                 <td class="center-align">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1496,9 +1516,7 @@
                     <select class="browser-default" id="arr_item_source` + count + `" name="arr_item_source[]" onchange="getItemSourceData('` + count + `');"></select>
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;"></select>
                 </td>
                 <td>
                     <input name="arr_qty_conversion_source[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty_conversion_source`+ count +`">
@@ -1534,6 +1552,35 @@
             </tr>
         `);
         select2ServerSide('#arr_item_source' + count, '{{ url("admin/select2/sales_item_pallet_only") }}');
+        $('#arr_item_stock' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_stock_repack") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $('#arr_item_source' + count).val(),
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
         $('#arr_item_target' + count).select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1562,12 +1609,15 @@
 
     function setStock(id){
         if($('#arr_item_stock' + id).val()){
+            let datakuy = $('#arr_item_stock' + id).select2('data')[0];
+            $('#item_information' + id).attr('data-stock',datakuy.qty_raw);
+            $('#item_information' + id).attr('data-batch',datakuy.batch);
             let qtyInput = parseFloat($('#arr_qty' + id).val().replaceAll(".", "").replaceAll(",","."));
-            let qtyStock = parseFloat($('#arr_item_stock' + id).find(':selected').data('stock').toString().replaceAll(".", "").replaceAll(",","."));
+            let qtyStock = parseFloat($('#item_information' + id).data('stock').toString().replaceAll(".", "").replaceAll(",","."));
             if(qtyInput > qtyStock){
-                $('#arr_qty' + id).val($('#arr_item_stock' + id).find(':selected').data('stock'));
+                $('#arr_qty' + id).val($('#item_information' + id).data('stock'));
             }
-            $('#source-batch' + id).text($('#arr_item_stock' + id).find(':selected').data('batch'));
+            $('#source-batch' + id).text($('#item_information' + id).data('batch'));
         }else{
             $('#arr_item_stock' + id).val('0,000');
             $('#source-batch' + id).text('-');
@@ -1592,7 +1642,7 @@
             );
         }
         if($('#arr_item_stock' + id).val()){
-            batch = $('#arr_item_stock' + id).find(':selected').data('batch');
+            batch = $('#item_information' + id).data('batch');
             let targetUnit = '';
             if($('#arr_unit_target_conversion' + id).val() || $('#arr_unit_target_conversion' + id).val() !== ''){
                 targetUnit = $("#arr_unit_target_conversion" + id + " option:selected").text().substring(0, 1);
@@ -1629,7 +1679,7 @@
                 },
                 success: function(response) {
                     loadingClose('#modal1');
-                    if(response.list_stock.length > 0){
+                    /* if(response.list_stock.length > 0){
                         $.each(response.list_stock, function(i, val) {
                             $('#arr_item_stock' + id).append(`
                                 <option value="` + val.id + `" data-stock="` + val.qty_raw + `" data-batch="` + val.batch + `">` + val.warehouse + `</option>
@@ -1639,7 +1689,7 @@
                         $('#arr_item_stock' + id).empty().append(`
                             <option value="">--Stock tidak ditemukan--</option>
                         `);
-                    }
+                    } */
                     $('#unit_source' + id).text(response.uom_unit_code);
                     if(response.sell_units.length > 0){
                         $('#arr_unit_conversion' + id).empty();

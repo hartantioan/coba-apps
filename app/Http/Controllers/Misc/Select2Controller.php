@@ -2921,6 +2921,51 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemStockRepack(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $data = ItemStock::where(function($query) use($search){
+                        $query->whereHas('item',function($query) use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name','like',"%$search%");
+                        })->orWhereHas('itemShading',function($query)use($search){
+                            $query->where('code', 'like', "%$search%");
+                        })->orWhereHas('productionBatch',function($query)use($search){
+                            $query->where('code', 'like', "%$search%");
+                        });
+                    })
+                    ->where(function($query)use($request){
+                        if($request->item_id){
+                            $query->where('item_id',$request->item_id);
+                        }
+                    })
+                    ->where('qty','>',0)
+                    ->whereIn('place_id',$this->dataplaces)
+                    ->whereIn('warehouse_id',$this->datawarehouses)
+                    ->paginate(10);
+
+        foreach($data as $d) {
+            $balance = $d->balanceWithUnsent();
+            if($balance > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->place->code.' - '.$d->warehouse->name.' - '.($d->area()->exists() ? $d->area->name : '').' Kode Batch '.($d->productionBatch->code ?? '-').' Qty. '.CustomHelper::formatConditionalQty($balance).' '.$d->item->uomUnit->code,
+                    'qty'               => CustomHelper::formatConditionalQty($balance).' '.$d->item->uomUnit->code,
+                    'qty_raw'           => CustomHelper::formatConditionalQty($balance),
+                    'batch'             => $d->productionBatch->code ?? '',
+                ];
+            }
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
+    }
+
     public function itemStockByPlaceItem(Request $request)
     {
         $response   = [];

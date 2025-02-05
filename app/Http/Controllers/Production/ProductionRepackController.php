@@ -199,12 +199,12 @@ class ProductionRepackController extends Controller
         $item = $request->id;
         if($type == 'source'){
             $data = Item::find($item);
-            $data['list_stock'] = $data->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses);
+            /* $data['list_stock'] = $data->currentStockMoreThanZeroRaw($this->dataplaces,$this->datawarehouses); */
             $data['uom_unit_code'] = $data->uomUnit->code;
             $data['sell_units'] = $data->arrSellUnits();
         }else{
             $data = Item::find($item);
-            $data['list_stock'] = $data->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses);
+            /* $data['list_stock'] = $data->currentStockMoreThanZeroRaw($this->dataplaces,$this->datawarehouses); */
             $data['uom_unit'] = $data->uomUnit->code;
             $data['sell_units'] = $data->arrSellUnits();
         }
@@ -489,13 +489,14 @@ class ProductionRepackController extends Controller
 
         foreach($po->productionRepackDetail as $row){
             $arr = explode('/',$row->batch_no);
+            $balance = $row->itemStock->balanceWithUnsent();
             $detail[] = [
                 'item_source_id'                => $row->item_source_id,
                 'item_source_info'              => $row->itemSource->code.' - '.$row->itemSource->name,
                 'item_unit_source'              => $row->itemSource->uomUnit->code,
                 'qty'                           => CustomHelper::formatConditionalQty($row->qty),
                 'qty_conversion_source'         => CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitSource->conversion,3)),
-                'list_stock'                    => $row->itemSource->currentStock($this->dataplaces,$this->datawarehouses),
+                /* 'list_stock'                    => $row->itemSource->currentStock($this->dataplaces,$this->datawarehouses), */
                 'unit_source_conversion'        => $row->itemSource->arrSellUnits(),
                 'item_unit_source_id'           => $row->item_unit_source_id,
                 'source_batch'                  => $row->itemStock->productionBatch->code,
@@ -506,6 +507,9 @@ class ProductionRepackController extends Controller
                 'item_unit_target_id'           => $row->item_unit_target_id,
                 'batch_no'                      => $arr[0].'/'.$arr[1],
                 'item_stock_id'                 => $row->item_stock_id,
+                'item_stock_information'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' Kode Batch '.($row->itemStock->productionBatch->code ?? '-').' Qty. '.CustomHelper::formatConditionalQty($balance).' '.$row->itemStock->item->uomUnit->code,
+                'qty_raw'                       => CustomHelper::formatConditionalQty( $balance + $row->qty),
+                'batch_source'                  => $row->itemStock->productionBatch->code,
             ];
         }
 

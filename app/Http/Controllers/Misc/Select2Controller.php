@@ -3113,6 +3113,7 @@ class Select2Controller extends Controller {
                 'qty'               => CustomHelper::formatConditionalQty($d->qty_final),
                 'percentage_modifier'     => CustomHelper::formatConditionalQty($percentage_mod),
                 'netto'             => CustomHelper::formatConditionalQty($d->qty_balance),
+                'qty_sj'             => CustomHelper::formatConditionalQty($d->qty_sj),
                 'id_rules'          => $id_rules,
                 'vehicle_no'          => $d->vehicle_no,
                 'delivery_no'          => $d->delivery_no,

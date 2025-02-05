@@ -798,6 +798,7 @@ class GoodReceiptPOController extends Controller
                             'good_scale_id'             => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'qty_sj'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
                             'item_unit_id'              => $pod->item_unit_id,
                             'qty_conversion'            => $pod->qty_conversion,
                             'total'                     => $arrDetail[$key]['total'],
@@ -1016,12 +1017,14 @@ class GoodReceiptPOController extends Controller
 
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
+                'id'                        => $row->id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
                 'good_scale_name'           => $row->goodScale()->exists() ? $row->goodScale->code.' '.$row->goodScale->item->name.' '.$row->goodScale->qty_final.' '.$row->goodScale->itemUnit->unit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                'qty_sj'                    => CustomHelper::formatConditionalQty($row->qty_sj),
                 'unit'                      => $row->itemUnit->unit->code,
                 'qty_stock'                 => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                 'unit_stock'                => $row->item->uomUnit->code,
@@ -1988,13 +1991,17 @@ class GoodReceiptPOController extends Controller
                         'vehicle_no'   => $request->vehicle_no_edit,
                     ]);
                     if($query->goodReceiptDetail()->exists()){
-                        foreach($query->goodReceiptDetail as $row){
-                            if($row->goodScale()->exists()){
-                                $row->goodScale->update([
-                                    'delivery_no'    => $request->delivery_no_edit,
-                                    'vehicle_no'   => $request->vehicle_no_edit,
+                        foreach($request->arr_detail_id as $key => $row){
+                            $query_detail_id = GoodReceiptDetail::where('id',$row)->first();
+                            if(str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])) !== 0){
+                                $query_detail_id->update([
+                                    'qty_sj'    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
+                                ]);
+                                $query_detail_id->goodscale->update([
+                                    'qty_sj' => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
                                 ]);
                             }
+
                         }
                     }
 

@@ -275,6 +275,7 @@
                                                     <th class="center">Timbangan & QC</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center">Qty PO</th>
+                                                    <th class="center">Qty SJ</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center">Qty Stok</th>
                                                     <th class="center">Satuan Stok</th>
@@ -581,6 +582,7 @@
                                                     <th class="center">Timbangan & QC</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center">Qty PO</th>
+                                                    <th class="center">Qty SJ</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center">Qty Stok</th>
                                                     <th class="center">Satuan Stok</th>
@@ -1184,6 +1186,9 @@
                                         </td>
                                         <td>
                                             <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1941,6 +1946,9 @@
                                         <td>
                                             <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + ($('#type').val() == '2' ? `readonly` : ``) + `>
                                         </td>
+                                        <td>
+                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
                                         </td>
@@ -2128,9 +2136,11 @@
 
     function applyScale(code,oldQty){
         if($('#arr_scale' + code).val()){
+            console.log($('#arr_scale' + code).select2('data')[0]);
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
+            $('#arr_qty_sj' + code).val($('#arr_scale' + code).select2('data')[0].qty_sj);
             $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
             $('#arr_residue' + code).val($('#arr_scale' + code).select2('data')[0].residue);
             $('#vehicle_no').val($('#arr_scale' + code).select2('data')[0].vehicle_no);
@@ -2259,6 +2269,9 @@
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
@@ -2427,6 +2440,7 @@
                         var count = makeid(10);
                         $('#body-item_edit').append(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.id + `">
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
@@ -2447,6 +2461,9 @@
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
@@ -2499,6 +2516,11 @@
                             </tr>
                         `);
 
+                        if(val.good_scale_id){
+                            $('#arr_scale' + count).append(`
+                                <option value="` + val.good_scale_id + `">` + val.good_scale_name + `</option>
+                            `);
+                        }
                     });
                 }
                 $('#empty-item_edit').remove();

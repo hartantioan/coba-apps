@@ -39,6 +39,7 @@ class GoodReceiptDetail extends Model
         'warehouse_id',
         'qty_balance',
         'percent_modifier',
+        'qty_sj',
     ];
 
     public function goodReceipt()

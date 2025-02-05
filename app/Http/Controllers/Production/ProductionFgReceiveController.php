@@ -506,8 +506,8 @@ class ProductionFgReceiveController extends Controller
                     $pb = ProductionBatch::find($row);
                     if($pb){
                         if($request->post_date >= $pb->lookable->parent->post_date){
-                            if($arrBatchQty[$key] > $pb->qty){
-                                $arrBatchError[] = 'Terdapat batch melebihi pemakaian stock : '.CustomHelper::formatConditionalQty($pb->qty).' sedangkan pemakaian : '.CustomHelper::formatConditionalQty($arrBatchQty[$key]).'.';
+                            if($arrBatchQty[$key] > $pb->itemStock->qty){
+                                $arrBatchError[] = 'Terdapat batch melebihi pemakaian stock : '.CustomHelper::formatConditionalQty($pb->itemStock->qty).' sedangkan pemakaian : '.CustomHelper::formatConditionalQty($arrBatchQty[$key]).'.';
                                 $passedBatchUsed = false;
                             }
                         }else{

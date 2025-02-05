@@ -165,7 +165,7 @@
                                     <label class="active" for="code">No. Dokumen</label>
                                 </div>
                                 <div class="input-field col m1 s12 step2">
-                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <select class="browser-default" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                         <option value="">--Pilih--</option>
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>

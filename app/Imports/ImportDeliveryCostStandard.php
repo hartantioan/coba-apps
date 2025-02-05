@@ -49,16 +49,15 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
         DB::beginTransaction();
         try {
             if (isset($row['kota']) && $row['kota']) {
-                
+
                 if(isset($row['code']) && $row['code']){
                     $check = ModelsDeliveryCostStandard::where('code',$row['code'])->first();
-                    
+
                 }
                 $price = $row['harga']; $note = $row['keterangan'];
                 $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
                 $city_id = Region::where('code',$city)->first()->id;
                 $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
-                $tipe_code = str_replace(',', '.', explode('#', $row['tipe'])[0]);
                 $firstFiveChars = substr($district, 0, 5);
                 if($firstFiveChars != $city){
                     $this->error = "kecamatan bukan dari kota yang sama";
@@ -66,7 +65,8 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 $district_id = Region::where('code',$district)->first()->id;
                 $categoryTransportation = explode('#', $row['transportasi'])[0];
                 $transportation_id = Transportation::where('code',$categoryTransportation)->first()->id;
-                $tipe = Type::where('code',$tipe_code)->first()->id;
+
+
                 $plant = explode('#', $row['plant'])[0];
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal_start'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');
@@ -75,7 +75,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 if(!$categoryTransportation && $this->error ==null){
                     $this->error = "Kategori Transportasi";
                 }elseif(!$price && $this->error ==null && $price != '0'){
-                    
+
                     $this->error = "Harga";
                 }elseif(!$note && $this->error ==null){
                     $this->error = "Keterangan ";
@@ -83,8 +83,6 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                     $this->error = "Kota";
                 }elseif(!$district && $this->error ==null){
                     $this->error = "kecamatan";
-                }elseif(!$tipe && $this->error ==null){
-                    $this->error = "Tipe";
                 }
                 if(!$this->error){
                     if($check){
@@ -98,7 +96,6 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                         $check->price = $price;
                         $check->start_date = $dateFormatted1;
                         $check->end_date = $dateFormatted2;
-                        $check->type_id = $tipe;
                         $check->note = $note;
                         $check->status = $row['status'] ?? 1;
 
@@ -112,25 +109,24 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                             'district_id' => $district_id,
                             'transportation_id' => $transportation_id,
                             'price' => $price,
-                            'type_id' => $tipe,
                             'start_date' => $dateFormatted1,
                             'end_date' => $dateFormatted2,
                             'note' => $note,
                             'status'=> $row['status'] ?? 1,
                         ]);
                     }
-                    
-                   
+
+
                 }else{
                     $sheet='Header';
                     throw new RowImportException('ada yang salah', $row->getIndex(),$this->error,$sheet);
                 }
-                    
+
             }
             else{
                 $sheet='header';
                 throw new RowImportException('Belum ada Kota', $row->getIndex(),$this->error,$sheet);
-            } 
+            }
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
@@ -138,7 +134,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
-    
+
     public function startRow(): int
     {
         return 2; // If you want to skip the first row (heading row)

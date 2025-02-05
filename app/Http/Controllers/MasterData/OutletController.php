@@ -133,6 +133,7 @@ class OutletController extends Controller
                     $val->type(),
                     $val->address,
                     $val->phone,
+                    $val->locationType(),
                     $val->province->name,
                     $val->city->name,
                     $val->district->name,
@@ -173,6 +174,7 @@ class OutletController extends Controller
             'group_outlet_id'       => 'required',
             'city_id'           => 'required',
             'district_id'       => 'required',
+            'location_type'       => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
@@ -184,6 +186,7 @@ class OutletController extends Controller
             'group_outlet_id.required'      => 'Grup Outlet tidak boleh kosong.',
             'city_id.required'          => 'Kota tidak boleh kosong.',
             'district_id.required'      => 'Kecamatan tidak boleh kosong.',
+            'location_type.required'      => 'Grouping tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -208,6 +211,7 @@ class OutletController extends Controller
                     $query->district_id     = $request->district_id;
                     $query->subdistrict_id  = $request->subdistrict_id ?? NULL;
                     $query->link_gmap       = $request->link_gmap;
+                    $query->location_type   = $request->location_type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -219,7 +223,7 @@ class OutletController extends Controller
                 try {
                     $query = Outlet::create([
                         'user_id'           => session('bo_id'),
-                        'code'              => $request->code,
+                        'code'              => Outlet::generateCode(),
                         'name'			    => $request->name,
                         'type'              => $request->type,
                         'phone'             => $request->phone,
@@ -230,6 +234,7 @@ class OutletController extends Controller
                         'district_id'       => $request->district_id,
                         'subdistrict_id'    => $request->subdistrict_id ?? NULL,
                         'link_gmap'         => $request->link_gmap,
+                        'location_type'     => $request->location_type,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -261,13 +266,21 @@ class OutletController extends Controller
 		return response()->json($response);
     }
 
+
+    public function getCode(Request $request){
+        $code = Outlet::generateCode();
+
+		return response()->json($code);
+    }
+
+
     public function show(Request $request){
         $unit = Outlet::find($request->id);
         $unit['province_name'] = $unit->province->name;
         $unit['outlet_group_name'] = $unit->outletGroup()->exists() ? $unit->outletGroup->name : '';
         $unit['city_name'] = $unit->city->name;
         $unit['district_name'] = $unit->district->name;
-        $unit['subdistrict_name'] = $unit->subdistrict->name;
+        $unit['subdistrict_name'] = $unit->subdistrict()->exists() ? $unit->subdistrict->name : '';
 
 		return response()->json($unit);
     }

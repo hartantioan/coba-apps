@@ -3055,7 +3055,7 @@ class Select2Controller extends Controller {
                             $query->where('account_id',$request->account_id);
                         }
                         $query->where('code','like',"%$search%")
-                            ->whereIn('status',['2'])
+                            ->where('status','2')
                             ->where('inventory_type','1');
                     });
                 })
@@ -3676,6 +3676,7 @@ class Select2Controller extends Controller {
                 'top_internal'      => $d->marketingOrderDelivery->top_internal,
                 'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
                 'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
+                'billing_address'   => $d->marketingOrderDelivery->customer->getBillingAddress(),
                 'note'              => $d->getNote(),
             ];
         }
@@ -3940,9 +3941,41 @@ class Select2Controller extends Controller {
             ->get();
 
         foreach($data as $d) {
+            $code = $d->province->code;
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$code%"]);
+            $array_city=[];
+            foreach ($cities as $city) {
+                $subdistricts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
+                ", ["$city->code%"]);
+
+                $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$city->code%"]);
+
+                $cityData = [
+                    'id'            => $city->id,
+                    'code'          => $city->code,
+                    'name'          => $city->name,
+                    'districts'     => $districts,
+                    'subdistricts'  => $subdistricts,
+                ];
+
+                $array_city[] = $cityData;
+            }
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
+                'code' 			    => $d->code,
+                'grouping' 			=> $d->locationType(),
                 'address'           => $d->address,
                 'province_id'       => $d->province_id,
                 'province_name'     => $d->province->name,
@@ -3950,7 +3983,7 @@ class Select2Controller extends Controller {
                 'city_name'         => $d->city->name,
                 'district_id'       => $d->district_id,
                 'district_name'     => $d->district->name,
-                'cities'            => $d->province->getCity(),
+                'cities'            => $array_city,
             ];
         }
 

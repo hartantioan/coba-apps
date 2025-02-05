@@ -235,6 +235,14 @@
                                 {{ $data->type() }}
                             </td>
                         </tr>
+                        <tr>
+                            <td width="40%">
+                                Kelengkapan Dok.
+                            </td>
+                            <td width="60%">
+                                {{ $data->documentStatus() }}
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>

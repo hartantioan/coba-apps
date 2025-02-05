@@ -83,8 +83,13 @@
 
                             <div class="card">
                                 <div class="card-content">
-                                    <div class="row" style="display:flex;justify-content: flex-end;">
-                                        <h4 class="card-title" id="status_document">Status :  </h4>
+                                    <div class="row">
+                                        <div class="col s6 m6">
+                                            <h4 class="card-title" id="status_approval">Status Approval :  </h4>
+                                        </div>
+                                        <div class="col s12 m6">
+                                            <h4 class="card-title" id="status_document">Status Dokumen :  </h4>
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col s12">
@@ -347,9 +352,10 @@
                     if(response.status == 200) {
 
                         if(response.mop){
-                            var status = response.status_s;
+                            var status = response.status_s, status_approval = response.status_a;
                             $('#temp').val(response.id);
-                            $('#status_document').text('Status: ').append(status);
+                            $('#status_document').text('Status Dokumen : ').append(status);
+                            $('#status_approval').text('Status Approval: ').append(status_approval);
                             $('#code').val(response.mop['code']);
                             $('#no_pol').val(response.mop['vehicle_no']);
 
@@ -516,9 +522,10 @@
                     if(response.mop){
                         console.log(response);
                         $('#table_body').empty();
-                        var status = response.status_s;
+                        var status = response.status_s, status_approval = response.status_a;
                         $('#temp').val(response.id);
-                        $('#status_document').text('Status: ').append(status);
+                        $('#status_document').text('Status Dokumen : ').append(status);
+                        $('#status_approval').text('Status Approval: ').append(status_approval);
                         $('#code').val(response.mop['code']);
                         $('#no_pol').val(response.mop['vehicle_no']);
                         $('#shipping_type').val(response.shipping_type);
@@ -622,7 +629,8 @@
                                 </div>
                             </div>`);
                             $('#table_body').empty();
-                            $('#status_document').empty().text('Status: ');
+                            $('#status_document').empty().text('Status Dokumen : ');
+                            $('#status_approval').empty().text('Status Approval : ');
                             M.toast({
                                 html: response.message
                             });

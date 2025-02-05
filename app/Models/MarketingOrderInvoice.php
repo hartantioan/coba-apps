@@ -668,8 +668,16 @@ class MarketingOrderInvoice extends Model
     public function isExport()
     {
         $ya = false;
-        if (substr($this->tax_no, 0, 3) == '070') {
-            $ya = true;
+        if($this->tax_no){
+            if (substr($this->tax_no, 0, 3) == '070') {
+                $ya = true;
+            }
+        }else{
+            if($this->account->userDataDefault()){
+                if($this->account->userDataDefault()->tax_type == '2'){
+                    $ya = true;
+                }
+            }
         }
         return $ya;
     }

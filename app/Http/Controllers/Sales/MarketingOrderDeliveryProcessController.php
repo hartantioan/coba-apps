@@ -1549,6 +1549,15 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ]);
             } */
 
+            if($data->marketingOrderDelivery->goodScaleDetail()->exists()){
+                if($data->marketingOrderDelivery->goodScaleDetail->goodScale->hasUnapprovedScale()){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Dokumen Timbangan terhubung belum di approve.'
+                    ]);
+                }
+            }
+
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status',$request->status_tracking)->first();
 
             if($request->status_tracking == '3' && $request->receive_date){

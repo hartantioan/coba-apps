@@ -192,7 +192,6 @@ class MarketingOrderController extends Controller
             ->whereDate('end_date', '>=', $date)
             ->where('city_id',$city)
             ->where('district_id',$district)
-            ->where('type_id',$item->type_id)
             ->where('status','1')
             ->first() ?? 0;
 
@@ -993,6 +992,8 @@ class MarketingOrderController extends Controller
         $po['user_data'] = $po->account->getBillingAddress();
         $po['transportation_name'] = $po->transportation()->exists() ? $po->transportation->code.' - '.$po->transportation->name : '';
         $po['outlet_name'] = $po->outlet()->exists() ? $po->outlet->code.' - '.$po->outlet->name : '';
+        $po['outlet_code'] = $po->outlet()->exists() ? $po->outlet->code : '';
+        $po['outlet_grouping'] = $po->outlet()->exists() ? $po->outlet->locationType() : '';
         $po['broker_name'] = $po->broker()->exists() ? $po->broker->employee_no.' - '.$po->broker->name : '';
         $po['deposit'] = number_format($po->account->deposit,2,',','.');
         $arr = [];
@@ -1267,7 +1268,7 @@ class MarketingOrderController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-                
+
                 /* if($query->mitraMarketingOrder()->exists()){
                     $query->mitraMarketingOrder->update([
                         'status'    => '5'

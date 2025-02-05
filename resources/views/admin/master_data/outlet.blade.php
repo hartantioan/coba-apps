@@ -94,6 +94,7 @@
                                                         <th>Tipe</th>
                                                         <th>{{ __('translations.address') }}</th>
                                                         <th>{{ __('translations.phone_number') }}</th>
+                                                        <th>Grouping</th>
                                                         <th>{{ __('translations.province') }}</th>
                                                         <th>{{ __('translations.city') }}</th>
                                                         <th>{{ __('translations.district') }}</th>
@@ -170,6 +171,13 @@
                         <div class="input-field col s3">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <select class="browser-default" id="location_type" name="location_type">
+                                <option value="1">Toko</option>
+                                <option value="2">Gudang</option>
+                            </select>
+                            <label class="active" for="location_type">Grouping</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="type" name="type">
@@ -392,6 +400,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
+                getCode();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -544,6 +553,7 @@
                 { name: 'outlet_group_id', className: '' },
                 { name: 'type', className: '' },
                 { name: 'address', className: '' },
+                { name: 'loct_ype', className: '' },
                 { name: 'phone', className: '' },
                 { name: 'province', className: '' },
                 { name: 'city', className: '' },
@@ -561,6 +571,34 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function getCode(){
+        $.ajax({
+            url: '{{ Request::url() }}/get_code',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                val: '',
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#code').val(response);
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function save(){
 
@@ -670,7 +708,9 @@
                 $('#subdistrict_id,#district_id,#city_id').empty();
                 $('#city_id').empty().append(`<option value="` + response.city_id + `">` + response.city_name + `</option>`);
                 $('#district_id').empty().append(`<option value="` + response.district_id + `">` + response.district_name + `</option>`);
-                $('#subdistrict_id').empty().append(`<option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>`);
+                if(response.subdistrict_id){
+                    $('#subdistrict_id').empty().append(`<option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>`);
+                }
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

@@ -220,7 +220,7 @@
                                 {!! $row->status() !!}
                             @else
                                 <label>
-                                    <input type="checkbox" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
+                                    <input type="checkbox" class="browser-default" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
                                     <span>{{ __('translations.select') }}</span>
                                 </label>
                             @endif

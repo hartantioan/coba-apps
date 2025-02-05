@@ -30,14 +30,14 @@ class ImportOutlet implements WithMultipleSheets
             0 => new handleOutlet()
         ];
     }
-    
+
 }
 
 class handleOutlet implements OnEachRow, WithHeadingRow
 {
     public $error = null;
 
-   
+
     public function onRow(Row $row)
     {
         DB::beginTransaction();
@@ -45,10 +45,10 @@ class handleOutlet implements OnEachRow, WithHeadingRow
             if (isset($row['name']) && $row['name']) {
                 $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
                 $district_id = Region::where('code',$district)->first()->id ?? null;
-                
+
                 $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
-                $city_id = Region::where('code',$city)->first()->id; 
-                
+                $city_id = Region::where('code',$city)->first()->id;
+
                 $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
                 $province_id = Region::where('code',$province)->first()->id ?? null;
 
@@ -56,9 +56,11 @@ class handleOutlet implements OnEachRow, WithHeadingRow
                 $type_group_id = Group::where('code',$type_group)->first()->id ?? null;
                 $group_outlet = explode('#', $row['grouping'])[0];
                 $type_group_outlet = GroupOutlet::where('code',$group_outlet)->first()->id?? null;
-                
+
+                $grouping_type =  explode('#', $row['grouping_type'])[0];
+
                 $type = explode('#', $row['type'])[0];
-                
+
                 if(!$district_id && $this->error ==null){
                     $this->error = "Kecamatan.";
                 }elseif(!$city_id && $this->error ==null){
@@ -68,14 +70,16 @@ class handleOutlet implements OnEachRow, WithHeadingRow
                 }elseif(!$province_id && $this->error ==null){
                     $this->error = "Provinsi.";
                 }elseif(!$type_group_outlet && $this->error ==null){
-                    $this->error = "grouping.";
+                    $this->error = "grouping outlet.";
+                }elseif(!$grouping_type && $this->error ==null){
+                    $this->error = "grouping Tipe gudang dan Toko.";
                 }
 
                 if (!$this->error) {
 
                     $query = Outlet::create([
                         'user_id'           => session('bo_id'),
-                        'code'              => $row['code'],
+                        'code'              => Outlet::generateCode(),
                         'name'              => $row['name'],
                         'type'              => $type,
                         'group_bp_id'       => $type_group_id,
@@ -87,11 +91,12 @@ class handleOutlet implements OnEachRow, WithHeadingRow
 
                         'phone'             => $row['no_telp'],
                         'address'           => $row['address'],
-                        
+                        'location_type'     => $grouping_type,
+
                         'status'            => 1,
                     ]);
 
-                    
+
                 }else{
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
@@ -104,9 +109,9 @@ class handleOutlet implements OnEachRow, WithHeadingRow
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
-    
+
     public function startRow(): int
     {
-        return 2; 
+        return 2;
     }
 }

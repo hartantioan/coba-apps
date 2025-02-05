@@ -330,8 +330,17 @@ class StockMovementController extends Controller
         }
         $combinedArray = [];
         // Merge $array_filter into $combinedArray
-        foreach ($array_filter as $item) {
-            $combinedArray[] = $item;
+        if($request->warehouse != 'all' && $request->item_id){
+            $cumulative = 0;
+            foreach ($array_filter as $item) {
+                $cumulative += floatval(str_replace(',','.',str_replace('.','',$item['qty'])));
+                $item['cum_qty'] = CustomHelper::formatConditionalQty($cumulative);
+                $combinedArray[] = $item;
+            }
+        }else{
+            foreach ($array_filter as $item) {
+                $combinedArray[] = $item;
+            }
         }
 
         // Merge $array_last_item into $combinedArray

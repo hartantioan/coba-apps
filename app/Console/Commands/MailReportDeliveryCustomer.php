@@ -36,9 +36,9 @@ class MailReportDeliveryCustomer extends Command
 
         $date = date('d');
 
-        if ($date == '02') {
-            $tanggal1 = date('Y-m-01', strtotime("-2 day"));
-            $tanggal2 = date('Y-m-d', strtotime("-2 day"));
+        if ($date == '03') {
+            $tanggal1 = date('Y-m-01', strtotime("-3 day"));
+            $tanggal2 = date('Y-m-d', strtotime("-3 day"));
         } else {
         }
 
@@ -49,14 +49,14 @@ class MailReportDeliveryCustomer extends Command
 
         //kirim setiap tanggal 2
         foreach ($customer as $row) {
-            if ($date == '02') {
+            if ($date == '03') {
                 if ($row == '1140') {
                     $recipient = ['edp@superior.co.id', 'marisa@superiorporcelain.co.id', 'diah.christian@abp.co.id', 'weni.anugrah@abp-jatim.co.id', 'tan.oesiung@abp-jatim.co.id'];
                    // $recipient = ['edp@superior.co.id'];
                 }
                 if ($row == '1141') {
                     $recipient = ['edp@superior.co.id', 'marisa@superiorporcelain.co.id', 'santika.bela@rima.co.id', 'hani.susanti@rima-jatim.co.id', 'tan.oesiung@abp-jatim.co.id'];
-                   // $recipient = ['edp@superior.co.id'];
+                    //$recipient = ['edp@superior.co.id'];
                 }
                 Excel::store(new ExportDeliveryCustomer($tanggal1, $tanggal2, $row), 'public/auto_email/delivery_report.xlsx', 'local');
                 Mail::to($recipient)->send(new SendMailDeliveryCustomer());

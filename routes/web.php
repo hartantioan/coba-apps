@@ -729,6 +729,7 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('outlet')->middleware('operation.access:outlet,view')->group(function () {
                         Route::get('/', [OutletController::class, 'index']);
+                        Route::post('get_code', [OutletController::class, 'getCode']);
                         Route::post('import', [OutletController::class, 'import'])->middleware('operation.access:outlet,update');
                         Route::get('get_import_excel', [OutletController::class, 'getImportExcel']);
                         Route::get('datatable', [OutletController::class, 'datatable']);

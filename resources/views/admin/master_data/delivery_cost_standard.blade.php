@@ -75,12 +75,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
-                                                
+
                                             </div>
                                             <div class="col m6 s6 ">
-                                                
+
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -105,12 +105,11 @@
                                                         <th>Transportasi</th>
                                                         <th>Kota</th>
                                                         <th>Kecamatan</th>
-                                                        <th>Price</th>
+                                                        <th>Price/Kg</th>
                                                         <th>Tanggal Mulai</th>
                                                         <th>Tanggal Akhir</th>
                                                         <th>Keterangan</th>
                                                         <th>Provinsi</th>
-                                                        <th>Tipe</th>
                                                         <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -146,7 +145,7 @@
                         </div>
                         <div class="input-field col s12 m3 ">
                             <select id="transportation_id"  class="browser-default" name="transportation_id" >
-                               
+
                             </select>
                             <label class="active" for="transportation_id">Tipe Transportasi</label>
                         </div>
@@ -158,14 +157,7 @@
                             </select>
                             <label for="plant_id" class="">{{ __('translations.plant') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <select id="type_id" name="type_id">
-                                @foreach($type as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="type_id" class="">Tipe:</label>
-                        </div>
+
                         <div class="col s12"></div>
                         <div class="input-field col m3 s12">
                             <select class="browser-default" id="city_id" name="city_id"></select>
@@ -177,7 +169,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="price">Cost / M2</label>
+                            <label class="active" for="price">Cost / Kg</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="note" name="note" type="text" >
@@ -193,10 +185,10 @@
                             <label class="active" for="end_date">Tgl. Akhir Aktif</label>
                         </div>
                         <div class="col s12"></div>
-                        
+
                         <div class="col s12 m6 row">
                             <div class="input-field col s12">
-                              
+
                                 <div class="switch mb-1">
                                     <label for="status">{{ __('translations.status') }}</label>
                                     <label class="right">
@@ -206,7 +198,7 @@
                                         {{ __('translations.active') }}
                                     </label>
                                 </div>
-                               
+
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -282,13 +274,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -305,9 +297,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -317,7 +309,7 @@
         $('#modal_import').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
@@ -354,8 +346,8 @@
                     } else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
-                       
+
+
                     } else {
                         M.toast({
                             html: response.message
@@ -394,8 +386,8 @@
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         console.log(response);
-                        let errorMessage = response.status === 400 ? 
-                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                        let errorMessage = response.status === 400 ?
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` :
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
 
                         $('#validation_alertImport').append(`
@@ -419,15 +411,15 @@
         loadDataTable();
 
         $('#datatable_serverside').on('click', 'button', function(event) {
-            event.stopPropagation();      
+            event.stopPropagation();
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#prefix').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -437,7 +429,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#city_id').empty();
-                
+
                 $('#district_id').empty();
                 $('#account_id').empty();
                 M.updateTextFields();
@@ -520,7 +512,6 @@
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
-                { name: 'start_date', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'end_date', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
@@ -530,7 +521,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -562,9 +553,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -584,8 +575,8 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 if(response.status == 200) {
-                    
-                    
+
+
                     success();
                     M.toast({
                         html: response.message
@@ -593,7 +584,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -659,13 +650,12 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);
-                $('#type_id').val(response.type_id).formSelect();
                 $('#note').val(response.note);
 
                 if(response.transportation_id){
@@ -673,10 +663,10 @@
                         <option value="` + response.transportation['id'] + `">` + response.transportation['code'] + ` || ` + response.transportation['name'] + `</option>
                     `);
                 }
-                
+
 
                 $('#price').val(response.price);
-                
+
                 if(response.account_id){
                     $('#account_id').append(`
                         <option value="` + response.account['id'] + `">` + response.account['employee_no'] + ` || ` + response.account['name'] + `</option>
@@ -688,17 +678,17 @@
                         <option value="` + response.district['id'] + `">` + response.district['code'] + ` || ` + response.district['name'] + `</option>
                     `);
                 }
-                
+
                 if(response.city_id){
                     $('#city_id').append(`
                         <option value="` + response.city['id'] + `">` + response.city['code'] + ` || ` + response.city['name'] + `</option>
                     `);
                 }
-              
 
-               
 
-              
+
+
+
 
 
                 if(response.status == '1'){
@@ -768,7 +758,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -776,7 +766,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -786,9 +776,9 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-           
+
         });
-        
+
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -807,8 +797,8 @@
                     'type': 'INVOICE',
                     'url': response.message
                 })
-                
-               
+
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -823,7 +813,7 @@
     }
     function saveImport(){
         var formData = new FormData($('#form_dataImport')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/import',
             type: 'POST',
@@ -850,7 +840,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alertImport').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -892,7 +882,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        
+
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status;
     }
 </script>

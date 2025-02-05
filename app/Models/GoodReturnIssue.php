@@ -180,6 +180,16 @@ class GoodReturnIssue extends Model
         return implode(', ',$arr);
     }
 
+    public function getIssueInformation(){
+        $arr = [];
+        foreach($this->goodReturnIssueDetail as $row){
+            if(!in_array($row->goodIssueDetail->goodIssue->code,$arr)){
+                $arr[] = $row->goodIssueDetail->goodIssue->code;
+            } 
+        }
+        return implode(', ',$arr);
+    }
+
     public function updateGrandtotal(){
         $total = $this->goodReturnIssueDetail()->sum('total');
         

@@ -72,7 +72,7 @@
                                                         <th>#</th>
                                                         <th>Pengguna</th>
                                                         <th>Item</th>
-                                                        <th>Prosentase</th>
+                                                        <th>Prosentase / M2</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -108,7 +108,7 @@
                         <div class="input-field col m2 s12">
                             <input id="percentage" name="percentage" type="text" placeholder="Berat Gross" onkeyup="formatRupiah(this)" value="0">
                             <div class="form-control-feedback">%</div>
-                            <label class="active" for="percentage">Prosentase (%)</label>
+                            <label class="active" for="percentage">Prosentase (%) / M2</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>

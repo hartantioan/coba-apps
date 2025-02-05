@@ -539,19 +539,19 @@ class JournalController extends Controller
             $totalDebitFC = 0;
             $totalCreditFC = 0;
             foreach($request->arr_multi_debit as $key => $row){
-                $totalDebit += floatval($row);
+                $totalDebit += round(floatval(str_replace(',', '.', $row)),2);
             }
 
             foreach($request->arr_multi_debit_fc as $key => $row){
-                $totalDebitFC += floatval($row);
+                $totalDebitFC += round(floatval(str_replace(',', '.', $row)),2);
             }
 
             foreach($request->arr_multi_kredit as $key => $row){
-                $totalCredit += floatval($row);
+                $totalCredit += round(floatval(str_replace(',', '.', $row)),2);
             }
 
             foreach($request->arr_multi_kredit_fc as $key => $row){
-                $totalCreditFC += floatval($row);
+                $totalCreditFC += round(floatval(str_replace(',', '.', $row)),2);
             }
 
             $cekCoa = true;
@@ -576,14 +576,14 @@ class JournalController extends Controller
                 ]);
             }
 
-            if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
+            if(round($totalDebit - $totalCredit,2) > 0 || round($totalDebit - $totalCredit,2) < 0){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))
                 ]);
             }
 
-            if($totalDebitFC - $totalCreditFC > 0 || $totalDebitFC - $totalCreditFC < 0){
+            if(round($totalDebitFC - $totalCreditFC,2) > 0 || round($totalDebitFC - $totalCreditFC,2) < 0){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Total debit mata uang asli dan kredit mata uang asli terdapat selisih '.(number_format($totalDebitFC - $totalCreditFC,2,',','.'))

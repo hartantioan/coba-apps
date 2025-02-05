@@ -547,7 +547,7 @@ class ProductionReceive extends Model
                 ]);
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive No. '.$this->code,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive No. '.$this->code,$this->user_id);
 
                 activity()
                     ->performedOn(new ProductionIssue())

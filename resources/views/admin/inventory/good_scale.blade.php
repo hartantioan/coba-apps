@@ -195,6 +195,7 @@
                                                         <th>Foto Keluar</th>
                                                         <th>Waktu Keluar</th>
                                                         <th>Status Dokumen</th>
+                                                        <th>Status Approval</th>
                                                         <th>Status QC</th>
                                                         <th>Catatan QC</th>
                                                         <th>By</th>
@@ -1495,6 +1496,7 @@
                 { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'time_scale_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status_approval', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

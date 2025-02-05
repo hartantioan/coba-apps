@@ -192,7 +192,6 @@ class MarketingOrderController extends Controller
             ->whereDate('end_date', '>=', $date)
             ->where('city_id',$city)
             ->where('district_id',$district)
-            ->where('type_id',$item->type_id)
             ->where('status','1')
             ->first() ?? 0;
 

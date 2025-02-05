@@ -24,7 +24,6 @@ class DeliveryCostStandard extends Model
         'start_date',
         'end_date',
         'place_id',
-        'type_id',
         'note',
         'status'
     ];

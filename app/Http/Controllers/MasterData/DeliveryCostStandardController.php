@@ -24,7 +24,6 @@ class DeliveryCostStandardController extends Controller
             'title'     => 'Standard Harga Pengiriman',
             'type'      => 'Standard Harga Pengiriman',
             'place'     => Place::where('status','1')->get(),
-            'type'     => Type::where('status','1')->get(),
             'content'   => 'admin.master_data.delivery_cost_standard',
         ];
 
@@ -41,7 +40,6 @@ class DeliveryCostStandardController extends Controller
             'price',
             'start_date',
             'end_date',
-            'type',
             'note',
             'status'
         ];
@@ -53,7 +51,7 @@ class DeliveryCostStandardController extends Controller
         $search = $request->input('search.value');
 
         $total_data = DeliveryCostStandard::count();
-        
+
         $query_data = DeliveryCostStandard::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -103,7 +101,7 @@ class DeliveryCostStandardController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -117,7 +115,6 @@ class DeliveryCostStandardController extends Controller
                     date('d/m/Y',strtotime($val->end_date)),
                     $val->note,
                     $val->city->getProvince(),
-                    $val->type->name ?? '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -144,7 +141,7 @@ class DeliveryCostStandardController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-          
+
             'transportation_id'              => 'required',
             'city_id'                        => 'required',
             'district_id'                    => 'required',
@@ -174,38 +171,36 @@ class DeliveryCostStandardController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = DeliveryCostStandard::find($request->temp);
-                  
+
                     $query->user_id = session('bo_id');
                     $query->code = $request->code;
                     $query->city_id = $request->city_id;
                     $query->district_id = $request->district_id;
-                    
+
                     $query->transportation_id = $request->transportation_id;
                     $query->place_id        = $request->place_id;
-                    $query->type_id         = $request->type_id;
                     $query->start_date      = $request->start_date;
                     $query->end_date        = $request->end_date;
                     $query->price           = str_replace(',','.',str_replace('.','',$request->price));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
-                    
-                    
+
+
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 
 			}else{
                 DB::beginTransaction();
-               
-                   
+
+
                     $query = DeliveryCostStandard::create([
                         'code'			            => $request->code,
                         'user_id'			        => session('bo_id'),
                         'city_id'	                => $request->city_id,
                         'district_id'               => $request->district_id,
                         'place_id'                  => $request->place_id,
-                        'type_id'                   => $request->type_id,
                         'note'                      => $request->note,
                         'payment_type'              => $request->payment_type,
                         'price'                     => str_replace(',','.',str_replace('.','',$request->price)),
@@ -215,11 +210,11 @@ class DeliveryCostStandardController extends Controller
                         'status'                    => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
-                    
-                   
-                
+
+
+
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -240,7 +235,7 @@ class DeliveryCostStandardController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -255,7 +250,7 @@ class DeliveryCostStandardController extends Controller
 
     public function destroy(Request $request){
         $query = DeliveryCostStandard::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new DeliveryCostStandard())
@@ -281,14 +276,13 @@ class DeliveryCostStandardController extends Controller
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
         $company = $request->company ? $request->company : 0;
-        $type = $request->type ? $request->type : '';
-		
+
 		// return Excel::download(new ExportCoa($search,$status,$company,$type), 'coa_'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){
         $search = $request->search? $request->search : '';
-        
+
         $start_date = $request->start_date ? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';

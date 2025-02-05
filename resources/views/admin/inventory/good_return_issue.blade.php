@@ -899,7 +899,7 @@
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'good_issue_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'good_issue_id', searchable: false, orderable: false, className: '' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

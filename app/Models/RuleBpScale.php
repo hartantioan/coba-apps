@@ -21,6 +21,7 @@ class RuleBpScale extends Model
         'start_effective_date',
         'effective_date',
         'percentage_level',
+        'percentage_netto_limit',
     ];
 
     public function user()

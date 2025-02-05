@@ -71,6 +71,7 @@
                                                         <th>Tanggal Akhir Valid</th>
                                                         <th>Nama Item</th>
                                                         <th>Kadar (%)</th>
+                                                        <th>Persentase Netto Yang Diterima (%)</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -113,8 +114,12 @@
                             <label class="active" for="item_id">Item</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="percentage_level" name="percentage_level" type="number" placeholder="Kadar Air">
+                            <input id="percentage_level" name="percentage_level" type="number" placeholder="Kadar level">
                             <label class="active" for="percentage_level">Kadar(%)</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="percentage_netto_limit" name="percentage_netto_limit" type="number" placeholder="Netto diterima %">
+                            <label class="active" for="percentage_netto_limit">Persentase Netto Kena Rule(%)</label>
                         </div>
                         <div class="col m6 s12 ">
                             <label for="start_effective_date" style="font-size:1rem;">Tanggal Mulai Valid : </label>
@@ -357,7 +362,8 @@
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": true,
+            "responsive": false,
+            "scrollX": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -392,6 +398,7 @@
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
                 { name: 'parent_id', className: '' },
+                { name: 'percentage_level', className: '' },
                 { name: 'percentage_level', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -500,7 +507,8 @@
                 $('#rule_procurement_id').empty().append(`
                     <option value="` + response.rule_procurement_id + `">` + response.rule_procurement_name + `</option>
                 `);
-                $('#water_percent').val(response.water_percent);
+                $('#percentage_level').val(response.percentage_level);
+                $('#percentage_netto_limit').val(response.percentage_netto_limit);
                 $('#start_effective_date').val(response.start_effective_date);
                 $('#effective_date').val(response.effective_date);
                 $('.modal-content').scrollTop(0);

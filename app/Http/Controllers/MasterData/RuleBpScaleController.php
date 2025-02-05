@@ -87,6 +87,7 @@ class RuleBpScaleController extends Controller
                     date('d/m/Y',strtotime($val->effective_date)),
                     $val->item->name,
                     CustomHelper::formatConditionalQty($val->percentage_level).'%',
+                    CustomHelper::formatConditionalQty($val->percentage_netto_limit).'%',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -160,6 +161,7 @@ class RuleBpScaleController extends Controller
                         'percentage_level'	=> $request->percentage_level,
                         'item_id'       => $request->item_id,
                         'start_effective_date'       => $request->start_effective_date,
+                        'percentage_netto_limit'       => $request->percentage_netto_limit,
                         'effective_date'       => $request->effective_date,
                     ]);
                     DB::commit();
@@ -176,6 +178,7 @@ class RuleBpScaleController extends Controller
                         'percentage_level'	=> $request->percentage_level,
                         'item_id'       => $request->item_id,
                         'start_effective_date'       => $request->start_effective_date,
+                        'percentage_netto_limit'       => $request->percentage_netto_limit,
                         'effective_date'       => $request->effective_date,
 
                     ]);

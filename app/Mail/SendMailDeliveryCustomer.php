@@ -22,8 +22,8 @@ class SendMailDeliveryCustomer extends Mailable
 
     public function build()
     {
-        $month = date('F', strtotime("-3 day"));
-        $year = date('Y', strtotime("-3 day"));
+        $month = date('F', strtotime("-2 day"));
+        $year = date('Y', strtotime("-2 day"));
 
 
         return $this->from('porcelain@superiorporcelain.co.id')

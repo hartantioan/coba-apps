@@ -82,7 +82,7 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getNpwpCoreTax()
-    //bedain perorangan ambil 15 digit, selain itu 16 digit
+   
     {
 
         $npwp = '';

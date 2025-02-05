@@ -3146,11 +3146,17 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $id_rules = null;
+            $rule_procurement_id = null;
             $percentage_mod = 0;
-            $getRules = RuleBPScale::where('account_id',$d->account_id)->whereDate('start_effective_date','>=',date('Y-m-d'))->whereDate('effective_date','<=',date('Y-m-d'))->where('item_id',$d->item_id)->first();
+            $getRules = RuleBPScale::where('account_id',$d->account_id)
+            ->whereDate('start_effective_date','<=',date('Y-m-d'))
+            ->whereDate('effective_date','>=',date('Y-m-d'))
+            ->where('item_id',$d->item_id)->first();
+
             if($getRules){
                 $id_rules = $getRules->id;
                 $percentage_mod = $getRules->percentage_level;
+                $rule_procurement_id = $getRules->ruleProcurement->id;
             }
             $response[] = [
                 'id'   			    => $d->id,
@@ -3160,6 +3166,7 @@ class Select2Controller extends Controller {
                 'netto'             => CustomHelper::formatConditionalQty($d->qty_balance),
                 'qty_sj'             => CustomHelper::formatConditionalQty($d->qty_sj),
                 'id_rules'          => $id_rules,
+                'rule_procurement_id'          => $rule_procurement_id,
                 'vehicle_no'          => $d->vehicle_no,
                 'delivery_no'          => $d->delivery_no,
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),

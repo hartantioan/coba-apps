@@ -144,7 +144,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 ->whereIn('status',["2","3","9"]);
             })
             ->where('item_id',$this->item_id)->get();
-            info($query_data);
+
         }
 
 
@@ -164,8 +164,8 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     $take_item_rule_percent = $row->percent_modifier;
                 }else{
                     $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
-                    ->whereDate('start_effective_date','>=',$row->purchaseOrderDetail->purchaseOrder->post_date)
-                    ->whereDate('effective_date','<=',$row->purchaseOrderDetail->purchaseOrder->post_date)
+                    ->whereDate('start_effective_date','<=',$row->purchaseOrderDetail->purchaseOrder->post_date)
+                    ->whereDate('effective_date','>=',$row->purchaseOrderDetail->purchaseOrder->post_date)
                     ->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
                 }
 

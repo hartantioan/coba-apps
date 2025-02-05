@@ -183,7 +183,7 @@ class GoodReturnIssue extends Model
     public function getIssueInformation(){
         $arr = [];
         foreach($this->goodReturnIssueDetail as $row){
-            if(!in_array($row->goodIssueDetail->goodIssue->code,[$arr])){
+            if(!in_array($row->goodIssueDetail->goodIssue->code,$arr)){
                 $arr[] = $row->goodIssueDetail->goodIssue->code;
             } 
         }

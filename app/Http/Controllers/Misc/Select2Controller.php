@@ -3055,7 +3055,7 @@ class Select2Controller extends Controller {
                             $query->where('account_id',$request->account_id);
                         }
                         $query->where('code','like',"%$search%")
-                            ->whereIn('status',['2'])
+                            ->where('status','2')
                             ->where('inventory_type','1');
                     });
                 })

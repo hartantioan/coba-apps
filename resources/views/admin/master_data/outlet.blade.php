@@ -703,6 +703,8 @@
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
+                $('#location_type').val(response.location_type).formSelect();
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
                 $('#group_outlet_id').empty().append(`<option value="` + response.outlet_group_id + `">` + response.outlet_group_name + `</option>`);
                 $('#subdistrict_id,#district_id,#city_id').empty();

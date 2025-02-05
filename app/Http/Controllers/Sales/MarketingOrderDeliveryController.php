@@ -936,6 +936,14 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
         }
+
+        if(!in_array(session('bo_employee_no'),['324138','121132'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Mohon maaf, Tahap 2 hanya untuk NIK 324138 & 121132.',
+            ]);
+        }
+
         $po['code'] = $request->revision ? $po->code.'-R' : $po->code;
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account()->exists() ? $po->account->employee_no.' - '.$po->account->name : '';

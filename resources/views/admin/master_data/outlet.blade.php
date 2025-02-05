@@ -400,6 +400,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
+                getCode();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -570,6 +571,34 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function getCode(){
+        $.ajax({
+            url: '{{ Request::url() }}/get_code',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                val: '',
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#code').val(response);
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function save(){
 

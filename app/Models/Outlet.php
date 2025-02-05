@@ -60,6 +60,33 @@ class Outlet extends Model
         return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
     }
 
+    public static function generateCode()
+    {
+        $query = Outlet::selectRaw('LEFT(code, 5) as prefix')
+        ->orderByDesc('created_at')
+        ->limit(1)
+        ->first();
+
+        $prefix = $query ? $query->prefix : '00000';
+
+        $latestCodeQuery = Outlet::selectRaw('RIGHT(code, 5) as code')
+            ->whereRaw("code LIKE '$prefix%'")
+            ->withTrashed()
+            ->orderByDesc('code')
+            ->limit(1)
+            ->get();
+
+        if ($latestCodeQuery->count() > 0) {
+            $code = (int)$latestCodeQuery[0]->code + 1;
+        } else {
+            $code = 1;
+        }
+
+        $no = str_pad($code, 5, '0', STR_PAD_LEFT);
+
+        return $no;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

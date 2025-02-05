@@ -381,25 +381,35 @@
                                         <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kirim">
                                         <label class="active" for="delivery_date">Tgl.Kirim</label>
                                     </div>
+                                    <div class="col s12 m12 l12"></div>
                                     <div class="input-field col m3 s12 step15">
                                         <select class="browser-default" id="outlet_id" name="outlet_id" onchange="getOutletAddress();"></select>
                                         <label class="active" for="outlet_id">{{ __('translations.outlet') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step16">
+                                        <textarea class="materialize-textarea" id="kode_outlet" name="kode_outlet" placeholder="kode outlet" rows="3" readonly></textarea>
+                                        <label class="active" for="kode_outlet">Kode Outlet</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step16">
+                                        <textarea class="materialize-textarea" id="grouping" name="grouping" placeholder="Grouping" rows="3" readonly></textarea>
+                                        <label class="active" for="grouping">Grouping Outlet</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step16">
                                         <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
                                         <label class="active" for="destination_address">Alamat Tujuan Kirim</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step17">
+                                    <div class="col s12 m12 l12"></div>
+                                    <div class="input-field col m3 s12 step17" id="province_id_field">
                                         <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                                         <label class="active" for="province_id">{{ __('translations.province') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step18">
+                                    <div class="input-field col m3 s12 step18"  id="city_id_field">
                                         <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
                                         <label class="active" for="city_id">{{ __('translations.city') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step19">
+                                    <div class="input-field col m3 s12 step19"  id="district_id_field">
                                         <select class="select2 browser-default" id="district_id" name="district_id">
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
@@ -409,6 +419,7 @@
                                         <input id="phone" name="phone" type="text" placeholder="No.Kontak Customer">
                                         <label class="active" for="phone">No.Kontak Customer</label>
                                     </div>
+                                    <div class="col s12 m12 l12"></div>
                                     <div class="input-field col m3 s12">
                                         <select class="form-control" id="delivery_schedule" name="delivery_schedule">
                                             <option value="1">Segera</option>
@@ -860,6 +871,8 @@
                 $('#province_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
+
+                $('#province_id_field, #district_id_field, #city_id_field').css('pointer-events', 'auto');
                 $('#billing_address').empty().append(`
                     <option value="">--Pilih customer ya--</option>
                 `);
@@ -1034,7 +1047,7 @@
                                 <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
                                     @foreach ($row['arr_sell_unit'] as $rowunit)
                                         <option value="{{ $rowunit['id'] }}" data-conversion="{{ $rowunit['conversion'] }}">{{ $rowunit['code'] }}</option>
-                                    @endforeach                                    
+                                    @endforeach
                                 </select>
                             </td>
                             <td>
@@ -1075,7 +1088,7 @@
                         <option value="{{ $row['item_id'] }}">{{ $row['item_code'].' - '.$row['item_name'] }}</option>
                     `);
                     select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                    /* $('#rowQtyUom' + count).trigger('keyup'); */                    
+                    /* $('#rowQtyUom' + count).trigger('keyup'); */
                 @endforeach
             @endif
 
@@ -1088,6 +1101,8 @@
         if($('#outlet_id').val()){
             $('#province_id,#district_id,#city_id').empty();
             $('#destination_address').val($('#outlet_id').select2('data')[0].address);
+            $('#kode_outlet').val($('#outlet_id').select2('data')[0].code);
+            $('#grouping').val($('#outlet_id').select2('data')[0].grouping);
             $('#province_id').empty().append(`
                 <option value="` + $('#outlet_id').select2('data')[0].province_id + `">` + $('#outlet_id').select2('data')[0].province_name + `</option>
             `);
@@ -1096,6 +1111,9 @@
                     <option value="` + val.id + `" ` + ($('#outlet_id').select2('data')[0].city_id == val.id ? 'selected' : '') + `>` + val.name + `</option>
                 `);
             });
+            $('#district_id').append(`
+                <option value="` + $('#outlet_id').select2('data')[0].district_id + `">` + $('#outlet_id').select2('data')[0].district_name + `</option>
+            `);
             let index = -1;
             $.each($('#outlet_id').select2('data')[0].cities, function(i, val) {
                 if(val.id == $('#outlet_id').select2('data')[0].city_id){
@@ -1110,11 +1128,14 @@
                     `);
                 });
             }
+            $('#province_id_field, #district_id_field, #city_id_field').css('pointer-events', 'none');
         }else{
             $('destination_address').val('');
             $('#province_id,#district_id,#city_id').empty().append(`
                 <option value="">--{{ __('translations.select') }}--</option>
             `);
+            $('#province_id_field, #district_id_field, #city_id_field').css('pointer-events', 'auto');
+
         }
     }
 
@@ -2218,6 +2239,8 @@
                     $('#outlet_id').empty().append(`
                         <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
                     `);
+                    $('#kode_outlet').val(response.outlet_code);
+                    $('#grouping').val(response.outlet_grouping);
                 }
                 $('#billing_address').empty();
                 $.each(response.user_data, function(i, val) {

@@ -3938,9 +3938,41 @@ class Select2Controller extends Controller {
             ->get();
 
         foreach($data as $d) {
+            $code = $d->province->code;
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$code%"]);
+            $array_city=[];
+            foreach ($cities as $city) {
+                $subdistricts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 13
+                ", ["$city->code%"]);
+
+                $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$city->code%"]);
+
+                $cityData = [
+                    'id'            => $city->id,
+                    'code'          => $city->code,
+                    'name'          => $city->name,
+                    'districts'     => $districts,
+                    'subdistricts'  => $subdistricts,
+                ];
+
+                $array_city[] = $cityData;
+            }
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
+                'code' 			    => $d->code,
+                'grouping' 			=> $d->locationType(),
                 'address'           => $d->address,
                 'province_id'       => $d->province_id,
                 'province_name'     => $d->province->name,
@@ -3948,7 +3980,7 @@ class Select2Controller extends Controller {
                 'city_name'         => $d->city->name,
                 'district_id'       => $d->district_id,
                 'district_name'     => $d->district->name,
-                'cities'            => $d->province->getCity(),
+                'cities'            => $array_city,
             ];
         }
 

@@ -3171,7 +3171,7 @@ class Select2Controller extends Controller {
                 'rule_procurement_id'          => $rule_procurement_id,
                 'vehicle_no'          => $d->vehicle_no,
                 'delivery_no'          => $d->delivery_no,
-                'percentage_limit_netto' => $percentage_limit_netto,
+                'percentage_limit_netto' => CustomHelper::formatConditionalQty($percentage_limit_netto),
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
                 'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
                 'residue'           => CustomHelper::formatConditionalQty($d->residue),

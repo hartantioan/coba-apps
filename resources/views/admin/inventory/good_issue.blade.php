@@ -1394,17 +1394,23 @@
                         },
                         cache: false,
                         beforeSend: function() {
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal1');
                         },
                         success: function(data){
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             if(data.status == '200'){
-                                $.each(data.stock_list, function(i, value) {
-                                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.warehouse + '</option>';
-                                });
-                                optionStock += '</select>';
+                                if(data.stock_list.length > 0){
+                                    $.each(data.stock_list, function(i, value) {
+                                        optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.warehouse + '</option>';
+                                    });
+                                    optionStock += '</select>';
 
-                                $('#stock' + val).append(optionStock);
+                                    $('#stock' + val).append(optionStock);
+                                }else{
+                                    $('#stock' + val).append(`
+                                        <option value="">Stock tidak ditemukan</option>
+                                    `);
+                                }
                             }else{
                                 M.toast({
                                     html: data.message

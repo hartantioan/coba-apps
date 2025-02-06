@@ -719,7 +719,8 @@ class ProductionFgReceiveController extends Controller
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),
                             ]);
                             CustomHelper::updateProductionBatch($pb->id,str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),'OUT');
-                            $totalCost += $pbu->productionBatch->totalById($pbu->id);
+                            $rowprice = $pbu->productionBatch->itemStock->priceDate($request->post_date);
+                            $totalCost += round($pbu->qty * $rowprice,2);
                             $totalBatch += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
                         }
                     }

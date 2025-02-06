@@ -28,6 +28,10 @@ class ProductionBatch extends Model
         'total',
         'post_date',
     ];
+    
+    public function itemStock(){
+        return $this->hasOne('App\Models\ItemStock');
+    }
 
     public function itemShading(){
         return $this->belongsTo('App\Models\ItemShading', 'item_shading_id', 'id')->withTrashed();

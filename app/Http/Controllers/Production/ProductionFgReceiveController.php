@@ -506,8 +506,8 @@ class ProductionFgReceiveController extends Controller
                     $pb = ProductionBatch::find($row);
                     if($pb){
                         if($request->post_date >= $pb->lookable->parent->post_date){
-                            if($arrBatchQty[$key] > $pb->qty){
-                                $arrBatchError[] = 'Terdapat batch melebihi pemakaian stock : '.CustomHelper::formatConditionalQty($pb->qty).' sedangkan pemakaian : '.CustomHelper::formatConditionalQty($arrBatchQty[$key]).'.';
+                            if($arrBatchQty[$key] > $pb->itemStock->qty){
+                                $arrBatchError[] = 'Terdapat batch melebihi pemakaian stock : '.CustomHelper::formatConditionalQty($pb->itemStock->qty).' sedangkan pemakaian : '.CustomHelper::formatConditionalQty($arrBatchQty[$key]).'.';
                                 $passedBatchUsed = false;
                             }
                         }else{
@@ -719,7 +719,8 @@ class ProductionFgReceiveController extends Controller
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),
                             ]);
                             CustomHelper::updateProductionBatch($pb->id,str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),'OUT');
-                            $totalCost += $pbu->productionBatch->totalById($pbu->id);
+                            $rowprice = $pbu->productionBatch->itemStock->priceDate($request->post_date);
+                            $totalCost += round($pbu->qty * $rowprice,2);
                             $totalBatch += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
                         }
                     }

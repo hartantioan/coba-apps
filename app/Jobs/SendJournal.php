@@ -4827,7 +4827,7 @@ class SendJournal implements ShouldQueue
 										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{
-										$rowtotal = $rowbatchusage->productionBatch->totalById($rowbatchusage->id);
+										$rowtotal = round($rowbatchusage->qty * $rowbatchusage->productionBatch->itemStock->priceDate($pir->post_date),2);
 									}
 									JournalDetail::create([
 										'journal_id'	=> $query->id,

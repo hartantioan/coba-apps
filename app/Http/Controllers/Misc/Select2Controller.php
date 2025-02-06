@@ -5490,17 +5490,19 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereHas('itemStock',function($query){
+                    $query->where('qty','>',0);
+                })
                 ->whereDoesntHave('used')
-                ->where('qty','>',0)
                 ->orderBy('created_at')
                 ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - Tgl. '.date('d/m/Y',strtotime($d->post_date)).' - Qty : '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' - Item : '.$d->lookable->item->code.' - '.$d->lookable->item->name,
+                'text' 			=> $d->code.' - Tgl. '.date('d/m/Y',strtotime($d->post_date)).' - Qty : '.CustomHelper::formatConditionalQty($d->itemStock->qty).' '.$d->item->uomUnit->code.' - Item : '.$d->lookable->item->code.' - '.$d->lookable->item->name,
                 'code'          => $d->code,
-                'qty'           => CustomHelper::formatConditionalQty($d->qty),
+                'qty'           => CustomHelper::formatConditionalQty($d->itemStock->qty),
                 'table'         => $d->getTable(),
                 'unit'          => $d->item->uomUnit->code,
             ];

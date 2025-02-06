@@ -284,7 +284,7 @@ class ProductionReceive extends Model
         foreach($this->productionReceiveIssue as $key => $row){
             if($row->productionReceiveIssueDetail()->exists()){
                 foreach($row->productionReceiveIssueDetail as $rowdetail){
-                    $rowtotal = $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id);
+                    $rowtotal = round($rowdetail->productionBatchUsage->qty * $rowdetail->productionBatchUsage->productionBatch->itemStock->priceDate($this->post_date),2);
                     $totalIssue += round($rowdetail->qty * ($rowtotal / $rowdetail->productionBatchUsage->qty),2);
                 }
             }else{
@@ -317,7 +317,7 @@ class ProductionReceive extends Model
         foreach($this->productionReceiveIssue as $key => $row){
             if($row->productionReceiveIssueDetail()->exists()){
                 foreach($row->productionReceiveIssueDetail as $rowdetail){
-                    $rowtotal = $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id);
+                    $rowtotal = round($rowdetail->productionBatchUsage->qty * $rowdetail->productionBatchUsage->productionBatch->itemStock->priceDate($this->post_date),2);
                     $totalIssue += round($rowdetail->qty * ($rowtotal / $rowdetail->productionBatchUsage->qty),2);
                 }
             }else{

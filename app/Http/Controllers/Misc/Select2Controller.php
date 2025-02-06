@@ -3148,6 +3148,7 @@ class Select2Controller extends Controller {
             $id_rules = null;
             $rule_procurement_id = null;
             $percentage_mod = 0;
+            $percentage_limit_netto = 0;
             $getRules = RuleBPScale::where('account_id',$d->account_id)
             ->whereDate('start_effective_date','<=',date('Y-m-d'))
             ->whereDate('effective_date','>=',date('Y-m-d'))
@@ -3157,6 +3158,7 @@ class Select2Controller extends Controller {
                 $id_rules = $getRules->id;
                 $percentage_mod = $getRules->percentage_level;
                 $rule_procurement_id = $getRules->ruleProcurement->id;
+                $percentage_limit_netto = $getRules->percentage_netto_limit??0;
             }
             $response[] = [
                 'id'   			    => $d->id,
@@ -3169,6 +3171,7 @@ class Select2Controller extends Controller {
                 'rule_procurement_id'          => $rule_procurement_id,
                 'vehicle_no'          => $d->vehicle_no,
                 'delivery_no'          => $d->delivery_no,
+                'percentage_limit_netto' => $percentage_limit_netto,
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
                 'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
                 'residue'           => CustomHelper::formatConditionalQty($d->residue),

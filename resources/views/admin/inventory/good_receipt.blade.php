@@ -2527,7 +2527,7 @@
                                     <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;" readonly>
                                 </td>
                                 <td>
-                                    <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);adjustPercentageModifier(this);" style="text-align:right;width:100px;" readonly>
+                                    <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);adjustPercentageModifier(this);" style="text-align:right;width:100px;" data-count="` + count + `" readonly>
                                 </td>
                                 <td>
                                     <input name="arr_viscosity[]" id="arr_viscosity` + count + `" class="browser-default" type="text" value="` + val.viscosity + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" readonly>

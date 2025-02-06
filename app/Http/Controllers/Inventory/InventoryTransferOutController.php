@@ -412,6 +412,10 @@ class InventoryTransferOutController extends Controller
                            $passedSameStockAndArea = false;
                         }
                     }
+                    if($itemstock->qty < $qtyout){
+                        $passed = false;
+                        $arrItemNotPassed[] = $itemstock->item->name;
+                    }
                 }
             }
 

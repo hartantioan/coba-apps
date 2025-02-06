@@ -80,8 +80,8 @@
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ $rowdetail->qty_return }}</td>
                 <td>{{ $nominal ? $rowdetail->total : '-' }}</td>
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->user->name : '-' }}</td>
+                <td>{{ $rowdetail->lookable()->exists()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>
+                <td>{{ $rowdetail->lookable()->exists()  ? $rowdetail->lookable->goodIssueRequest->user->name : '-' }}</td>
             </tr>
             @php
                 $no++;

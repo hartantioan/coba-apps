@@ -184,7 +184,7 @@
                     </td>
 
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="45%" style="position: absolute; top:5px; width:15%;right:0;">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:15%;right:0;">
                     </td>
                 </tr>
 
@@ -197,23 +197,18 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
-                                <th rowspan="2" >NO</th>
-                                <th rowspan="2" >PLANT</th>
-                                <th rowspan="2" >NO PO</th>
-                                <th rowspan="2" >NAMA ITEM</th>
-                                <th rowspan="2" >NO SJ</th>
-                                <th rowspan="2" >TGL MASUK</th>
-                                <th rowspan="2" >NO. KENDARAAN</th>
-                                <th rowspan="2" >NETTO JEMBATAN TIMBANG<br>KG</th>
-                                <th rowspan="2" >HASIL QC<br> Kadar Air %</th>
-                                <th rowspan="2" >STD POTONGAN QC</th>
-                                <th colspan="2" >FINANCE</th>
-                                <th rowspan="2">TOTAL BAYAR<br>KG</th>
-                                <th rowspan="2">TOTAL PENERIMAAN<br>KG</th>
-                            </tr>
-                            <tr>
-                                <th >Kadar Air (%)</th>
-                                <th >Kg</th>
+                                <th >NO</th>
+                                <th >PLANT</th>
+                                <th >NO PO</th>
+                                <th >NAMA ITEM</th>
+                                <th >NO SJ</th>
+                                <th >TGL MASUK</th>
+                                <th >NO. KENDARAAN</th>
+                                <th >NETTO SJ<br>{{$data['satuan']}}</th>
+                                <th >NETTO SPS<br> {{$data['satuan']}}</th>
+                                <th >SELISIH</th>
+                                <th >TOTAL BAYAR<br>{{$data['satuan']}}</th>
+                                <th >TOTAL PENERIMAAN<br>{{$data['satuan']}}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -229,34 +224,30 @@
                                     <td>{{ $row['NO SJ'] }}</td>
                                     <td>{{ $row['TGL MASUK'] }}</td>
                                     <td>{{ $row['NO. KENDARAAN'] }}</td>
-                                    <td>{{ $row['NETTO JEMBATAN TIMBANG'] }}</td>
-                                    <td>{{ $row['HASIL QC'] }}</td>
-                                    <td>{{ $row['STD POTONGAN QC'] }}</td>
-                                    <td>{{ $row['FINANCE Kadar air'] }}</td>
-                                    <td>{{ $row['FINANCE Kg'] }}</td>
-                                    <td>{{ $row['TOTAL BAYAR KG'] }}</td>
+                                    <td>{{ $row['NETTO SJ'] }}</td>
+                                    <td>{{ $row['NETTO SPS'] }}</td>
+                                    <td>{{ $row['SELISIH'] }}</td>
+                                    <td>{{ $row['TOTAL BAYAR'] }}</td>
                                     <td>{{ $row['TOTAL PENERIMAAN'] }}</td>
                                 </tr>
                                 @php
                                     $keys+=1;
                                 @endphp
                             @endforeach
-                                <tr align="center">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{$data['total_netto']}}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{$data['total_all_bayar']}}</td>
-                                    <td>{{$data['total_all_penerimaan']}}</td>
-                                </tr>
+                            <tr align="center">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>{{$data['total_netto']}}</td>
+                                <td></td>
+                                <td>{{$data['total_all_bayar']}}</td>
+                                <td>{{$data['total_all_penerimaan']}}</td>
+                            </tr>
                         </tbody>
 
                     </table>

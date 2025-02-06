@@ -256,6 +256,7 @@ class GoodReceiptPOController extends Controller
                 $isOpenPeriod = $val->isOpenPeriod();
                 $dis = '';
                 $nodis = '';
+                $btn_unlock = '';
                 if($isOpenPeriod){
                     $dis = 'style="cursor: default;
                     pointer-events: none;
@@ -268,6 +269,14 @@ class GoodReceiptPOController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
+                }
+                if(($val->status =='9'&& session('bo_id') == 1079 )){
+                    $btn_unlock ='
+
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="unlockProcurement(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">lock_open</i></button>';
+                }else{
+                    $btn_unlock ='
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="editGrpoNew(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>';
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
@@ -309,6 +318,7 @@ class GoodReceiptPOController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        '.$btn_unlock.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         '.$btn_cancel.'
@@ -757,6 +767,7 @@ class GoodReceiptPOController extends Controller
                         'post_date'             => $request->post_date,
                         'document_date'         => $request->document_date,
                         'delivery_no'           => $request->delivery_no,
+                        'vehicle_no'           => $request->vehicle_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
@@ -787,6 +798,7 @@ class GoodReceiptPOController extends Controller
                             'good_scale_id'             => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'qty_sj'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
                             'item_unit_id'              => $pod->item_unit_id,
                             'qty_conversion'            => $pod->qty_conversion,
                             'total'                     => $arrDetail[$key]['total'],
@@ -804,8 +816,8 @@ class GoodReceiptPOController extends Controller
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'              => $request->arr_warehouse[$key],
-                            /* 'qty_balance'               => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
-                            'percentage_modifier'                 => str_replace(',','.',str_replace('.','',$request->arr_percentage_modifier[$key])), */
+                            'qty_balance'               => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
+                            'percent_modifier'                 => str_replace(',','.',str_replace('.','',$request->arr_percentage_modifier[$key])),
                         ]);
                         if($request->arr_serial_po){
                             foreach($request->arr_serial_po as $keyserial => $rowserial){
@@ -1005,12 +1017,14 @@ class GoodReceiptPOController extends Controller
 
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
+                'id'                        => $row->id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
                 'good_scale_name'           => $row->goodScale()->exists() ? $row->goodScale->code.' '.$row->goodScale->item->name.' '.$row->goodScale->qty_final.' '.$row->goodScale->itemUnit->unit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                'qty_sj'                    => CustomHelper::formatConditionalQty($row->qty_sj),
                 'unit'                      => $row->itemUnit->unit->code,
                 'qty_stock'                 => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                 'unit_stock'                => $row->item->uomUnit->code,
@@ -1020,6 +1034,8 @@ class GoodReceiptPOController extends Controller
                 'water_content'             => CustomHelper::formatConditionalQty($row->water_content),
                 'viscosity'                 => CustomHelper::formatConditionalQty($row->viscosity),
                 'residue'                   => CustomHelper::formatConditionalQty($row->residue),
+                'percent_modifier'             => CustomHelper::formatConditionalQty($row->percent_modifier),
+                'qty_balance'                 => CustomHelper::formatConditionalQty($row->qty_balance),
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
                 'line_id'                   => $row->line_id ? $row->line_id : '',
@@ -1141,6 +1157,57 @@ class GoodReceiptPOController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function unlockProcurement(Request $request){
+        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '2',
+                ]);
+
+                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah dibuka kembali dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+
+
+                activity()
+                    ->performedOn(new GoodReceipt())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('unlock procurement the good receipt data');
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data unlock successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to unlock.'
             ];
         }
 
@@ -1877,6 +1944,88 @@ class GoodReceiptPOController extends Controller
                 'message' => 'Data failed to delete.'
             ];
         }
+
+        return response()->json($response);
+    }
+
+    public function editSelected(Request $request){
+        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->temp_edit))->first();
+        $validation = Validator::make($request->all(), [
+            'temp_edit'                      => 'required',
+
+            'delivery_no_edit'		        => 'required',
+		], [
+            'temp_edit.required'            => 'Plant Tidak boleh kosong',
+
+            'delivery_no_edit.required' 			    => 'No surat jalan tidak boleh kosong.',
+		]);
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        }else{
+            if($query) {
+
+                if(!CustomHelper::checkLockAcc($request->cancel_date)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+                    ]);
+                }
+
+                if(in_array($query->status,['4','5','8','9'])){
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data telah ditutup/dikunci anda tidak edit lagi.'
+                    ];
+                }elseif(!$query->hasBalanceInvoice()){
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data tidak memiliki saldo atau sudah 100% digunakan pada APIN.'
+                    ];
+                }else{
+
+                    $query->update([
+                        'delivery_no'    => $request->delivery_no_edit,
+                        'vehicle_no'   => $request->vehicle_no_edit,
+                    ]);
+                    if($query->goodReceiptDetail()->exists()){
+                        foreach($request->arr_detail_id as $key => $row){
+                            $query_detail_id = GoodReceiptDetail::where('id',$row)->first();
+                            if(str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])) !== 0){
+                                $query_detail_id->update([
+                                    'qty_sj'    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
+                                ]);
+                                $query_detail_id->goodscale->update([
+                                    'qty_sj' => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
+                                ]);
+                            }
+
+                        }
+                    }
+
+                    activity()
+                        ->performedOn(new GoodReceipt())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Edit No SJ/NOPO GRPO');
+
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Good Receipt PO No. '.$query->code.' telah di edit dengan tombol edit sj/nopol .','Good Receipt PO No. '.$query->code.' telah di edit dengan tombol edit sj/nopol.',$query->user_id);
+
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data edited successfully.'
+                    ];
+                }
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to edit.'
+                ];
+            }
+        }
+
 
         return response()->json($response);
     }

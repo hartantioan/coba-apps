@@ -20,17 +20,6 @@ class ExportTransportService implements FromCollection, WithTitle, WithHeadings,
     }
 
     private $headings = [
-        'NO',
-        'PLANT',
-        'NO LC',
-        'NO GRPO',
-        'NAMA VENDOR',
-        'NO SJ',
-        'TGL MASUK',
-        'NO. KENDARAAN',
-        'NETTO SPS',
-        'BIAYA EKSPEDISI',
-        'HARGA OP/BBM'
     ];
 
 
@@ -73,6 +62,18 @@ class ExportTransportService implements FromCollection, WithTitle, WithHeadings,
                         'NETTO SPS'=>'',
                         'BIAYA EKSPEDISI'=>'',
                         'HARGA OP/BBM'=>'',
+                    ];
+                    $arr[] = [
+                        'NO'=>'NO',
+                        'PLANT'=>'PLANT',
+                        'NO LC'=>'NO LC',
+                        'NO GRPO'=>'NO GRPO',
+                        'NAMA VENDOR'=>'NAMA VENDOR',
+                        'NO SJ'=>'NO SJ',
+                        'TGL MASUK'=>'TGL MASUK',
+                        'NETTO SPS'=>'NETTO SPS',
+                        'BIAYA EKSPEDISI'=>'BIAYA EKSPEDISI',
+                        'HARGA OP/BBM'=>'HARGA OP/BBM',
                     ];
                 }
                 $all_netto += $lc_detail->lookable->qty;

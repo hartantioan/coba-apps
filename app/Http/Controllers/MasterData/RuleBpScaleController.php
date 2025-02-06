@@ -86,7 +86,8 @@ class RuleBpScaleController extends Controller
                     $start_date,
                     date('d/m/Y',strtotime($val->effective_date)),
                     $val->item->name,
-                    CustomHelper::formatConditionalQty($val->water_percent).'%',
+                    CustomHelper::formatConditionalQty($val->percentage_level).'%',
+                    CustomHelper::formatConditionalQty($val->percentage_netto_limit).'%',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -136,9 +137,11 @@ class RuleBpScaleController extends Controller
         $validation = Validator::make($request->all(), [
             'account_id' 			=> 'required',
             'item_id'               => 'required',
+            'rule_procurement_id'   => 'required'
         ], [
             'account_id.required' 	    => 'User tidak boleh kosong.',
             'item_id.required'      => 'Brand tidak boleh kosong.',
+            'rule_procurement_id.required'      => 'Harap pilih rule.',
         ]);
 
         if($validation->fails()) {
@@ -155,9 +158,10 @@ class RuleBpScaleController extends Controller
                         'user_id'       => session('bo_id'),
                         'account_id'	=> $request->account_id,
                         'rule_procurement_id'	=> $request->rule_procurement_id,
-                        'water_percent'	=> $request->water_percent,
+                        'percentage_level'	=> $request->percentage_level,
                         'item_id'       => $request->item_id,
                         'start_effective_date'       => $request->start_effective_date,
+                        'percentage_netto_limit'       => $request->percentage_netto_limit,
                         'effective_date'       => $request->effective_date,
                     ]);
                     DB::commit();
@@ -171,9 +175,10 @@ class RuleBpScaleController extends Controller
                         'user_id'       => session('bo_id'),
                         'account_id'	=> $request->account_id,
                         'rule_procurement_id'	=> $request->rule_procurement_id,
-                        'water_percent'	=> $request->water_percent,
+                        'percentage_level'	=> $request->percentage_level,
                         'item_id'       => $request->item_id,
                         'start_effective_date'       => $request->start_effective_date,
+                        'percentage_netto_limit'       => $request->percentage_netto_limit,
                         'effective_date'       => $request->effective_date,
 
                     ]);

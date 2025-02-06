@@ -90,7 +90,9 @@ class ListBgCheck extends Model
 
     public function incomingPaymentList()
     {
-        return $this->hasOne('App\Models\IncomingPaymentList','list_bg_check_id','id')->whereIn('status',['2','3']);
+        return $this->hasOne('App\Models\IncomingPaymentList','list_bg_check_id','id')->whereHas('incomingPayment',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function account()

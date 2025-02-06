@@ -90,20 +90,21 @@ class LandedCostDetail extends Model
     public function getDocumentSj(){
         $document = '-';
         if($this->lookable_type == 'good_receipt_details'){
-            $this->lookable->goodReceipt->delivery_no;
+            $document = $this->lookable->goodReceipt->delivery_no;
         }elseif($this->lookable_type == 'landed_cost_details'){
             if($this->lookable->lookable_type == 'good_receipt_details'){
-                $this->lookable->lookable->goodReceipt->delivery_no;
+                $document = $this->lookable->lookable->goodReceipt->delivery_no;
             }elseif($this->lookable->lookable_type == 'landed_cost_details'){
                 if($this->lookable->lookable->lookable_type == 'good_receipt_details'){
-                    $this->lookable->lookable->lookable->goodReceipt->delivery_no;
+                    $document = $this->lookable->lookable->lookable->goodReceipt->delivery_no;
                 }elseif($this->lookable->lookable->lookable_type == 'landed_cost_details'){
                     if($this->lookable->lookable->lookable->lookable_type == 'good_receipt_details'){
-                        $this->lookable->lookable->lookable->goodReceipt->delivery_no;
+                        $document = $this->lookable->lookable->lookable->goodReceipt->delivery_no;
                     }
                 }
             }
         }
+        return $document;
     }
 
     public function inventoryTransferOutDetail()

@@ -75,6 +75,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Kategori Warna',
         // 'Tgl. Cetak',
         'Kode Outlet',
+        'Tipe Outlet',
     ];
 
     public function collection()
@@ -238,6 +239,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'other_fee'             => $row_detail->other_fee,
                         'ongkir'        => $row_detail->price_delivery, */
                         'outlet_code'   => isset($row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->code) ? $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->code : '-',
+                        'tipe_outlet'   => isset($row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->code) ? $row_shading['detail']->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->locationType() : '-',
 
                     ];
                     $x++;

@@ -1974,7 +1974,7 @@ class GoodReceiptPOController extends Controller
                     ]);
                 }
 
-                if(in_array($query->status,['4','5','8','9'])){
+                if(in_array($query->status,['3','4','5','8','9'])){
                     $response = [
                         'status'  => 500,
                         'message' => 'Data telah ditutup/dikunci anda tidak edit lagi.'
@@ -1996,6 +1996,7 @@ class GoodReceiptPOController extends Controller
                             if(str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])) !== 0){
                                 $query_detail_id->update([
                                     'qty_sj'    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
+                                    'qty_balance'    => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
                                 ]);
                                 $query_detail_id->goodscale->update([
                                     'qty_sj' => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),

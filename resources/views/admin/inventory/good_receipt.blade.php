@@ -1171,6 +1171,7 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-po="` + valmain.id + `">
+                                        <input type="hidden" name="arr_rule_id[]" id="arr_rule_id` + count + `" value="` + val.rule_id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
@@ -1188,7 +1189,7 @@
                                             <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td>
-                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1923,10 +1924,12 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-po="` + response.id + `">
+                                        <input type="hidden" name="arr_rule_id[]" id="arr_rule_id` + count + `" value="0">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `"  value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
+                                        <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
 
                                         <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                         <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
@@ -1947,7 +1950,7 @@
                                             <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + ($('#type').val() == '2' ? `readonly` : ``) + `>
                                         </td>
                                         <td>
-                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -2094,6 +2097,34 @@
         }, doneTypingInterval);
     }
 
+    function hitungRule(count){
+        if($('#arr_scale' + count).val()){
+            if($('#arr_rule_id' + count).val() == 3){
+                function parseNumber2(inputString) {
+                    let normalizedString = inputString.replace(/\./g, '');
+
+                    normalizedString = normalizedString.replace(/,([^,]*)$/, '.$1');
+
+                    return parseFloat(parseFloat(normalizedString).toFixed(3));
+                }
+                function formatNumber2(number) {
+
+                    let formatted = new Intl.NumberFormat('de-DE').format(number);
+
+                    return formatted;
+                }
+
+                var qty = parseNumber2($('#arr_qty' + count).val());
+                var qty_sj = parseNumber2($('#arr_qty_sj' + count).val());
+                if(qty_sj < qty){
+                    $('#arr_qty_balance' + count).val(formatNumber2(qty_sj));
+                }else{
+                    $('#arr_qty_balance' + count).val(formatNumber2(qty));
+                }
+            }
+        }
+    }
+
     function hitungSelisih(count){
         function parseNumber(inputString) {
             let normalizedString = inputString.replace(/\./g, '');
@@ -2112,7 +2143,8 @@
         var water_content = parseNumber($('#arr_water_content' + count).val());
         var percent_mod = parseNumber($('#arr_percentage_modifier' + count).val());
         var qty_balance = parseNumber($('#arr_netto' + count).val());
-        if($('#arr_scale' + code).val()){
+        var percentage_limit_netto = parseNumber($('#arr_percentage_limit_netto' + count).val());
+        if($('#arr_scale' + count).val()){
             if(percent_mod > 0){
                 var kadar_air = 0;
                 var finance_kg = 0;
@@ -2121,7 +2153,7 @@
                     kadar_air = water_content-percent_mod;
                 }
                 if(kadar_air > 0){
-                    finance_kg = (kadar_air*qty_balance) / 100;
+                    finance_kg = ((kadar_air/100)*(percentage_limit_netto/100)*qty_balance);
                     total_bayar = total_bayar-finance_kg;
                 }
 
@@ -2137,6 +2169,7 @@
     function applyScale(code,oldQty){
         if($('#arr_scale' + code).val()){
             console.log($('#arr_scale' + code).select2('data')[0]);
+            console.log(code);
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
@@ -2147,12 +2180,15 @@
             $('#delivery_no').val($('#arr_scale' + code).select2('data')[0].delivery_no);
             $('#arr_percentage_modifier' + code).val($('#arr_scale' + code).select2('data')[0].percentage_modifier);
             $('#arr_netto' + code).val($('#arr_scale' + code).select2('data')[0].netto);
+            $('#arr_percentage_limit_netto' + code).val($('#arr_scale' + code).select2('data')[0].percentage_limit_netto);
+            $('#arr_rule_id' + code).val($('#arr_scale' + code).select2('data')[0].rule_procurement_id);
             hitungSelisih(code);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
             $('#arr_water_content' + code).val('0,000');
             $('#arr_viscosity' + code).val('0,000');
             $('#arr_residue' + code).val('0,000');
+            $('#arr_rule_id' + code).val(0);
             $('#arr_percentage_modifier' + code).val('0,000');
         }
     }
@@ -2249,12 +2285,16 @@
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.id + `">
+                                <input type="hidden" name="arr_rule_id[]" id="arr_rule_id` + count + `" value="` + val.rule_id + `">
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
+                                <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
@@ -2271,7 +2311,7 @@
                                     <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
                                 </td>
                                 <td>
-                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
@@ -2441,11 +2481,14 @@
                         $('#body-item_edit').append(`
                             <tr class="row_item">
                                 <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.id + `">
+                                <input type="hidden" name="arr_rule_id[]" id="arr_rule_id` + count + `" value="` + val.rule_id + `">
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
+                                <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
+                                <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <td class="center">
@@ -2463,7 +2506,7 @@
                                     <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
                                 </td>
                                 <td>
-                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>

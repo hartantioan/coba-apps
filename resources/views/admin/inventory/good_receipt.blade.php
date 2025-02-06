@@ -2098,21 +2098,22 @@
     }
 
     function hitungRule(count){
+        function parseNumber2(inputString) {
+            let normalizedString = inputString.replace(/\./g, '');
+
+            normalizedString = normalizedString.replace(/,([^,]*)$/, '.$1');
+
+            return parseFloat(parseFloat(normalizedString).toFixed(3));
+        }
+        function formatNumber2(number) {
+
+            let formatted = new Intl.NumberFormat('de-DE').format(number);
+
+            return formatted;
+        }
         if($('#arr_scale' + count).val()){
             if($('#arr_rule_id' + count).val() == 3){
-                function parseNumber2(inputString) {
-                    let normalizedString = inputString.replace(/\./g, '');
 
-                    normalizedString = normalizedString.replace(/,([^,]*)$/, '.$1');
-
-                    return parseFloat(parseFloat(normalizedString).toFixed(3));
-                }
-                function formatNumber2(number) {
-
-                    let formatted = new Intl.NumberFormat('de-DE').format(number);
-
-                    return formatted;
-                }
 
                 var qty = parseNumber2($('#arr_qty' + count).val());
                 var qty_sj = parseNumber2($('#arr_qty_sj' + count).val());
@@ -2122,6 +2123,9 @@
                     $('#arr_qty_balance' + count).val(formatNumber2(qty));
                 }
             }
+        }else{
+            var qty_sj = parseNumber2($('#arr_qty_sj' + count).val());
+            $('#arr_qty_balance' + count).val(formatNumber2(qty_sj));
         }
     }
 
@@ -2487,7 +2491,7 @@
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
-                                <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
+                                <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="` + val.netto + `">
                                 <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">

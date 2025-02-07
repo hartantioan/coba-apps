@@ -410,6 +410,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
                 Route::get('good_receipt_return', [Select2Controller::class, 'goodReceiptReturn']);
                 Route::get('supplier_vendor', [Select2Controller::class, 'supplierVendor']);
+                Route::get('supplier_vendor_customer', [Select2Controller::class, 'supplierVendorCustomer']);
                 Route::get('bank', [Select2Controller::class, 'bank']);
                 Route::get('region', [Select2Controller::class, 'region']);
                 Route::get('project', [Select2Controller::class, 'project']);

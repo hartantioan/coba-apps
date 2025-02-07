@@ -1887,6 +1887,38 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function supplierVendorCustomer(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%")
+                    ->orWhere('pic', 'like', "%$search%")
+                    ->orWhere('pic_no', 'like', "%$search%")
+                    ->orWhere('office_no', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->whereIn('type',['1','3','4'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			        => $d->id,
+                'text' 			        => $d->employee_no.' - '.$d->name,
+                'limit_credit'          => $d->limit_credit,
+                'count_limit'           => $d->count_limit_credit,
+                'balance_limit'         => $d->limit_credit - $d->count_limit_credit,
+                'type'                  => $d->type,
+                'arrinfo'               => $d,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function bank(Request $request)
     {
         $response = [];

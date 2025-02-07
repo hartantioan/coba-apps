@@ -335,7 +335,7 @@ class ProductionFgReceive extends Model
                 'note'                      => 'PRODUCTION RECEIVE FG NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
                 'status'                    => '1',
             ]);
-            $price = $row->productionBatch->itemStock->priceDate($this->post_date);
+            $price = $row->productionBatch->itemStock->priceFgNow($this->post_date);
             $rowtotal = round($price * $row->qty,2);
             $itemStock = ItemStock::where('item_id',$row->productionBatch->item_id)->where('place_id',$row->productionBatch->place_id)->where('warehouse_id',$row->productionBatch->warehouse_id)->where('production_batch_id',$row->productionBatch->id)->first();
             $querydetail = ProductionIssueDetail::create([

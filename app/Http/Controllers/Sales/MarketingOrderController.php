@@ -707,6 +707,12 @@ class MarketingOrderController extends Controller
                                         ]);
 
                                     }
+                                }else{
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'Ada Barang yang belum memiliki pricelist',
+                                    ]);
+
                                 }
                             }
                         }

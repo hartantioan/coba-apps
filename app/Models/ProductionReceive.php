@@ -427,7 +427,7 @@ class ProductionReceive extends Model
                                     $price = $item->priceNowProduction($this->place_id,$this->post_date);
                                     $total = round(round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3) * $price,2);
                                     $nominal = $price;
-                                    $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                    $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                                 }
                                 $nominal_planned = $nominal;
                             }
@@ -449,7 +449,7 @@ class ProductionReceive extends Model
                             'total_planned'                 => $total_planned,
                             'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                             'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
-                            'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : $rowbom->lookable->warehouse()) : NULL,
+                            'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : $rowbom->lookable->warehouseSm()) : NULL,
                         ]);
                     }
 
@@ -509,7 +509,7 @@ class ProductionReceive extends Model
                                         $price = $item->priceNowProduction($this->place_id,$this->post_date);
                                         $total = round(round($rowbom->qty * ($row->qty + $row->qty_reject),3) * $price,2);
                                         $nominal = $price;
-                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouseSm())->first();
                                     }
                                     $nominal_planned = $nominal;
                                 }
@@ -531,7 +531,7 @@ class ProductionReceive extends Model
                                 'total_planned'                 => $total_planned,
                                 'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                                 'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
-                                'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : $rowbom->lookable->warehouse()) : NULL,
+                                'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : $rowbom->lookable->warehouseSm()) : NULL,
                                 'cost_distribution_id'          => $rowbom->cost_distribution_id ?? NULL,
                             ]);
                         }

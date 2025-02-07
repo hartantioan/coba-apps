@@ -18,7 +18,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
 
     protected $start_date, $end_date;
 
-    public function __construct(string $start_date, string $end_date)
+    public function __construct(string $start_date = null, string $end_date = null)
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->end_date = $end_date ? $end_date : '';

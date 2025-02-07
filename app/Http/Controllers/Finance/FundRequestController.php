@@ -1174,6 +1174,10 @@ class FundRequestController extends Controller
                             $document = $query->document;
                         }
 
+                        if($query->type == '1' && $query->account->type == '1'){
+                            CustomHelper::removeCountLimitCredit($request->account_id,$query->grandtotal);
+                        }
+
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;

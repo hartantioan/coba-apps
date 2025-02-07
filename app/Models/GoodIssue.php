@@ -252,7 +252,7 @@ class GoodIssue extends Model
 
     public function updateRootDocumentStatusDone(){
         foreach($this->goodIssueDetail as $row){
-            if($row->materialRequestDetail()){
+            if($row->materialRequestDetail() && $row->lookable){
                 if(!$row->lookable->materialRequest->hasBalanceQtyPrGi()){
                     $row->lookable->materialRequest->update([
                         'status'    => '3'
@@ -260,7 +260,7 @@ class GoodIssue extends Model
                 }
             }
 
-            if($row->goodIssueRequestDetail()){
+            if($row->goodIssueRequestDetail() && $row->lookable){
                 if(!$row->lookable->goodIssueRequest->hasBalanceQtyGi()){
                     $row->lookable->goodIssueRequest->update([
                         'status'    => '3'

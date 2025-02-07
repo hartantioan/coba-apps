@@ -1325,7 +1325,7 @@ class ResetCogsNewForProduction implements ShouldQueue
                         }
                     }else{
                         $cek = ItemCogs::where('detailable_type',$rowbatch->getTable())->where('detailable_id',$rowbatch->id)->count();
-                        $rowprice = $rowbatch->productionBatch->itemStock->priceDate($row->productionIssue->post_date);
+                        $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($row->productionIssue->post_date);
                         $rowtotal = round($rowbatch->qty * $rowprice,2);
                         $total += $rowtotal;
                         $totalBefore -= $rowtotal;

@@ -137,6 +137,7 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">No.Surat Jalan</th>
+                                                        <th rowspan="2">Plat Nomor</th>
                                                         <th rowspan="2">Status LC</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
@@ -1570,6 +1571,7 @@
                 { name: 'date_doc', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'delivery_no', className: 'center-align' },
+                { name: 'vehicle_no', className: 'center-align' },
                 { name: 'is_multiple_lc', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },

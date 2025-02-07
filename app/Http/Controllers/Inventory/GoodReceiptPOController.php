@@ -86,6 +86,7 @@ class GoodReceiptPOController extends Controller
             'document_date',
             'note',
             'delivery_no',
+            'vehicle_no',
             'is_multiple_lc',
         ];
 
@@ -113,6 +114,7 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
                             ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
@@ -187,6 +189,7 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
                             ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
@@ -297,6 +300,7 @@ class GoodReceiptPOController extends Controller
                     date('d/m/Y',strtotime($val->document_date)),
                     $val->note,
                     $val->delivery_no,
+                    $val->vehicle_no,
                     $val->isMultipleLC(),
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),

@@ -17,6 +17,7 @@
             <th>Tgl. Terima</th>
             <th>Tgl. SJ</th>
             <th>No. SJ</th>
+            <th>Plat Nomor</th>
             <th>Penerima</th>
             <th>{{ __('translations.note') }}</th>
             <th>Dokumen</th>
@@ -65,6 +66,7 @@
                 <td>{{ $row->post_date }}</td>
                 <td>{{ $row->document_date }}</td>
                 <td>{{ $row->delivery_no }}</td>
+                <td>{{ $row->vehicle_no }}</td>
                 <td>{{ $row->receiver_name }}</td>
                 <td>{{ $row->note }}</td>
                 {{-- <td>{{ $row->company->name }}</td> --}}

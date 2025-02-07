@@ -1279,7 +1279,7 @@
             countAll();
         });
 
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/user") }}');
 
         $("#table-detail th").resizable({
             minWidth: 100,

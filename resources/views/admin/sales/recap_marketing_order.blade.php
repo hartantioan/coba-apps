@@ -102,7 +102,7 @@
         if(difference_in_days > 7){
             swal({
                 title: 'Ups!',
-                text: 'Mohon maaf tarikan data tidak boleh lebih dari 7 hari.',
+                text: 'Mohon maaf range tarikan data tidak boleh lebih dari 7 hari.',
                 icon: 'warning'
             });
         }else{

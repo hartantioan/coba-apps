@@ -151,7 +151,7 @@ class ResetCogsNewByDate10 implements ShouldQueue
                 'price_in'			      => $total / $qty,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => round($total_final / $qty_final,5),
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'IN'
@@ -211,7 +211,7 @@ class ResetCogsNewByDate10 implements ShouldQueue
                     'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
-                    'price_final'		      => round($total_final / $qty_final,5),
+                    'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                     'total_final'		      => $total_final,
                     'date'				        => $dateloop,
                     'type'				        => 'IN',

@@ -55,7 +55,12 @@
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
-                                                      
+
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="downloadAttachment();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">Download Lampiran</span>
+                                                            <i class="material-icons right">attach_file</i>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -90,7 +95,19 @@
         window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
     }
    
-   
-
+    function downloadAttachment(){
+        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
+        var difference_in_time = new Date(end_date).getTime() - new Date(start_date).getTime();
+        var difference_in_days = difference_in_time / (1000 * 3600 * 24);
+        if(difference_in_days > 7){
+            swal({
+                title: 'Ups!',
+                text: 'Mohon maaf tarikan data tidak boleh lebih dari 7 hari.',
+                icon: 'warning'
+            });
+        }else{
+            window.location = "{{ Request::url() }}/download_attachment?start_date=" + start_date + "&end_date=" + end_date;
+        }
+    }
    
 </script>

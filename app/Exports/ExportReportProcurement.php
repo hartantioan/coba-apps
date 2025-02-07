@@ -164,18 +164,23 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     $take_item_rule_percent = $row->percent_modifier;
                 }else{
                     $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
-                    ->whereDate('start_effective_date','<=',$row->purchaseOrderDetail->purchaseOrder->post_date)
-                    ->whereDate('effective_date','>=',$row->purchaseOrderDetail->purchaseOrder->post_date)
-                    ->where('account_id',$row->purchaseOrderDetail->purchaseOrder->account_id)->first()->percentage_level ?? 0;
+                    ->whereDate('start_effective_date','<=',$row->goodScale->post_date)
+                    ->whereDate('effective_date','>=',$row->goodScale->post_date)
+                    ->where('account_id',$row->goodScale->account_id)->first();
                 }
-
+                $percentage_level = 0;
+                $percentage_netto_limit = 0;
                 $finance_kadar_air = 0;
                 $finance_kg = 0;
-                if($row->goodScale->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
-                    $finance_kadar_air = $row->water_content - $take_item_rule_percent;
+                if($take_item_rule_percent && !$row->percent_modifier){
+                    $percentage_level = round($take_item_rule_percent->percentage_level,2);
+                    $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
+                }
+                if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                    $finance_kadar_air = $row->water_content - $percentage_level;
                 }
                 if($finance_kadar_air > 0){
-                    $finance_kg = ($finance_kadar_air*$row->goodScale->qty_balance) / 100;
+                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->goodScale->qty_balance);
                 }
                 $total_bayar = $row->goodScale->qty_balance;
                 if($finance_kadar_air > 0){
@@ -199,7 +204,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     'NO. KENDARAAN' =>$row->goodScale->vehicle_no,
                     'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance,
                     'HASIL QC' =>$row->water_content,
-                    'STD POTONGAN QC' =>$take_item_rule_percent,
+                    'STD POTONGAN QC' =>$percentage_level,
                     'FINANCE Kadar air' =>$finance_kadar_air,
                     'FINANCE Kg' =>$finance_kg,
                     'TOTAL BAYAR KG'=>$total_bayar,

@@ -137,18 +137,23 @@ class ReportProcurementController extends Controller
                                 $satuan = $detail_gs->itemUnit->unit->code;
                             }
 
-                        $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)
-                        ->whereDate('start_effective_date','>=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
-                        ->whereDate('effective_date','<=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
-                        ->where('account_id',$detail_gs->purchaseOrderDetail->purchaseOrder->account_id)->first()->water_percent ?? 0;
-
+                            $take_item_rule_percent = RuleBpScale::where('item_id',$detail_gs->goodScale->item_id)
+                            ->whereDate('start_effective_date','<=',$detail_gs->goodScale->post_date)
+                            ->whereDate('effective_date','>=',$detail_gs->goodScale->post_date)
+                            ->where('account_id',$detail_gs->goodScale->account_id)->first();
+                            $percentage_level = 0;
+                            $percentage_netto_limit = 0;
                             $finance_kadar_air = 0;
                             $finance_kg = 0;
-                            if($detail_gs->goodScale->water_content > $take_item_rule_percent && $take_item_rule_percent != 0){
-                                $finance_kadar_air = $detail_gs->water_content - $take_item_rule_percent;
+                            if($take_item_rule_percent){
+                                $percentage_level = round($take_item_rule_percent->percentage_level,2);
+                                $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
+                            }
+                            if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                                $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                             }
                             if($finance_kadar_air > 0){
-                                $finance_kg = ($finance_kadar_air*$detail_gs->goodScale->qty_balance) / 100;
+                                $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->goodScale->qty_balance);
                             }
                             $total_bayar = $detail_gs->goodScale->qty_balance;
                             if($finance_kadar_air > 0){
@@ -176,7 +181,7 @@ class ReportProcurementController extends Controller
                                 'NO. KENDARAAN' =>$detail_gs->goodScale->vehicle_no,
                                 'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->goodScale->qty_balance,2,',','.'),
                                 'HASIL QC' =>number_format($detail_gs->water_content,2,',','.'),
-                                'STD POTONGAN QC' =>number_format($take_item_rule_percent,2,',','.'),
+                                'STD POTONGAN QC' =>number_format($percentage_level,2,',','.'),
                                 'FINANCE Kadar air' =>number_format($finance_kadar_air,2,',','.'),
                                 'FINANCE Kg' =>number_format($finance_kg,2,',','.'),
                                 'TOTAL BAYAR KG'=>number_format($total_bayar,2,',','.'),

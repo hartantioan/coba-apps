@@ -618,7 +618,7 @@
 
     function applyBpList(){
         if($('#type').val() == '1'){
-            select2ServerSide('#account_id', '{{ url("admin/select2/user") }}');
+            select2ServerSide('#account_id', '{{ url("admin/select2/supplier_vendor_customer") }}');
         }else if($('#type').val() == '2'){
             select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
         }

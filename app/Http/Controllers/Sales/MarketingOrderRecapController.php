@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExportMarketingOrderRecap;
-use App\Exports\ExportMarketingRecapitulation;
-use App\Exports\ExportMarketingRecapitulationCsv;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingOrder;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
 
 class MarketingOrderRecapController extends Controller
 {
@@ -42,5 +44,35 @@ class MarketingOrderRecapController extends Controller
         return $response;
     }
 
-   
+    public function downloadAttachment(Request $request){
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $data = MarketingOrder::whereIn('status',['1','2','3'])->whereNotNull('document')->where('post_date','>=',$start_date)->where('post_date','<=',$end_date)->get();
+        $arrPath = [];
+        foreach($data as $row){
+            if(Storage::exists($row->document)){
+                $arrPath[] = [
+                    'path'      => storage_path('app/'.$row->document),
+                    'code'      => $row->code,
+                ];
+            }
+        }
+        $zipFileName = 'app/public/temp/marketing_order_attachment.zip';
+        $zipFilePath = storage_path($zipFileName);
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            foreach($arrPath as $file) {
+                if (File::exists($file['path'])) {
+                    $extension = explode('.',basename($file['path']));
+                    $newFileName = $file['code'].'.'.$extension[1];
+                    $zip->addFile($file['path'], $newFileName);
+                }
+            }
+            $zip->close();
+        } else {
+            return response()->json(['error' => 'Unable to create ZIP file'], 500);
+        }
+
+        return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    }
 }

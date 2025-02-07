@@ -280,7 +280,7 @@ class GoodReceiptPOController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="unlockProcurement(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">lock_open</i></button>';
                 }else{
                     $btn_unlock ='
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Unlock Procurement" onclick="editGrpoNew(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>';
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-purple white-text btn-small" data-popup="tooltip" title="Edit GRPO Keterangan Atas" onclick="editGrpoNew(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>';
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';

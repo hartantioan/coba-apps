@@ -44,13 +44,20 @@ class RuleBpScaleController extends Controller
 
         $total_data = RuleBpScale::count();
 
-        $query_data = RuleBpScale::whereHas('user',function($query) use ($search){
-            $query->where('name','like',"%$search%")
-            ->orWhere('employee_no', 'like', "%$search%");
-        })
-        ->whereHas('item',function($query) use ($search){
-            $query->where('name','like',"%$search%")
-            ->orWhere('code', 'like', "%$search%");
+        $query_data = RuleBpScale::where(function($query) use ($search, $request) {
+            if ($search) {
+                $query->where(function($query) use ($search, $request) {
+                    $query->where('effective_date', 'like', "%$search%")
+                        ->orWhereHas('user', function($query) use ($search) {
+                            $query->where('name', 'like', "%$search%")
+                                  ->orWhere('employee_no', 'like', "%$search%");
+                        })
+                        ->orWhereHas('item', function($query) use ($search) {
+                            $query->where('name', 'like', "%$search%")
+                                  ->orWhere('code', 'like', "%$search%");
+                        });
+                });
+            }
         })
         ->offset($start)
         ->limit($length)
@@ -58,13 +65,21 @@ class RuleBpScaleController extends Controller
         ->get();
 
 
-        $total_filtered = RuleBpScale::whereHas('user',function($query) use ($search){
-            $query->where('name','like',"%$search%")
-            ->orWhere('employee_no', 'like', "%$search%");
-        })
-        ->whereHas('item',function($query) use ($search){
-            $query->where('name','like',"%$search%")
-            ->orWhere('code', 'like', "%$search%");
+
+        $total_filtered = RuleBpScale::where(function($query) use ($search, $request) {
+            if ($search) {
+                $query->where(function($query) use ($search, $request) {
+                    $query->where('effective_date', 'like', "%$search%")
+                        ->orWhereHas('user', function($query) use ($search) {
+                            $query->where('name', 'like', "%$search%")
+                                  ->orWhere('employee_no', 'like', "%$search%");
+                        })
+                        ->orWhereHas('item', function($query) use ($search) {
+                            $query->where('name', 'like', "%$search%")
+                                  ->orWhere('code', 'like', "%$search%");
+                        });
+                });
+            }
         })
         ->orderBy($order, $dir)
         ->count();

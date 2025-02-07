@@ -251,7 +251,7 @@ class GoodReceive extends Model
                 ]);
             }
             $balance -= $rowtotal;
-            CustomHelper::sendCogs($this->table,
+            /* CustomHelper::sendCogs($this->table,
                 $this->id,
                 $row->place->company_id,
                 $row->place_id,
@@ -266,7 +266,7 @@ class GoodReceive extends Model
                 $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
                 $row->getTable(),
                 $row->id,
-            );
+            ); */
         }
         $this->updateGrandtotal();
     }

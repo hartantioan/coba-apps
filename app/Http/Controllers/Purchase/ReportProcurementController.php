@@ -138,9 +138,9 @@ class ReportProcurementController extends Controller
                             }
 
                             $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)
-                            ->whereDate('start_effective_date','>=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
-                            ->whereDate('effective_date','<=',$detail_gs->purchaseOrderDetail->purchaseOrder->post_date)
-                            ->where('account_id',$detail_gs->purchaseOrderDetail->purchaseOrder->account_id)->first();
+                            ->whereDate('start_effective_date','>=',$detail_gs->goodScale->post_date)
+                            ->whereDate('effective_date','<=',$detail_gs->goodScale->post_date)
+                            ->where('account_id',$detail_gs->goodScale->account_id)->first();
                             $percentage_level = 0;
                             $percentage_netto_limit = 0;
                             $finance_kadar_air = 0;

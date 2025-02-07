@@ -1016,7 +1016,7 @@ class ResetCogsNewByDate10 implements ShouldQueue
                 if($gi){
                     $gi->updateGrandtotal();
                     if($gi->goodReceive()->exists()){
-                        $gi->goodReceive->upgradeDetail();
+                        /* $gi->goodReceive->upgradeDetail(); */
                     }
                 }
             }

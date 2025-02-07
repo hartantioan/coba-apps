@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Exports\ExportMarketingOrderRecap;
-use App\Exports\ExportMarketingRecapitulation;
-use App\Exports\ExportMarketingRecapitulationCsv;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingOrder;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
 
 class MarketingOrderRecapController extends Controller
 {
@@ -42,5 +44,16 @@ class MarketingOrderRecapController extends Controller
         return $response;
     }
 
-   
+    public function downloadAttachment(Request $request){
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $data = MarketingOrder::whereIn('status',['1','2','3'])->whereNotNull('document')->get();
+        $arrPath = [];
+        foreach($data as $row){
+            if(Storage::exists($row->document)){
+                $arrPath[] = storage_path(path: 'app/'.$row->document);
+            }
+        }
+        info($arrPath);
+    }
 }

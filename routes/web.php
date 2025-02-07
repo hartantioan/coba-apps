@@ -3336,6 +3336,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_marketing_order')->middleware('operation.access:report_marketing_order,view')->group(function () {
                         Route::get('/', [MarketingOrderRecapController::class, 'index']);
                         Route::get('export', [MarketingOrderRecapController::class, 'export']);
+                        Route::get('download_attachment', [MarketingOrderRecapController::class, 'downloadAttachment']);
                     });
 
                     Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {

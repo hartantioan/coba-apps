@@ -2492,7 +2492,7 @@
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="` + val.netto + `">
-                                <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
+                                <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="` + val.percentage_limit_netto + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <td class="center">

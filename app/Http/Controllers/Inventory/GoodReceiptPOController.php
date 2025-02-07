@@ -11,6 +11,7 @@ use App\Exports\ExportOutstandingGRPO;
 use App\Exports\ExportGoodReceiptTransactionPage;
 use App\Models\PurchaseOrderDetail;
 
+use App\Models\RuleBpScale;
 use App\Models\PurchaseOrder;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
@@ -1016,10 +1017,29 @@ class GoodReceiptPOController extends Controller
         $serials = [];
 
         foreach($grm->goodReceiptDetail as $row){
+
+            $rule_procurement_id = null;
+            $percentage_mod = 0;
+            $percentage_limit_netto = 0;
+            if($row->goodScale()->exists()){
+                $getRules = RuleBPScale::where('account_id',$row->goodScale->account_id)
+                ->whereDate('start_effective_date','<=',date('Y-m-d'))
+                ->whereDate('effective_date','>=',date('Y-m-d'))
+                ->where('item_id',$row->goodScale->item_id)->first();
+                if($getRules){
+                    $id_rules = $getRules->id;
+                    $percentage_mod = $getRules->percentage_level;
+                    $rule_procurement_id = $getRules->ruleProcurement->id;
+                    $percentage_limit_netto = $getRules->percentage_netto_limit??0;
+                }
+            }
             $arr[] = [
                 'id'                        => $row->id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
+                'netto'                     => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($row->goodScale->qty_balance) : '',
+                'percentage_limit_netto'    => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($percentage_limit_netto) : '',
+                'percentage_mod'            => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($percentage_mod) : '',
                 'good_scale_name'           => $row->goodScale()->exists() ? $row->goodScale->code.' '.$row->goodScale->item->name.' '.$row->goodScale->qty_final.' '.$row->goodScale->itemUnit->unit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,

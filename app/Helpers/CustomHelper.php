@@ -901,7 +901,7 @@ class CustomHelper {
 					Notification::create([
 						'code'				=> Str::random(20),
 						'menu_id'			=> $menu->id,
-						'from_user_id'		=> session('bo_id'),
+						'from_user_id'		=> session('bo_id') ?? $to,
 						'to_user_id'		=> $to,
 						'lookable_type'		=> $table_name,
 						'lookable_id'		=> $table_id,

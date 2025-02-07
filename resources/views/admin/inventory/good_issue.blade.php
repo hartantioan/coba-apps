@@ -1473,11 +1473,11 @@
 
     function setStock(val){
         if($("#arr_item" + val).val()){
-            let qtyMax = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+            /* let qtyMax = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
             let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
             if(qtyInput > qtyMax){
                 $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-            }
+            } */
             if($('#arr_serial' + val).length > 0){
                 $('#arr_serial' + val).empty();
                 $('#arr_serial' + val).select2({

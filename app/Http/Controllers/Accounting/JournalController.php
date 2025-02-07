@@ -811,7 +811,7 @@ class JournalController extends Controller
                 'coa_name'                      => $row->coa->code.' - '.$row->coa->name,
                 'place_id'                      => $row->place_id ? $row->place_id : '',
                 'account_id'                    => $row->account_id ? $row->account_id : '',
-                'account_name'                  => $row->account_id ? $row->account->name : '',
+                'account_name'                  => $row->account_id ? $row->account->employee_no.' - '.$row->account->name.' - '.$row->account->type() : '',
                 'line_id'                       => $row->line_id ? $row->line_id : '',
                 'line_name'                     => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
                 'machine_id'                    => $row->machine()->exists() ? $row->machine_id : '',

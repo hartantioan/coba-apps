@@ -544,12 +544,12 @@ class GoodIssueController extends Controller
                     ]);
                 }
 
-                if($passedQtyMinus == false){
+                /* if($passedQtyMinus == false){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
                     ]);
-                }
+                } */
 
                 if($passed == false){
                     return response()->json([

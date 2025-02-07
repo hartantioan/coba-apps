@@ -28,6 +28,7 @@ use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Events\BeforeImport;
+use Illuminate\Support\Facades\Log;
 
 class ImportItem implements WithMultipleSheets
 {
@@ -75,32 +76,61 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 
                 if(!$check){
                     $query = Item::create([
-                        'code' => $row['code'],
-                        'name' => $row['name'],
-                        'other_name' => $row['other_name'],
-                        'print_name' => $row['print_name'],
-                        'item_group_id' =>$item_group_id->id,
-                        'uom_unit' => $item_unit_id->id,
-                        'tolerance_gr' => $row['toleransi_gr'],
+                        'code'              => $row['code'],
+                        'name'              => $row['name'],
+                        'other_name'        => $row['other_name'],
+                        'print_name'        => $row['print_name'],
+                        'item_group_id'     => $item_group_id->id,
+                        'uom_unit'          => $item_unit_id->id,
+                        'tolerance_gr'      => $row['toleransi_gr'],
                         'is_inventory_item' => $row['is_invent_item'],
-                        'is_sales_item' => $row['is_sales_item'],
-                        'is_purchase_item' => $row['is_purchase'],
-                        'is_service' => $row['is_service'],
-                        'is_production' => $row['is_production'],
-                        'is_quality_check' => $row['is_quality_check'],
-                        'is_hide_supplier' => $row['is_top_secret'],
-                        'type_id' => $type ? $type->id : NULL,
-                        'size_id' => $size ? $size->id : NULL,
-                        'variety_id' => $variety ? $variety->id : NULL,
-                        'pattern_id' => $pattern ? $pattern->id : NULL,
-                        'pallet_id' => $pallet ? $pallet->id : NULL,
-                        'grade_id' => $grade ? $grade->id : NULL,
-                        'brand_id' => $brand ? $brand->id : NULL,
-                        'note' => $row['note'],
-                        'min_stock' => $row['min_stock'],
-                        'max_stock' => $row['max_stock'],
-                        'status' => '1',
+                        'is_sales_item'     => $row['is_sales_item'],
+                        'is_purchase_item'  => $row['is_purchase'],
+                        'is_service'        => $row['is_service'],
+                        'is_production'     => $row['is_production'],
+                        'is_quality_check'  => $row['is_quality_check'],
+                        'is_hide_supplier'  => $row['is_top_secret'],
+                        'type_id'           => $type ? $type->id : NULL,
+                        'size_id'           => $size ? $size->id : NULL,
+                        'variety_id'        => $variety ? $variety->id : NULL,
+                        'pattern_id'        => $pattern ? $pattern->id : NULL,
+                        'pallet_id'         => $pallet ? $pallet->id : NULL,
+                        'grade_id'          => $grade ? $grade->id : NULL,
+                        'brand_id'          => $brand ? $brand->id : NULL,
+                        'note'              => $row['note'],
+                        'min_stock'         => $row['min_stock'],
+                        'max_stock'         => $row['max_stock'],
+                        'status'            => '1',
                     ]);
+
+                    //FOR TKTW API Insert
+                    if ($brand->id == 15){
+                        // $konversi=[
+                        //     ['uomCode' => optional(Unit::where('id', $item_unit_id->id)->first())->code, 'qty' => 1 ],
+                        // ];
+
+                        $payload=[
+                            "code"           => $row['code'],
+                            "name"           => $row['name'],
+                            "uom"            => $item_unit_code,
+                            "desc"           => ($row['note'] == null || $row['note'] == "") ? "-" : $row['note'],
+                            "type"           => $type ? $type->name :  explode('#', $row['type_fg'])[1],
+                            "size"           => $size ? $size->name : explode('#', $row['size_fg'])[1],
+                            "variety"        => $variety ? $variety->name : explode('#', $row['variety_fg'])[1],
+                            "pattern"        => $pattern ? $pattern->name : explode('#', $row['pattern_fg'])[1],
+                            "grade"          => $grade ? $grade->name : explode('#', $row['grade_fg'])[1],
+                            "merk"           => $brand ? $brand->name : explode('#', $row['brand_fg'])[1],
+                            "package"        => $pallet ? $pallet->prefix_code : explode('#', $row['palet_fg'])[1],
+                            "uomConvertions" => [],
+                        ];
+                        $query_syncdata = $query->mitraApiSyncDatas()->create([
+                            'mitra_id'  => 1411,
+                            'operation' => 'store',
+                            'payload'   => json_encode($payload),
+                            'status'    => '0',
+                            'attempts'  => 0,
+                        ]);
+                    }
 
                     foreach($query->itemGroup->itemGroupWarehouse as $row){
                         ItemStock::create([
@@ -144,6 +174,28 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 
                         $check->save();
 
+                        //FOR TKTW API Update
+                        if ($check->brand_id == 15){
+                            $payload=[
+                                "code" => $row['code'],
+                                "name" => $row['name'],
+                                "uom" => $item_unit_code,
+                                "desc" => ($row['note'] == null || $row['note'] == "") ? "-" : $row['note'],
+                                "type" => explode('#', $row['type_fg'])[1],
+                                "size" => explode('#', $row['size_fg'])[1],
+                                "variety" => explode('#', $row['variety_fg'])[1],
+                                "pattern" => explode('#', $row['pattern_fg'])[1],
+                                "grade" => explode('#', $row['grade_fg'])[1],
+                                "merk" => explode('#', $row['brand_fg'])[1],
+                            ];
+                            $query_syncdata = $check->mitraApiSyncDatas()->create([
+                                'mitra_id'  => 1411,
+                                'operation' => 'store',
+                                'payload'   => json_encode($payload),
+                                'status'    => '0',
+                                'attempts'  => 0,
+                            ]);
+                        }
                     }
                 }
             }
@@ -152,8 +204,8 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
             }
             DB::commit();
         }catch (\Exception $e) {
+            Log::error($e);
             DB::rollback();
-
         }
     }
 
@@ -181,9 +233,9 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
             $check = null;
             $row = $row->toArray();
             if(isset($row['item_code']) && $row['item_code']){
-                $check = Item::where('code',$row['item_code'])->first();
+                $check     = Item::where('code',$row['item_code'])->first();
                 $code_unit = explode('#', $row['unit'])[0];
-                $unit = Unit::where('code',$code_unit)->first();
+                $unit      = Unit::where('code',$code_unit)->first();
                 if ($check) {
                     if(!$check->hasChildDocument()){
                         $checkUnit = ItemUnit::where('item_id',$check->id)->where('unit_id',$unit->id)->first();
@@ -196,12 +248,12 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                             ]);
                         }else{
                             ItemUnit::create([
-                                'item_id'       => $check->id,
-                                'unit_id'       => $unit->id,
-                                'conversion'    => $row['konversi'] ?? 1,
-                                'is_buy_unit'   => $row['beli'],
-                                'is_sell_unit'   => $row['jual'],
-                                'is_default'    => $row['default'],
+                                'item_id'      => $check->id,
+                                'unit_id'      => $unit->id,
+                                'conversion'   => $row['konversi'] ?? 1,
+                                'is_buy_unit'  => $row['beli'],
+                                'is_sell_unit' => $row['jual'],
+                                'is_default'   => $row['default'],
                             ]);
                         }
                     }
@@ -212,8 +264,8 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
             }
             DB::commit();
         }catch (\Exception $e) {
+            Log::error($e);
             DB::rollback();
-
         }
 
     }

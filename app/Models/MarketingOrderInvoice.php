@@ -12,10 +12,11 @@ class MarketingOrderInvoice extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'marketing_order_invoices';
+    protected $table      = 'marketing_order_invoices';
     protected $primaryKey = 'id';
-    protected $dates = ['deleted_at'];
-    protected $fillable = [
+    protected $dates      = ['deleted_at'];
+    public    $model_name = "Invoice Mitra";
+    protected $fillable   = [
         'code',
         'user_id',
         'account_id',
@@ -87,6 +88,7 @@ class MarketingOrderInvoice extends Model
     {
         return $this->belongsTo('App\Models\UserData', 'user_data_id', 'id')->withTrashed();
     }
+
     public function getNpwp()
     //bedain perorangan ambil 15 digit, selain itu 16 digit
     {
@@ -124,7 +126,6 @@ class MarketingOrderInvoice extends Model
     }
 
     public function getNitkuCoreTax()
-   
     {
 
         $nitku = '';
@@ -142,7 +143,6 @@ class MarketingOrderInvoice extends Model
     }
 
     public function getBuyerDocCoreTax()
-   
     {
 
         $doc = '';
@@ -160,7 +160,6 @@ class MarketingOrderInvoice extends Model
     }
 
     public function getBuyerDocNumberCoreTax()
-   
     {
 
         $doc = '';
@@ -219,6 +218,10 @@ class MarketingOrderInvoice extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function mitraApiSyncDatas(){
+        return $this->morphMany(MitraApiSyncData::class, 'lookable');
     }
 
     public function used()

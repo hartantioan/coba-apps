@@ -190,6 +190,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
+                            <input type="hidden" id="temp_mitra_customer" name="temp_mitra_customer">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
@@ -1504,6 +1505,451 @@
                 $('.checkboxView[data-id="' + $(this).data('parent') + '"]').prop('checked', false);
             }
         }); */
+
+        @if($mitra_customer)
+            $('#modal1').modal('open');
+            $('#type').val('2').trigger('change').formSelect();
+            $('#temp').val('');
+            $('#temp_mitra_customer').val('{{ $mitra_customer->id }}');
+            $('#name').val('{{ $mitra_customer->name }}');
+            $("#type_body").val('{{ $mitra_customer->type }}');
+            $("#sales_payment_type").val('2').trigger('change').formSelect();
+            @if($mitra_customer->type == 'PERORANGAN')
+                $("#type_body").val('3').trigger('change').formSelect();
+            @endif
+            $('#xxx').val('{{ $mitra_customer->branch_code }}');
+            $('#phone').val('{{ $mitra_customer->phone }}');
+            $('#office_no').val('{{ $mitra_customer->phone }}');
+            $('#email').val('{{ $mitra_customer->email }}');
+            $('#address').val('{{ $mitra_customer->address }}');
+            $('#id_card').val('{{ $mitra_customer->id_card }}');
+            $('#pic').val('{{ $mitra_customer->pic_name }}');
+            $('#id_card_address').val('{{ $mitra_customer->pic_address }}');
+            $('#limit_credit').val('{{ $mitra_customer->limit_credit }}');
+            $('#top').val('{{ $mitra_customer->top }}');
+            $('#top_internal').val('{{ $mitra_customer->top_internal }}');
+
+            $('#country_id, #province_id, #city_id, #district_id').empty();
+            @if($mitra_customer->country_id)
+                $('#country_id').append(`
+                    <option value="` + '{{ $mitra_customer->country_id }}' + `">` + '{{ $mitra_customer->country_name }}' + `</option>
+                `);
+            @endif
+            @if($mitra_customer->province_id)
+                $('#province_id').append(`
+                    <option value="` + '{{ $mitra_customer->province_id }}' + `">` + '{{ $mitra_customer->province_name }}' + `</option>
+                `);
+            @endif
+            @if($mitra_customer->city_id)
+                $('#city_id').append(`
+                    <option value="` + '{{ $mitra_customer->city_id }}' + `">` + '{{ $mitra_customer->city_name }}' + `</option>
+                `);
+            @endif
+            @if($mitra_customer->district_id)
+                $('#district_id').append(`
+                    <option value="` + '{{ $mitra_customer->district_id }}' + `">` + '{{ $mitra_customer->district_name }}' + `</option>
+                `);
+            @endif
+
+            @if(count($mitra_customer->datas)>0)
+                @foreach($mitra_customer->datas as $row)
+                    var count = makeid(10);
+                    $('#last-row-info').before(`
+                        <tr class="row_info">
+                            <input type="hidden" name="arr_id_data[]" value="">
+                            <td class="center">
+                                <label>
+                                    <input class="with-gap" name="check_info" type="radio" value="{{ $row['is_default'] === '1' ? 'checked' : '' }}">
+                                    <span>Pilih</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input name="arr_title[]" type="text" style="width:200px !important;" value="{{ $row['name'] }}">
+                            </td>
+                            <td>
+                                <select style="width: 200px !important;" class="browser-default" id="arr_tax_type` + count + `" name="arr_tax_type[]">
+                                    <option value="1">Normal</option>
+                                    <option value="2">Perdagangan Bebas</option>
+                                </select>
+                            </td>
+                            <td class="center">
+                                <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;" value="{{ $row['notes'] }}">
+                            </td>
+                            <td class="center">
+                                <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" value="{{ $row['npwp'] }}" class="npwp">
+                            </td>
+                            <td class="center">
+                                <input name="arr_nitku[]" type="text" placeholder="Nomor NITKU" style="width:200px !important;" value="" class="nitku">
+                            </td>
+                            <td class="center">
+                                <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;" value="{{ $row['address'] }}">
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_country` + count + `" name="arr_country[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_province` + count + `" name="arr_province[]">
+                                </select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_city` + count + `" name="arr_city[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
+                            </td>
+
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+
+                    @if($row['country_id'])
+                        $('#arr_country' + count).append(`
+                            <option value="{{ $row['country_id'] }}"> {{ $row['country_name'] }} </option>
+                        `);
+                    @endif
+                    select2ServerSide('#arr_country' + count, '{{ url("admin/select2/country") }}');
+                    
+                    $('#arr_province' + count).select2({
+                        dropdownAutoWidth: true,
+                        width: '100%',
+                    });
+
+                    @if($row['province_id'])
+                        /*$('#arr_province' + count).val("{{ $row['province_id'] }}").trigger('change');*/
+                        $('#arr_province' + count).append(`
+                            <option value="{{ $row['province_id'] }}"> {{ $row['province_name'] }} </option>
+                        `);
+                    @endif
+                    select2ServerSide('#arr_province' + count, '{{ url("admin/select2/province") }}');
+
+                    @if($row['city_id'])
+                        $('#arr_city' + count).append(`
+                            <option value="{{ $row['city_id'] }}"> {{ $row['city_name'] }} </option>
+                        `);
+                    @endif
+
+                    $('#arr_city'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/city_by_province") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    province: $('#arr_province' + count).select2().find(":selected").data("code"),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+
+                    $('#arr_city'+ count).bind('change', function() {
+                        if(!$(this).val()){
+                            $('#arr_district'+ count).empty();
+                        }
+                    });
+
+                    @if($row['district_id'])
+                        $('#arr_district' + count).append(`
+                            <option value="{{ $row['district_id'] }}"> {{ $row['district_name'] }} </option>
+                        `);
+                    @endif
+
+                    $('#arr_district'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/district_by_city") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    city: $('#arr_city' + count).select2('data')[0].code,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                @endforeach
+            @endif
+
+            @if(count($mitra_customer->destinations)>0)
+                @foreach($mitra_customer->destinations as $row)
+                    var count = makeid(10);
+                    $('#last-row-destination').before(`
+                        <tr class="row_destination">
+                            <input type="hidden" name="arr_id_data_destination[]" value="">
+                            <td class="center">
+                                <label>
+                                    <input class="with-gap" name="check_destination" type="radio" value="{{ $row['is_default'] === '1' ? 'checked' : '' }}">
+                                    <span>Pilih</span>
+                                </label>
+                            </td>
+                            <td class="center">
+                                <input name="arr_address_destination[]" type="text" placeholder="Alamat Kantor" value="{{ $row['address'] }}">
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_country_destination` + count + `" name="arr_country_destination[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default select2" id="arr_province_destination` + count + `" name="arr_province_destination[]">
+                                    <option value="">--Silahkan pilih--</option>
+                                    @foreach($province as $row1)
+                                        <option value="{{ $row1->id }}" data-code="{{ $row1->code }}">{{ $row1->code.' - '.$row1->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_city_destination` + count + `" name="arr_city_destination[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_district_destination` + count + `" name="arr_district_destination[]"></select>
+                            </td>
+
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-destination" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                    @if($row['country_id'])
+                        $('#arr_country_destination' + count).append(`
+                            <option value="{{ $row['country_id'] }}"> {{ $row['country_name'] }} </option>
+                        `);
+                    @endif
+                    select2ServerSide('#arr_country_destination' + count, '{{ url("admin/select2/country") }}');
+                    $('#arr_province_destination' + count).select2({
+                        dropdownAutoWidth: true,
+                        width: '100%',
+                    });
+
+                    @if($row['province_id'])
+                        $('#arr_province_destination' + count).val("{{ $row['province_id'] }}").trigger('change');
+                    @endif
+
+                    @if($row['city_id'])
+                        $('#arr_city_destination' + count).append(`
+                            <option value="{{ $row['city_id'] }}">{{ $row['city_name'] }}</option>
+                        `);
+                    @endif
+
+                    $('#arr_city_destination'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/city_by_province") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    province: $('#arr_province_destination' + count).select2().find(":selected").data("code"),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+
+                    $('#arr_city_destination'+ count).bind('change', function() {
+                        if(!$(this).val()){
+                            $('#arr_district'+ count).empty();
+                        }
+                    });
+
+                    @if($row['district_id'])
+                        $('#arr_district_destination' + count).append(`
+                            <option value="{{ $row['district_id'] }}"> {{ $row['district_name'] }} </option>
+                        `);
+                    @endif
+
+                    $('#arr_district_destination'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/district_by_city") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    city: $('#arr_city_destination' + count).select2('data')[0].code,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                @endforeach
+            @endif
+
+            @if(count($mitra_customer->documents)>0)
+                @foreach($mitra_customer->documents as $row)
+                    var count = makeid(10);
+                    $('#last-row-destination-doc').before(`
+                        <tr class="row_destination_doc">
+                            <input type="hidden" name="arr_id_data_document[]" value="">
+                            <td class="center">
+                                <label>
+                                    <input class="with-gap" name="check_document" type="radio" value="{{ $row['is_default'] === '1' ? 'checked' : '' }}">
+                                    <span>Pilih</span>
+                                </label>
+                            </td>
+                            <td class="center">
+                                <input name="arr_address_document[]" type="text" placeholder="Alamat Kantor" value="{{ $row['address'] }}">
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_country_document` + count + `" name="arr_country_document[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default select2" id="arr_province_document` + count + `" name="arr_province_document[]">
+                                    <option value="">--Silahkan pilih--</option>
+                                    @foreach($province as $row1)
+                                        <option value="{{ $row1->id }}" data-code="{{ $row1->code }}">{{ $row1->code.' - '.$row1->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_city_document` + count + `" name="arr_city_document[]"></select>
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_district_document` + count + `" name="arr_district_document[]"></select>
+                            </td>
+
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-document" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                    @if($row['country_id'])
+                        $('#arr_country_document' + count).append(`
+                            <option value="{{ $row['country_id'] }}"> {{ $row['country_name'] }} </option>
+                        `);
+                    @endif
+                    select2ServerSide('#arr_country_document' + count, '{{ url("admin/select2/country") }}');
+                    $('#arr_province_document' + count).select2({
+                        dropdownAutoWidth: true,
+                        width: '100%',
+                    });
+
+                    @if($row['province_id'])
+                        $('#arr_province_document' + count).val("{{ $row['province_id'] }}").trigger('change');
+                    @endif
+
+                    @if($row['city_id'])
+                        $('#arr_city_document' + count).append(`
+                            <option value="{{ $row['city_id'] }}">{{ $row['city_name'] }}</option>
+                        `);
+                    @endif
+
+                    $('#arr_city_document'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url     : '{{ url("admin/select2/city_by_province") }}',
+                            type    : 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    province: $('#arr_province_document' + count).select2().find(":selected").data("code"),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+
+                    $('#arr_city_document'+ count).bind('change', function() {
+                        if(!$(this).val()){
+                            $('#arr_district'+ count).empty();
+                        }
+                    });
+
+                    @if($row['district_id'])
+                        $('#arr_district_document' + count).append(`
+                            <option value="{{ $row['district_id'] }}"> {{ $row['district_name'] }} </option>
+                        `);
+                    @endif
+
+                    $('#arr_district_document'+ count).select2({
+                        placeholder       : '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear        : true,
+                        cache             : true,
+                        width             : 'resolve',
+                        dropdownParent    : $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/district_by_city") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    city: $('#arr_city_document' + count).select2('data')[0].code,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                @endforeach
+            @endif
+            
+
+            $('.modal-content').scrollTop(0);
+            $('#note').focus();
+        @endif
     });
 
     function successImport(){
@@ -2548,6 +2994,10 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
 
+                /*cek apakah terdaftar di mitra customer*/
+                if(response.mitra_customer_id){
+                    $('#temp_mitra_customer').val(response.mitra_customer_id);
+                }
                 $('#temp').val(id);
                 $('#name').val(response.name);
                 $('#username').val(response.username);

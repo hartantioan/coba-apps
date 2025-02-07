@@ -14,10 +14,11 @@ class MarketingOrderDeliveryProcess extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'marketing_order_delivery_processes';
+    protected $table      = 'marketing_order_delivery_processes';
     protected $primaryKey = 'id';
-    protected $dates = ['deleted_at'];
-    protected $fillable = [
+    protected $dates      = ['deleted_at'];
+    public    $model_name = 'Surat Jalan Mitra';
+    protected $fillable   = [
         'user_id',
         'code',
         'company_id',
@@ -431,6 +432,10 @@ class MarketingOrderDeliveryProcess extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function mitraApiSyncDatas(){
+        return $this->morphMany(MitraApiSyncData::class, 'lookable');
     }
 
     public function status()

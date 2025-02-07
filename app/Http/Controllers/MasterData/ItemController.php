@@ -22,6 +22,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
 use App\Models\Unit;
+use App\Models\Type;
+use App\Models\Size;
+use App\Models\Variety;
+use App\Models\Pattern;
+use App\Models\Grade;
+use App\Models\Brand;
 use App\Models\ItemGroup;
 use App\Models\ItemStock;
 use App\Models\Place;
@@ -29,6 +35,7 @@ use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use App\Imports\ImportItem;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\MitraApiSyncData;
 
 use App\Exports\ExportItem;
 use App\Imports\ImportItemMaster;
@@ -366,14 +373,43 @@ class ItemController extends Controller
                     if(!$query->itemCogs()->exists()){
                         $query->itemStock()->delete();
                     }
+                    
+                    //FOR TKTW API Update
+                    if ($request->brand_id == 15){
+                        $payload=[
+                            "code"           => $query->code,
+                            "name"           => $query->code,
+                            "uom"            => $query->uomUnit->code,
+                            "desc"           => $query->note,
+                            "type"           => $query->type->name,
+                            "size"           => $query->size->name,
+                            "variety"        => $query->variety->name,
+                            "pattern"        => $query->pattern->name,
+                            "grade"          => $query->grade->name,
+                            "merk"           => $query->brand->name,
+                            "package"        => $query->pallet->prefix_code,
+                            "uomConvertions" => [],
+                        ];
+
+                        $query_syncdata = $query->mitraApiSyncDatas()->create([
+                            'mitra_id'  => 1411,
+                            'operation' => 'update',
+                            'payload'   => json_encode($payload),
+                            'status'    => '0',
+                            'attempts'  => 0,
+                        ]);
+
+                        // MitraApiSyncData
+                    }
 
                     DB::commit();
                 }catch(\Exception $e){
+                    Log::error($e);
                     DB::rollback();
                 }
 			}else{
                 DB::beginTransaction();
-                try {
+                try {   
                     $passedBomCalculator = true;
 
                     if($request->bom_calculator_id){
@@ -418,8 +454,40 @@ class ItemController extends Controller
                         'bom_calculator_id' => $request->bom_calculator_id ?? NULL,
                         'print_name'        => $request->print_name ?? NULL,
                     ]);
+
+                    //FOR TKTW API Insert
+                    if ($request->brand_id == 15){
+                        // konversi default dengan dirinya sendiri
+                        // $konversi=[
+                        //     ['uomCode' => optional(Unit::where('id',$query->uom_unit)->first())->code, 'qty' => 1 ],
+                        // ];
+                        $konversi = [];
+                        $payload=[
+                            "code"           => $request->code,
+                            "name"           => $request->name,
+                            "uom"            => optional(Unit::where('id',$query->uom_unit)->first())->code,
+                            "desc"           => $request?->note ?? "-",
+                            "type"           => optional(Type::where('id',$query->type_id)->first())->name,
+                            "size"           => optional(Size::where('id',$query->size_id)->first())->name,
+                            "variety"        => optional(Variety::where('id',$query->variety_id)->first())->name,
+                            "pattern"        => optional(Pattern::where('id',$query->pattern_id)->first())->name,
+                            "grade"          => optional(Grade::where('id',$query->grade_id)->first())->name,
+                            "merk"           => optional(Brand::where('id',$query->brand_id)->first())->name,
+                            "package"        => optional(Pallet::where('id',$query->pallet_id)->first())->prefix_code,
+                            "uomConvertions" => $konversi,
+                        ];
+                        $query_syncdata = $query->mitraApiSyncDatas()->create([
+                            'mitra_id'  => 1411,
+                            'operation' => 'store',
+                            'payload'   => json_encode($payload),
+                            'status'    => '0',
+                            'attempts'  => 0,
+                        ]);
+                        Log::info($payload);
+                    }
                     DB::commit();
                 }catch(\Exception $e){
+                    Log::error($e);
                     DB::rollback();
                 }
 			}
@@ -478,6 +546,9 @@ class ItemController extends Controller
                                 'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
                                 'is_default'    => $request->arr_default[$key] ? $request->arr_default[$key] : NULL,
                             ]);
+                            
+                            
+
                         }else{
                             $itemUnit = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->first();
                             if($itemUnit){
@@ -489,6 +560,25 @@ class ItemController extends Controller
                                 ]);
                             }
                         }
+                    }
+
+                    if($query->brand_id == "15"){
+                        $arrItemUnit = ItemUnit::where('item_id', $query->id)->get();
+                        $itemUnit=[];
+                        foreach($arrItemUnit as $row){
+                            $itemUnit[] = [
+                                'uomCode' => $row->unit->code,
+                                'qty'     => $row->conversion,
+                            ];
+                        }
+                        
+                        //get object sync data yang baru diinput
+                        $sync_data = MitraApiSyncData::find($query_syncdata->id);
+                        $temp_payload                 = json_decode($sync_data->payload);
+                        $temp_payload->uomConvertions = $itemUnit;
+                        //save kembali konversi ke payload
+                        $sync_data->payload           = json_encode($temp_payload);
+                        $sync_data->save();
                     }
                 }
 

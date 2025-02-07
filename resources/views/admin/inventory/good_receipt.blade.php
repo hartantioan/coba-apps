@@ -556,8 +556,7 @@
                             </div>
                             <div class="input-field col m3 s12 div-account">
                                 <input type="hidden" id="temp_edit" name="temp_edit">
-                                <select class="browser-default" id="account_id_edit" name="account_id_edit" onchange="resetDetails();"></select>
-                                <label class="active" for="account_id_edit">Supplier</label>
+
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">

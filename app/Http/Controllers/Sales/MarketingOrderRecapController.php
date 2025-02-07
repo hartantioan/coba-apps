@@ -47,13 +47,27 @@ class MarketingOrderRecapController extends Controller
     public function downloadAttachment(Request $request){
         $start_date = $request->start_date;
         $end_date = $request->end_date;
-        $data = MarketingOrder::whereIn('status',['1','2','3'])->whereNotNull('document')->get();
+        $data = MarketingOrder::whereIn('status',['1','2','3'])->whereNotNull('document')->where('post_date','>=',$start_date)->where('post_date','<=',$end_date)->get();
         $arrPath = [];
         foreach($data as $row){
             if(Storage::exists($row->document)){
-                $arrPath[] = storage_path(path: 'app/'.$row->document);
+                $arrPath[] = storage_path('app/'.$row->document);
             }
         }
-        info($arrPath);
+        $zipFileName = 'app/public/temp/attachment.zip';
+        $zipFilePath = storage_path($zipFileName);
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            foreach($arrPath as $file) {
+                if (File::exists($file)) {
+                    $zip->addFile($file, basename($file));
+                }
+            }
+            $zip->close();
+        } else {
+            return response()->json(['error' => 'Unable to create ZIP file'], 500);
+        }
+
+        return response()->download($zipFilePath)->deleteFileAfterSend(true);
     }
 }

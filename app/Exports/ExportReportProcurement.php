@@ -177,7 +177,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 $percentage_netto_limit = 0;
                 $finance_kadar_air = 0;
                 $finance_kg = 0;
-                if($take_item_rule_percent && !$row->percent_modifier){
+                if($take_item_rule_percent){
                     $percentage_level = round($take_item_rule_percent->percentage_level,2);
                     $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
                 }

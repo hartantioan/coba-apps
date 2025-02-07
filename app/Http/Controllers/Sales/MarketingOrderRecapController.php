@@ -64,7 +64,7 @@ class MarketingOrderRecapController extends Controller
             foreach($arrPath as $file) {
                 if (File::exists($file['path'])) {
                     $extension = explode('.',basename($file['path']));
-                    $newFileName = $file['path'].'.'.$extension[1];
+                    $newFileName = $file['code'].'.'.$extension[1];
                     $zip->addFile($file['path'], $newFileName);
                 }
             }

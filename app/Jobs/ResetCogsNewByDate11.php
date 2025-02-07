@@ -151,7 +151,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 'price_in'			      => $total / $qty,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => round($total_final / $qty_final,5),
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'IN'
@@ -211,7 +211,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                     'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
-                    'price_final'		      => round($total_final / $qty_final,5),
+                    'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                     'total_final'		      => $total_final,
                     'date'				        => $dateloop,
                     'type'				        => 'IN',
@@ -782,7 +782,8 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 $totalBefore = $total_final;
             }
         }
-    
+
+        #gas
         $revaluation = InventoryRevaluationDetail::whereHas('inventoryRevaluation',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->whereHas('itemStock',function($query)use($item_id,$area_id,$item_shading_id,$production_batch_id){
@@ -1076,7 +1077,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 $ig = IssueGlaze::find(intval($id));
                 if($ig){
                     $ig->updateGrandtotal();
-                    self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date);
+                    /* self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date); */
                 }
             }   
         }
@@ -1138,7 +1139,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                 $ig = ReceiveGlaze::find(intval($id));
                 if($ig){
                     $ig->updateGrandtotal();
-                    self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date);
+                    /* self::dispatch($dateloop,$ig->company_id,$ig->place_id,$ig->itemStock->item_id,$ig->itemStock->area_id,$ig->itemStock->item_shading_id,$ig->itemStock->production_batch_id,$end_date); */
                 }
             }   
         }

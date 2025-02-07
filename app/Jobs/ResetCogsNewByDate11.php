@@ -1354,7 +1354,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                                 'warehouse_id'		        => $rowbatch->productionBatch->warehouse_id,
                                 'item_id'			        => $rowbatch->productionBatch->item_id,
                                 'qty_out'			        => $rowbatch->qty,
-                                'price_out'			        => $rowprice,
+                                'price_out'			        => round($rowprice,5),
                                 'total_out'			        => $rowtotal,
                                 'qty_final'			        => $qtyBefore,
                                 'price_final'		        => round($qtyBefore,3) > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,

@@ -42,23 +42,101 @@ use App\Imports\ImportUser;
 use App\Models\NonStaffCompany;
 use App\Models\UserDestination;
 use App\Models\UserDestinationDocument;
+use App\Models\MitraCustomer;
+use App\Models\MitraCustomerBilling;
+use App\Models\MitraCustomerDelivery;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // $mitra_customer_code = $request->mitra_customer_code ? CustomHelper::decrypt($request->mitra_customer_code) : '';
+        $mitra_customer_code = $request->mitra_customer_code ? $request->mitra_customer_code : '';
+        $mitra_customer = '';
+        if($mitra_customer_code){
+            $mitra_customer = MitraCustomer::where('code',$mitra_customer_code)/*->where('status_approval','2')*/->first();
+            if($mitra_customer){
+                $mitra_customer['province_name'] = $mitra_customer->province->name;
+                $mitra_customer['city_name']     = $mitra_customer->city->name;
+                $mitra_customer['district_name'] = $mitra_customer->district->name;
+                $mitra_customer['country_id']    = 103;
+                $mitra_customer['country_name']  = 'INDONESIA';
+                $mitra_customer['limit_credit']  = number_format($mitra_customer->limit_credit, 0, ',', '.');
+
+                $datas = [];
+                $destinations = [];
+                $documents = [];
+
+                foreach($mitra_customer->billingAddress as $row){
+                    $datas[] = [
+                        'id'                => $row->id,
+                        'name'              => $row->name,
+                        'notes'             => $row->notes,
+                        'npwp'              => $row->npwp,
+                        'address'           => $row->address,
+                        'country_id'        => 103,
+                        'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                        'province_id'       => $row->province_id ? $row->province_id : '',
+                        'province_name'     => $row->province()->exists() ? $row->province->code.' - '.$row->province->name : '',
+                        'city_id'           => $row->city_id ? $row->city_id : '',
+                        'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                        'district_id'       => $row->district_id ? $row->district_id : '',
+                        'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                        'is_default'        => '1',
+                    ];
+                }
+
+                foreach($mitra_customer->deliveryAddress as $row){
+                    $destinations[] = [
+                        'id'                => $row->id,
+                        'address'           => $row->address,
+                        'country_id'        => $row->country_id ? $row->country_id : '',
+                        'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                        'province_id'       => $row->province_id ? $row->province_id : '',
+                        'province_name'     => $row->province()->exists() ? $row->province->code.' - '.$row->province->name : '',
+                        'city_id'           => $row->city_id ? $row->city_id : '',
+                        'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                        'district_id'       => $row->district_id ? $row->district_id : '',
+                        'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                        'is_default'        => '1',
+                    ];
+
+                    $documents[] = [
+                        'id'                => $row->id,
+                        'address'           => $row->address,
+                        'country_id'        => $row->country_id ? $row->country_id : '',
+                        'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                        'province_id'       => $row->province_id ? $row->province_id : '',
+                        'province_name'     => $row->province()->exists() ? $row->province->code.' - '.$row->province->name : '',
+                        'city_id'           => $row->city_id ? $row->city_id : '',
+                        'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                        'district_id'       => $row->district_id ? $row->district_id : '',
+                        'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                        'is_default'        => '1',
+                    ];
+                }
+
+                $mitra_customer['datas']        = $datas;
+                $mitra_customer['destinations'] = $destinations;
+                $mitra_customer['documents']    = $documents;
+            }
+        }
+
         $data = [
-            'title'         => 'Partner Bisnis',
-            'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->get(),
-            'warehouse'     => Warehouse::where('status','1')->get(),
-            'department'    => Department::where('status','1')->get(),
-            'position'      => Position::where('status','1')->get(),
-            'group'         => Group::where('status','1')->get(['id','name','type'])->toArray(),
-            'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
-            'province'      => Region::whereRaw("LENGTH(code) = 2")->get(),
-            'city'          => Region::whereRaw("LENGTH(code) = 5")->get(),
-            'content'       => 'admin.master_data.user'
+            'title'               => 'Partner Bisnis',
+            'company'             => Company::where('status','1')->get(),
+            'place'               => Place::where('status','1')->get(),
+            'warehouse'           => Warehouse::where('status','1')->get(),
+            'department'          => Department::where('status','1')->get(),
+            'position'            => Position::where('status','1')->get(),
+            'group'               => Group::where('status','1')->get(['id','name','type'])->toArray(),
+            'menu'                => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
+            'province'            => Region::whereRaw("LENGTH(code) = 2")->get(),
+            'city'                => Region::whereRaw("LENGTH(code) = 5")->get(),
+            'content'             => 'admin.master_data.user',
+            'mitra_customer_code' => $mitra_customer_code,
+            'mitra_customer'      => $mitra_customer,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -627,6 +705,8 @@ class UserController extends Controller
                 ]);
             }
 
+
+            //update User
 			if($request->temp){
                 /* DB::beginTransaction();
                 try { */
@@ -690,11 +770,22 @@ class UserController extends Controller
                     $query->is_special_lock_user = $request->is_special_lock_user && $request->type == '1' ? $request->is_special_lock_user : NULL;
                     $query->save();
 
+                    //update tabel mitra customer saat update data user/customer
+                    if($request->temp_mitra_customer){
+                        $mitra_customer = MitraCustomer::find($request->temp_mitra_customer);
+
+                        // $mitra_customer->status = $query->status;
+                        $mitra_customer->status_approval = '1';
+                        // $mitra_customer->user_id = $query->id; //tidak perlu update lagi
+                        $mitra_customer->save();
+                    }
                     /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 } */
-			}else{
+			}
+            //create User
+            else{
                 /* DB::beginTransaction();
                 try { */
                     $query = User::create([
@@ -763,6 +854,16 @@ class UserController extends Controller
                                 'nominal'	            => 0
                             ]);
                         }
+                    }
+
+                    //update tabel mitra customer saat create data user/customer
+                    if($request->temp_mitra_customer){
+                        $mitra_customer = MitraCustomer::find($request->temp_mitra_customer);
+
+                        $mitra_customer->status = $query->status;
+                        $mitra_customer->status_approval = '1';
+                        $mitra_customer->user_id = $query->id;
+                        $mitra_customer->save();
                     }
 
                     /* DB::commit();
@@ -1395,16 +1496,18 @@ class UserController extends Controller
 
     public function show(Request $request){
         $user = User::find($request->id);
-        $user['province_name'] = $user->province()->exists() ? $user->province->code.' - '.$user->province->name : '';
-        $user['city_name'] = $user->city()->exists() ? $user->city->code.' - '.$user->city->name : '';
-        $user['district_name'] = $user->district()->exists() ? $user->district->code.' - '.$user->district->name : '';
-        $user['country_name'] = $user->country()->exists() ? $user->country->name : '';
-        $user['limit_credit'] = number_format($user->limit_credit, 0, ',', '.');
-        $user['cities'] = $user->province()->exists() ? $user->province->getCity() : '';
-        $user['has_document'] = $user->hasDocument() ? '1' : '';
-        $user['brand_name'] = $user->brand()->exists() ? $user->brand->code.' - '.$user->brand->name : '';
-        $banks = [];
+        //cek apakah terdaftar di mitra customer
+        // $user["mitra_customer_id"] = MitraCustomer::where('user_id', $user->id)->first()->id;
+        $user['province_name']     = $user->province()->exists() ? $user->province->code.' - '.$user->province->name : '';
+        $user['city_name']         = $user->city()->exists() ? $user->city->code.' - '.$user->city->name : '';
+        $user['district_name']     = $user->district()->exists() ? $user->district->code.' - '.$user->district->name : '';
+        $user['country_name']      = $user->country()->exists() ? $user->country->name : '';
+        $user['limit_credit']      = number_format($user->limit_credit, 0, ',', '.');
+        $user['cities']            = $user->province()->exists() ? $user->province->getCity() : '';
+        $user['has_document']      = $user->hasDocument() ? '1' : '';
+        $user['brand_name']        = $user->brand()->exists() ? $user->brand->code.' - '.$user->brand->name : '';
 
+        $banks = [];
 		foreach($user->userBank as $row){
 			$banks[] = [
                 'id'            => $row->id,
@@ -1415,13 +1518,11 @@ class UserController extends Controller
                 'is_default'    => $row->is_default
             ];
 		}
-
 		$user['banks'] = $banks;
 
-        $datas = [];
+        $datas        = [];
         $destinations = [];
-        $documents = [];
-
+        $documents    = [];
         foreach($user->userData as $row){
 			$datas[] = [
                 'id'                => $row->id,
@@ -1441,7 +1542,6 @@ class UserController extends Controller
                 'is_default'        => $row->is_default
             ];
 		}
-
         foreach($user->userDestination as $row){
 			$destinations[] = [
                 'id'                => $row->id,
@@ -1456,7 +1556,6 @@ class UserController extends Controller
                 'is_default'        => $row->is_default
             ];
 		}
-
         foreach($user->userDestinationDocument as $row){
 			$documents[] = [
                 'id'                => $row->id,
@@ -1471,13 +1570,11 @@ class UserController extends Controller
                 'is_default'        => $row->is_default
             ];
 		}
-
-		$user['datas'] = $datas;
+        $user['datas']        = $datas;
         $user['destinations'] = $destinations;
-        $user['documents'] = $documents;
+        $user['documents']    = $documents;
 
         $drivers = [];
-
         foreach($user->userDriver as $row){
             $drivers[] = [
                 'id'    => $row->id,
@@ -1485,7 +1582,6 @@ class UserController extends Controller
                 'hp'    => $row->hp,
             ];
         }
-
         $user['drivers'] = $drivers;
 
 		return response()->json($user);

@@ -1874,8 +1874,13 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->employee_no.' - '.$d->name,
+                'id'   			        => $d->id,
+                'text' 			        => $d->employee_no.' - '.$d->name,
+                'limit_credit'          => $d->limit_credit,
+                'count_limit'           => $d->count_limit_credit,
+                'balance_limit'         => $d->limit_credit - $d->count_limit_credit,
+                'type'                  => $d->type,
+                'arrinfo'               => $d,
             ];
         }
 

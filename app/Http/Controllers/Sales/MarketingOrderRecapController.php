@@ -51,16 +51,21 @@ class MarketingOrderRecapController extends Controller
         $arrPath = [];
         foreach($data as $row){
             if(Storage::exists($row->document)){
-                $arrPath[] = storage_path('app/'.$row->document);
+                $arrPath[] = [
+                    'path'      => storage_path('app/'.$row->document),
+                    'code'      => $row->code,
+                ];
             }
         }
-        $zipFileName = 'app/public/temp/attachment.zip';
+        $zipFileName = 'app/public/temp/marketing_order_attachment.zip';
         $zipFilePath = storage_path($zipFileName);
         $zip = new ZipArchive;
         if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
             foreach($arrPath as $file) {
-                if (File::exists($file)) {
-                    $zip->addFile($file, basename($file));
+                if (File::exists($file['path'])) {
+                    $extension = explode('.',basename($file['path']));
+                    $newFileName = $file['path'].'.'.$extension[1];
+                    $zip->addFile($file['path'], $newFileName);
                 }
             }
             $zip->close();

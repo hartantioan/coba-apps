@@ -1366,8 +1366,8 @@ class ResetCogsNewByDate11 implements ShouldQueue
                         }
                         foreach($rowbatch->journalDetail as $rowjournal){
                             $rowjournal->update([
-                                'nominal_fc'  => round($rowtotal,2),
-                                'nominal'     => round($rowtotal,2),
+                                'nominal_fc'  => $rowtotal,
+                                'nominal'     => $rowtotal,
                             ]);
                         }
                     }

@@ -1290,7 +1290,7 @@ class ResetCogsNewForProduction implements ShouldQueue
                 $arrProductionIssue[] = $row->productionIssue->id;
             }
             if($row->productionBatchUsage()->exists()){
-                foreach($row->productionBatchUsage->where('production_batch_id',$production_batch_id) as $rowbatch){
+                foreach($row->productionBatchUsage as $rowbatch){
                     if($bomGroup == '1'){
                         $rowprice = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
                         $rowtotal = round($rowbatch->qty * $rowprice,2);
@@ -1327,35 +1327,39 @@ class ResetCogsNewForProduction implements ShouldQueue
                         $cek = ItemCogs::where('detailable_type',$rowbatch->getTable())->where('detailable_id',$rowbatch->id)->count();
                         $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($dateloop);
                         $rowtotal = round($rowbatch->qty * $rowprice,2);
-                        $total += $rowtotal;
-                        $totalBefore -= $rowtotal;
-                        $qtyBefore -= $rowbatch->qty;
-                        if($cek == 0){
-                            ItemCogs::create([
-                                'lookable_type'		        => $row->productionIssue->getTable(),
-                                'lookable_id'		        => $row->productionIssue->id,
-                                'detailable_type'	        => $rowbatch->getTable(),
-                                'detailable_id'		        => $rowbatch->id,
-                                'company_id'		        => $row->productionIssue->company_id,
-                                'place_id'			        => $rowbatch->productionBatch->place_id,
-                                'warehouse_id'		        => $rowbatch->productionBatch->warehouse_id,
-                                'item_id'			        => $rowbatch->productionBatch->item_id,
-                                'qty_out'			        => $rowbatch->qty,
-                                'price_out'			        => $rowprice,
-                                'total_out'			        => $rowtotal,
-                                'qty_final'			        => $qtyBefore,
-                                'price_final'		        => round($qtyBefore,3) > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,
-                                'total_final'		        => $totalBefore,
-                                'date'				        => $dateloop,
-                                'type'				        => 'OUT',
-                                'production_batch_id'       => $rowbatch->productionBatch->id,
-                            ]);
-                        }
-                        foreach($rowbatch->journalDetail as $rowjournal){
-                            $rowjournal->update([
-                                'nominal_fc'  => $rowtotal,
-                                'nominal'     => $rowtotal,
-                            ]);
+                        if($rowbatch->production_batch_id == $production_batch_id){
+                            $total += $rowtotal;
+                            $totalBefore -= $rowtotal;
+                            $qtyBefore -= $rowbatch->qty;
+                            if($cek == 0){
+                                ItemCogs::create([
+                                    'lookable_type'		        => $row->productionIssue->getTable(),
+                                    'lookable_id'		        => $row->productionIssue->id,
+                                    'detailable_type'	        => $rowbatch->getTable(),
+                                    'detailable_id'		        => $rowbatch->id,
+                                    'company_id'		        => $row->productionIssue->company_id,
+                                    'place_id'			        => $rowbatch->productionBatch->place_id,
+                                    'warehouse_id'		        => $rowbatch->productionBatch->warehouse_id,
+                                    'item_id'			        => $rowbatch->productionBatch->item_id,
+                                    'qty_out'			        => $rowbatch->qty,
+                                    'price_out'			        => round($rowprice,5),
+                                    'total_out'			        => $rowtotal,
+                                    'qty_final'			        => $qtyBefore,
+                                    'price_final'		        => round($qtyBefore,3) > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,
+                                    'total_final'		        => $totalBefore,
+                                    'date'				        => $dateloop,
+                                    'type'				        => 'OUT',
+                                    'production_batch_id'       => $rowbatch->productionBatch->id,
+                                ]);
+                            }
+                            foreach($rowbatch->journalDetail as $rowjournal){
+                                $rowjournal->update([
+                                    'nominal_fc'  => $rowtotal,
+                                    'nominal'     => $rowtotal,
+                                ]);
+                            }
+                        }else{
+                            $total += $rowtotal;
                         }
                     }
                 }

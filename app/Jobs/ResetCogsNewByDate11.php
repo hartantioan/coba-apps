@@ -1339,7 +1339,7 @@ class ResetCogsNewByDate11 implements ShouldQueue
                     }else{
                         $cek = ItemCogs::where('detailable_type',$rowbatch->getTable())->where('detailable_id',$rowbatch->id)->count();
                         if($rowbatch->production_batch_id == $production_batch_id){
-                            $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($dateloop);
+                            $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($row->productionIssue->post_date);
                             $rowtotal = round($rowbatch->qty * $rowprice,2);
                             $total += $rowtotal;
                             $totalBefore -= $rowtotal;
@@ -1372,8 +1372,13 @@ class ResetCogsNewByDate11 implements ShouldQueue
                                 ]);
                             }
                         }else{
-                            $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($rowbatch->lookable->header->post_date);
-                            $rowtotal = round($rowbatch->qty * $rowprice,2);
+                            $cekOther = ItemCogs::where('detailable_type',$rowbatch->getTable())->where('detailable_id',$rowbatch->id)->first();
+                            if($cekOther){
+                                $rowtotal = round($cekOther->total_out,2);
+                            }else{
+                                $rowprice = $rowbatch->productionBatch->itemStock->priceFgNow($row->productionIssue->post_date);
+                                $rowtotal = round($rowbatch->qty * $rowprice,2);
+                            }
                             $total += $rowtotal;
                         }
                     }

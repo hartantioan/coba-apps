@@ -139,6 +139,11 @@ class GoodIssueDetail extends Model
         return $this->belongsTo('App\Models\GoodIssue', 'good_issue_id', 'id')->withTrashed();
     }
 
+    public function header()
+    {
+        return $this->belongsTo('App\Models\GoodIssue', 'good_issue_id', 'id')->withTrashed();
+    }
+
     public function itemStock()
     {
         return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');

@@ -54,6 +54,11 @@ class ProductionIssueDetail extends Model
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
 
+    public function header()
+    {
+        return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
+    }
+
     public function costDistribution()
     {
         return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();

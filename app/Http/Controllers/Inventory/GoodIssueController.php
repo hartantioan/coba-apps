@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SendApproval;
+use App\Jobs\SendJournal;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\GoodIssueRequest;
@@ -506,9 +507,27 @@ class GoodIssueController extends Controller
                                 }
                             } */
                             $cogs = $itemCogsBefore->infoFg();
-                            if($cogs['qty'] < $qtyout){
-                                $passedQtyMinus = false;
-                                $arrItemNotPassed[] = $item_stock->item->name;
+                            if(!$request->temp){
+                                if($cogs['qty'] < $qtyout){
+                                    $passedQtyMinus = false;
+                                    $arrItemNotPassed[] = $item_stock->item->name;
+                                }
+                            }else{
+                                if(($cogs['qty'] + $qtyout) < $qtyout){
+                                    $passedQtyMinus = false;
+                                    $arrItemNotPassed[] = $item_stock->item->name;
+                                }
+                            }
+                            $startqty = $cogs['qty'] - $qtyout;
+                            foreach($itemCogsAfter as $row){
+                                if($row->type == 'IN'){
+                                    $startqty += $row->qty_in;
+                                }elseif($row->type == 'OUT'){
+                                    $startqty -= $row->qty_out;
+                                }
+                                if($startqty < 0){
+                                    $passedQtyMinus = false;
+                                }
                             }
                         }else{
                             $passed = false;
@@ -537,26 +556,38 @@ class GoodIssueController extends Controller
                     }
                 }
 
-                if($passedZeroQty == false){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Maaf, qty tidak boleh 0.',
-                    ]);
+                if(!$request->temp){
+
+                    if($passedZeroQty == false){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, qty tidak boleh 0.',
+                        ]);
+                    }
+
+                    if($passedQtyMinus == false){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                        ]);
+                    }
+
+                    if($passed == false){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
+                        ]);
+                    }
+
+                }else{
+                    if($passedQtyMinus == false){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                        ]);
+                    }
                 }
 
-                /* if($passedQtyMinus == false){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
-                    ]);
-                } */
-
-                if($passed == false){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
-                    ]);
-                }
                 if($request->temp){
                     $query = GoodIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -591,8 +622,8 @@ class GoodIssueController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
-                        if($request->has('file')) {
+                    if(in_array($query->status,['1','2','3','6']) && in_array(session('bo_division_id'),[20,18])){
+                        /* if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
@@ -607,20 +638,20 @@ class GoodIssueController extends Controller
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->document = $document;
-                        $query->note = $request->note;
-                        $query->grandtotal = round($grandtotal,2);
-                        $query->status = '1';
+                        $query->document = $document; */
+                        $query->note = strtoupper($request->note);
+                        /* $query->grandtotal = round($grandtotal,2);
+                        $query->status = '1'; */
 
                         $query->save();
 
-                        foreach($query->goodIssueDetail as $row){
+                        /* foreach($query->goodIssueDetail as $row){
                             $row->itemSerial()->update([
                                 'usable_id'     => NULL,
                                 'usable_type'   => NULL,
                             ]);
                             $row->delete();
-                        }
+                        } */
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -646,64 +677,98 @@ class GoodIssueController extends Controller
 
                 if($query) {
 
-                    foreach($request->arr_item_stock as $key => $row){
-                        $rowprice = NULL;
-                        $item_stock = ItemStock::find(intval($row));
-                        $rowprice = $item_stock->priceDate($query->post_date);
-                        $gid = GoodIssueDetail::create([
-                            'good_issue_id'         => $query->id,
-                            'item_stock_id'         => $row,
-                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                 => $rowprice,
-                            'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'                  => $request->arr_note[$key],
-                            'note2'                 => $request->arr_note2[$key],
-                            'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
-                            'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
-                            'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
-                            'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
-                            'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
-                            'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                            'warehouse_id'          => $item_stock->warehouse_id,
-                            'area_id'               => $item_stock->area_id ? $item_stock->area_id : NULL,
-                            'item_shading_id'       => $item_stock->item_shading_id ? $item_stock->item_shading_id : NULL,
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                            'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
-                            'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
-                            'qty_return'            => $request->arr_qty_return[$key] ? str_replace(',','.',str_replace('.','',$request->arr_qty_return[$key])) : 0,
-                        ]);
+                    if(!$request->temp){
+                        foreach($request->arr_item_stock as $key => $row){
+                            $rowprice = NULL;
+                            $item_stock = ItemStock::find(intval($row));
+                            $rowprice = $item_stock->priceDate($query->post_date);
+                            $gid = GoodIssueDetail::create([
+                                'good_issue_id'         => $query->id,
+                                'item_stock_id'         => $row,
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'price'                 => $rowprice,
+                                'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'note'                  => $request->arr_note[$key],
+                                'note2'                 => $request->arr_note2[$key],
+                                'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
+                                'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
+                                'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
+                                'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
+                                'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
+                                'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                'warehouse_id'          => $item_stock->warehouse_id,
+                                'area_id'               => $item_stock->area_id ? $item_stock->area_id : NULL,
+                                'item_shading_id'       => $item_stock->item_shading_id ? $item_stock->item_shading_id : NULL,
+                                'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                                'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
+                                'qty_return'            => $request->arr_qty_return[$key] ? str_replace(',','.',str_replace('.','',$request->arr_qty_return[$key])) : 0,
+                            ]);
+    
+                            if($request->arr_serial[$key]){
+                                $rowArr = explode(',',$request->arr_serial[$key]);
+                                foreach($rowArr as $rowdetail){
+                                    ItemSerial::find(intval($rowdetail))->update([
+                                        'usable_type'   => $gid->getTable(),
+                                        'usable_id'     => $gid->id
+                                    ]);
+                                }
+                            }
+    
+                            if($gid->itemStock->productionBatch()->exists()){
+                                ProductionBatchUsage::create([
+                                    'production_batch_id'   => $gid->itemStock->productionBatch->id,
+                                    'lookable_type'         => $gid->getTable(),
+                                    'lookable_id'           => $gid->id,
+                                    'qty'                   => $gid->qty,
+                                ]);
+                                CustomHelper::updateProductionBatch($gid->itemStock->productionBatch->id,$gid->qty,'OUT');
+                            }
+                        }
 
-                        if($request->arr_serial[$key]){
-                            $rowArr = explode(',',$request->arr_serial[$key]);
-                            foreach($rowArr as $rowdetail){
-                                ItemSerial::find(intval($rowdetail))->update([
-                                    'usable_type'   => $gid->getTable(),
-                                    'usable_id'     => $gid->id
+                        SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
+                        CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code,$query->note,session('bo_id'));
+
+                        activity()
+                            ->performedOn(new GoodIssue())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Add / edit penggunaan barang.');
+
+                    }else{
+                        foreach($request->arr_item_stock as $key => $row){
+                            $gid = GoodIssueDetail::find($request->arr_id[$key]);
+                            if($gid){
+                                $gid->update([
+                                    'note'                  => strtoupper($request->arr_note[$key]),
+                                    'note2'                 => strtoupper($request->arr_note2[$key]),
+                                    'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
+                                    'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
+                                    'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
+                                    'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                    'warehouse_id'          => $item_stock->warehouse_id,
+                                    'area_id'               => $item_stock->area_id ? $item_stock->area_id : NULL,
+                                    'item_shading_id'       => $item_stock->item_shading_id ? $item_stock->item_shading_id : NULL,
+                                    'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                    'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                    'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                                    'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
                                 ]);
                             }
                         }
 
-                        if($gid->itemStock->productionBatch()->exists()){
-                            ProductionBatchUsage::create([
-                                'production_batch_id'   => $gid->itemStock->productionBatch->id,
-                                'lookable_type'         => $gid->getTable(),
-                                'lookable_id'           => $gid->id,
-                                'qty'                   => $gid->qty,
-                            ]);
-                            CustomHelper::updateProductionBatch($gid->itemStock->productionBatch->id,$gid->qty,'OUT');
-                        }
+                        CustomHelper::removeJournal($query->getTable(),$query->id);
+                        SendJournal::dispatch($query->getTable(),$query->id,NULL,$query->user_id);
+
+                        activity()
+                            ->performedOn(new GoodIssue())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Edit penggunaan barang oleh accounting / edp.');
                     }
-
-                    SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
-                    CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code,$query->note,session('bo_id'));
-
-                    activity()
-                        ->performedOn(new GoodIssue())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit penggunaan barang.');
 
                     $response = [
                         'status'    => 200,
@@ -873,6 +938,7 @@ class GoodIssueController extends Controller
         $arr_used = [];
         foreach($gr->goodIssueDetail as $row){
             $arr[] = [
+                'id'                        => $row->id,
                 'item_id'                   => $row->itemStock->item_id,
                 'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
                 'uom'                       => $row->itemStock->item->uomUnit->code,

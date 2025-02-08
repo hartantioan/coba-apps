@@ -1093,7 +1093,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                                             <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($machine as $row)
                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1248,6 +1248,7 @@
         }
         $('#last-row-item').before(`
             <tr class="row_item" data-id="">
+                <input type="hidden" name="arr_id[]" value="0">
                 <input type="hidden" name="arr_lookable_type[]" value="">
                 <input type="hidden" name="arr_lookable_id[]" value="">
                 <td>
@@ -1295,7 +1296,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1361,7 +1362,6 @@
         $(element).parent().next().find('select[name="arr_machine[]"] option').show();
         if($(element).val()){
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
-            $(element).parent().next().find('select[name="arr_machine[]"] option[data-line!="' + $(element).val() + '"]').hide();
         }else{
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
         }
@@ -1473,11 +1473,11 @@
 
     function setStock(val){
         if($("#arr_item" + val).val()){
-            /* let qtyMax = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+            let qtyMax = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
             let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
             if(qtyInput > qtyMax){
                 $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-            } */
+            }
             if($('#arr_serial' + val).length > 0){
                 $('#arr_serial' + val).empty();
                 $('#arr_serial' + val).select2({
@@ -1745,6 +1745,7 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item" data-id="` + val.reference_id + `">
+                                <input type="hidden" name="arr_id[]" value="` + val.id + `">
                                 <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                 <td>
@@ -1792,7 +1793,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>

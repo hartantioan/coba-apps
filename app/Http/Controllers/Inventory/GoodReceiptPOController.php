@@ -1846,7 +1846,7 @@ class GoodReceiptPOController extends Controller
                 $query_done = GoodReceipt::where('code',$row)->first();
                 if($query_done){
 
-                    if(in_array($query_done->status,['2','3'])){
+                    if(in_array($query_done->status,['2','3','9'])){
                         $currentStatusLc = $query_done->status_lc;
                         $newStatusLc = ($currentStatusLc == '1') ? '2' : '1';
                         $query_done->update([
@@ -1867,7 +1867,7 @@ class GoodReceiptPOController extends Controller
                     }else{
                         $response = [
                             'status'  => 500,
-                            'message' => 'Data'.$query_done->code .'tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
+                            'message' => 'Data'.$query_done->code .'tidak bisa diselesaikan karena status bukan PROSES / SELESAI / LOCK PROCUREMENT.'
                         ];
 
                         return response()->json($response);

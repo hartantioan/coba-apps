@@ -149,13 +149,13 @@ class PurchaseOrderDetail extends Model
 
     public function goodReceiptDetail(){
         return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id')->whereHas('goodReceipt',function($query){
-            $query->whereIn('status',['1','2','3']);
+            $query->whereIn('status',['1','2','3','9']);
         });
     }
 
     public function goodReceiptDetailProgressReport(){
         return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id')->whereHas('goodReceipt',function($query){
-            $query->whereIn('status',['1','2','3','4','5','6']);
+            $query->whereIn('status',['1','2','3','4','5','6','9']);
         });
     }
 
@@ -200,7 +200,7 @@ class PurchaseOrderDetail extends Model
         if($this->is_tax == '1' && $this->is_include_tax == '1'){
             $total = $total / (1 + ($this->percent_tax / 100));
         }
-        
+
         if($this->is_tax == '1'){
             $tax = round($total * ($this->percent_tax / 100),2);
         }
@@ -233,7 +233,7 @@ class PurchaseOrderDetail extends Model
             }
             $balance = $this->qty - $received + $return;
         /* } */
-        
+
         return $balance;
     }
 
@@ -259,7 +259,7 @@ class PurchaseOrderDetail extends Model
 
             $balance = $this->qty + ($this->qty * ($this->item->tolerance_gr / 100)) - $received + $return;
         /* } */
-        
+
         return $balance;
     }
 

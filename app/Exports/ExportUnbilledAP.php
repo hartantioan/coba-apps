@@ -21,7 +21,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
-		
+
     }
 
     private $headings = [
@@ -89,11 +89,11 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                             AND pi.status IN ('2','3','7','8')
                             AND pi.post_date <= :date1
                             AND pi.id NOT IN (
-                                SELECT 
-                                    cd.lookable_id 
-                                    FROM cancel_documents cd 
-                                    WHERE 
-                                        cd.lookable_type = 'purchase_invoices' 
+                                SELECT
+                                    cd.lookable_id
+                                    FROM cancel_documents cd
+                                    WHERE
+                                        cd.lookable_type = 'purchase_invoices'
                                         AND cd.deleted_at IS NULL
                                         AND :date2 >= cd.post_date
                                 )
@@ -209,7 +209,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                         IFNULL((SELECT
                             '1'
                             FROM cancel_documents cdu
-                            WHERE 
+                            WHERE
                                 cdu.post_date <= :date9
                                 AND cdu.lookable_type = 'good_receipts'
                                 AND cdu.lookable_id = gr.id
@@ -220,7 +220,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                             ON u.id = gr.account_id
                         WHERE
                             gr.post_date <= :date10
-                            AND gr.status IN ('2','3','8')
+                            AND gr.status IN ('2','3','8','9')
                             AND gr.deleted_at IS NULL
                     ) AS rs
                 WHERE (rs.total - rs.total_invoice - rs.total_return - rs.total_journal) > 0

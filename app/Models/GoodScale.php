@@ -133,14 +133,14 @@ class GoodScale extends Model
 
     public function goodReceiptDetail(){
         return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['2','3','9']);
         });
     }
 
     public function goodReceiptDetailExcel(){
 
         $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['2','3','9']);
         })->get();
         $array = [];
         foreach($x as  $row){
@@ -427,7 +427,7 @@ class GoodScale extends Model
         $data = [];
         if($this->type == '1'){
             $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['2','3','9']);
             })->get();
             $array = [];
             foreach($x as  $row){

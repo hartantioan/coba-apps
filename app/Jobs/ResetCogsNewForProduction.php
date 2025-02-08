@@ -1290,7 +1290,7 @@ class ResetCogsNewForProduction implements ShouldQueue
                 $arrProductionIssue[] = $row->productionIssue->id;
             }
             if($row->productionBatchUsage()->exists()){
-                foreach($row->productionBatchUsage as $rowbatch){
+                foreach($row->productionBatchUsage->where('production_batch_id',$production_batch_id) as $rowbatch){
                     if($bomGroup == '1'){
                         $rowprice = round($qtyBefore,3) > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
                         $rowtotal = round($rowbatch->qty * $rowprice,2);

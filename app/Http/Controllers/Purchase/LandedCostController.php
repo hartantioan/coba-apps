@@ -694,10 +694,10 @@ class LandedCostController extends Controller
                 $wtax = 0;
                 $grandtotal = 0;
                 foreach($request->arr_fee_id as $key => $row){
-                    $total += str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key]));
-                    $tax += str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key]));
-                    $wtax += str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key]));
-                    $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key]));
+                    $total += floatval(str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key])));
+                    $tax += floatval(str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key])));
+                    $wtax += floatval(str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key])));
+                    $grandtotal += floatval(str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key])));
                 }
 
                 /* if($grandtotal <= 0){

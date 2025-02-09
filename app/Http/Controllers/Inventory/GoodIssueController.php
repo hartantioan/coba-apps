@@ -512,23 +512,24 @@ class GoodIssueController extends Controller
                                     $passedQtyMinus = false;
                                     $arrItemNotPassed[] = $item_stock->item->name;
                                 }
+                                $startqty = $cogs['qty'] - $qtyout;
+                                foreach($itemCogsAfter as $row){
+                                    if($row->type == 'IN'){
+                                        $startqty += $row->qty_in;
+                                    }elseif($row->type == 'OUT'){
+                                        $startqty -= $row->qty_out;
+                                    }
+                                    if($startqty < 0){
+                                        $passedQtyMinus = false;
+                                    }
+                                }
                             }else{
                                 if(($cogs['qty'] + $qtyout) < $qtyout){
                                     $passedQtyMinus = false;
                                     $arrItemNotPassed[] = $item_stock->item->name;
                                 }
                             }
-                            $startqty = $cogs['qty'] - $qtyout;
-                            foreach($itemCogsAfter as $row){
-                                if($row->type == 'IN'){
-                                    $startqty += $row->qty_in;
-                                }elseif($row->type == 'OUT'){
-                                    $startqty -= $row->qty_out;
-                                }
-                                if($startqty < 0){
-                                    $passedQtyMinus = false;
-                                }
-                            }
+                            
                         }else{
                             $passed = false;
                             $arrItemNotPassed[] = $item_stock->item->name;

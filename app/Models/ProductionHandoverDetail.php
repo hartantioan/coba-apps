@@ -47,6 +47,11 @@ class ProductionHandoverDetail extends Model
         return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id')->withTrashed();
     }
 
+    public function header()
+    {
+        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id')->withTrashed();
+    }
+
     public function parent()
     {
         return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id')->withTrashed();

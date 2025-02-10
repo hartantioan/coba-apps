@@ -3078,11 +3078,11 @@ class CustomHelper {
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
-								'coa_id'		=> $coabiayaharusdibayarkan->id,
+								'coa_id'		=> $coaselisihhargabahan->id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+								'account_id'	=> $coaselisihhargabahan->bp_journal ? $lc->account_id : NULL,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,
@@ -7606,11 +7606,11 @@ class CustomHelper {
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
-								'coa_id'		=> $coabiayaharusdibayarkan->id,
+								'coa_id'		=> $coaselisihhargabahan->id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $coabiayaharusdibayarkan->bp_journal ? $lc->account_id : NULL,
+								'account_id'	=> $coaselisihhargabahan->bp_journal ? $lc->account_id : NULL,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,

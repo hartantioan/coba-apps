@@ -206,10 +206,10 @@
                                                 <th class="center">Outstanding Req.(Satuan UoM)</th>
                                                 <th class="center">{{ __('translations.qty') }}</th>
                                                 <th class="center">{{ __('translations.unit') }}</th>
-                                                <th class="center">Dist. Biaya</th>
                                                 <th class="center">Keterangan 1</th>
                                                 <th class="center">Keterangan 2</th>
                                                 <th class="center">Tgl.Dipakai</th>
+                                                <th class="center">Dist. Biaya</th>
                                                 <th class="center">{{ __('translations.plant') }}</th>
                                                 <th class="center">{{ __('translations.warehouse') }}</th>
                                                 <th class="center">{{ __('translations.line') }}</th>
@@ -237,9 +237,6 @@
                                                 <td class="center" id="unit_stock0">
                                                     -
                                                 </td>
-                                                <td class="center">
-                                                    <select class="browser-default" id="arr_cost_distribution0" name="arr_cost_distribution[]"></select>
-                                                </td>
                                                 <td>
                                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
                                                 </td>
@@ -248,6 +245,9 @@
                                                 </td>
                                                 <td>
                                                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                </td>
+                                                <td class="center">
+                                                    <select class="browser-default" id="arr_cost_distribution0" name="arr_cost_distribution[]"></select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_place0" name="arr_place[]">
@@ -1324,11 +1324,6 @@
                                 <td class="center" id="unit_stock` + count + `">
                                     ` + val.unit_stock + `
                                 </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
-                                         <option value="">--Silahkan pilih item--</option>
-                                    </select>
-                                </td>
                                 <td>
                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                 </td>
@@ -1337,6 +1332,11 @@
                                 </td>
                                 <td>
                                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                                         <option value="">--Silahkan pilih item--</option>
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1560,6 +1560,11 @@
                                         </td>
                                         <td>
                                             <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                                                <option value="">--Silahkan pilih item--</option>
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1914,11 +1919,6 @@
                 <td class="center" id="unit_stock` + count + `">
                     -
                 </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
-                         <option value="">--Silahkan pilih item--</option>
-                    </select>
-                </td>
                 <td>
                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
                 </td>
@@ -1927,6 +1927,11 @@
                 </td>
                 <td>
                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                            <option value="">--Silahkan pilih item--</option>
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" required>

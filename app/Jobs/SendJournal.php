@@ -2189,6 +2189,7 @@ class SendJournal implements ShouldQueue
 
 				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
 				$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$lc->company_id)->where('status','1')->first();
+				$coabiayaekspedisi = Coa::where('code','500.02.01.07.01')->where('company_id',$lc->company_id)->where('status','1')->first();
 
 				$query = Journal::create([
 					'user_id'		=> $this->user_id,
@@ -2267,11 +2268,11 @@ class SendJournal implements ShouldQueue
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaselisihhargabahan->id,
+								'coa_id'		=> $coabiayaekspedisi->id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $coaselisihhargabahan->bp_journal ? $lc->account_id : NULL,
+								'account_id'	=> $coabiayaekspedisi->bp_journal ? $lc->account_id : NULL,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,

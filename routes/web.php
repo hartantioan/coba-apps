@@ -147,6 +147,7 @@ use App\Http\Controllers\Finance\EmployeeReceivableController;
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
 use App\Http\Controllers\Purchase\SampleTestInputController;
+use App\Http\Controllers\Purchase\SpecialNotePICSampleController;
 use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
 use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
@@ -530,6 +531,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('truck_queue_good_scale', [Select2Controller::class, 'truckQueueGoodScale']);
                 Route::get('marketing_order_delivery_process_complaint', [Select2Controller::class, 'marketingOrderDeliveryProcessComplaint']);
                 Route::get('sample_type', [Select2Controller::class, 'sampleType']);
+                Route::get('sample_test_input', [Select2Controller::class, 'sampleTestInput']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -1965,6 +1967,31 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual_chi/{id}', [SampleTestInputController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [SampleTestInputController::class, 'voidStatus'])->middleware('operation.access:sample_test_input,void');
                     Route::post('destroy', [SampleTestInputController::class, 'destroy'])->middleware('operation.access:sample_test_input,delete');
+                });
+
+                Route::prefix('sample_test_input_pic_note')->middleware(['operation.access:sample_test_input,view', 'lockacc'])->group(function () {
+                    Route::get('/', [SpecialNotePICSampleController::class, 'index']);
+                    Route::get('datatable', [SpecialNotePICSampleController::class, 'datatable']);
+                    Route::get('row_detail', [SpecialNotePICSampleController::class, 'rowDetail']);
+                    Route::post('show', [SpecialNotePICSampleController::class, 'show']);
+                    Route::post('done', [SpecialNotePICSampleController::class, 'done'])->middleware('operation.access:sample_test_input,update');
+                    Route::post('get_items', [SpecialNotePICSampleController::class, 'getItems']);
+                    Route::post('get_code', [SpecialNotePICSampleController::class, 'getCode']);
+                    Route::post('print', [SpecialNotePICSampleController::class, 'print']);
+                    Route::post('print_by_range', [SpecialNotePICSampleController::class, 'printByRange']);
+                    Route::get('export_from_page', [SpecialNotePICSampleController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [SpecialNotePICSampleController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [SpecialNotePICSampleController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [SpecialNotePICSampleController::class, 'getDetails']);
+                    Route::post('send_email', [SpecialNotePICSampleController::class, 'sendEmail']);
+                    Route::post('remove_used_data', [SpecialNotePICSampleController::class, 'removeUsedData']);
+                    Route::post('create', [SpecialNotePICSampleController::class, 'create'])->middleware('operation.access:sample_test_input,update');
+                    Route::post('create_done', [SpecialNotePICSampleController::class, 'createDone'])->middleware('operation.access:sample_test_input,update');
+                    Route::get('approval/{id}', [SpecialNotePICSampleController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [SpecialNotePICSampleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [SpecialNotePICSampleController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [SpecialNotePICSampleController::class, 'voidStatus'])->middleware('operation.access:sample_test_input,void');
+                    Route::post('destroy', [SpecialNotePICSampleController::class, 'destroy'])->middleware('operation.access:sample_test_input,delete');
                 });
 
                 #report

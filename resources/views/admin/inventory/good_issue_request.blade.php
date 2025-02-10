@@ -36,13 +36,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                                     <div class="col m12 s12">
                                         <div class="card-alert card green">
                                             <div class="card-content white-text">
-                                                <p>INFO : Setiap pukul 00:00 / 24:00 akan dilakukan PENUTUPAN permintaan barang keluar. PENUTUPAN ini berlaku untuk permintaan yang ber-status PROSES. 
+                                                <p>INFO : Setiap pukul 00:00 / 24:00 akan dilakukan PENUTUPAN permintaan barang keluar. PENUTUPAN ini berlaku untuk permintaan yang ber-status PROSES.
                                                     <ol>
                                                         <li>Jika permintaan lebih dari 2 hari dan permintaan barang sudah ditarik sebagian ke BARANG KELUAR / GOOD ISSUE maka status akan dirubah menjadi SELESAI.</li>
                                                         <li>Jika permintaan lebih dari 2 hari dan permintaan belum sama sekali ditarik menjadi BARANG KELUAR / GOOD ISSUE maka status akan dirubah menjadi DITUTUP.</li>
@@ -138,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -209,6 +209,7 @@
                                                 <th class="center">Keterangan 1</th>
                                                 <th class="center">Keterangan 2</th>
                                                 <th class="center">Tgl.Dipakai</th>
+                                                <th class="center">Dist. Biaya</th>
                                                 <th class="center">{{ __('translations.plant') }}</th>
                                                 <th class="center">{{ __('translations.warehouse') }}</th>
                                                 <th class="center">{{ __('translations.line') }}</th>
@@ -225,10 +226,10 @@
                                                     <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
                                                 </td>
                                                 <td id="arr_stock0" class="center-align">
-                                                    -   
+                                                    -
                                                 </td>
                                                 <td id="arr_outstanding0" class="center-align">
-                                                    -   
+                                                    -
                                                 </td>
                                                 <td>
                                                     <input name="arr_qty[]" id="rowQty0" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('0')" style="width:100px;">
@@ -245,17 +246,20 @@
                                                 <td>
                                                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
                                                 </td>
+                                                <td class="center">
+                                                    <select class="browser-default" id="arr_cost_distribution0" name="arr_cost_distribution[]"></select>
+                                                </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_place0" name="arr_place[]">
                                                         @foreach ($place as $rowplace)
                                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                         @endforeach
-                                                    </select>    
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">
-                                                        <option value="">--Silahkan pilih item--</option>    
-                                                    </select>    
+                                                        <option value="">--Silahkan pilih item--</option>
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
@@ -263,14 +267,14 @@
                                                         @foreach ($line as $rowline)
                                                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                                         @endforeach
-                                                    </select>    
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
                                                         <option value="">--{{ __('translations.empty') }}--</option>
                                                         @foreach ($machine as $row)
                                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                        @endforeach    
+                                                        @endforeach
                                                     </select>
                                                 </td>
                                                 <td>
@@ -279,7 +283,7 @@
                                                         @foreach ($department as $rowdept)
                                                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                         @endforeach
-                                                    </select>    
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_project0" name="arr_project[]"></select>
@@ -311,7 +315,7 @@
                                 <label class="active" for="note">{{ __('translations.note') }}</label>
                             </div>
                             <div class="col s12 mt-3">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -330,7 +334,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -393,7 +397,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -416,7 +420,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -433,7 +437,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -444,10 +448,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -512,13 +516,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -535,7 +539,7 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
@@ -545,9 +549,9 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -557,9 +561,9 @@
         $('#modal3').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -573,9 +577,9 @@
         $('#modal4').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -585,7 +589,7 @@
         $('#modal7').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
 
@@ -598,7 +602,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -608,7 +612,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
@@ -643,6 +647,8 @@
         });
 
         $('#arr_place0,#arr_department0').formSelect();
+
+        select2ServerSide('#arr_cost_distribution0', '{{ url("admin/select2/cost_distribution") }}');
         $('#arr_item0').select2({
             placeholder: '-- Pilih ya --',
             minimumInputLength: 4,
@@ -688,11 +694,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -714,8 +720,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -723,7 +729,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -732,10 +738,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -759,7 +765,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -772,17 +778,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -801,8 +807,8 @@
             nodeDataArray: data,
             linkDataArray: link
         });
-            
-            
+
+
     }
 
     function printMultiSelect(){
@@ -813,7 +819,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -858,13 +864,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -894,11 +900,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function viewStructureTree(id){
@@ -906,7 +912,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -917,9 +923,9 @@
             },
             success: function(response) {
                 loadingClose('#main');
-            
+
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1036,7 +1042,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-            
+
             },
             success: function(response) {
                  printService.submit({
@@ -1091,7 +1097,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true, passedRequester = true, passedNoteDetail = true;
 
                 formData.delete("arr_line[]");
@@ -1127,7 +1133,7 @@
                         passedPlaceWarehouse = false;
                     }
                 });
-                
+
                 $('select[name^="arr_place[]"]').each(function(index){
                     if(!$(this).val()){
                         passedPlaceWarehouse = false;
@@ -1178,12 +1184,12 @@
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
@@ -1210,7 +1216,7 @@
                                 } else if(response.status == 422) {
                                     $('#validation_alert').show();
                                     $('.modal-content').scrollTop(0);
-                                    
+
                                     swal({
                                         title: 'Ups! Validation',
                                         text: 'Check your form.',
@@ -1327,17 +1333,22 @@
                                 <td>
                                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                                         <option value="">--Silahkan pilih item--</option>
+                                    </select>
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                        <option value="">--Silahkan pilih item--</option>    
-                                    </select>    
+                                        <option value="">--Silahkan pilih item--</option>
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1345,14 +1356,14 @@
                                         @foreach ($line as $rowline)
                                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                        @endforeach    
+                                        @endforeach
                                     </select>
                                 </td>
                                 <td>
@@ -1361,7 +1372,7 @@
                                         @foreach ($department as $rowdept)
                                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1376,9 +1387,16 @@
                                 </td>
                             </tr>
                         `);
+
+                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
+                        if(val.cost_distribution_id){
+                            $('#arr_cost_distribution' + count).empty().append(`
+                                <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                            `);
+                        }
                         $('#arr_item' + count).select2({
                             placeholder: '-- Pilih ya --',
                             minimumInputLength: 4,
@@ -1409,7 +1427,7 @@
                             }
                         });
                         $('#arr_place' + count).val(val.place_id);
-                        
+
                         if(val.line_id){
                             $('#arr_line' + count).val(val.line_id);
                         }
@@ -1460,7 +1478,7 @@
                         }
                     });
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1505,7 +1523,7 @@
                     success: function(response) {
                         loadingClose('#main');
                         $('#modal1').modal('open');
-                        
+
                         $('#note').val(response.note);
                         $('#post_date').val(response.post_date);
                         $('#company_id').val(response.company_id).formSelect();
@@ -1543,17 +1561,22 @@
                                         <td>
                                             <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                         </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                                                <option value="">--Silahkan pilih item--</option>
+                                            </select>
+                                        </td>
                                         <td>
                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                 @foreach ($place as $rowplace)
                                                     <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                 @endforeach
-                                            </select>    
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                <option value="">--Silahkan pilih item--</option>    
-                                            </select>    
+                                                <option value="">--Silahkan pilih item--</option>
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1561,14 +1584,14 @@
                                                 @foreach ($line as $rowline)
                                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                                 @endforeach
-                                            </select>    
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                                 <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($machine as $row)
                                                     <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                @endforeach    
+                                                @endforeach
                                             </select>
                                         </td>
                                         <td>
@@ -1577,7 +1600,7 @@
                                                 @foreach ($department as $rowdept)
                                                     <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                 @endforeach
-                                            </select>    
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1597,7 +1620,7 @@
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/inventory_item") }}');
                                 $('#arr_place' + count).val(val.place_id);
-                                
+
                                 if(val.line_id){
                                     $('#arr_line' + count).val(val.line_id);
                                 }
@@ -1648,7 +1671,7 @@
                                 }
                             });
                         }
-                        
+
                         $('.modal-content').scrollTop(0);
                         $('#note').focus();
                         M.updateTextFields();
@@ -1862,7 +1885,7 @@
                 $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
             }else{
                 $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toString().replace('.',',')));
-            }     
+            }
         }
     }
 
@@ -1885,10 +1908,10 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td id="arr_stock` + count + `" class="center-align">
-                    -   
+                    -
                 </td>
                 <td id="arr_outstanding` + count + `" class="center-align">
-                    -   
+                    -
                 </td>
                 <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="width:100px;">
@@ -1905,17 +1928,22 @@
                 <td>
                     <input name="arr_required_date[]" type="date" max="{{ date('9999'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
                 </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]">
+                            <option value="">--Silahkan pilih item--</option>
+                    </select>
+                </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" required>
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
-                    </select>    
-                </td>               
+                    </select>
+                </td>
                 <td>
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" required>
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>    
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1923,14 +1951,14 @@
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                        @endforeach    
+                        @endforeach
                     </select>
                 </td>
                 <td>
@@ -1939,7 +1967,7 @@
                         @foreach ($department as $rowdept)
                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1954,6 +1982,8 @@
                 </td>
             </tr>
         `);
+
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         $('#arr_item' + count).select2({
             placeholder: '-- Pilih ya --',
             minimumInputLength: 4,
@@ -2080,7 +2110,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2089,15 +2119,15 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2105,7 +2135,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2130,27 +2160,27 @@
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step3'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step4'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Detail produk',
                     element : document.querySelector('.step5'),
-                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, karena itu nantinya akan menentukan dimana stok akan dicek.' 
+                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, karena itu nantinya akan menentukan dimana stok akan dicek.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step6'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step7'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2164,7 +2194,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2181,7 +2211,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2251,6 +2281,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

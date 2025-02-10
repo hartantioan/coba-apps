@@ -1156,7 +1156,11 @@
                             select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
                             select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-
+                            if(val.cost_distribution_id){
+                                $('#arr_cost_distribution' + count).empty().append(`
+                                    <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                `);
+                            }
                             if(val.is_activa){
                                 $('#serial' + count).append(`
                                     <select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>

@@ -311,6 +311,7 @@ class GoodIssueRequestController extends Controller
                                 <th class="center-align">Stok</th>
                                 <th class="center-align">Outstand Req.</th>
                                 <th class="center-align">Satuan</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Keterangan 1</th>
                                 <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Tgl.Dipakai</th>
@@ -333,6 +334,7 @@ class GoodIssueRequestController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->stock).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->outstanding).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->required_date)).'</td>
@@ -657,6 +659,7 @@ class GoodIssueRequestController extends Controller
                             'outstanding'           => $item->getOutstandingIssueRequest(),
                             'item_unit_id'          => NULL,
                             'qty_conversion'        => 1,
+                            'cost_distribution_id' => isset($request->arr_cost_distribution[$key]) && $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                             'note'                  => $request->arr_note[$key],
                             'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
@@ -715,6 +718,8 @@ class GoodIssueRequestController extends Controller
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'qty_stock'         => $row->item_id ? CustomHelper::formatConditionalQty($row->stock).' '.$row->item->uomUnit->code : '-',
                 'qty_outstanding'   => $row->item_id ? CustomHelper::formatConditionalQty($row->item->getOutstandingIssueRequest()).' '.$row->item->uomUnit->code : '-',
+                'cost_distribution_id'  => $row->cost_distribution_id,
+                'cost_distribution_name'    => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',

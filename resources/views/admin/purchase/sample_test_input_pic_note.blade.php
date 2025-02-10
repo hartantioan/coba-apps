@@ -1,0 +1,1687 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+
+    body.tab-active input:focus {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+
+    .modal-content .select2.tab-active {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+
+    .select-wrapper, .select2-container {
+        height:auto !important;
+    }
+
+    .preserveLines {
+        white-space: pre-line;
+    }
+</style>
+<!-- BEGIN: Page Main-->
+<div id="main">
+    <div class="row">
+        <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
+            <!-- Search for small screen-->
+            <div class="container">
+                <div class="row">
+                    <div class="col s8 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12">
+            <div class="container">
+                <div class="section section-data-tables">
+                    <!-- DataTables example -->
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
+                                                        <option value="1">Menunggu</option>
+                                                        <option value="2">Dalam Proses</option>
+                                                        <option value="3">Selesai</option>
+                                                        <option value="4">Ditolak</option>
+                                                        <option value="5">Ditutup</option>
+                                                        <option value="6">Direvisi</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
+                                                <div class="input-field col s12">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
+                                                <div class="input-field col s12">
+                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">
+                                        List Data
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Input Sampel tidak boleh memiliki kode yang sama.</p>
+                                                </div>
+                                            </div>
+                                            <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                                <span class="hide-on-small-onl">Export</span>
+                                                <i class="material-icons right">view_headline</i>
+                                            </a>
+                                            <table id="datatable_serverside">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>code</th>
+                                                        <th>Pengguna</th>
+                                                        <th>Catatan</th>
+                                                        <th>Status</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-overlay"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <form class="row" id="form_data" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>No Test Input</legend>
+
+                                    <div class="input-field col s12 m4">
+                                        <select class="select2 browser-default" id="sample_type_id_test" name="sample_type_id_test" >
+                                            <option value="">--{{ __('translations.select') }}--</option>
+                                        </select>
+                                        <label class="active" for="sample_type_id_test">Jenis Sampel Filter</label>
+                                    </div>
+                                    <div class="input-field col s12 m4">
+                                        <select class="select2 browser-default" id="sample_test_input_id" name="sample_test_input_id" onchange="applySampleTest()">
+                                            <option value="">--{{ __('translations.select') }}--</option>
+                                        </select>
+                                        <label class="active" for="sample_test_input_id">NO Sample Test Input</label>
+                                    </div>
+                                    <div class="input-field col s12 m12 l12"></div>
+                                    <div class="input-field col m4 s12 step4">
+                                        <textarea class="materialize-textarea" id="note_pic" name="note_pic" placeholder="Catatan PIC" rows="3"></textarea>
+                                        <label class="active" for="note_pic"> Catatan Kusus</label>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="row">
+                                        <div class="col s12 m6">
+                                            <div class="switch mb-1">
+                                                <label for="with_test">Hasil Uji</label>
+                                                <label >
+                                                    Tidak
+                                                    <input checked type="checkbox" id="with_test" name="with_test" value="1">
+                                                    <span class="lever"></span>
+                                                    Ya
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col s12 m6">
+                                        </div>
+                                    </div>
+
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m2 s12 step1">
+                                        <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                        <label class="active" for="code">No. Dokumen</label>
+                                    </div>
+                                    <div class="input-field col m1 s12 step2">
+                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="input-field col s12 m3">
+                                        <select class="select2 browser-default" id="sample_type_id" name="sample_type_id">
+                                            <option value="">--{{ __('translations.select') }}--</option>
+                                        </select>
+                                        <label class="active" for="sample_type_id">Jenis Sampel</label>
+                                    </div>
+                                    <div class="input-field col s12 m3">
+                                        <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
+                                        <label class="active" for="province_id">{{ __('translations.province') }}</label>
+                                    </div>
+                                    <div class="input-field col s12 m3">
+                                        <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
+                                            <option value="">--{{ __('translations.select') }}--</option>
+                                        </select>
+                                        <label class="active" for="city_id">{{ __('translations.city') }}</label>
+                                    </div>
+                                    <div class="input-field col s12 m3">
+                                        <select class="select2 browser-default" id="district_id" name="district_id">
+                                            <option value="">--{{ __('translations.select') }}--</option>
+                                        </select>
+                                        <label class="active" for="district_id">{{ __('translations.district') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="village_name" name="village_name" type="text" placeholder="Desa / Kecamatan">
+                                        <label class="active" for="village_name">Desa / Kecamatan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="link_map" name="link_map" type="text" placeholder="Link Map">
+                                        <label class="active" for="link_map">Link Map</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="sample_date" name="sample_date" type="date" placeholder="Nama Izin">
+                                        <label class="active" for="sample_date">Tanggal Sampel</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input type="hidden" id="temp" name="temp">
+                                        <input id="supplier" name="supplier" type="text" placeholder="Supplier">
+                                        <label class="active" for="supplier"> Supplier</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+
+                                        <input id="supplier_name" name="supplier_name" type="text" placeholder="CP Supplier">
+                                        <label class="active" for="supplier_name">CP Supplier</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="supplier_phone" name="supplier_phone" type="text" placeholder="Telp CP Supplier">
+                                        <label class="active" for="supplier_phone">Telp CP Supplier</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="permission_type" name="permission_type" type="text" placeholder="Jenis Izin">
+                                        <label class="active" for="permission_type">Jenis Izin</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="permission_name" name="permission_name" type="text" placeholder="Nama Izin">
+                                        <label class="active" for="permission_name">Nama Izin</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="commodity_permits" name="commodity_permits" type="text" placeholder="Komoditas Izin">
+                                        <label class="active" for="commodity_permits">Komoditas Izin</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="permits_period" name="permits_period" type="text" placeholder="Masa Berlaku Izin">
+                                        <label class="active" for="permits_period">Masa Berlaku Izin</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step26">
+                                        <input id="receiveable_capacity" name="receiveable_capacity" type="text" value="0" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="receiveable_capacity">Kapasitas yang bisa didapatkan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step26">
+                                        <input id="price_estimation" name="price_estimation" type="text" value="0" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="price_estimation">Estimasi Harga</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="supplier_sample_code" name="supplier_sample_code" type="text" placeholder="Kode dari Supplier">
+                                        <label class="active" for="supplier_sample_code">Kode dari Supplier</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input id="company_sample_code" name="company_sample_code" type="text" placeholder="Kode dari Perusahaan">
+                                        <label class="active" for="company_sample_code">Kode dari Perusahaan ( No Duplicate )</label>
+                                    </div>
+                                    <div class="col m4 s12 step6">
+                                        <label class="">Bukti Upload</label>
+                                        <br>
+                                        <input type="file" name="file" id="fileInput" style="display: none;">
+                                        <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                            Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                            <br>
+
+                                        </div>
+                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                                           Clear
+                                        </a>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <div id="fileName"></div>
+                                        <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+
+                                        <input id="note" name="note" type="text" placeholder="Catatan Sampel">
+                                        <label class="active" for="note"> Catatan Sampel</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col s12">
+                                <fieldset id="modal-fieldset">
+                                    <legend>2. Hasil Uji</legend>
+                                    <div class="input-field col m3 s12 step12">
+                                        <label class="active" for="lab_type">Laboratorium</label>
+                                        <select class="form-control" id="lab_type" name="lab_type">
+                                            <option value="1">Pabrik</option>
+                                            <option value="2">Luar</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12" id="lab_name_field">
+                                        <label class="active" for="lab_name">Nama Lab.</label>
+                                        <input  type="text" id="lab_name" name="lab_name"></input>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  type="text" id="wet_whiteness_value" name="wet_whiteness_value" placeholder="Nilai wet whiteness"></input>
+                                        <label class="active" for="wet_whiteness_value">Nilai wet whiteness</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  type="text" id="dry_whiteness_value" name="dry_whiteness_value" placeholder="Nilai dry whiteness"></input>
+                                        <label class="active" for="dry_whiteness_value">Nilai dry whiteness.</label>
+                                    </div>
+                                    <div class="col m4 s12 step6">
+                                        <label class="">Bukti Upload</label>
+                                        <br>
+                                        <input type="file" name="file_test_result" id="fileInput_test_result" style="display: none;">
+                                        <div  class="col m8 s12 " id="dropZone_test_result" ondrop="dropHandlerTestResult(event);" ondragover="dragOverHandlerTestResult(event);" style="margin-top: 0.5em;height: 5em;">
+                                            Drop image here or <a href="javascript:void(0);" id="uploadLink_test_result">upload</a>
+                                            <br>
+
+                                        </div>
+                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton_testresult" href="javascript:void(0);">
+                                           Clear
+                                        </a>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <div id="fileName_test_result"></div>
+                                        <img src="" alt="Preview" id="imagePreview_test_result" style="display: none;">
+                                    </div>
+                                    <div class="col s12 m12 l12"></div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  id="item_name" type="text" name="item_name"  placeholder="Nama Item"></input>
+                                        <label class="active" for="item_name">Nama Item</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  id="test_result_note" type="text" name="test_result_note" placeholder="Keterangan Hasil Uji"></input>
+                                        <label class="active" for="test_result_note">Keterangan Hasil Uji</label>
+                                    </div>
+
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_print">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_structure">
+                <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_detail">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
+    <div class="modal-header ml-6 mt-2">
+        <h6>Range Printing</h6>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_data_print_multi" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_multi" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab">
+                                <a href="#range-tabs" class="" id="part-tabs-btn">
+                                <span>By No</span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a href="#date-tabs" class="">
+                                <span>By Date</span>
+                                </a>
+                            </li>
+                            <li class="indicator" style="left: 0px; right: 0px;"></li>
+                        </ul>
+                        <div id="range-tabs" style="display: block;" class="">
+                            <div class="row ml-2 mt-2">
+                                <div class="row">
+                                    <div class="input-field col m2 s12">
+                                        <p>{{ $menucode }}</p>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <select class="form-control" id="code_place_range" name="code_place_range">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="code_place_range">Plant / Place</label>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <input id="year_range" name="year_range" min="0" type="number" placeholder="23">
+                                        <label class="active" for="year_range">Tahun</label>
+                                    </div>
+                                    <div class="input-field col m1 s12">
+                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
+                                        <label class="" for="range_end">No Awal</label>
+                                    </div>
+
+                                    <div class="input-field col m1 s12">
+                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
+                                        <label class="active" for="range_end">No akhir</label>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <label>
+                                            <input name="type_date" type="radio" checked value="1"/>
+                                            <span>Dengan range biasa</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="input-field col m8 s12">
+                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
+                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
+                                </div>
+
+                                <div class="input-field col m1 s12">
+                                    <label>
+                                        <input name="type_date" type="radio" value="2"/>
+                                        <span>Dengan Range koma</span>
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="date-tabs" style="display: none;" class="">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_done" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_done" style="display:none;"></div>
+                    </div>
+                    <p class="mt-2 mb-2">
+                        <h4>Detail Penutupan Permintaan Pembelian per Item</h4>
+                        <input type="hidden" id="tempDone" name="tempDone">
+                        <table class="bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th class="center">Tutup</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
+                                    <th class="center">{{ __('translations.unit') }}</th>
+                                    <th class="center">Qty Order</th>
+                                    <th class="center">Qty Diterima</th>
+                                    <th class="center">Qty Gantungan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-done"></tbody>
+                        </table>
+                    </p>
+                    <button class="btn waves-effect waves-light right submit" onclick="saveDone();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                </form>
+                <p>Info : Item yang tertutup akan dianggap sudah diterima / masuk gudang secara keseluruhan, sehingga tidak akan muncul di form Penerimaan PO / Goods Receipt.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
+<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
+        <i class="material-icons">view_comfy</i>
+    </a>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+        toggleLabNameField($('#lab_type').val());
+
+        $('#lab_type').change(function() {
+            toggleLabNameField($(this).val());
+        });
+
+        function toggleLabNameField(value) {
+            if (value == "2") {
+                $('#lab_name_field').show();
+            } else {
+                $('#lab_name_field').hide();
+            }
+        }
+    });
+    var mode = '';
+
+    const dropZone = document.getElementById('dropZone');
+    const uploadLink = document.getElementById('uploadLink');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const clearButton = document.getElementById('clearButton');
+    const fileNameDiv = document.getElementById('fileName');
+
+    const dropZone_test_result = document.getElementById('dropZone_test_result');
+    const uploadLink_test_result = document.getElementById('uploadLink_test_result');
+    const fileInput_test_result = document.getElementById('fileInput_test_result');
+    const imagePreview_test_result = document.getElementById('imagePreview_test_result');
+    const clearButton_testresult = document.getElementById('clearButton_testresult');
+    const fileNameDiv_test_result = document.getElementById('fileName_test_result');
+
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    dropZone_test_result.addEventListener('click', () => {
+        fileInput_test_result.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFile(e.target.files[0]);
+    });
+    fileInput_test_result.addEventListener('change', (e) => {
+        handleFileTestResult(e.target.files[0]);
+    });
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#f0f0f0';
+    }
+
+    function dragOverHandlerTestResult(event) {
+        event.preventDefault();
+        dropZone_test_result.style.backgroundColor = '#f0f0f0';
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#fff';
+
+        handleFile(event.dataTransfer.files[0]);
+    }
+
+    function dropHandlerTestResult(event) {
+        event.preventDefault();
+        dropZone_test_result.style.backgroundColor = '#fff';
+
+        handleFileTestResult(event.dataTransfer.files[0]);
+    }
+
+    function handleFileTestResult(file) {
+        if (file) {
+        const reader = new FileReader();
+        const fileType = file.type.split('/')[0];
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds the maximum limit of 10 MB.');
+            return;
+        }
+
+        reader.onload = () => {
+
+            fileNameDiv_test_result.textContent = 'File uploaded: ' + file.name;
+
+            if (fileType === 'image') {
+
+                imagePreview_test_result.src = reader.result;
+                imagePreview_test_result.style.display = 'inline-block';
+                clearButton_testresult.style.display = 'inline-block';
+            } else {
+
+                imagePreview_test_result.style.display = 'none';
+
+            }
+        };
+
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+
+        fileInput_test_result.files = dataTransfer.files;
+
+        }
+    }
+
+
+
+    function handleFile(file) {
+        if (file) {
+        const reader = new FileReader();
+        const fileType = file.type.split('/')[0];
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds the maximum limit of 10 MB.');
+            return;
+        }
+
+        reader.onload = () => {
+
+            fileNameDiv.textContent = 'File uploaded: ' + file.name;
+
+            if (fileType === 'image') {
+
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'inline-block';
+                clearButton.style.display = 'inline-block';
+            } else {
+
+                imagePreview.style.display = 'none';
+
+            }
+        };
+
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+
+        fileInput.files = dataTransfer.files;
+
+        }
+    }
+
+
+    clearButton.addEventListener('click', () => {
+        imagePreview.src = '';
+        imagePreview.style.display = 'none';
+        fileInput.value = '';
+        fileNameDiv.textContent = '';
+    });
+
+    clearButton_testresult.addEventListener('click', () => {
+        imagePreview_test_result.src = '';
+        imagePreview_test_result.style.display = 'none';
+        fileInput_test_result.value = '';
+        fileNameDiv_test_result.textContent = '';
+    });
+
+    document.addEventListener('paste', (event) => {
+        const items = event.clipboardData.items;
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    handleFile(file);
+                    break;
+                }
+            }
+        }
+    });
+
+    function displayFile(fileLink) {
+        const fileType = getFileType(fileLink);
+
+        fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
+
+        if (fileType === 'image') {
+
+            imagePreview.src = fileLink;
+            imagePreview.style.display = 'inline-block';
+
+        } else {
+
+            imagePreview.style.display = 'none';
+
+
+            const fileExtension = getFileExtension(fileLink);
+            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileLink;
+                downloadLink.download = getFileName(fileLink);
+                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
+                fileNameDiv.appendChild(downloadLink);
+            }
+        }
+    }
+
+    function displayFileTestResult(fileLink) {
+        const fileType = getFileType(fileLink);
+
+        fileNameDiv_test_result.textContent = 'File uploaded: ' + getFileName(fileLink);
+
+        if (fileType === 'image') {
+
+            imagePreview_test_result.src = fileLink;
+            imagePreview_test_result.style.display = 'inline-block';
+
+        } else {
+
+            imagePreview_test_result.style.display = 'none';
+
+
+            const fileExtension = getFileExtension(fileLink);
+            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileLink;
+                downloadLink.download = getFileName(fileLink);
+                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
+                fileNameDiv_test_result.appendChild(downloadLink);
+            }
+        }
+    }
+
+
+    function getFileType(fileLink) {
+        const fileExtension = getFileExtension(fileLink);
+        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+            return 'image';
+        } else {
+            return 'other';
+        }
+    }
+
+
+    function getFileExtension(fileLink) {
+        return fileLink.split('.').pop().toLowerCase();
+    }
+
+    function getFileName(fileLink) {
+        return fileLink.split('/').pop();
+    }
+
+
+
+
+    document.addEventListener('focusin', function (event) {
+        const select2Container = event.target.closest('.modal-content .select2');
+        const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
+        if (event.target.closest('.modal-content')) {
+            document.body.classList.add('tab-active');
+        }
+
+
+        if (activeSelect2 && !select2Container) {
+            activeSelect2.classList.remove('tab-active');
+        }
+
+
+        if (select2Container) {
+            select2Container.classList.add('tab-active');
+        }
+    });
+
+    document.addEventListener('mousedown', function () {
+        const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
+        document.body.classList.remove('tab-active');
+        if (activeSelect2) {
+            activeSelect2.classList.remove('tab-active');
+        }
+    });
+    $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+
+        $('#with_test').change(function() {
+            if ($(this).is(':checked')) {
+                $('#modal-fieldset').show();
+            } else {
+                $('#modal-fieldset').hide();
+            }
+        });
+
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+
+        });
+
+        loadDataTable();
+
+        $('#modal4').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#show_detail').empty();
+            }
+        });
+
+        window.table.search('{{ $code }}').draw();
+
+        $('#modal1').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
+                $('#due_date').attr('min','{{ date("Y-m-d") }}');
+                $('#required_date').attr('min','{{ date("Y-m-d") }}');
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#name').focus();
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                    $('#company_id').trigger('change');
+                }
+                /* $('#pr-show,#gi-show,#sj-show').show(); */
+                $('#inventory_type').formSelect().trigger('change');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                $('#form_data')[0].reset();
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                $('#temp').val('');
+                $('#supplier_id').empty();
+                $('#province_id,#district_id,#city_id').empty().append(`
+                    <option value="">--{{ __('translations.select') }}--</option>
+                `);
+                $('#sample_type_id').empty();
+                $('#province_id').empty();
+                $('#city_id').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
+                mode = '';
+                $('#button-add-item').show();
+            }
+        });
+
+        $('#modal2').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                window.print();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#show_print').html('');
+            }
+        });
+
+        $('#modal3').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#myDiagramDiv').remove();
+                $('#show_structure').append(
+                    `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
+                    `
+                );
+            }
+        });
+
+        $('#modal5').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_multi').hide();
+                $('#validation_alert_multi').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_done').hide();
+                $('#validation_alert_done').html('');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-done').empty();
+                $('#tempDone').val('');
+            }
+        });
+
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            countAll();
+            if($('.row_item').length == 0){
+                mode = '';
+            }
+        });
+
+        $('#sample_test_input_id').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/sample_test_input") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        sample_type_id: $('#sample_type_id_test').val(),
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
+
+
+        select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
+        // select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        // select2ServerSide('#district_id', '{{ url("admin/select2/district") }}');
+        select2ServerSide('#sample_type_id,#sample_type_id_test', '{{ url("admin/select2/sample_type") }}');
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
+    });
+
+
+
+    function getCode(val){
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
+                }
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    function loadDataTable() {
+		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
+            "order": [[0, 'desc']],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle',
+                'selectAll',
+                'selectNone',
+            ],
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
+                    selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
+                }
+            },
+            select: {
+                style: 'multi'
+            },
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    'status' : $('#filter_status').val(),
+                    inventory_type : $('#filter_inventory').val(),
+                    shipping_type : $('#filter_shipping').val(),
+                    'supplier_id[]' : $('#filter_supplier').val(),
+                    company_id : $('#filter_company').val(),
+                    payment_type : $('#filter_payment').val(),
+                    'currency_id[]' : $('#filter_currency').val(),
+                    start_date : $('#start_date').val(),
+                    finish_date : $('#finish_date').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'sample_type', className: 'center-align' },
+                { name: 'sample_type', className: 'center-align' },
+                { name: 'supplier', className: '' },
+                { name: 'note', className: '' },
+                { name: 'action', searchable: false, orderable: false, className: 'right-align' }
+            ],
+        });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
+
+    function printData(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+        });
+        $.ajax({
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            },
+            success: function(response) {
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': response.message
+                });
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    }
+
+    function rowDetail(data) {
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            data: {
+                id: data
+            },
+            success: function(response) {
+                $('#modal4').modal('open');
+                $('#show_detail').html(response);
+                loadingClose('.modal-content');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+	}
+
+    function save(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let passedUpload = true;
+                var files = document.getElementById('file');
+
+
+
+                    var formData = new FormData($('#form_data')[0]);
+
+                    var path = window.location.pathname;
+                        path = path.replace(/^\/|\/$/g, '');
+
+
+                        var segments = path.split('/');
+                        var lastSegment = segments[segments.length - 1];
+
+                        formData.append('lastsegment',lastSegment);
+
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('#modal1');
+                            },
+                            success: function(response) {
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                loadingClose('#modal1');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+                                    $.each(response.error, function(field, errorMessage) {
+                                        $('#' + field).addClass('error-input');
+                                        $('#' + field).css('border', '1px solid red');
+
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('#modal1');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+            }
+        });
+    }
+
+    function success(){
+        loadDataTable();
+        $('#modal1').modal('close');
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                $('#temp').val(response.temp);
+                $('#sample_test_input_id').empty();
+                $('#sample_test_input_id').append(`
+                    <option value="` + response.sample_test_input_id + `">` + response.sample_test_input_code + `</option>
+                `);
+                $('#sample_type_id').empty();
+                $('#sample_type_id').append(`
+                    <option value="` + response.sample_type_id + `">` + response.sample_type_name + `</option>
+                `);
+                $('#code_place_id').val(response.code_place_id).formSelect();
+                $('#code').val(response.code);
+                $('#sample_type_id').empty();
+                $('#sample_type_id').append(`
+                    <option value="` + response.sample_type_id + `">` + response.sample_type_name + `</option>
+                `);
+
+                $('#province_id').empty();
+                $('#province_id').append(`
+                    <option value="` + response.province_id + `">` + response.province_name + `</option>
+                `);
+
+                $('#city_id').empty();
+                $('#city_id').append(`
+                    <option value="` + response.city_id + `">` + response.city_name + `</option>
+                `);
+
+                $('#district_id').empty();
+                $('#district_id').append(`
+                    <option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>
+                `);
+                $('#link_map').val(response.link_map);
+                $('#note_pic').val(response.note_pic);
+                $('#supplier_phone').val(response.supplier_phone);
+                $('#village_name').val(response.village_name);
+                $('#sample_date').val(response.sample_date);
+                $('#supplier').val(response.supplier);
+                $('#supplier_name').val(response.supplier_name);
+                $('#permission_type').val(response.permission_type);
+                $('#permission_name').val(response.permission_name);
+                $('#commodity_permits').val(response.commodity_permits);
+                $('#permits_period').val(response.permits_period);
+                $('#price_estimation').val(response.price_estimation);
+                $('#receiveable_capacity').val(response.receiveable_capacity);
+                $('#supplier_sample_code').val(response.supplier_sample_code);
+                $('#company_sample_code').val(response.company_sample_code);
+                $('#lab_type').val(response.lab_type).formSelect();
+                $('#lab_name').val(response.lab_name);
+                $('#wet_whiteness_value').val(response.wet_whiteness_value);
+                $('#dry_whiteness_value').val(response.dry_whiteness_value);
+                $('#item_name').val(response.item_name);
+
+                $('#note').val(response.note);
+                $('#test_result_note').val(response.test_result_note);
+
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function printPreview(code,aslicode){
+        swal({
+            title: "Apakah Anda ingin mengeprint dokumen ini?",
+            text: "Dengan Kode "+aslicode,
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/print_individual/' + code,
+                    type:'GET',
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    complete: function() {
+
+                    },
+                    success: function(data){
+                        loadingClose('.modal-content');
+                        printService.submit({
+                            'type': 'INVOICE',
+                            'url': data
+                        })
+                    }
+                });
+            }
+        });
+
+    }
+
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function destroy(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+
+        },
+        onDisconnect: function () {
+            /* M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            }); */
+        },
+        onUpdate: function (message) {
+
+        },
+    });
+
+    function getCity(){
+        $('#city_id,#district_id').empty().append(`
+            <option value="">--{{ __('translations.select') }}--</option>
+        `);
+        if($('#province_id').val()){
+            city = $('#province_id').select2('data')[0].cities;
+            $.each(city, function(i, val) {
+                $('#city_id').append(`
+                    <option value="` + val.id + `">` + val.name + `</option>
+                `);
+            });
+        }else{
+            city = [];
+            district = [];
+        }
+    }
+
+    function getDistrict(){
+        $('#district_id').empty().append(`
+            <option value="">--{{ __('translations.select') }}--</option>
+        `);
+        if($('#city_id').val()){
+            let index = -1;
+            $.each(city, function(i, val) {
+                if(val.id == $('#city_id').val()){
+                    index = i;
+                }
+            });
+
+            $.each(city[index].districts, function(i, value) {
+                $('#district_id').append(`
+                    <option value="` + value.id + `">` + value.name + `</option>
+                `);
+            });
+        }else{
+            district = [];
+        }
+    }
+
+
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var type_buy = $('#filter_inventory').val();
+        var type_deliv = $('#filter_shipping').val();
+        var company = $('#filter_company').val();
+        var type_pay = $('#filter_payment').val();
+        var supplier = $('#filter_supplier').val();
+        var currency = $('#filter_currency').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date;
+
+    }
+
+
+    function applySampleTest(){
+        if($('#sample_test_input_id').val()){
+
+            $('#sample_type_id').empty().append(`
+                <option value="` + $('#sample_test_input_id').select2('data')[0].sample_type_id + `">` + $('#sample_test_input_id').select2('data')[0].sample_type_name + `</option>
+            `);
+
+            $('#province_id').empty().append(`
+                <option value="` + $('#sample_test_input_id').select2('data')[0].province_id + `">` + $('#sample_test_input_id').select2('data')[0].province_name + `</option>
+            `);
+
+            $('#city_id').empty().append(`
+                <option value="` + $('#sample_test_input_id').select2('data')[0].city_id + `">` + $('#sample_test_input_id').select2('data')[0].city_name + `</option>
+            `);
+
+            $('#district_id').empty().append(`
+                <option value="` + $('#sample_test_input_id').select2('data')[0].subdistrict_id + `">` + $('#sample_test_input_id').select2('data')[0].subdistrict_name + `</option>
+            `);
+            $('#code').val($('#sample_test_input_id').select2('data')[0].code);
+
+            $('#village_name').val($('#sample_test_input_id').select2('data')[0].village_name);
+            $('#supplier').val($('#sample_test_input_id').select2('data')[0].supplier);
+            $('#sample_date').val($('#sample_test_input_id').select2('data')[0].sample_date);
+            $('#supplier_name').val($('#sample_test_input_id').select2('data')[0].supplier_name);
+            $('#supplier_phone').val($('#sample_test_input_id').select2('data')[0].supplier_phone);
+            $('#link_map').val($('#sample_test_input_id').select2('data')[0].link_map);
+            $('#permission_type').val($('#sample_test_input_id').select2('data')[0].permission_type);
+            $('#permission_name').val($('#sample_test_input_id').select2('data')[0].permission_name);
+            $('#commodity_permits').val($('#sample_test_input_id').select2('data')[0].commodity_permits);
+            $('#permits_period').val($('#sample_test_input_id').select2('data')[0].permits_period);
+            $('#receiveable_capacity').val($('#sample_test_input_id').select2('data')[0].receiveable_capacity);
+            $('#price_estimation').val($('#sample_test_input_id').select2('data')[0].price_estimation);
+            $('#supplier_sample_code').val($('#sample_test_input_id').select2('data')[0].supplier_sample_code);
+            $('#company_sample_code').val($('#sample_test_input_id').select2('data')[0].company_sample_code);
+            $('#lab_type').val($('#sample_test_input_id').select2('data')[0].lab_type).formSelect();
+            $('#lab_name').val($('#sample_test_input_id').select2('data')[0].lab_name);
+            $('#wet_whiteness_value').val($('#sample_test_input_id').select2('data')[0].wet_whiteness_value);
+            $('#dry_whiteness_value').val($('#sample_test_input_id').select2('data')[0].dry_whiteness_value);
+            $('#item_name').val($('#sample_test_input_id').select2('data')[0].item_name);
+            $('#note').val($('#sample_test_input_id').select2('data')[0].note);
+            $('#test_result_note').val($('#sample_test_input_id').select2('data')[0].test_result_note);
+
+        }else{
+            $('#sample_type_id').val('').empty();
+
+            $('#province_id').val('').empty();
+
+            $('#city_id').val('').empty();
+
+            $('#district_id').val('').empty();
+            $('#code').val('');
+            $('#village_name').val('');
+            $('#supplier').val('');
+            $('#sample_date').val('');
+            $('#supplier_name').val('');
+            $('#supplier_phone').val('');
+            $('#link_map').val('');
+            $('#permission_type').val('');
+            $('#permission_name').val('');
+            $('#commodity_permits').val('');
+            $('#permits_period').val('');
+            $('#receiveable_capacity').val('');
+            $('#price_estimation').val('');
+            $('#supplier_sample_code').val('');
+            $('#company_sample_code').val('');
+            $('#lab_type').val('').formSelect();
+            $('#lab_name').val('');
+            $('#wet_whiteness_value').val('');
+            $('#dry_whiteness_value').val('');
+            $('#item_name').val('');
+            $('#note').val('');
+            $('#test_result_note').val('');
+        }
+    }
+
+    function formatRupiahNominal(angka){
+        let decimal = 2;
+        if($('#currency_id').val() !== '1'){
+            decimal = 11;
+        }
+        let val = angka.value ? angka.value : '';
+        var number_string = val.replace(/[^,\d]/g, '').toString(),
+        sign = val.charAt(0),
+        split   		= number_string.toString().split(','),
+        sisa     		= parseFloat(split[0]).toString().length % 3,
+        rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+        ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
+
+        if(ribuan){
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        if(split[1] != undefined){
+            if(split[1].length > decimal){
+                rupiah = rupiah + ',' + split[1].slice(0,decimal);
+            }else{
+                rupiah = rupiah + ',' + split[1];
+            }
+        }else{
+            rupiah = rupiah;
+        }
+
+        angka.value = sign == '-' ? sign + rupiah : rupiah;
+    }
+</script>

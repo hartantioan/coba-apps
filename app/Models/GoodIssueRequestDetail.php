@@ -31,9 +31,11 @@ class GoodIssueRequestDetail extends Model
         'department_id',
         'warehouse_id',
         'project_id',
+
         'status',
         'requester',
         'total',
+        'cost_distribution_id',
     ];
 
     public function goodIssueRequest()
@@ -91,7 +93,7 @@ class GoodIssueRequestDetail extends Model
         return $this->hasMany('App\Models\GoodIssueDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('goodIssue',function($query){
             $query->whereIn('status',['1','2','3']);
         });
-    } 
+    }
 
     public function totalGi(){
         $total = 0;
@@ -124,8 +126,13 @@ class GoodIssueRequestDetail extends Model
             '2' => '<b style="font-weight:900;color:red;">&#10060;</b>',
             default => '<b style="font-weight:900;color:yellow;">&#9898;</b>',
         };
-  
+
         return $status;
+    }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
     }
 
     public function statusConvert(){
@@ -134,7 +141,7 @@ class GoodIssueRequestDetail extends Model
             '2' => 'Ditolak',
             default => 'Menunggu',
         };
-  
+
         return $status;
     }
 }

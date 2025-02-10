@@ -206,7 +206,7 @@
                                                 <th class="center">Outstanding Req.(Satuan UoM)</th>
                                                 <th class="center">{{ __('translations.qty') }}</th>
                                                 <th class="center">{{ __('translations.unit') }}</th>
-                                                <th class="center">Tipe Pengeluaran</th>
+                                                <th class="center">Dist. Biaya</th>
                                                 <th class="center">Keterangan 1</th>
                                                 <th class="center">Keterangan 2</th>
                                                 <th class="center">Tgl.Dipakai</th>

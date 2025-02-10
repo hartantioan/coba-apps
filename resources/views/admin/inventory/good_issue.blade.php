@@ -266,7 +266,7 @@
                                                         <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Ket.1</th>
                                                         <th class="center">Ket.2</th>
-                                                        <th class="center">Dist.Biaya</th>
+                                                        <th class="center">Tipe Pengeluaran</th>
                                                         <th class="center">Coa</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>

@@ -6003,22 +6003,26 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = SampleTestInput::where(function($query) use($search,$request){
             $query->where('code', 'like', "%$search%");
-            if($request->sample_type){
+            if($request->sample_type_id){
                 $query->whereHas('sampleType',function($query)use($request){
-                    $query->where('id',$request->sample_type);
+                    $query->where('id',$request->sample_type_id);
                 });
             }
         })->paginate(10);
-
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code,
+                'code' 			=> $d->code,
                 'user_id'              => $d->user_id,
                 'sample_type_id'       => $d->sample_type_id,
+                'sample_type_name'     => $d->sampleType->name,
                 'province_id'          => $d->province_id,
                 'city_id'              => $d->city_id,
                 'subdistrict_id'       => $d->subdistrict_id,
+                'province_name'        => $d->province->name,
+                'city_name'            => $d->city->name,
+                'subdistrict_name'     => $d->subdistrict->name,
                 'village_name'         => $d->village_name,
                 'supplier'             => $d->supplier,
                 'sample_date'          => $d->sample_date,

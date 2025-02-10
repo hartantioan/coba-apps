@@ -3802,7 +3802,7 @@ class Select2Controller extends Controller {
             }
         })
         ->whereHas('marketingOrderInvoice',function($query) use ($search){
-            $query->whereDoesntHave('incomingPaymentDetail');
+            //$query->whereDoesntHave('incomingPaymentDetail');
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

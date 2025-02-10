@@ -6,9 +6,10 @@ use App\Models\ItemCogs;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
-class ExportStockInRupiah implements FromView,ShouldAutoSize
+class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromView,ShouldAutoSize,WithCustomValueBinder
 {
     /**
     * @return \Illuminate\Support\Collection

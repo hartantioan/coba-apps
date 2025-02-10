@@ -53,7 +53,7 @@
                         <td align="center">{{ $row['date'] }}</td>
                         <td align="center">{{ $row['plant'] }}</td>
                         <td align="center">{{ $row['warehouse'] }}</td>
-                        <td align="center">{{ "'".$row['kode'] }}</td>
+                        <td align="center">{{ $row['kode'] }}</td>
                         <td align="center">{{ $row['item'] }}</td>
                         <td align="center">{{ $row['satuan'] }}</td>
                         <td align="center">{{ $row['area'] }}</td>

@@ -135,6 +135,11 @@ use App\Http\Controllers\MasterData\PatternController;
 use App\Http\Controllers\MasterData\ColorController;
 use App\Http\Controllers\MasterData\GradeController;
 use App\Http\Controllers\MasterData\BrandController;
+use App\Http\Controllers\MasterData\MitraApiSyncDataController;
+use App\Http\Controllers\MasterData\MitraSalesAreaController;
+use App\Http\Controllers\MasterData\MitraPriceListController;
+use App\Http\Controllers\MasterData\MitraCustomerController;
+use App\Http\Controllers\MasterData\TirtaKencanaController;
 use App\Http\Controllers\MasterData\ToleranceScaleController;
 
 use App\Http\Controllers\Finance\FundRequestController;
@@ -1582,7 +1587,59 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
+                Route::prefix('mitra')->group(function(){
+                    //Sync Data API Out
+                    Route::prefix('mitra_api_sync_data')->group(function(){
+                        Route::get('/', [MitraApiSyncDataController::class, 'index']);
+                        Route::get('datatable', [MitraApiSyncDataController::class, 'datatable']);
+                        Route::get('row_detail', [MitraApiSyncDataController::class, 'rowDetail']);
+                        Route::get('sync_data', [MitraApiSyncDataController::class, 'syncData']);
+                        // Route::get('export', [MitraApiSyncDataController::class, 'export']);
+                    });
 
+                    //Sales Area untuk Broker
+                    Route::prefix('mitra_sales_area')->group(function(){
+                        Route::get('/', [MitraSalesAreaController::class, 'index']);
+                        Route::get('datatable', [MitraSalesAreaController::class, 'datatable']);
+                        Route::get('row_detail', [MitraSalesAreaController::class, 'rowDetail']);
+                        Route::get('export', [MitraSalesAreaController::class, 'export']);
+                        Route::get('get_import_excel', [MitraSalesAreaController::class, 'getImportExcel']);
+                        Route::post('import', [MitraSalesAreaController::class, 'import']);
+                    });
+
+                    //Pricelist untuk Broker
+                    Route::prefix('mitra_price_list')->group(function(){
+                        Route::get('/', [MitraPriceListController::class, 'index']);
+                        Route::get('datatable', [MitraPriceListController::class, 'datatable']);
+                        Route::get('row_detail', [MitraPriceListController::class, 'rowDetail']);
+                        Route::get('export', [MitraPriceListController::class, 'export']);
+                        Route::get('get_import_excel', [MitraPriceListController::class, 'getImportExcel']);
+                        Route::post('import', [MitraPriceListController::class, 'import']);
+                    });
+
+                    // Route::prefix('mitra')->middleware()->group(function(){
+                    //Customer dari Broker
+                    Route::prefix('mitra_customer')->group(function(){
+                        Route::get('/', [MitraCustomerController::class, 'index']);
+                        Route::get('datatable', [MitraCustomerController::class, 'datatable']);
+                        Route::post('show', [MitraCustomerController::class, 'show']);
+                        Route::post('create', [MitraCustomerController::class, 'create']);
+                        Route::get('row_detail', [MitraCustomerController::class, 'rowDetail']);
+                        // Route::get('export', [MitraCustomerController::class, 'export']);
+                        // Route::get('get_import_excel', [MitraCustomerController::class, 'getImportExcel']);
+                        // Route::post('import', [MitraCustomerController::class, 'import']);
+                    });
+                    
+                    //testing api
+                    Route::prefix('item')->group(function (){
+                        Route::get('/', [TirtaKencanaController::class, 'getItemIndex']);
+                        Route::get('/{code}', [TirtaKencanaController::class, 'getItemShow']);
+                        Route::put('/{code}', [TirtaKencanaController::class, 'postItemUpdate']);
+                        Route::post('/', [TirtaKencanaController::class, 'postItemStore']);
+                        // Route::del('/', [TirtaKencanaController::class, 'postItemDestroy']);
+                    });
+                    Route::post('item-pricelists', [TirtaKencanaController::class, 'postPriceListStore']);
+                });
 
 
             });

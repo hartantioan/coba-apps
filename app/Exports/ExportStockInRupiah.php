@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
-class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromView,ShouldAutoSize,WithCustomValueBinder
+class ExportStockInRupiah /* extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder */ implements FromView,ShouldAutoSize/* ,WithCustomValueBinder */
 {
     /**
     * @return \Illuminate\Support\Collection

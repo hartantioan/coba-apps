@@ -668,7 +668,7 @@ class PurchaseInvoiceController extends Controller
             }elseif($row == 'landed_costs'){
                 $datalc = LandedCost::find(intval($request->arr_id[$key]));
 
-                if($datalc->balanceInvoice() > 0 && !$datalc->cancelDocument()->exists()){
+                if($datalc->balanceInvoiceActive() > 0 && !$datalc->cancelDocument()->exists()){
                     foreach($datalc->landedCostFeeDetail as $rowdetail){
                         $details[] = [
                             'type'          => $rowdetail->getTable(),

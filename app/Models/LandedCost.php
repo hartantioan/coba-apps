@@ -299,6 +299,18 @@ class LandedCost extends Model
         return $total;
     }
 
+    public function balanceInvoiceActive(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->landedCostFeeDetail as $row){
+            foreach($row->purchaseInvoiceActive as $rowinvoice){
+                $total -= $rowinvoice->grandtotal;
+            }
+        }
+
+        return $total;
+    }
+
     public function hasBalanceInvoice(){
         if($this->balanceInvoice() > 0){
             return true;

@@ -149,6 +149,7 @@
                     <div class="col s12">
                         <div class="row">
                             <div class="input-field col m2 s12 step1">
+                                <input type="hidden" id="temp" name="temp">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>

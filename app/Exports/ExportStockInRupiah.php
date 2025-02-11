@@ -26,7 +26,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
-        $this->group = $group ? $group : [];
+        $this->group = $group;
 
     }
 

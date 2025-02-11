@@ -159,7 +159,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
                 'cum_qty' => $row->qty_final,
-                'cum_val' => number_format($row->total_final,2,',','.'),
+                'cum_val' => $row->total_final,
             ];
             $array_filter[]=$data_tempura;
 
@@ -194,7 +194,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                         'area'         => $row->area->name ?? '-',
                         'production_batch' => '-',
                         'shading'      => $row->itemShading->code ?? '-',
-                        'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                        'last_nominal' => $query_first ? $query_first->total_final : 0,
                         'item'         => $row->item->name,
                         'satuan'       => $row->item->uomUnit->code,
                         'kode'         => $row->item->code,
@@ -310,7 +310,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                             'item_id'      => $row_tidak_ada->item->id,
                             'id'           => $row_tidak_ada->id,
                             'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
-                            'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
+                            'last_nominal' => $row_tidak_ada ? $row_tidak_ada->total_final : 0,
                             'item'         => $row_tidak_ada->item->name,
                             'area'         => $row_tidak_ada->area->name ?? '-',
                             'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',

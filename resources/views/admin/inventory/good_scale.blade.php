@@ -269,8 +269,9 @@
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="type" name="type" onchange="changeMode(this.value);">
                                     <option value="1">Timbang Barang Masuk (Pembelian)</option>
+                                    <option value="4" disabled>Timbang Barang Masuk Manual (Pembelian)</option>
                                     <option value="2">Timbang Barang Keluar (Penjualan)</option>
-                                    <option value="3">Timbang Barang Manual</option>
+                                    <option value="3">Timbang Barang Keluar Manual (Penjualan)</option>
                                 </select>
                                 <label class="ac" for="type">Tipe Timbang</label>
                             </div>

@@ -41,8 +41,8 @@
                         <td align="center"></td>
                         <td align="center"></td>
                         <td align="center"></td>
-                        <td align="right">{{ $row['last_qty'] }}</td>
-                        <td align="right">{{ $row['last_nominal'] }}</td>
+                        <td align="right">{{ number_format($row['last_qty'],3,',','.') }}</td>
+                        <td align="right">{{ number_format($row['last_nominal'],2,',','.') }}</td>
                     </tr>
                     @php
                         $x++;
@@ -64,7 +64,7 @@
                         <td  align="right">{{ number_format($row['final'],2,',','.') }}</td>
                         <td  align="right">{{ number_format($row['total'],2,',','.') }}</td>
                         <td  align="right">{{ number_format($row['cum_qty'],3,',','.') }}</td>
-                        <td  align="right">{{ number_format($row['cum_val'],3,',','.') }}</td>
+                        <td  align="right">{{ number_format($row['cum_val'],2,',','.') }}</td>
                     </tr>
                 @endif
             @endforeach

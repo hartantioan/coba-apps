@@ -60,11 +60,11 @@
                         <td align="center">{{ $row['shading'] }}</td>
                         <td align="center">{{$row['production_batch']}}</td>
                         <td align="center">{{ $row['document'] }}</td>
-                        <td  align="right">{{ $row['qty'] }}</td>
-                        <td  align="right">{{ $row['final'] }}</td>
-                        <td  align="right">{{ $row['total'] }}</td>
-                        <td  align="right">{{ $row['cum_qty'] }}</td>
-                        <td  align="right">{{ $row['cum_val'] }}</td>
+                        <td  align="right">{{ number_format($row['qty'],3,'.',',') }}</td>
+                        <td  align="right">{{ number_format($row['final'],2,'.',',') }}</td>
+                        <td  align="right">{{ number_format($row['total'],2,'.',',') }}</td>
+                        <td  align="right">{{ number_format($row['cum_qty'],3,'.',',') }}</td>
+                        <td  align="right">{{ number_format($row['cum_val'],3,'.',',') }}</td>
                     </tr>
                 @endif
             @endforeach

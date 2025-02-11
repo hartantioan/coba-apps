@@ -60,11 +60,11 @@
                         <td align="center">{{ $row['shading'] }}</td>
                         <td align="center">{{$row['production_batch']}}</td>
                         <td align="center">{{ $row['document'] }}</td>
-                        <td  align="right">{{ number_format($row['qty'],3,'.',',') }}</td>
-                        <td  align="right">{{ number_format($row['final'],2,'.',',') }}</td>
-                        <td  align="right">{{ number_format($row['total'],2,'.',',') }}</td>
-                        <td  align="right">{{ number_format($row['cum_qty'],3,'.',',') }}</td>
-                        <td  align="right">{{ number_format($row['cum_val'],3,'.',',') }}</td>
+                        <td  align="right">{{ number_format($row['qty'],3,',','.') }}</td>
+                        <td  align="right">{{ number_format($row['final'],2,',','.') }}</td>
+                        <td  align="right">{{ number_format($row['total'],2,',','.') }}</td>
+                        <td  align="right">{{ number_format($row['cum_qty'],3,',','.') }}</td>
+                        <td  align="right">{{ number_format($row['cum_val'],3,',','.') }}</td>
                     </tr>
                 @endif
             @endforeach
@@ -107,8 +107,8 @@
                 <td align="center">{{$row['satuan']}}</td>
                 <td align="center">{{ $row['area'] }}</td>
                 <td align="center">{{ $row['shading'] }}</td>
-                <td align="center">{{$row['cum_qty']}}</td>
-                <td align="center">{{$row['cum_val']}}</td>
+                <td align="center">{{ number_format($row['cum_qty'],3,',','.') }}</td>
+                <td align="center">{{ number_format($row['cum_val'],2,',','.') }}</td>
             </tr>
             @endforeach
             @if(count($data) == 0)

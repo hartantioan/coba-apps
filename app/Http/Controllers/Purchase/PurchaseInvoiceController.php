@@ -402,7 +402,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->whereDoesntHave('cancelDocument')->get();
+        $datagr = GoodReceipt::whereIn('status',['2','3','9'])->where('account_id',$request->id)->whereDoesntHave('cancelDocument')->get();
 
         foreach($datagr as $row){
             $invoice = round($row->totalInvoice(),2);

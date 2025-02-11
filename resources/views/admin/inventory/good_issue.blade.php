@@ -1579,7 +1579,9 @@
                         if(arr.length > 0){
                             formData.append('arr_serial[]',$('#arr_serial' + $(this).data('id')).val());
                         }else{
-                            passedSerial = false;
+                            if(!$('#temp').val()){
+                                passedSerial = false;
+                            }
                         }
                     }else{
                         formData.append('arr_serial[]','');

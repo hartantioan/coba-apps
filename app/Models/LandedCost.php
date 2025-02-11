@@ -340,6 +340,18 @@ class LandedCost extends Model
         return $total;
     }
 
+    public function totalInvoiceOnlyActive(){
+        $total = 0;
+
+        foreach($this->landedCostFeeDetail as $row){
+            foreach($row->purchaseInvoiceActive as $rowinvoice){
+                $total += $rowinvoice->grandtotal;
+            }
+        }
+
+        return $total;
+    }
+
     public function hasCancelDocumentByDate($date){
         $has = false;
         if($this->cancelDocument()->exists()){

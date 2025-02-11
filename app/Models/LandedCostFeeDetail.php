@@ -71,6 +71,13 @@ class LandedCostFeeDetail extends Model
         });
     }
 
+    public function purchaseInvoiceActive()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['1','2','3','7']);
+        });
+    }
+
     public function purchaseInvoiceRealDetail()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){

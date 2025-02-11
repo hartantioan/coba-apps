@@ -426,7 +426,7 @@ class PurchaseInvoiceController extends Controller
         $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
-            $invoice = round($row->totalInvoice(),2);
+            $invoice = round($row->totalInvoiceOnlyActive(),2);
             if(($row->grandtotal - $invoice) > 0 && !$row->hasLandedCost()){
                 $details[] = [
                     'type'          => 'landed_costs',

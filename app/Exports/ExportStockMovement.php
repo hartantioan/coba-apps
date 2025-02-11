@@ -27,43 +27,6 @@ class ExportStockMovement implements FromView,ShouldAutoSize
     {
         DB::statement("SET SQL_MODE=''");
         if($this->type == 'final'){
-            /* $perlu = 0 ;
-            $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$this->finish_date."' GROUP BY item_id)")
-            ->where(function($query) {
-                $query->whereHas('item',function($query){
-                    $query->whereIn('status',['1','2']);
-                });
-
-               if($this->finish_date) {
-                    $query->whereDate('date','<=', $this->finish_date);
-                }
-                if($this->item) {
-                    $query->whereHas('item',function($query){
-                        $query->where('id',$this->item);
-                    });
-                }
-                if($this->plant != 'all'){
-                    $query->whereHas('place',function($query){
-                        $query->where('id',$this->plant);
-                    });
-                }
-                if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query){
-                        $query->where('id',$this->warehouse);
-                    });
-                }
-
-                if($this->group){
-                    $groupIds = explode(',', $this->group);
-                    $query->whereHas('item',function($query)use($groupIds){
-                        $query->whereIn('item_group_id', $groupIds);
-                    });
-                }
-            })
-            ->orderBy('date', 'desc')
-            ->orderBy('id', 'desc')
-            ->get(); */
-
             $perlu = 0 ;
             $combinedArray = [];
             $item = Item::where(function($query){

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Exports;
+use App\Models\Item;
 use Illuminate\Support\Facades\DB;
 use App\Models\ItemCogs;
 use Illuminate\View\View;
@@ -17,7 +18,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
 
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
 
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group)
+    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , array $group)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
@@ -34,50 +35,53 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
         DB::statement("SET SQL_MODE=''");
         if($this->type == 'final'){
             $perlu = 0 ;
-
-            $query_data = ItemCogs::where(function($query)  {
-                $query->whereHas('item',function($query) {
-                    $query->whereIn('status',['1','2']);
-                });
-                if($this->finish_date) {
-                    $query->whereDate('date','<=', $this->finish_date);
-                }
+            $combinedArray = [];
+            $item = Item::where(function($query){
                 if($this->item) {
-                    $query->whereHas('item',function($query) {
-                        $query->where('id',$this->item);
-                    });
+                    $query->where('id',$this->item);
                 }
-                if($this->plant != 'all'){
-                    $query->whereHas('place',function($query) {
-                        $query->where('id',$this->plant);
-                    });
+                if(count($this->group) > 0){
+                    $query->whereIn('item_group_id',$this->group);
                 }
-                if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query) {
-                        $query->where('id',$this->warehouse);
-                    });
-                }
+            })->pluck('id');
 
-                if($this->group){
-                    $groupIds = explode(',', $this->group);
-
-                    $query->whereHas('item',function($query) use($groupIds) {
-                        $query->whereIn('item_group_id', $groupIds);
-                    });
-                }
-            })
-            ->groupBy('item_id')
-            ->pluck('item_id');
-
-            $arr = [];
-            foreach($query_data as $row){
-                $data = ItemCogs::where('date','<=',$this->finish_date)->where('item_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
+            foreach($item as $row){
+                $data = ItemCogs::where('date','<=',$this->finish_date)->where('item_id',$row)->where(function($query){
+                    if($this->plant != 'all'){
+                        $query->whereHas('place',function($query){
+                            $query->where('id',$this->plant);
+                        });
+                    }
+                    if($this->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query){
+                            $query->where('id',$this->warehouse);
+                        });
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
-                    $arr[] = $data;
+                    $combinedArray[] = [
+                        'plant'     => $data->place->code,
+                        'warehouse' => $data->warehouse->name,
+                        'kode'      => $data->item->code,
+                        'item'      => $data->item->name,
+                        'satuan'    => $data->item->uomUnit->code,
+                        'requester' => '-',
+                        'area'      => $data->area->name ?? '-',
+                        'shading'   => $data->itemShading->code ?? '-',
+                        'cum_qty'   => $data->qty_final,
+                    ];
                 }
             }
 
-            $query_data = collect($arr);
+            activity()
+                ->performedOn(new ItemCogs())
+                ->causedBy(session('bo_id'))
+                ->withProperties(null)
+                ->log('Export stock movement data  .');
+            return view('admin.exports.stock_in_rupiah', [
+                'data'      => $combinedArray,
+                'perlu'     =>  $perlu,
+            ]);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) {
@@ -119,255 +123,254 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
             ->orderBy('date')
             ->orderBy('id')
             ->get();
-        }
+            
+            $previousId = null; // Initialize the previous ID variable
+            $cum_qty = 0;
+            $cum_val = 0 ;
+            $array_filter=[];
+            $uom_unit = null;
+            $previousId = null;
+            $array_last_item = [];
+            $array_first_item = [];
+            foreach($query_data as $row){
+
+                if($row->type=='IN'){
+                    $priceNow = $row->price_in;
+                    $cum_qty=$row->qty_in;
+                    $cum_val=round($row->total_in,2);
+                }else{
+                    $priceNow = $row->price_out;
+                    $cum_qty=$row->qty_out * -1;
+                    $cum_val=round($row->total_out,2) * -1;
+                }
+
+                $data_tempura = [
+                    'item_id'      => $row->item->id,
+                    'perlu'        => 0,
+                    'plant' => $row->place->code,
+                    'warehouse' => $row->warehouse->name,
+                    'item' => $row->item->name,
+                    'satuan' => $row->item->uomUnit->code,
+                    'kode' => $row->item->code,
+                    'area' => $this->type == 'final' ? '' : ($row->area->name ?? '-'),
+                    'shading' => $this->type == 'final' ? '' : ($row->itemShading->code ?? '-'),
+                    'production_batch' => $this->type == 'final' ? '' : ($row->productionBatch()->exists() ? $row->productionBatch->code : '-'),
+                    'final'=>$priceNow,
+                    'total'=>$perlu == 0 ? 0 : $cum_val,
+                    'qty' => $perlu == 0 ? 0 : $cum_qty,
+                    'date' =>  date('d/m/Y',strtotime($row->date)),
+                    'document' => $row->lookable->code,
+                    'cum_qty' => $row->qty_final,
+                    'cum_val' => $row->total_final,
+                ];
+                $array_filter[]=$data_tempura;
+
+                if($this->type !== 'final'){
+                    if ($row->item_id !== $previousId) {
+
+                        $query_first =
+                        ItemCogs::where(function($query) use ( $row) {
+                            $query->where('item_id',$row->item_id)
+                            ->where('date', '<', $row->date);
+
+                            if($this->plant !== 'all'){
+                                $query->whereHas('place',function($query){
+                                    $query->where('id',$this->plant);
+                                });
+                            }
+                            if($this->warehouse !== 'all'){
+                                $query->whereHas('warehouse',function($query){
+                                    $query->where('id',$this->warehouse);
+                                });
+                            }
+                        })
+                        ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                        ->orderBy('id','desc')
+                        ->first();
+
+                        $array_last_item[] = [
+                            'perlu'        => 1,
+                            'item_id'      => $row->item->id,
+                            'id'           => $query_first->id ?? null,
+                            'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                            'area'         => $row->area->name ?? '-',
+                            'production_batch' => '-',
+                            'shading'      => $row->itemShading->code ?? '-',
+                            'last_nominal' => $query_first ? $query_first->total_final : 0,
+                            'item'         => $row->item->name,
+                            'satuan'       => $row->item->uomUnit->code,
+                            'kode'         => $row->item->code,
+                            'last_qty'     => $query_first ? $query_first->qty_final : 0,
+                        ];
 
 
-        $previousId = null; // Initialize the previous ID variable
-        $cum_qty = 0;
-        $cum_val = 0 ;
-        $array_filter=[];
-        $uom_unit = null;
-        $previousId = null;
-        $array_last_item = [];
-        $array_first_item = [];
-        foreach($query_data as $row){
+                    }
+                }
+                $previousId = $row->item_id;
 
-            if($row->type=='IN'){
-                $priceNow = $row->price_in;
-                $cum_qty=$row->qty_in;
-                $cum_val=round($row->total_in,2);
-            }else{
-                $priceNow = $row->price_out;
-                $cum_qty=$row->qty_out * -1;
-                $cum_val=round($row->total_out,2) * -1;
+                if($uom_unit ===null){
+                    $uom_unit = $row->item->uomUnit->code;
+                }
+
+
             }
-
-            $data_tempura = [
-                'item_id'      => $row->item->id,
-                'perlu'        => 0,
-                'plant' => $row->place->code,
-                'warehouse' => $row->warehouse->name,
-                'item' => $row->item->name,
-                'satuan' => $row->item->uomUnit->code,
-                'kode' => $row->item->code,
-                'area' => $this->type == 'final' ? '' : ($row->area->name ?? '-'),
-                'shading' => $this->type == 'final' ? '' : ($row->itemShading->code ?? '-'),
-                'production_batch' => $this->type == 'final' ? '' : ($row->productionBatch()->exists() ? $row->productionBatch->code : '-'),
-                'final'=>$priceNow,
-                'total'=>$perlu == 0 ? 0 : $cum_val,
-                'qty' => $perlu == 0 ? 0 : $cum_qty,
-                'date' =>  date('d/m/Y',strtotime($row->date)),
-                'document' => $row->lookable->code,
-                'cum_qty' => $row->qty_final,
-                'cum_val' => $row->total_final,
-            ];
-            $array_filter[]=$data_tempura;
-
-            if($this->type !== 'final'){
-                if ($row->item_id !== $previousId) {
-
-                    $query_first =
-                    ItemCogs::where(function($query) use ( $row) {
-                        $query->where('item_id',$row->item_id)
-                        ->where('date', '<', $row->date);
+            if( $this->type !== 'final'){
+                if(!$this->item){
+                    $query_no = ItemCogs::whereIn('id', function ($query) {
+                        $query->selectRaw('MAX(id)')
+                            ->from('item_cogs')
+                            ->where('date', '<=', $this->finish_date)
+                            ->groupBy('item_id');
+                    })
+                    ->where(function($query) use ($array_last_item) {
+                        $query->whereHas('item',function($query) {
+                            $query->whereIn('status',['1','2']);
+                        });
+                        if($this->finish_date) {
+                            $query->whereDate('date','<=', $this->finish_date);
+                        }
 
                         if($this->plant !== 'all'){
-                            $query->whereHas('place',function($query){
+                            $query->whereHas('place',function($query) {
                                 $query->where('id',$this->plant);
                             });
                         }
                         if($this->warehouse !== 'all'){
-                            $query->whereHas('warehouse',function($query){
+                            $query->whereHas('warehouse',function($query) {
                                 $query->where('id',$this->warehouse);
                             });
                         }
+
+                        if($this->group){
+
+                            $query->whereHas('item',function($query) {
+                                $query->whereIn('item_group_id', explode(',',$this->group));
+                            });
+                        }
+                        $array_last_item = collect($array_last_item);
+                        $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
+
+                        if (!empty($excludeIds)) {
+
+                            $query->whereNotIn('item_id', $excludeIds);
+                        }
                     })
-                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                    ->orderBy('id','desc')
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->get();
+                }else{
+                    $query_no = [];
+                    $first = ItemCogs::where(function($query) use ($array_last_item) {
+                        $query->whereHas('item',function($query) {
+                            $query->whereIn('status',['1','2'])
+                            ->where('id',$this->item);
+                        });
+                        if($this->finish_date) {
+                            $query->whereDate('date','<=', $this->finish_date);
+                        }
+
+                        if($this->plant !== 'all'){
+                            $query->whereHas('place',function($query) {
+                                $query->where('id',$this->plant);
+                            });
+                        }
+                        if($this->warehouse !== 'all'){
+                            $query->whereHas('warehouse',function($query) {
+                                $query->where('id',$this->warehouse);
+                            });
+                        }
+
+                        if($this->group){
+
+                            $query->whereHas('item',function($query) {
+                                $query->whereIn('item_group_id', explode(',',$this->group));
+                            });
+                        }
+                        $array_last_item = collect($array_last_item);
+                        $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
+
+                        if (!empty($excludeIds)) {
+
+                            $query->whereNotIn('item_id', $excludeIds);
+                        }
+                    })
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
                     ->first();
-
-                    $array_last_item[] = [
-                        'perlu'        => 1,
-                        'item_id'      => $row->item->id,
-                        'id'           => $query_first->id ?? null,
-                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                        'area'         => $row->area->name ?? '-',
-                        'production_batch' => '-',
-                        'shading'      => $row->itemShading->code ?? '-',
-                        'last_nominal' => $query_first ? $query_first->total_final : 0,
-                        'item'         => $row->item->name,
-                        'satuan'       => $row->item->uomUnit->code,
-                        'kode'         => $row->item->code,
-                        'last_qty'     => $query_first ? $query_first->qty_final : 0,
-                    ];
-
-
+                    if($first){
+                        $query_no[]=$first;
+                    }
                 }
-            }
-            $previousId = $row->item_id;
 
-            if($uom_unit ===null){
-                $uom_unit = $row->item->uomUnit->code;
-            }
+                if(count($query_no) > 0 ){
 
+                    foreach($query_no as $row_tidak_ada){
 
-        }
-        if( $this->type !== 'final'){
-            if(!$this->item){
-                $query_no = ItemCogs::whereIn('id', function ($query) {
-                    $query->selectRaw('MAX(id)')
-                        ->from('item_cogs')
-                        ->where('date', '<=', $this->finish_date)
-                        ->groupBy('item_id');
-                })
-                ->where(function($query) use ($array_last_item) {
-                    $query->whereHas('item',function($query) {
-                        $query->whereIn('status',['1','2']);
-                    });
-                    if($this->finish_date) {
-                        $query->whereDate('date','<=', $this->finish_date);
+                        if($row_tidak_ada->qty_final > 0){
+                            $array_first_item[] = [
+                                'perlu'        => 1,
+                                'item_id'      => $row_tidak_ada->item->id,
+                                'id'           => $row_tidak_ada->id,
+                                'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
+                                'last_nominal' => $row_tidak_ada ? $row_tidak_ada->total_final : 0,
+                                'item'         => $row_tidak_ada->item->name,
+                                'area'         => $row_tidak_ada->area->name ?? '-',
+                                'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
+                                'shading'      => $row_tidak_ada->itemShading->code ?? '-',
+                                'satuan'       => $row_tidak_ada->item->uomUnit->code,
+                                'kode'         => $row_tidak_ada->item->code,
+                                'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
+                            ];
+                        }
+
                     }
-
-                    if($this->plant !== 'all'){
-                        $query->whereHas('place',function($query) {
-                            $query->where('id',$this->plant);
-                        });
-                    }
-                    if($this->warehouse !== 'all'){
-                        $query->whereHas('warehouse',function($query) {
-                            $query->where('id',$this->warehouse);
-                        });
-                    }
-
-                    if($this->group){
-
-                        $query->whereHas('item',function($query) {
-                            $query->whereIn('item_group_id', explode(',',$this->group));
-                        });
-                    }
-                    $array_last_item = collect($array_last_item);
-                    $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-
-                    if (!empty($excludeIds)) {
-
-                        $query->whereNotIn('item_id', $excludeIds);
-                    }
-                })
-                ->orderBy('date', 'desc')
-                ->orderBy('id', 'desc')
-                ->get();
-            }else{
-                $query_no = [];
-                $first = ItemCogs::where(function($query) use ($array_last_item) {
-                    $query->whereHas('item',function($query) {
-                        $query->whereIn('status',['1','2'])
-                        ->where('id',$this->item);
-                    });
-                    if($this->finish_date) {
-                        $query->whereDate('date','<=', $this->finish_date);
-                    }
-
-                    if($this->plant !== 'all'){
-                        $query->whereHas('place',function($query) {
-                            $query->where('id',$this->plant);
-                        });
-                    }
-                    if($this->warehouse !== 'all'){
-                        $query->whereHas('warehouse',function($query) {
-                            $query->where('id',$this->warehouse);
-                        });
-                    }
-
-                    if($this->group){
-
-                        $query->whereHas('item',function($query) {
-                            $query->whereIn('item_group_id', explode(',',$this->group));
-                        });
-                    }
-                    $array_last_item = collect($array_last_item);
-                    $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
-
-                    if (!empty($excludeIds)) {
-
-                        $query->whereNotIn('item_id', $excludeIds);
-                    }
-                })
-                ->orderBy('date', 'desc')
-                ->orderBy('id', 'desc')
-                ->first();
-                if($first){
-                    $query_no[]=$first;
                 }
+
             }
 
-            if(count($query_no) > 0 ){
+            $combinedArray = [];
 
-                foreach($query_no as $row_tidak_ada){
+            // Merge $array_filter into $combinedArray
+            foreach ($array_filter as $item) {
+                $combinedArray[] = $item;
+            }
 
-                    if($row_tidak_ada->qty_final > 0){
-                        $array_first_item[] = [
-                            'perlu'        => 1,
-                            'item_id'      => $row_tidak_ada->item->id,
-                            'id'           => $row_tidak_ada->id,
-                            'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
-                            'last_nominal' => $row_tidak_ada ? $row_tidak_ada->total_final : 0,
-                            'item'         => $row_tidak_ada->item->name,
-                            'area'         => $row_tidak_ada->area->name ?? '-',
-                            'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
-                            'shading'      => $row_tidak_ada->itemShading->code ?? '-',
-                            'satuan'       => $row_tidak_ada->item->uomUnit->code,
-                            'kode'         => $row_tidak_ada->item->code,
-                            'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
-                        ];
-                    }
+            // Merge $array_last_item into $combinedArray
+            foreach ($array_last_item as $item) {
+                $combinedArray[] = $item;
+            }
 
+            // Merge $array_first_item into $combinedArray
+            foreach ($array_first_item as $item) {
+                $combinedArray[] = $item;
+            }
+            usort($combinedArray, function ($a, $b) {
+                // First, sort by 'kode' in ascending order
+                $kodeComparison = strcmp($a['kode'], $b['kode']);
+
+                if ($kodeComparison !== 0) {
+                    return $kodeComparison;
                 }
+
+                // If 'kode' is the same, prioritize 'perlu' in descending order
+                return $b['perlu'] - $a['perlu'];
+            });
+            if($this->type == 'final'){
+                $combinedArray=$array_filter;
             }
 
+            activity()
+                ->performedOn(new ItemCogs())
+                ->causedBy(session('bo_id'))
+                ->withProperties(null)
+                ->log('Export stock in rupiah data  .');
+
+            return view('admin.exports.stock_in_rupiah', [
+                'data'          => $combinedArray,
+                'latest'        => $array_last_item,
+                'first'         => $array_first_item,
+                'perlu'         =>  $perlu,
+            ]);
         }
-
-        $combinedArray = [];
-
-        // Merge $array_filter into $combinedArray
-        foreach ($array_filter as $item) {
-            $combinedArray[] = $item;
-        }
-
-        // Merge $array_last_item into $combinedArray
-        foreach ($array_last_item as $item) {
-            $combinedArray[] = $item;
-        }
-
-        // Merge $array_first_item into $combinedArray
-        foreach ($array_first_item as $item) {
-            $combinedArray[] = $item;
-        }
-        usort($combinedArray, function ($a, $b) {
-            // First, sort by 'kode' in ascending order
-            $kodeComparison = strcmp($a['kode'], $b['kode']);
-
-            if ($kodeComparison !== 0) {
-                return $kodeComparison;
-            }
-
-            // If 'kode' is the same, prioritize 'perlu' in descending order
-            return $b['perlu'] - $a['perlu'];
-        });
-        if($this->type == 'final'){
-            $combinedArray=$array_filter;
-        }
-
-        activity()
-            ->performedOn(new ItemCogs())
-            ->causedBy(session('bo_id'))
-            ->withProperties(null)
-            ->log('Export stock in rupiah data  .');
-
-        return view('admin.exports.stock_in_rupiah', [
-            'data'          => $combinedArray,
-            'latest'        => $array_last_item,
-            'first'         => $array_first_item,
-            'perlu'         =>  $perlu,
-        ]);
     }
 }

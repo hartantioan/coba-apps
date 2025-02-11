@@ -1010,7 +1010,7 @@
                     }else{
                         let countItem = $('.row_item').length;
 
-                        if(datakuy.details.length+countItem > 49){
+                        if(datakuy.details.length+countItem > 50){
                             swal({
                                 title: 'Ups!',
                                 text: 'Satu GI tidak boleh memiliki baris item lebih dari 50.',

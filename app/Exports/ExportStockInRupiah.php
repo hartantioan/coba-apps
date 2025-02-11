@@ -69,6 +69,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                         'area'      => $data->area->name ?? '-',
                         'shading'   => $data->itemShading->code ?? '-',
                         'cum_qty'   => $data->qty_final,
+                        'cum_val'   => $data->total_final,
                     ];
                 }
             }

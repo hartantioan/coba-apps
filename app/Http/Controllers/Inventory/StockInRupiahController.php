@@ -425,7 +425,7 @@ class StockInRupiahController extends Controller
         $item = $request->item ? $request->item:'';
         $start_date = $request->start_date ? $request->start_date:'';
         $finish_date = $request->finish_date ? $request->finish_date:'';
-        $group = $request->group ? $request->group:'';
+        $group = $request->group ? $request->group : [];
         $type = $request->type ? $request->type:'';
         $user_id = session('bo_id');
 

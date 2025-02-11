@@ -370,7 +370,7 @@ class MarketingOrderMemoController extends Controller
             }
         })->whereHas('marketingOrderDeliveryProcess',function($query){
             $query->whereHas('marketingOrderInvoice',function($query){
-                $query->whereDoesntHave('incomingPaymentDetail');
+                //$query->whereDoesntHave('incomingPaymentDetail');
             });
         })->whereIn('id',$request->arr_id)->whereHas('itemStock',function($query){
             $query->whereHas('item',function($query){

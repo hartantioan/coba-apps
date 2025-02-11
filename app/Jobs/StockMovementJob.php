@@ -20,7 +20,7 @@ class StockMovementJob implements ShouldQueue
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
 
     protected $user_id;
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group ,string $user_id)
+    public function __construct(string $plant = null, string $item = null,string $warehouse = null, string $start_date = null, string $finish_date = null, string $type = null, array $group = [],string $user_id = null)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
@@ -28,7 +28,7 @@ class StockMovementJob implements ShouldQueue
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
-        $this->group = $group ? $group : '';
+        $this->group = $group;
         $this->user_id = $user_id;
         $this->queue = 'report';
     }

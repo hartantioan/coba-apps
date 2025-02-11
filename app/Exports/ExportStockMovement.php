@@ -13,7 +13,7 @@ use App\Helpers\PrintHelper;
 class ExportStockMovement implements FromView,ShouldAutoSize
 {
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , string $group)
+    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , array $group)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
@@ -21,7 +21,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
-        $this->group = $group ? $group : '';
+        $this->group = $group;
     }
     public function view(): View
     {
@@ -70,9 +70,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 if($this->item) {
                     $query->where('id',$this->item);
                 }
-                if($this->group){
-                    $groupIds = explode(',', $this->group);
-                    $query->whereIn('item_group_id', $groupIds);
+                if(count($this->group) > 0){
+                    $query->whereIn('item_group_id',$this->group);
                 }
             })->pluck('id');
 
@@ -142,12 +141,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                         $query->where('id',$this->warehouse);
                     });
                 }
-                if($this->group){
-                    $groupIds = explode(',', $this->group);
-
-                    $query->whereHas('item',function($query) use($groupIds){
-                        $query->whereIn('item_group_id', $groupIds);
-                    });
+                if(count($this->group) > 0){
+                    $query->whereIn('item_group_id',$this->group);
                 }
             })
             ->orderBy('item_id')
@@ -266,12 +261,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                             });
                         }
 
-                        if($this->group){
-                            $groupIds = explode(',', $this->group);
-
-                            $query->whereHas('item',function($query) use($groupIds){
-                                $query->whereIn('item_group_id', $groupIds);
-                            });
+                        if(count($this->group) > 0){
+                            $query->whereIn('item_group_id',$this->group);
                         }
                         $array_last_item = collect($array_last_item);
                         $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();

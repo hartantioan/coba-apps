@@ -425,7 +425,7 @@ class StockMovementController extends Controller
         $item = $request->item ? $request->item:'';
         $start_date = $request->startdate ? $request->startdate:'';
         $finish_date = $request->finishdate ? $request->finishdate:'';
-        $group = $request->group ? $request->group:'';
+        $group = $request->group ? $request->group : [];
         $type = $request->type ? $request->type:'';
         $user_id = session('bo_id');
         StockMovementJob::dispatch($plant,$item,$warehouse,$start_date,$finish_date,$type,$group, $user_id);

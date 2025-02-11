@@ -36,6 +36,9 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
             if($this->type !== 'all'){
                 $query->whereHas('landedCostFee',function($query){
                     $query->where('type',$this->type);
+                    if($this->type == '2'){
+                        $query->orWhere('type','3');
+                    }
                 });
             }
         })

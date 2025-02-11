@@ -64,23 +64,6 @@ class StockMovementController extends Controller
             })->pluck('id');
 
             $arr = [];
-            foreach($item as $row){
-                $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
-                    if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
-                    }
-                    if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query) use($request){
-                            $query->where('id',$request->warehouse);
-                        });
-                    }
-                })->orderByDesc('date')->orderByDesc('id')->first();
-                if($data){
-                    $arr[] = $data;
-                }
-            }
 
             $html = '<table class="bordered" style="font-size:10px;">
                         <thead id="t_head">
@@ -95,18 +78,67 @@ class StockMovementController extends Controller
                             </tr>
                         </thead>
                         <tbody id="table_body">';
+
             $total = 0;
-            foreach($arr as $key => $rowdata){
-                $html .= '<tr>
-                    <td>'.($key + 1).'</td>
-                    <td>'.$rowdata->place->code.'</td>
-                    <td>'.$rowdata->warehouse->name.'</td>
-                    <td>'.$rowdata->item->code.'</td>
-                    <td>'.$rowdata->item->name.'</td>
-                    <td>'.$rowdata->item->uomUnit->code.'</td>
-                    <td class="right-align">'.number_format($rowdata->qty_final,3,',','.').'</td>
-                </tr>';
-                $total += round($rowdata->qty_final,2);
+
+            foreach($item as $key => $row){
+                /* $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                    if($request->plant != 'all'){
+                        $query->whereHas('place',function($query) use($request){
+                            $query->where('id',$request->plant);
+                        });
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query) use($request){
+                            $query->where('id',$request->warehouse);
+                        });
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first(); */
+
+                $data = DB::select("
+                    SELECT 
+                        IFNULL(ROUND(ic.qty_final,3),0) AS qty,
+                        pb.code AS warehouse_name,
+                        i.code AS item_code,
+                        i.name AS item_name,
+                        p.code AS place_code,
+                        u.code AS unit_code
+                    FROM item_cogs ic
+                        LEFT JOIN production_batches pb
+                            ON pb.id = ic.production_batch_id
+                        LEFT JOIN item_shadings ish
+                            ON ish.id = ic.item_shading_id
+                        LEFT JOIN items i
+                            ON i.id = ic.item_id
+                        LEFT JOIN places p
+                            ON p.id = ic.place_id
+                        LEFT JOIN units u
+                            ON u.id = i.uom_unit
+                    WHERE 
+                        ic.date <= :date
+                        ".($request->plant != 'all' ? " AND ic.place_id = ".$request->plant : " ")."
+                        ".($request->warehouse != 'all' ? " AND ic.warehouse_id = ".$request->warehouse : " ")."
+                        AND ic.item_id = :item_id
+                        AND ic.deleted_at IS NULL
+                    ORDER BY ic.date, ic.id DESC
+                    LIMIT 1
+                ", array(
+                    'date'              => $request->finish_date,
+                    'item_id'           => $row,
+                ));
+
+                if($data){
+                    $html .= '<tr>
+                        <td>'.($key + 1).'</td>
+                        <td>'.$data[0]->place_code.'</td>
+                        <td>'.$data[0]->warehouse_name.'</td>
+                        <td>'.$data[0]->item_code.'</td>
+                        <td>'.$data[0]->item_name.'</td>
+                        <td>'.$data[0]->unit_code.'</td>
+                        <td class="right-align">'.number_format($data[0]->qty,3,',','.').'</td>
+                    </tr>';
+                    $total += round($data[0]->qty,2);
+                }
             }
 
             $end_time = microtime(true);

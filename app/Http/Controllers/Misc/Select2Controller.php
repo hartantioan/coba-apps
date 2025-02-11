@@ -6058,4 +6058,56 @@ class Select2Controller extends Controller {
             ]
         ]);
     }
+
+    public function marketingOrderComplaint(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                  ->orWhere('note_internal', 'like', "%$search%")
+                  ->orWhere('note_external', 'like', "%$search%")
+                  ->orWhereHas('user', function($query) use ($search){
+                      $query->where('name', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%");
+                  })
+                  ->orWhereHas('account', function($query) use ($search){
+                      $query->where('name', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%");
+                  });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','", $this->dataplacecode)."')")
+        ->whereIn('status', ['2', '3'])
+        ->paginate(10);
+
+        foreach($data as $d) {
+
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->account->name,
+                'account_id' 	=> $d->account_id,
+                'outlet'        => $d->outlet->name ?? '-',
+                'address'       => $d->destination_address,
+                'province'      => $d->province->name,
+                'city'          => $d->city->name,
+                'district'      => $d->district->name,
+                'subdistrict'   => $d->subdistrict->name ?? '',
+                'type'          => $d->getTable(),
+                'post_date'     => date('d/m/Y',strtotime($d->post_date)),
+                'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
+                'code'          => $d->code,
+                'grandtotal'    => number_format($d->grandtotal,2,',','.'),
+                'payment_type'  => $d->payment_type,
+            ];
+
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
+    }
 }

@@ -970,8 +970,6 @@
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
-        // select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
-        // select2ServerSide('#district_id', '{{ url("admin/select2/district") }}');
         select2ServerSide('#sample_type_id', '{{ url("admin/select2/sample_type") }}');
 
         $("#table-detail th").resizable({

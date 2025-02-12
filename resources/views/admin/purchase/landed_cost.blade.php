@@ -226,85 +226,90 @@
                     <div class="col s12">
                         <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO & LC. Untuk Inventori Transfer, supplier / vendor kosong dan tekan tombol Tampilkan Data.</i>
                         <div class="row">
-                            <div class="input-field col m2 s12 step1">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m3 s12 step3">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="supplier_id" name="supplier_id"></select>
-                                <label class="active" for="supplier_id">Supplier/Vendor</label>
-                            </div>
-                            <div class="input-field col m3 s12 step4">
-                                <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
-                                <label class="active">&nbsp;</label>
-                            </div>
-                            <div class="input-field col m3 s12 step5">
-                                <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Broker</label>
-                            </div>
-                            <div class="col m12 s12 l12"></div>
-                            <div class="input-field col m3 s12 step6">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">{{ __('translations.company') }}</label>
-                            </div>
-                            <div class="input-field col m3 s12 step7">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
-                                <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
-                            </div>
-                            <div class="input-field col m3 s12 step9">
-                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">{{ __('translations.currency') }}</label>
-                            </div>
-                            <div class="input-field col m3 s12 step10">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
-                            </div>
-                            <div class="col m12 s12 l12"></div>
-                            <div class="input-field col m3 s12 step11">
-                                <input id="reference" name="reference" type="text" placeholder="No. Referensi">
-                                <label class="active" for="reference">No. Referensi</label>
-                            </div>
-
-                            <div class="col m4 s12 step8">
-                                <label class="">Bukti Upload</label>
-                                <br>
-                                <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
-                                <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                    Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
-                                    <br>
-
-                                </div>
-                                <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
-                                   Clear
-                                </a>
-                            </div>
-                            <div class="col m4 s12">
-                                <div id="fileName"></div>
-                                <img src="" alt="Preview" id="imagePreview" style="display: none;">
-                            </div>
-                            <div class="col m12 s12 step12">
-                                <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
-                            </div>
                             <div class="col m12 s12 ">
                                 <fieldset>
-                                    <legend class="step13">1. Rincian Biaya</legend>
+                                    <legend class="step13">1. Informasi Utama</legend>
+                                    <div class="row">
+                                        <div class="input-field col m2 s12 step1">
+                                            <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                            <label class="active" for="code">No. Dokumen</label>
+                                        </div>
+                                        <div class="input-field col m1 s12 step2">
+                                            <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                                <option value="">--Pilih--</option>
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="input-field col m3 s12 step3">
+                                            <input type="hidden" id="temp" name="temp">
+                                            <select class="browser-default" id="supplier_id" name="supplier_id"></select>
+                                            <label class="active" for="supplier_id">Supplier/Vendor</label>
+                                        </div>
+                                        <div class="input-field col m3 s12 step4">
+                                            <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
+                                            <label class="active">&nbsp;</label>
+                                        </div>
+                                        <div class="input-field col m3 s12 step5">
+                                            <select class="browser-default" id="account_id" name="account_id"></select>
+                                            <label class="active" for="account_id">Broker</label>
+                                        </div>
+                                        <div class="col m12 s12 l12"></div>
+                                        <div class="input-field col m3 s12 step6">
+                                            <select class="form-control" id="company_id" name="company_id">
+                                                @foreach ($company as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label class="" for="company_id">{{ __('translations.company') }}</label>
+                                        </div>
+                                        <div class="input-field col m3 s12 step7">
+                                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
+                                            <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
+                                        </div>
+                                        <div class="input-field col m3 s12 step9">
+                                            <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                                @foreach ($currency as $row)
+                                                    <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label class="" for="currency_id">{{ __('translations.currency') }}</label>
+                                        </div>
+                                        <div class="input-field col m3 s12 step10">
+                                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                            <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
+                                        </div>
+                                        <div class="col m12 s12 l12"></div>
+                                        <div class="input-field col m3 s12 step11">
+                                            <input id="reference" name="reference" type="text" placeholder="No. Referensi">
+                                            <label class="active" for="reference">No. Referensi</label>
+                                        </div>
+            
+                                        <div class="col m4 s12 step8">
+                                            <label class="">Bukti Upload</label>
+                                            <br>
+                                            <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                            <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                                Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                                <br>
+            
+                                            </div>
+                                            <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                                               Clear
+                                            </a>
+                                        </div>
+                                        <div class="col m4 s12">
+                                            <div id="fileName"></div>
+                                            <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                                        </div>
+                                        <div class="col m12 s12 step12">
+                                            <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <legend class="step13">2. Rincian Biaya</legend>
                                     <div class="row">
                                         <div class="col m12 s12">
                                             <p class="mt-2 mb-2">
@@ -513,7 +518,7 @@
                                     </div>
                                 </fieldset>
                                 <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>2. Detail Harga per Produk</legend>
+                                    <legend>3. Detail Harga per Produk</legend>
                                     <div class="row">
                                         <div class="col m12 s12">
                                             <table class="bordered" id="table-detail1" width="min-width:2500px !important;">

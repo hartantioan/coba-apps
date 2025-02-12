@@ -58,6 +58,13 @@
     .width-300{
         width:300px;
     }
+
+    #table-detail1 {
+        display: table;
+        width: 2000px !important;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -296,243 +303,249 @@
                                 <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="col m12 s12 ">
-                                <p class="mt-2 mb-2">
-                                    <h5 class="step13">Rincian Biaya</h5>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">No</th>
-                                                    <th class="center" width="15%">Deskripsi</th>
-                                                    <th class="center" width="15%">{{ __('translations.total') }}</th>
-                                                    <th class="center">Termasuk PPN</th>
-                                                    <th class="center">PPN(%)</th>
-                                                    <th class="center">PPN(Rp)</th>
-                                                    <th class="center">PPh(%)</th>
-                                                    <th class="center">PPh(Rp)</th>
-                                                    <th class="center" width="15%">{{ __('translations.grandtotal') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="9"><h6>A. Local</h6></td>
-                                                </tr>
-                                                @foreach ($landedcostfee->where('type','1') as $key => $row)
-                                                    <tr>
-                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
-                                                        <td class="center-align">
-                                                            {{ $loop->iteration }}.
-                                                        </td>
-                                                        <td>
-                                                            {{ $row->name }}
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <div class="switch mb-1">
-                                                                <label>
-                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});">
-                                                                    <span class="lever"></span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPN --</option>
-                                                                @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPh --</option>
-                                                                @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                                <tr>
-                                                    <td colspan="9"><h6>B. Impor</h6></td>
-                                                </tr>
-                                                @foreach ($landedcostfee->where('type','2') as $key => $row)
-                                                    <tr>
-                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
-                                                        <td class="center-align">
-                                                            {{ $loop->iteration }}.
-                                                        </td>
-                                                        <td>
-                                                            {{ $row->name }}
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <div class="switch mb-1">
-                                                                <label>
-                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});">
-                                                                    <span class="lever"></span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPN --</option>
-                                                                @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPh --</option>
-                                                                @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                                <tr>
-                                                    <td colspan="9"><h6>C. PIB</h6></td>
-                                                </tr>
-                                                @foreach ($landedcostfee->where('type','3') as $key => $row)
-                                                    <tr>
-                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
-                                                        <td class="center-align">
-                                                            {{ $loop->iteration }}.
-                                                        </td>
-                                                        <td>
-                                                            {{ $row->name }}
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input class="special" id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEachSpecial({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <div class="switch mb-1">
-                                                                <label>
-                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});" disabled>
-                                                                    <span class="lever"></span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEachSpecial({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPN --</option>
-                                                                @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEachSpecial({{ $row->id }});">
-                                                                <option value="0.00000" data-id="0">-- Non-PPh --</option>
-                                                                @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                        <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                        <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <td class="center" colspan="2">
-                                                        Total Masuk ke STOCK
-                                                    </td>
-                                                    <td class="center">
-                                                        <input id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        <input id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        <input id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                    </td>
-                                                    <td class="center">
-                                                        <input id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                <fieldset>
+                                    <legend class="step13">1. Rincian Biaya</legend>
+                                    <div class="row">
+                                        <div class="col m12 s12">
+                                            <p class="mt-2 mb-2">
+                                                <div style="overflow:auto;">
+                                                    <table class="bordered" id="table-detail">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="center">No</th>
+                                                                <th class="center" width="15%">Deskripsi</th>
+                                                                <th class="center" width="15%">{{ __('translations.total') }}</th>
+                                                                <th class="center">Termasuk PPN</th>
+                                                                <th class="center">PPN(%)</th>
+                                                                <th class="center">PPN(Rp)</th>
+                                                                <th class="center">PPh(%)</th>
+                                                                <th class="center">PPh(Rp)</th>
+                                                                <th class="center" width="15%">{{ __('translations.grandtotal') }}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td colspan="9"><h6>A. Local</h6></td>
+                                                            </tr>
+                                                            @foreach ($landedcostfee->where('type','1') as $key => $row)
+                                                                <tr>
+                                                                    <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                                    <td class="center-align">
+                                                                        {{ $loop->iteration }}.
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $row->name }}
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
+                                                                        <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <div class="switch mb-1">
+                                                                            <label>
+                                                                                <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});">
+                                                                                <span class="lever"></span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPN --</option>
+                                                                            @foreach ($tax as $row1)
+                                                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPh --</option>
+                                                                            @foreach ($wtax as $row2)
+                                                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                            <tr>
+                                                                <td colspan="9"><h6>B. Impor</h6></td>
+                                                            </tr>
+                                                            @foreach ($landedcostfee->where('type','2') as $key => $row)
+                                                                <tr>
+                                                                    <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                                    <td class="center-align">
+                                                                        {{ $loop->iteration }}.
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $row->name }}
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
+                                                                        <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <div class="switch mb-1">
+                                                                            <label>
+                                                                                <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});">
+                                                                                <span class="lever"></span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPN --</option>
+                                                                            @foreach ($tax as $row1)
+                                                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPh --</option>
+                                                                            @foreach ($wtax as $row2)
+                                                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                            <tr>
+                                                                <td colspan="9"><h6>C. PIB</h6></td>
+                                                            </tr>
+                                                            @foreach ($landedcostfee->where('type','3') as $key => $row)
+                                                                <tr>
+                                                                    <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                                    <td class="center-align">
+                                                                        {{ $loop->iteration }}.
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $row->name }}
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input class="special" id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
+                                                                        <input class=" {{ $row->to_stock == '2' ? 'no-stock' : '' }}" id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEachSpecial({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <div class="switch mb-1">
+                                                                            <label>
+                                                                                <input type="checkbox" id="arr_fee_include_tax{{ $row->id }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $row->id }});" disabled>
+                                                                                <span class="lever"></span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEachSpecial({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPN --</option>
+                                                                            @foreach ($tax as $row1)
+                                                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEachSpecial({{ $row->id }});">
+                                                                            <option value="0.00000" data-id="0">-- Non-PPh --</option>
+                                                                            @foreach ($wtax as $row2)
+                                                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="right-align">
+                                                                        <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEachSpecial({{ $row->id }});" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                    <td class="center-align">
+                                                                        <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td class="center" colspan="2">
+                                                                    Total Masuk ke STOCK
+                                                                </td>
+                                                                <td class="center">
+                                                                    <input id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                </td>
+                                                                <td class="center">
+                                                                    -
+                                                                </td>
+                                                                <td class="center">
+                                                                    -
+                                                                </td>
+                                                                <td class="center">
+                                                                    <input id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                </td>
+                                                                <td class="center">
+                                                                    -
+                                                                </td>
+                                                                <td class="center">
+                                                                    <input id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                </td>
+                                                                <td class="center">
+                                                                    <input id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </p>    
+                                        </div> 
                                     </div>
-                                </p>
-                            </div>
-                            <div class="col m12 s12 step14">
-                                <p class="mt-2 mb-2">
-                                    <h5>Detail Harga per Produk</h5>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail1">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Ref.No</th>
-                                                    <th class="center">{{ __('translations.item') }}</th>
-                                                    <th class="center">{{ __('translations.qty') }}</th>
-                                                    <th class="center">Satuan (UOM)</th>
-                                                    <th class="center">{{ __('translations.plant') }}</th>
-                                                    <th class="center">{{ __('translations.line') }}</th>
-                                                    <th class="center">{{ __('translations.engine') }}</th>
-                                                    <th class="center">{{ __('translations.division') }}</th>
-                                                    <th class="center">{{ __('translations.warehouse') }}</th>
-                                                    <th class="center">Proyek</th>
-                                                    <th class="center">Qty x Harga</th>
-                                                    <th class="center">Proporsional</th>
-                                                    <th class="center">Coa Biaya (Stock 0)</th>
-                                                    <th class="center">Harga Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item">
-                                                <tr id="last-row-item">
-                                                    <td colspan="14" class="center">
-                                                        Silahkan pilih supplier untuk memulai...
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                </fieldset>
+                                <fieldset style="min-width: 100%;overflow:auto;">
+                                    <legend>2. Detail Harga per Produk</legend>
+                                    <div class="row">
+                                        <div class="col m12 s12">
+                                            <table class="bordered" id="table-detail1" width="min-width:2500px !important;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Ref.No</th>
+                                                        <th class="center">{{ __('translations.item') }}</th>
+                                                        <th class="center">{{ __('translations.qty') }}</th>
+                                                        <th class="center">Satuan (UOM)</th>
+                                                        <th class="center">{{ __('translations.plant') }}</th>
+                                                        <th class="center">{{ __('translations.line') }}</th>
+                                                        <th class="center">{{ __('translations.engine') }}</th>
+                                                        <th class="center">{{ __('translations.division') }}</th>
+                                                        <th class="center">{{ __('translations.warehouse') }}</th>
+                                                        <th class="center">Proyek</th>
+                                                        <th class="center">Qty x Harga</th>
+                                                        <th class="center">Proporsional</th>
+                                                        <th class="center">Coa Biaya (Stock 0)</th>
+                                                        <th class="center">Harga Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item">
+                                                    <tr id="last-row-item">
+                                                        <td colspan="14" class="center">
+                                                            Silahkan pilih supplier untuk memulai...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </p>
+                                </fieldset>
                             </div>
                             <div class="input-field col m4 s12 step15">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -1330,7 +1343,7 @@
         select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier_vendor") }}');
 
-        $("#table-detail th,#table-detail1 th").resizable({
+        $("#table-detail th").resizable({
             minWidth: 100,
         });
     });

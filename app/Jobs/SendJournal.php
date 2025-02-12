@@ -4084,7 +4084,7 @@ class SendJournal implements ShouldQueue
                             JournalDetail::create([
                                 'journal_id'	=> $query->id,
                                 'cost_distribution_detail_id'   => $rowcost->id,
-                                'coa_id'						=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+                                'coa_id'		=> $pod->coa_id,
                                 'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
                                 'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
                                 'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),

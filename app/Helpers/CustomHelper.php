@@ -934,7 +934,7 @@ class CustomHelper {
 	}
 
 	public static function sendJournal($table_name = null,$table_id = null,$account_id = null){
-        
+
 		$data = DB::table($table_name)->where('id',$table_id)->first();
 
 		if($table_name == 'good_receipts'){
@@ -4810,7 +4810,7 @@ class CustomHelper {
 
                             JournalDetail::create([
                                 'journal_id'	=> $query->id,
-                                'coa_id'						=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+                                'coa_id'		=> $row->lookable_id,
                                 'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
                                 'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
                                 'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
@@ -4902,7 +4902,7 @@ class CustomHelper {
 
                             JournalDetail::create([
                                 'journal_id'	=> $query->id,
-                                'coa_id'						=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+                                'coa_id'		=> $pod->coa_id,
                                 'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
                                 'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
                                 'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),

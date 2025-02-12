@@ -438,7 +438,7 @@ class GoodScaleController extends Controller
                 'code_place_id'             => 'required',
                 'company_id'                => 'required',
                 'vehicle_no'                => 'required',
-                'no_queue'                  => $request->type == '2' && str_replace(',','.',str_replace('.','',$request->qty_out)) == 0 ?'required' : '',
+                'no_queue'                  => $request->type == '2' && str_replace(',','.',str_replace('.','',$request->qty_out)) == 0 ? '' : 'required',
                 'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
                 'driver'                    => 'required',
                 'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',

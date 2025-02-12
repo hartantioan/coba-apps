@@ -115,6 +115,7 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('delivery_no', 'like', "%$search%")
                             ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
@@ -190,6 +191,7 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('delivery_no', 'like', "%$search%")
                             ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")

@@ -28,7 +28,7 @@ class StockInRupiahJob implements ShouldQueue
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->type = $type ? $type : '';
-        $this->group = $group ? $group : [];
+        $this->group = $group;
         $this->user_id = $user_id;
         $this->queue = 'report';
     }

@@ -515,12 +515,13 @@ class GoodIssueController extends Controller
                                 $startqty = $cogs['qty'] - $qtyout;
                                 foreach($itemCogsAfter as $row){
                                     if($row->type == 'IN'){
-                                        $startqty += $row->qty_in;
+                                        $startqty += round($row->qty_in,3);
                                     }elseif($row->type == 'OUT'){
-                                        $startqty -= $row->qty_out;
+                                        $startqty -= round($row->qty_out,3);
                                     }
                                     if($startqty < 0){
                                         $passedQtyMinus = false;
+                                        $arrItemNotPassed[] = $item_stock->item->name;
                                     }
                                 }
                             }else{
@@ -569,7 +570,7 @@ class GoodIssueController extends Controller
                     if($passedQtyMinus == false){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok. Barang '.implode(", ",$arrItemNotPassed),
                         ]);
                     }
 
@@ -584,7 +585,7 @@ class GoodIssueController extends Controller
                     if($passedQtyMinus == false){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                            'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok. Barang '.implode(", ",$arrItemNotPassed),
                         ]);
                     }
                 }

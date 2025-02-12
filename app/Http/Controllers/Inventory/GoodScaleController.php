@@ -400,7 +400,7 @@ class GoodScaleController extends Controller
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
                 'company_id'                => 'required',
-                /* 'no_queue'                  => 'required', */
+                'no_queue'                  => 'required',
                 // 'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
 
                 // 'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
@@ -417,7 +417,7 @@ class GoodScaleController extends Controller
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-                /* 'no_queue.required'                 => 'Kode Antrian Truk tidak boleh kosong.', */
+                'no_queue.required'                 => 'Kode Antrian Truk tidak boleh kosong.',
                 // 'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
                 // 'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
                 // 'purchase_order_detail_id.required' => 'Data PO tidak boleh kosong.',
@@ -438,7 +438,7 @@ class GoodScaleController extends Controller
                 'code_place_id'             => 'required',
                 'company_id'                => 'required',
                 'vehicle_no'                => 'required',
-                /* 'no_queue'                  => 'required', */
+                'no_queue'                  => 'required',
                 'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
                 'driver'                    => 'required',
                 'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
@@ -456,7 +456,7 @@ class GoodScaleController extends Controller
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'company_id.required'               => 'Perusahaan tidak boleh kosong.',
                 'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
-                /* 'no_queue.required'                 => 'Kode Antrian Truk tidak boleh kosong.', */
+                'no_queue.required'                 => 'Kode Antrian Truk tidak boleh kosong.',
                 'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
                 'purchase_order_detail_id.required' => 'Data PO tidak boleh kosong.',
                 'driver.required'                   => 'Nama supir tidak boleh kosong.',

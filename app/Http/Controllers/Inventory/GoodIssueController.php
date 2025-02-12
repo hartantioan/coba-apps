@@ -508,9 +508,10 @@ class GoodIssueController extends Controller
                             } */
                             $cogs = $itemCogsBefore->infoFg();
                             if(!$request->temp){
-                                if($cogs['qty'] < $qtyout){
+                                if(round(($cogs['qty'] - $qtyout),3) < 0){
                                     $passedQtyMinus = false;
                                     $arrItemNotPassed[] = $item_stock->item->name;
+                                    info(($cogs['qty'] - $qtyout));
                                 }
                                 $startqty = $cogs['qty'] - $qtyout;
                                 foreach($itemCogsAfter as $row){
@@ -525,7 +526,7 @@ class GoodIssueController extends Controller
                                     }
                                 }
                             }else{
-                                if(($cogs['qty'] + $qtyout) < $qtyout){
+                                if(round(($cogs['qty'] + $qtyout),3) < $qtyout){
                                     $passedQtyMinus = false;
                                     $arrItemNotPassed[] = $item_stock->item->name;
                                 }

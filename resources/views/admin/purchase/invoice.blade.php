@@ -2162,10 +2162,10 @@
                                                             -
                                                         </td>
                                                         <td class="center">
-                                                            -
+                                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                                                         </td>
                                                         <td class="center">
-                                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                                            -
                                                         </td>
                                                         <td class="center">
                                                             -

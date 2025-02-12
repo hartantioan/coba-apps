@@ -80,6 +80,9 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             $query_data = ItemCogs::where(function($query) {
                 $query->whereHas('item',function($query){
                     $query->whereIn('status',['1','2']);
+                    if(count($this->group) > 0){
+                        $query->whereIn('item_group_id',$this->group);
+                    }
                 });
                 if($this->start_date && $this->finish_date) {
                     $query->whereDate('date', '>=', $this->start_date)
@@ -103,9 +106,6 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
                     });
-                }
-                if(count($this->group) > 0){
-                    $query->whereIn('item_group_id',$this->group);
                 }
             })
             ->orderBy('item_id')

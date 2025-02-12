@@ -2230,60 +2230,62 @@ class SendJournal implements ShouldQueue
 
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
-						if($itemdata->qty_final > 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-								'place_id'		=> $rowdetail->place_id,
-								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-								'warehouse_id'	=> $rowdetail->warehouse_id,
-								'item_id'		=> $rowdetail->item_id,
-								'type'			=> '1',
-								'nominal'		=> $rowtotal,
-								'nominal_fc'	=> $rowfc,
-								'lookable_type'	=> $table_name,
-								'lookable_id'	=> $table_id,
-								'detailable_type'=> $rowdetail->getTable(),
-								'detailable_id'	=> $rowdetail->id,
-							]);
+						if($rowtotal > 0 || $rowtotal < 0){
+							if($itemdata->qty_final > 0){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+									'place_id'		=> $rowdetail->place_id,
+									'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+									'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+									'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+									'warehouse_id'	=> $rowdetail->warehouse_id,
+									'item_id'		=> $rowdetail->item_id,
+									'type'			=> '1',
+									'nominal'		=> $rowtotal,
+									'nominal_fc'	=> $rowfc,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $rowdetail->getTable(),
+									'detailable_id'	=> $rowdetail->id,
+								]);
 
-							CustomHelper::sendCogs('landed_costs',
-								$lc->id,
-								$rowdetail->place->company_id,
-								$rowdetail->place_id,
-								$rowdetail->warehouse_id,
-								$rowdetail->item_id,
-								0,
-								$rowtotal,
-								'IN',
-								$lc->post_date,
-								NULL,
-								NULL,
-								NULL,
-								$rowdetail->getTable(),
-								$rowdetail->id,
-							);
-						}else{
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coabiayaekspedisi->id,
-								'place_id'		=> $rowdetail->place_id,
-								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $coabiayaekspedisi->bp_journal ? $lc->account_id : NULL,
-								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-								'warehouse_id'	=> $rowdetail->warehouse_id,
-								'item_id'		=> $rowdetail->item_id,
-								'type'			=> '1',
-								'nominal'		=> $rowtotal,
-								'nominal_fc'	=> $rowfc,
-								'lookable_type'	=> $table_name,
-								'lookable_id'	=> $table_id,
-								'detailable_type'=> $rowdetail->getTable(),
-								'detailable_id'	=> $rowdetail->id,
-							]);
+								CustomHelper::sendCogs('landed_costs',
+									$lc->id,
+									$rowdetail->place->company_id,
+									$rowdetail->place_id,
+									$rowdetail->warehouse_id,
+									$rowdetail->item_id,
+									0,
+									$rowtotal,
+									'IN',
+									$lc->post_date,
+									NULL,
+									NULL,
+									NULL,
+									$rowdetail->getTable(),
+									$rowdetail->id,
+								);
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $coabiayaekspedisi->id,
+									'place_id'		=> $rowdetail->place_id,
+									'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+									'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+									'account_id'	=> $coabiayaekspedisi->bp_journal ? $lc->account_id : NULL,
+									'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+									'warehouse_id'	=> $rowdetail->warehouse_id,
+									'item_id'		=> $rowdetail->item_id,
+									'type'			=> '1',
+									'nominal'		=> $rowtotal,
+									'nominal_fc'	=> $rowfc,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $rowdetail->getTable(),
+									'detailable_id'	=> $rowdetail->id,
+								]);
+							}
 						}
 					}
 				}

@@ -33,7 +33,7 @@ class ExportGoodReceiptFinance implements FromView,ShouldAutoSize
                 if(!$this->modedata){
                     $query->where('user_id',session('bo_id'));
                 }
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['2','3','9']);
             })
             ->get();
             activity()
@@ -56,7 +56,7 @@ class ExportGoodReceiptFinance implements FromView,ShouldAutoSize
                 if(!$this->modedata){
                     $query->where('user_id',session('bo_id'));
                 }
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['2','3','9']);
             })
             ->get();
             activity()

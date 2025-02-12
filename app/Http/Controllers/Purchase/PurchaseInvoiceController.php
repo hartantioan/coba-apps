@@ -1341,7 +1341,7 @@ class PurchaseInvoiceController extends Controller
                                     'percent_tax'           => $request->arr_percent_tax[$key],
                                     'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                                     'percent_wtax'          => $request->arr_percent_wtax[$key],
-                                    'cost_distribution_id' => isset($request->arr_cost_distribution[$key]) && $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
+                                    'cost_distribution_id'  => $request->arr_cost_distribution[$key] ?? NULL,
                                     'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                                     'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                                     'note'                  => $request->arr_note[$key],

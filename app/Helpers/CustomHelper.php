@@ -934,7 +934,7 @@ class CustomHelper {
 	}
 
 	public static function sendJournal($table_name = null,$table_id = null,$account_id = null){
-        info('mbeng');
+        
 		$data = DB::table($table_name)->where('id',$table_id)->first();
 
 		if($table_name == 'good_receipts'){
@@ -4756,7 +4756,6 @@ class CustomHelper {
 			}
 
 		}elseif($table_name == 'purchase_invoices'){
-            info('mbeng');
 			#self::removeJournal($table_name,$table_id);
 			#start untuk po tipe biaya / jasa
 			$totalOutSide = 0;

@@ -20,7 +20,7 @@ class StockInRupiahJob implements ShouldQueue
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
 
     protected $user_id;
-    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , array $group ,string $user_id)
+    public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date , string $type , array $group = [],string $user_id)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';

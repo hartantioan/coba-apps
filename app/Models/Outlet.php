@@ -63,7 +63,7 @@ class Outlet extends Model
     public static function generateCode()
     {
         $query = Outlet::selectRaw('LEFT(code, 5) as prefix')
-        ->orderByDesc('created_at')
+        ->orderByDesc('code')
         ->limit(1)
         ->first();
 

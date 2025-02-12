@@ -155,7 +155,7 @@ class QualityControlController extends Controller
             foreach($query_data as $val) {
                 $btnUpdate = $val->goodReceiptDetail()->exists() || in_array($val->status,['4','5','6']) ? '' : '<button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Isi hasil pemeriksaan." onclick="inspect(`' . CustomHelper::encrypt($val->code) . '`);"><i class="material-icons dp48">done_all</i></button><br>';
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
                     $val->referencePO(),
                     $val->user->name,

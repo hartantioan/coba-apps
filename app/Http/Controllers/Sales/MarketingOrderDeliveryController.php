@@ -250,7 +250,7 @@ class MarketingOrderDeliveryController extends Controller
 
                 }
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     '
                         <select class="browser-default" onchange="updateSendStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
                             <option value="" '.(!$val->send_status ? 'selected' : '').'>BELUM SIAP</option>

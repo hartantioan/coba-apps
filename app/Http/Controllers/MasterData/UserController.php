@@ -252,7 +252,7 @@ class UserController extends Controller
                 }
 
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->name,
                     $val->username,
                     $val->employee_no,

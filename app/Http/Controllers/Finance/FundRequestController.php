@@ -239,7 +239,7 @@ class FundRequestController extends Controller
                 $totalReceivableUsed = $val->totalReceivableUsedPaid();
                 $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
                     $val->user->name ?? '',
                     $val->account->name ?? '',
@@ -944,7 +944,7 @@ class FundRequestController extends Controller
                 $totalReceivableUsed = $val->totalReceivableUsedPaid();
                 $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
                     $val->account->name,
                     $val->type(),

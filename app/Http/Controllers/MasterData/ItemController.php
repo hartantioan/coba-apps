@@ -224,7 +224,7 @@ class ItemController extends Controller
             foreach($query_data as $val) {
 				$btnShading = $val->is_sales_item ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light '.($val->itemShading()->exists() ? 'green' : 'amber darken-3').' accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item : '.count($val->itemShading).'" onclick="shading(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">devices_other</i></button>' : '';
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
                     $val->name??'',
                     $val->other_name??'',

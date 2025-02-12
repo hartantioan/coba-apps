@@ -157,7 +157,7 @@ class LedgerController extends Controller
                 $ending_total = round($balance + $total_debit - $total_credit,2);
 
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code.' - '.$val->name,
                     $val->company->name,
                     number_format($balance, 2, ',', '.'),

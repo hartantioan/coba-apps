@@ -209,7 +209,7 @@ class DocumentTaxController extends Controller
                     $code=$val->transaction_code.$val->replace.$val->code;
                 }
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $pdate_dtax,
                     $refrence,
                     $val->user->name ?? '-',

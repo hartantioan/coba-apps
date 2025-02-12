@@ -117,7 +117,7 @@ class EmployeeController extends Controller
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-1 white-text btn-small" data-popup="tooltip" title="Komponen Gaji" onclick="getSalaryComponent(' . $val->id . ')"><i class="material-icons dp48">wb_iridescent</i></button>';
                 
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->name,
                     $val->username,
                     $val->employee_no,

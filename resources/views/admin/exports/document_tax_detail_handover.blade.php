@@ -24,7 +24,10 @@
                     <td style="border: 1px solid black;">{{ $row->documentTax->total ?? ''}}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_name ?? ''}}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->post_date ?? '' }}</td>
-                    <td style="border: 1px solid black;">{{ $row->documentTax->status() }}</td>
+                    <td style="border: 1px solid black;">
+                        {{ $row->documentTax?->status() ?? '' }}
+                    </td>
+
                 </tr>
             @endforeach
         @endif

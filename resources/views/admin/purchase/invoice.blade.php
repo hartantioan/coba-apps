@@ -294,7 +294,7 @@
                                     <h3 class="right-align" id="balance_bs" style="font-weight:900;color:red;background-color:rgb(255, 252, 85);">0,00</h3>
                                     <label class="active" for="type">Saldo BS Supplier</label>
                                 </div>
-                                
+
                                 <div class="col s12 m12 l12"></div>
 
 
@@ -400,6 +400,7 @@
                                                                             <th class="center">NO.PO/GRPO/FR</th>
                                                                             <th class="center">No.SJ</th>
                                                                             <th class="center">Item / Coa Jasa</th>
+                                                                            <th class="center">Dist. Biaya</th>
                                                                             <th class="center">{{ __('translations.unit') }}</th>
                                                                             <th class="center">Qty Diterima</th>
                                                                             <th class="center">Qty Kembali</th>
@@ -427,7 +428,7 @@
                                                                     </thead>
                                                                     <tbody id="body-detail">
                                                                         <tr id="last-row-detail">
-                                                                            <td colspan="29">
+                                                                            <td colspan="30">
                                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                                     <i class="material-icons left">add</i> Pembulatan Manual
                                                                                 </a>
@@ -1344,6 +1345,9 @@
                                                     ` + val.name + `
                                                 </td>
                                                 <td class="center">
+                                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                                </td>
+                                                <td class="center">
                                                     ` + val.buy_unit + `
                                                 </td>
                                                 <td class="center">
@@ -1425,6 +1429,7 @@
                                                 </td>
                                             </tr>
                                         `);
+                                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
 
                                         $('#arr_percent_tax' + count).val(val.percent_tax);
                                         $('#arr_percent_wtax' + count).val(val.percent_wtax);
@@ -2160,6 +2165,9 @@
                                                             -
                                                         </td>
                                                         <td class="center">
+                                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                                        </td>
+                                                        <td class="center">
                                                             -
                                                         </td>
                                                         <td class="center">
@@ -2280,8 +2288,17 @@
                                                         <option value="` + val.project_id + `">` + val.project_name + `</value>
                                                     `);
                                                 }
+                                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+
+                                                if(val.cost_distribution_id){
+                                                    $('#arr_cost_distribution' + count).append(`
+                                                        <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                                    `);
+                                                }
+                                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+
                                                 $('#due_date').val(val.due_date);
-                                            }else{
+                                            }else if(val.type == 'purchase_order_details'){
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">
                                                         <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
@@ -2321,6 +2338,143 @@
                                                         </td>
                                                         <td class="">
                                                             ` + val.name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.buy_unit + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.qty_received + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.qty_returned + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                                        </td>
+                                                        <td class="center" id="qty_stock` + count + `">
+                                                            ` + val.qty_stock + `
+                                                        </td>
+                                                        <td class="center" id="unit_stock` + count + `">
+                                                            ` + val.unit_stock + `
+                                                        </td>
+                                                        <td class="right-align">
+                                                            ` + val.price + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.post_date + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.due_date + `
+                                                        </td>
+                                                        <td class="right-align row_total" id="row_total` + count + `">
+                                                            ` + val.total + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row1)
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0">Tidak</option>
+                                                                <option value="1">Ya</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_tax` + count + `">
+                                                            ` + val.tax + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPh --</option>
+                                                                @foreach ($wtax as $row2)
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_wtax` + count + `">
+                                                            ` + val.wtax + `
+                                                        </td>
+                                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                                            ` + val.grandtotal + `
+                                                        </td>
+
+                                                        <td class="center">
+                                                            ` + val.place_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.line_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.machine_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.department_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.warehouse_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.project_name + `
+                                                        </td>
+                                                    </tr>
+                                                `);
+                                                if(val.cost_distribution_id){
+                                                    $('#arr_cost_distribution' + count).append(`
+                                                        <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                                    `);
+                                                }
+                                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                            }
+
+                                            else{
+                                                $('#last-row-detail').before(`
+                                                    <tr class="row_detail">
+                                                        <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_price[]" value="` + val.raw_price + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                                        <td class="center">
+                                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                                <i class="material-icons">delete</i>
+                                                            </a>
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.rawcode + `
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.purchase_no + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.delivery_no + `
+                                                        </td>
+                                                        <td class="">
+                                                            ` + val.name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            -
                                                         </td>
                                                         <td class="center">
                                                             ` + val.buy_unit + `
@@ -2728,6 +2882,9 @@
                     -
                 </td>
                 <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                </td>
+                <td class="center">
                     -
                 </td>
                 <td class="center">
@@ -2834,6 +2991,8 @@
         `);
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+
     }
 
     function changePlace(element){
@@ -3681,6 +3840,9 @@
                                             -
                                         </td>
                                         <td class="center">
+                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                        </td>
+                                        <td class="center">
                                             -
                                         </td>
                                         <td class="center">
@@ -3803,7 +3965,14 @@
                                     `);
                                 }
                                 select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                            }else{
+                                if(val.cost_distribution_id){
+                                    $('#arr_cost_distribution' + count).append(`
+                                        <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                    `);
+                                }
+                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+
+                            }else if(val.type == 'fund_request_details' || val.type == 'purchase_order_details'){
                                 $('#last-row-detail').before(`
                                     <tr class="row_detail">
                                         <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
@@ -3843,6 +4012,9 @@
                                         </td>
                                         <td class="">
                                             ` + val.name + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                                         </td>
                                         <td class="center">
                                             ` + val.buy_unit + `
@@ -3926,7 +4098,143 @@
                                         </td>
                                     </tr>
                                 `);
+                                if(val.cost_distribution_id){
+                                    $('#arr_cost_distribution' + count).append(`
+                                        <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                    `);
+                                }
+                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
 
+                                $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                                $('#arr_percent_tax' + count).val(val.percent_tax);
+                                $('#arr_include_tax' + count).val(val.include_tax);
+                            }
+                            else{
+                                $('#last-row-detail').before(`
+                                    <tr class="row_detail">
+                                        <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td class="center">
+                                            ` + val.rawcode + `
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            ` + val.purchase_no + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.delivery_no + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.name + `
+                                        </td>
+                                        <td class="center">
+                                           -
+                                        </td>
+                                        <td class="center">
+                                            ` + val.buy_unit + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.qty_received + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.qty_returned + `
+                                        </td>
+                                        <td class="center">
+                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                        </td>
+                                        <td class="center" id="qty_stock` + count + `">
+                                            ` + val.qty_stock + `
+                                        </td>
+                                        <td class="center" id="unit_stock` + count + `">
+                                            ` + val.unit_stock + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.price + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.due_date + `
+                                        </td>
+                                        <td class="right-align row_total" id="row_total` + count + `">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000">-- Non-PPN --</option>
+                                                @foreach ($tax as $row1)
+                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0">Tidak</option>
+                                                <option value="1">Ya</option>
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_tax` + count + `">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000">-- Non-PPh --</option>
+                                                @foreach ($wtax as $row2)
+                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_wtax` + count + `">
+                                            ` + val.wtax + `
+                                        </td>
+                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                            ` + val.grandtotal + `
+                                        </td>
+
+                                        <td class="center">
+                                            ` + val.place_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.line_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.machine_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.department_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.warehouse_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.project_name + `
+                                        </td>
+                                    </tr>
+                                `);
                                 $('#arr_percent_wtax' + count).val(val.percent_wtax);
                                 $('#arr_percent_tax' + count).val(val.percent_tax);
                                 $('#arr_include_tax' + count).val(val.include_tax);

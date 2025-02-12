@@ -256,7 +256,7 @@ class SendJournal implements ShouldQueue
 					'status'	=> '3',
 				]);
 			}
-			
+
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 
@@ -1860,7 +1860,7 @@ class SendJournal implements ShouldQueue
 				'currency_id'	=> 1,
 			]);
 
-			if($ig->grandtotal > 0){	
+			if($ig->grandtotal > 0){
 				foreach($ig->issueGlazeDetail as $row){
 					if($row->lookable_type == 'items'){
 						JournalDetail::create([
@@ -1876,7 +1876,7 @@ class SendJournal implements ShouldQueue
 							'detailable_type'=> $row->getTable(),
 							'detailable_id'	=> $row->id,
 						]);
-	
+
 						CustomHelper::sendCogs($ig->getTable(),
 							$ig->id,
 							$row->itemStock->place->company_id,
@@ -1893,7 +1893,7 @@ class SendJournal implements ShouldQueue
 							$row->getTable(),
 							$row->id,
 						);
-	
+
 						CustomHelper::sendStock(
 							$row->itemStock->place_id,
 							$row->itemStock->warehouse_id,
@@ -1906,7 +1906,7 @@ class SendJournal implements ShouldQueue
 						);
 					}
 				}
-				
+
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $ig->item->itemGroup->coa_id,
@@ -1965,7 +1965,7 @@ class SendJournal implements ShouldQueue
 				'currency_id'	=> 1,
 			]);
 
-			if($ig->grandtotal > 0){	
+			if($ig->grandtotal > 0){
 				foreach($ig->receiveGlazeDetail as $row){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -2016,7 +2016,7 @@ class SendJournal implements ShouldQueue
                         }
                     }
 				}
-				
+
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $ig->item->itemGroup->coa_id,
@@ -2392,7 +2392,7 @@ class SendJournal implements ShouldQueue
 									'detailable_type'=> $rowfee->getTable(),
 									'detailable_id'	=> $rowfee->id,
 								]);
-								
+
 								JournalDetail::create([
 									'journal_id'	=> $query->id,
 									'coa_id'		=> $coabiayaharusdibayarkan->id,
@@ -3833,7 +3833,7 @@ class SendJournal implements ShouldQueue
 						'note'			=> $mom->getArinCode(),
 					]);
 				}
-                
+
             }
 
             if($tax > 0){
@@ -3905,7 +3905,7 @@ class SendJournal implements ShouldQueue
 									'detailable_id'	=> $row->id,
 								]);
 							} */
-				
+
 							CustomHelper::sendCogs($mom->getTable(),
 								$mom->id,
 								$row->itemStock->place->company_id,
@@ -3922,7 +3922,7 @@ class SendJournal implements ShouldQueue
 								$row->getTable(),
 								$row->id,
 							);
-				
+
 							CustomHelper::sendStock(
 								$row->itemStock->place_id,
 								$row->itemStock->warehouse_id,
@@ -4016,378 +4016,582 @@ class SendJournal implements ShouldQueue
 			$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$pi->company_id)->where('status','1')->first();
 
 			foreach($pi->purchaseInvoiceDetail as $row){
+                if($row->cost_distribution_id){
+					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $row->total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $row->total,2);
+							$accumulation += $nominal;
+						}
 
-				if($row->lookable_type == 'coas'){
+                        if($row->lookable_type == 'coas'){
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable_id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $row->lookable->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $row->total * $pi->currency_rate,
-						'nominal_fc'	=> $row->total,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+						        'coa_id'		=> $row->lookable_id,
+                                'cost_distribution_detail_id'   => $rowcost->id,
+                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
+                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
+                                'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
+                                'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '1',
+                                'nominal'						=> $nominal,
+                                'nominal_fc'					=> $nominal,
+                                'note'			=> $row->note,
+                                'note2'			=> $row->note2,
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
 
-					$grandtotal += $row->grandtotal;
-					$tax += $row->tax;
-					$wtax += $row->wtax;
+                            $grandtotal += $row->grandtotal;
+                            $tax += $row->tax;
+                            $wtax += $row->wtax;
 
-					if($row->tax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $row->tax * $pi->currency_rate,
-							'nominal_fc'	=> $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
+                            if($row->tax_id){
+                                JournalDetail::create([
+                                    'journal_id'	=> $query->id,
+                                    'cost_distribution_detail_id'   => $rowcost->id,
+                                    'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                    'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
+                                    'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
+                                    'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
+                                    'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                    'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
+                                    'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                    'type'			=> '1',
+                                    'nominal'		=> $row->tax * $pi->currency_rate,
+                                    'nominal_fc'	=> $row->tax,
+                                    'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                    'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                    'lookable_type'	=> $table_name,
+                                    'lookable_id'	=> $table_id,
+                                    'detailable_type'=> $row->getTable(),
+                                    'detailable_id'	=> $row->id,
+                                ]);
+                            }
+
+                        }elseif($row->lookable_type == 'purchase_order_details'){
+                            $type = $pi->currency->type;
+                            $currency_rate = $pi->currency_rate;
+                            $pod = $row->lookable;
+
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'cost_distribution_detail_id'   => $rowcost->id,
+                                'coa_id'						=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
+                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
+                                'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
+                                'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '1',
+                                'nominal'						=> $nominal,
+                                'nominal_fc'					=> $nominal,
+                                'note'			=> $row->note,
+                                'note2'			=> $row->note2,
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+
+                            $grandtotal += $row->grandtotal * $pi->currency_rate;
+                            $tax += $row->tax * $pi->currency_rate;
+                            $wtax += $row->wtax * $pi->currency_rate;
+                            $currency_rate = $pi->currency_rate;
+
+                            if($row->tax_id){
+                                JournalDetail::create([
+                                    'journal_id'	=> $query->id,
+                                    'cost_distribution_detail_id'   => $rowcost->id,
+                                    'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                    'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
+                                    'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
+                                    'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
+                                    'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
+                                    'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                    'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                    'type'			=> '1',
+                                    'nominal'		=> $row->tax * $pi->currency_rate,
+                                    'nominal_fc'	=> $pi->currency->type == '1' ? $row->tax * $pi->currency_rate : $row->tax,
+                                    'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                    'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                    'lookable_type'	=> $table_name,
+                                    'lookable_id'	=> $table_id,
+                                    'detailable_type'=> $row->getTable(),
+                                    'detailable_id'	=> $row->id,
+                                ]);
+                            }
+
+                        }
+
 					}
+                    if($row->lookable_type == 'coas'){
 
-					if($row->wtax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->wtax * $pi->currency_rate,
-							'nominal_fc'	=> $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> $row->wtax * $pi->currency_rate,
+                                'nominal_fc'	=> $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coahutangusaha->id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $pi->currency_rate,
-						'nominal_fc'	=> $row->grandtotal,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> $row->grandtotal * $pi->currency_rate,
+                            'nominal_fc'	=> $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+                    }elseif($row->lookable_type == 'purchase_order_details'){
 
-				}elseif($row->lookable_type == 'purchase_order_details'){
-					$type = $pi->currency->type;
-					$currency_rate = $pi->currency_rate;
-					$pod = $row->lookable;
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> $row->wtax * $pi->currency_rate,
+                                'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->wtax * $pi->currency_rate : $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $pod->coa_id,
-						'place_id'		=> $pod->place_id,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $pod->coa->bp_journal ? $account_id : NULL,
-						'department_id'	=> $pod->department_id,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $row->total * $pi->currency_rate,
-						'nominal_fc'	=> $row->total,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
-
-					$grandtotal += $row->grandtotal * $pi->currency_rate;
-					$tax += $row->tax * $pi->currency_rate;
-					$wtax += $row->wtax * $pi->currency_rate;
-					$currency_rate = $pi->currency_rate;
-
-					if($row->tax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $row->tax * $pi->currency_rate,
-							'nominal_fc'	=> $pi->currency->type == '1' ? $row->tax * $pi->currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
-
-					if($row->wtax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->wtax * $pi->currency_rate,
-							'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->wtax * $pi->currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
-
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coahutangusaha->id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $pi->currency_rate,
-						'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
-
-				}elseif($row->lookable_type == 'landed_cost_fee_details'){
-					$type = $pi->currency->type;
-					$currency_rate = $row->lookable->landedCost->currency_rate;
-					$rowcoa = $row->lookable->landedCostFee->type == '1' ? $row->lookable->landedCostFee->coa : $coabiayaharusdibayarkan;
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $rowcoa->id,
-						'account_id'	=> $rowcoa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $row->lookable->total * $currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
-						'note'			=> $row->lookable->landedCostFee->name,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
-
-					$grandtotal += $row->grandtotal * $currency_rate;
-					$tax += $row->tax * $currency_rate;
-					$wtax += $row->wtax * $currency_rate;
-
-					if($row->tax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $row->tax * $currency_rate,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
-
-					if($row->wtax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->wtax * $currency_rate,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
-
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coahutangusaha->id,
-						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate : $row->grandtotal,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
-
-					$adjustLandedCost += (($row->grandtotal * $currency_rate) - ($row->grandtotal * $pi->currency_rate));
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> $row->grandtotal * $pi->currency_rate,
+                            'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+                    }
 				}else{
-					$type = $pi->currency->type;
+                    if($row->lookable_type == 'coas'){
 
-					$currency_rate = $row->lookable->goodReceipt->journal->currency_rate;
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $row->lookable_id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $row->lookable->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '1',
+                            'nominal'		=> $row->total * $pi->currency_rate,
+                            'nominal_fc'	=> $row->total,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
 
-					$totalgrpo = round($row->total * $currency_rate,2);
-					$totalinvoice = round($row->total * $pi->currency_rate,2);
-					$balancegrpo = $totalgrpo - $totalinvoice;
+                        $grandtotal += $row->grandtotal;
+                        $tax += $row->tax;
+                        $wtax += $row->wtax;
 
-					if($balancegrpo > 0 || $balancegrpo < 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coaselisihkurs->id,
-							'account_id'	=> $coaselisihkurs->bp_journal ? $pi->account_id : NULL,
-							'type'			=> $balancegrpo > 0  ? '2' : '1',
-							'nominal'		=> floatval(abs($balancegrpo)),
-							'nominal_fc'	=> 0,
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
+                        if($row->tax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '1',
+                                'nominal'		=> $row->tax * $pi->currency_rate,
+                                'nominal_fc'	=> $row->tax,
+                                'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coahutangbelumditagih->id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $coahutangbelumditagih->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $totalgrpo,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $totalgrpo : $row->total,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> $row->wtax * $pi->currency_rate,
+                                'nominal_fc'	=> $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
 
-					$grandtotal += $row->grandtotal * $pi->currency_rate;
-					$tax += $row->tax * $pi->currency_rate;
-					$wtax += $row->wtax * $pi->currency_rate;
-					$currency_rate = $pi->currency_rate;
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> $row->grandtotal * $pi->currency_rate,
+                            'nominal_fc'	=> $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
 
-					if($row->tax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> round($row->tax * $pi->currency_rate,2),
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $pi->currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
+                    }elseif($row->lookable_type == 'purchase_order_details'){
+                        $type = $pi->currency->type;
+                        $currency_rate = $pi->currency_rate;
+                        $pod = $row->lookable;
 
-					if($row->wtax_id){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> round($row->wtax * $pi->currency_rate,2),
-							'nominal_fc'	=> $type == '1' || $type == '2' ? $row->wtax * $pi->currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $pod->coa_id,
+                            'place_id'		=> $pod->place_id,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $pod->coa->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $pod->department_id,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '1',
+                            'nominal'		=> $row->total * $pi->currency_rate,
+                            'nominal_fc'	=> $row->total,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coahutangusaha->id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> round($row->grandtotal * $pi->currency_rate,2),
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
-						'note'			=> $row->note,
-						'note2'			=> $row->note2,
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'detailable_type'=> $row->getTable(),
-						'detailable_id'	=> $row->id,
-					]);
+                        $grandtotal += $row->grandtotal * $pi->currency_rate;
+                        $tax += $row->tax * $pi->currency_rate;
+                        $wtax += $row->wtax * $pi->currency_rate;
+                        $currency_rate = $pi->currency_rate;
 
-					$adjustGrpo += round($row->grandtotal * $pi->currency_rate,2);
-				}
+                        if($row->tax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '1',
+                                'nominal'		=> $row->tax * $pi->currency_rate,
+                                'nominal_fc'	=> $pi->currency->type == '1' ? $row->tax * $pi->currency_rate : $row->tax,
+                                'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> $row->wtax * $pi->currency_rate,
+                                'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->wtax * $pi->currency_rate : $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->project_id ? $row->project_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> $row->grandtotal * $pi->currency_rate,
+                            'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+
+                    }elseif($row->lookable_type == 'landed_cost_fee_details'){
+                        $type = $pi->currency->type;
+                        $currency_rate = $row->lookable->landedCost->currency_rate;
+                        $rowcoa = $row->lookable->landedCostFee->type == '1' ? $row->lookable->landedCostFee->coa : $coabiayaharusdibayarkan;
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $rowcoa->id,
+                            'account_id'	=> $rowcoa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
+                            'type'			=> '1',
+                            'nominal'		=> $row->lookable->total * $currency_rate,
+                            'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
+                            'note'			=> $row->lookable->landedCostFee->name,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+
+                        $grandtotal += $row->grandtotal * $currency_rate;
+                        $tax += $row->tax * $currency_rate;
+                        $wtax += $row->wtax * $currency_rate;
+
+                        if($row->tax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'type'			=> '1',
+                                'nominal'		=> $row->tax * $currency_rate,
+                                'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $currency_rate : $row->tax,
+                                'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> $row->wtax * $currency_rate,
+                                'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $currency_rate : $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> $row->grandtotal * $currency_rate,
+                            'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate : $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+
+                        $adjustLandedCost += (($row->grandtotal * $currency_rate) - ($row->grandtotal * $pi->currency_rate));
+                    }else{
+                        $type = $pi->currency->type;
+
+                        $currency_rate = $row->lookable->goodReceipt->journal->currency_rate;
+
+                        $totalgrpo = round($row->total * $currency_rate,2);
+                        $totalinvoice = round($row->total * $pi->currency_rate,2);
+                        $balancegrpo = $totalgrpo - $totalinvoice;
+
+                        if($balancegrpo > 0 || $balancegrpo < 0){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $coaselisihkurs->id,
+                                'account_id'	=> $coaselisihkurs->bp_journal ? $pi->account_id : NULL,
+                                'type'			=> $balancegrpo > 0  ? '2' : '1',
+                                'nominal'		=> floatval(abs($balancegrpo)),
+                                'nominal_fc'	=> 0,
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangbelumditagih->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangbelumditagih->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
+                            'type'			=> '1',
+                            'nominal'		=> $totalgrpo,
+                            'nominal_fc'	=> $type == '1' || $type == '' ? $totalgrpo : $row->total,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+
+                        $grandtotal += $row->grandtotal * $pi->currency_rate;
+                        $tax += $row->tax * $pi->currency_rate;
+                        $wtax += $row->wtax * $pi->currency_rate;
+                        $currency_rate = $pi->currency_rate;
+
+                        if($row->tax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->taxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
+                                'type'			=> '1',
+                                'nominal'		=> round($row->tax * $pi->currency_rate,2),
+                                'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $pi->currency_rate : $row->tax,
+                                'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        if($row->wtax_id){
+                            JournalDetail::create([
+                                'journal_id'	=> $query->id,
+                                'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+                                'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                                'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                                'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                                'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+                                'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                                'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
+                                'type'			=> '2',
+                                'nominal'		=> round($row->wtax * $pi->currency_rate,2),
+                                'nominal_fc'	=> $type == '1' || $type == '2' ? $row->wtax * $pi->currency_rate : $row->wtax,
+                                'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+                                'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+                                'lookable_type'	=> $table_name,
+                                'lookable_id'	=> $table_id,
+                                'detailable_type'=> $row->getTable(),
+                                'detailable_id'	=> $row->id,
+                            ]);
+                        }
+
+                        JournalDetail::create([
+                            'journal_id'	=> $query->id,
+                            'coa_id'		=> $coahutangusaha->id,
+                            'place_id'		=> $row->place_id ? $row->place_id : NULL,
+                            'line_id'		=> $row->line_id ? $row->line_id : NULL,
+                            'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+                            'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+                            'department_id'	=> $row->department_id ? $row->department_id : NULL,
+                            'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
+                            'type'			=> '2',
+                            'nominal'		=> round($row->grandtotal * $pi->currency_rate,2),
+                            'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
+                            'note'			=> $row->note,
+                            'note2'			=> $row->note2,
+                            'lookable_type'	=> $table_name,
+                            'lookable_id'	=> $table_id,
+                            'detailable_type'=> $row->getTable(),
+                            'detailable_id'	=> $row->id,
+                        ]);
+
+                        $adjustGrpo += round($row->grandtotal * $pi->currency_rate,2);
+                    }
+                }
 			}
 
 			#start journal rounding

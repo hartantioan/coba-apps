@@ -518,51 +518,57 @@ class ComplaintSalesController extends Controller
                     ->whereHas('approvalTemplateOriginator',function($query){
                         $query->where('user_id',session('bo_id'));
                     })->get();
-                    foreach($approvalTemplate as $row){
 
-                        $source = ApprovalSource::create([
-                            'code'			=> strtoupper(uniqid()),
-                            'user_id'		=> session('bo_id'),
-                            'date_request'	=> date('Y-m-d H:i:s'),
-                            'lookable_type'	=> $query->getTable(),
-                            'lookable_id'	=> $query->id,
-                            'note'			=> $query->note,
-                        ]);
+                    if($query->approval()){
 
-                        $passed = true;
+                    }else{
+                        foreach($approvalTemplate as $row){
 
-                        if($passed == true){
+                            $source = ApprovalSource::create([
+                                'code'			=> strtoupper(uniqid()),
+                                'user_id'		=> session('bo_id'),
+                                'date_request'	=> date('Y-m-d H:i:s'),
+                                'lookable_type'	=> $query->getTable(),
+                                'lookable_id'	=> $query->id,
+                                'note'			=> $query->note,
+                            ]);
 
-                            $count = 0;
+                            $passed = true;
 
-                            foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
-                                    $status = $count == 0 ? '1': '0';
-                                    $check = true;
-                                    if($check){
-                                        if($percent > 5){
-                                            ApprovalMatrix::create([
-                                                'code'							=> strtoupper(Str::random(30)),
-                                                'approval_template_stage_id'	=> $rowTemplateStage->id,
-                                                'approval_source_id'			=> $source->id,
-                                                'user_id'						=> 354,
-                                                'date_request'					=> date('Y-m-d H:i:s'),
-                                                'status'						=> $status
-                                            ]);
-                                        }else{
-                                            ApprovalMatrix::create([
-                                                'code'							=> strtoupper(Str::random(30)),
-                                                'approval_template_stage_id'	=> $rowTemplateStage->id,
-                                                'approval_source_id'			=> $source->id,
-                                                'user_id'						=> 746,
-                                                'date_request'					=> date('Y-m-d H:i:s'),
-                                                'status'						=> $status
-                                            ]);
+                            if($passed == true){
+
+                                $count = 0;
+
+                                foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
+                                        $status = $count == 0 ? '1': '0';
+                                        $check = true;
+                                        if($check){
+                                            if($percent > 5){
+                                                ApprovalMatrix::create([
+                                                    'code'							=> strtoupper(Str::random(30)),
+                                                    'approval_template_stage_id'	=> $rowTemplateStage->id,
+                                                    'approval_source_id'			=> $source->id,
+                                                    'user_id'						=> 354,
+                                                    'date_request'					=> date('Y-m-d H:i:s'),
+                                                    'status'						=> $status
+                                                ]);
+                                            }else{
+                                                ApprovalMatrix::create([
+                                                    'code'							=> strtoupper(Str::random(30)),
+                                                    'approval_template_stage_id'	=> $rowTemplateStage->id,
+                                                    'approval_source_id'			=> $source->id,
+                                                    'user_id'						=> 746,
+                                                    'date_request'					=> date('Y-m-d H:i:s'),
+                                                    'status'						=> $status
+                                                ]);
+                                            }
                                         }
                                     }
-                                }
 
-                            }
+                                }
+                        }
                     }
+
 
 
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Komplain Sales. '.$query->code,$query->note.' - '.$query->note_complaint,session('bo_id'));

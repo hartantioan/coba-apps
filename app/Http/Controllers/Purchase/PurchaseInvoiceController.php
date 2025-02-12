@@ -937,19 +937,19 @@ class PurchaseInvoiceController extends Controller
             foreach($query_data as $val) {
                 $dis = '';
                 $nodis = '';
-                if($val->isOpenPeriod()){
-                    $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
-                }else{
-                    $nodis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
-                }
+                // if($val->isOpenPeriod()){
+                //     $dis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
+                // }else{
+                //     $nodis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
+                // }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
@@ -1590,6 +1590,7 @@ class PurchaseInvoiceController extends Controller
                                 <th class="center-align">Item / Biaya</th>
                                 <th class="center-align">Keterangan 1</th>
                                 <th class="center-align">Keterangan 2</th>
+                                <th class="center-align">Dist. Biaya</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
@@ -1607,11 +1608,13 @@ class PurchaseInvoiceController extends Controller
                 $totalppn+=$row->tax;
                 $totalpph+=$row->wtax;
                 $totalgrandtotal+=$row->grandtotal;
+                $cost_distribution = $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '';
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->getCode().'</td>
                     <td class="">'.$row->note.'</td>
                     <td class="">'.$row->note2.'</td>
+                    <td class="">'.$cost_distribution.'</td>
                     <td>'.$row->getHeaderCode().'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>

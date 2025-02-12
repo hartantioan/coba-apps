@@ -40,6 +40,7 @@ class PurchaseInvoiceDetail extends Model
         'department_id',
         'warehouse_id',
         'project_id',
+        'cost_distribution_id',
     ];
 
     public function lookable(){
@@ -360,5 +361,9 @@ class PurchaseInvoiceDetail extends Model
         }
 
         return $total;
+    }
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
     }
 }

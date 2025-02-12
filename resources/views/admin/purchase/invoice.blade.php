@@ -3378,7 +3378,7 @@
 
                     $('input[name^="arr_code"]').each(function(index){
                         passed = true;
-                        formData.append('arr_cost_distribution[]',($('input[name^="arr_cost_distribution"]').eq(index).val() ?? ''));
+                        formData.append('arr_cost_distribution[]',($('select[name^="arr_cost_distribution"]').eq(index).val() ?? ''));
                         if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
                             if($('#arr_coa' + $(this).data('id')).val()){
                                 formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());

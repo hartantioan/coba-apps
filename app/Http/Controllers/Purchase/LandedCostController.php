@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Jobs\ResetCogs;
+use App\Jobs\ResetCogsNew;
 use App\Jobs\SendApproval;
 use App\Jobs\ResetStock;
 use App\Models\Coa;
@@ -1226,14 +1227,10 @@ class LandedCostController extends Controller
 
             CustomHelper::removeApproval('landed_costs',$query->id);
 
-            foreach($query->landedCostDetail as $rowdetail){
-                ItemCogs::where('lookable_type','landed_costs')->where('lookable_id',$query->id)->delete();
-                ResetCogs::dispatch($query->post_date,$rowdetail->place_id,$rowdetail->item_id);
-            }
-
             $query->landedCostDetail()->delete();
 
             CustomHelper::removeJournal('landed_costs',$query->id);
+            CustomHelper::removeCogs('landed_costs',$query->id);
 
             activity()
                 ->performedOn(new LandedCost())

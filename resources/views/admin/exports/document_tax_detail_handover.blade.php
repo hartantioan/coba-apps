@@ -18,7 +18,9 @@
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->code }}.</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->user->name }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->account->name ?? '' }}</td>
-                    <td style="border: 1px solid black;">{{ $row->documentTax->transaction_code ?? '-'.$row->documentTax->replace ??''.$row->documentTax->code ?? '' }}</td>
+                    <td style="border: 1px solid black;">
+                        {{ $row->documentTax->transaction_code ?? $row->documentTax->replace ?? $row->documentTax->code ?? '' }}
+                    </td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->total }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxHandover->post_date }}</td>

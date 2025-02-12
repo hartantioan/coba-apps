@@ -387,20 +387,22 @@ class ComplaintSalesController extends Controller
 
                     $approved = false;
                     $revised = false;
+                    if($query->marketing_order_id_complaint){
+                        if($query->approval()){
+                            foreach ($query->approval() as $detail){
+                                foreach($detail->approvalMatrix as $row){
+                                    if($row->approved){
+                                        $approved = true;
+                                    }
 
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
+                                    if($row->revised){
+                                        $revised = true;
+                                    }
                                 }
                             }
                         }
                     }
+
 
                     if($approved && !$revised){
                         return response()->json([
@@ -408,7 +410,7 @@ class ComplaintSalesController extends Controller
                             'message' => 'Sales Order telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
                         if($request->has('file')) {
 
                             if($query->document){

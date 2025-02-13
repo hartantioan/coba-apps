@@ -24,7 +24,7 @@ class MailOutstandingARInvoiceInternal extends Command
     public function handle()
     {
         // $recipient = ['andrew@superior.co.id', 'henrianto@superior.co.id', 'haidong@superiorporcelain.co.id', 'annabela@superior.co.id', 'yorghi@superior.co.id', 'marisa@superiorporcelain.co.id'];
-        $recipient = ['andrew@superior.co.id','marisa@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id'];
+        $recipient = ['andrew@superior.co.id','marisa@superiorporcelain.co.id','henrianto@superior.co.id','haidong@superiorporcelain.co.id','jimmy@superiorporcelain.co.id','adrianto@superiorporcelain.co.id','hunawan@superiorporcelain.co.id','iwan@superiorporcelain.co.id'];
         $date = date('Y-m-d');
         $results = DB::select("
             SELECT 

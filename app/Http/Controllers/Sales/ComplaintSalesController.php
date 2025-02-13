@@ -518,10 +518,22 @@ class ComplaintSalesController extends Controller
                     })->get();
 
                     if($query->approval()){
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                        $query->status = '3';
+                                if($row->revised){
+                                    $revised = true;
+                                }
+                            }
+                        }
+                        if($approved && !$revised){
+                            $query->status = '3';
 
-                        $query->save();
+                            $query->save();
+                        }
                     }else{
                         foreach($approvalTemplate as $row){
 

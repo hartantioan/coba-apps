@@ -445,8 +445,6 @@ class ComplaintSalesController extends Controller
                         $query->lookable_type = 'marketing_order_delivery_processes';
                         $query->solution = $request->solution;
 
-                        $query->status = '1';
-
                         $query->save();
 
                         foreach($query->complaintSalesDetail as $row){
@@ -521,6 +519,9 @@ class ComplaintSalesController extends Controller
 
                     if($query->approval()){
 
+                        $query->status = '3';
+
+                        $query->save();
                     }else{
                         foreach($approvalTemplate as $row){
 

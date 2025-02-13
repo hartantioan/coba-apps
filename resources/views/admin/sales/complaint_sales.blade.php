@@ -1781,6 +1781,37 @@
         });
     }
 
+    function doneStatus(id){
+        var msg = '';
+        $.ajax({
+            url: '{{ Request::url() }}/done_status',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { id : id },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                M.toast({
+                    html: response.message
+                });
+                loadDataTable();
+            },
+            error: function() {
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function countRow(id){
         if($('#arr_lookable_id' + id).val()){
             var qtyColorMistake = parseFloat($('#qty_color_mistake' + id).val().replace(/\./g, '').replace(',', '.'));

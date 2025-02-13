@@ -180,6 +180,7 @@ class ComplaintSalesController extends Controller
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="Done Status" onclick="doneStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">thumb_up</i></button>
 					'
                 ];
 
@@ -662,5 +663,122 @@ class ComplaintSalesController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function doneStatus(Request $request){
+        $query = ComplaintSales::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $approved = false;
+        $revised = false;
+
+        if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+
+        if(in_array($query->status,['3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if($query) {
+
+            if($approved && !$revised){
+                $query->update([
+                    'status'     => '3',
+                ]);
+            }
+
+
+            activity()
+                ->performedOn(new ComplaintSales())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('update done the complaint sales order data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data updated successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to update.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = ComplaintSales::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $approved = false;
+        $revised = false;
+
+        if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if(in_array($query->status,['2','3','4','5'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if($query->delete()) {
+
+            $query->complaintSalesDetail()->delete();
+
+            CustomHelper::removeApproval('complaint_sales',$query->id);
+
+            activity()
+                ->performedOn(new ComplaintSales())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the ComplaintSales order data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

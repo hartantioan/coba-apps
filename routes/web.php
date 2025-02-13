@@ -1630,7 +1630,7 @@ Route::prefix('admin')->group(function () {
                         // Route::get('get_import_excel', [MitraCustomerController::class, 'getImportExcel']);
                         // Route::post('import', [MitraCustomerController::class, 'import']);
                     });
-                    
+
                     //testing api
                     Route::prefix('item')->group(function (){
                         Route::get('/', [TirtaKencanaController::class, 'getItemIndex']);
@@ -3070,6 +3070,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_details', [ComplaintSalesController::class, 'getDetails']);
                     Route::post('remove_used_data', [ComplaintSalesController::class, 'removeUsedData']);
                     Route::post('create', [ComplaintSalesController::class, 'create'])->middleware('operation.access:complaint_sales,update');
+                    Route::post('done_status', [ComplaintSalesController::class, 'doneStatus'])->middleware('operation.access:complaint_sales,update');
                     Route::post('create_done', [ComplaintSalesController::class, 'createDone'])->middleware('operation.access:complaint_sales,update');
                     Route::get('approval/{id}', [ComplaintSalesController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}', [ComplaintSalesController::class, 'printIndividual'])->withoutMiddleware('direct.access');

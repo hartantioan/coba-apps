@@ -2988,7 +2988,7 @@ class Select2Controller extends Controller {
             if($balance > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->place->code.' - '.$d->warehouse->name.' - '.($d->area()->exists() ? $d->area->name : '').' Kode Batch '.($d->productionBatch->code ?? '-').' Qty. '.CustomHelper::formatConditionalQty($balance).' '.$d->item->uomUnit->code,
+                    'text' 			    => $d->place->code.' - '.$d->warehouse->name.' - '.($d->area()->exists() ? $d->area->name : '').' Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '').' Kode Batch '.($d->productionBatch->code ?? '-').' Qty. '.CustomHelper::formatConditionalQty($balance).' '.$d->item->uomUnit->code,
                     'qty'               => CustomHelper::formatConditionalQty($balance).' '.$d->item->uomUnit->code,
                     'qty_raw'           => CustomHelper::formatConditionalQty($balance),
                     'batch'             => $d->productionBatch->code ?? '',

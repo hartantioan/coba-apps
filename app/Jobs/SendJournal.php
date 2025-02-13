@@ -2191,7 +2191,7 @@ class SendJournal implements ShouldQueue
 				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
 				$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$lc->company_id)->where('status','1')->first();
 				$coabiayaekspedisi = Coa::where('code','500.02.01.07.01')->where('company_id',$lc->company_id)->where('status','1')->first();
-				$distribusiBiaya = CostDistribution::where('code','P1.L1L2')->where('status','1')->first();
+				$distribusiBiaya = CostDistribution::where('code','P1.L0')->where('status','1')->first();
 
 				$query = Journal::create([
 					'user_id'		=> $this->user_id,

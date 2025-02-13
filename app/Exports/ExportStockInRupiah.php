@@ -88,6 +88,9 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
             $query_data = ItemCogs::where(function($query) {
                 $query->whereHas('item',function($query){
                     $query->whereIn('status',['1','2']);
+                    if(count($this->group) > 0){
+                        $query->whereIn('item_group_id', $this->group);
+                    }
                 });
                 if($this->start_date && $this->finish_date) {
                     $query->whereDate('date', '>=', $this->start_date)
@@ -110,13 +113,6 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                 if($this->warehouse !== 'all'){
                     $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
-                    });
-                }
-                if($this->group){
-                    $groupIds = explode(',', $this->group);
-
-                    $query->whereHas('item',function($query) use($groupIds){
-                        $query->whereIn('item_group_id', $groupIds);
                     });
                 }
             })

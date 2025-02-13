@@ -1542,16 +1542,10 @@
     function exportExcel(){
         var search = table.search();
         var status = $('#filter_status').val();
-        var type_buy = $('#filter_inventory').val();
-        var type_deliv = $('#filter_shipping').val();
-        var company = $('#filter_company').val();
-        var type_pay = $('#filter_payment').val();
-        var supplier = $('#filter_supplier').val();
-        var currency = $('#filter_currency').val();
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status +"&end_date=" + end_date + "&start_date=" + start_date;
 
     }
 

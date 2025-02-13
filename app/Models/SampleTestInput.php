@@ -132,4 +132,14 @@ class SampleTestInput extends Model
     public function sampleTestInputPICNote(){
         return $this->hasOne('App\Models\SampleTestInputPICNote','sample_test_input_id','id');
     }
+
+    public function labType(){
+        $status = match ($this->lab_type) {
+            '1' => 'Pabrik',
+            '2' => 'Luar',
+            default => '-',
+        };
+
+        return $status;
+    }
 }

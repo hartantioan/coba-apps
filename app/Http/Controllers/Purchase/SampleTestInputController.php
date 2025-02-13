@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Purchase;
 
+use App\Exports\ExportFromTransactionPageSampleTestInput;
+use App\Exports\ExportFromTransactionPageSampleTestInputPicNote;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
@@ -14,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SampleTestInputController extends Controller
 {
@@ -383,6 +386,14 @@ class SampleTestInputController extends Controller
         $code = SampleTestInput::generateCode($request->val);
 
 		return response()->json($code);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        $search = $request->search ? $request->search : '';
+		return Excel::download(new ExportFromTransactionPageSampleTestInput($post_date,$end_date,$status,$search), 'sample_test_input'.uniqid().'.xlsx');
     }
 
     public function destroy(Request $request){

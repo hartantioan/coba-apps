@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 
+use App\Exports\ExportFromTransactionPageSampleTestInputPicNote;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Menu;
@@ -13,6 +14,7 @@ use App\Models\SampleTestInput;
 use App\Models\SampleTestInputPICNote;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SpecialNotePICSampleController extends Controller
 {
@@ -214,6 +216,14 @@ class SpecialNotePICSampleController extends Controller
 		}
 
 		return response()->json($response);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        $search = $request->search ? $request->search : '';
+		return Excel::download(new ExportFromTransactionPageSampleTestInputPicNote($post_date,$end_date,$status,$search), 'sample_test_input'.uniqid().'.xlsx');
     }
 
     public function show(Request $request){

@@ -302,7 +302,7 @@
                                         <label class="active" for="is_include_tax">Termasuk PPN</label>
                                     </div>
                                     <div class="input-field col m3 s12 step13">
-                                        <input id="tax_no" name="tax_no" type="text">
+                                        <input id="tax_no" name="tax_no" type="text" placeholder="auto generate">
                                         <label class="active" for="tax_no">No. Seri Pajak</label>
                                     </div>
                                 </fieldset>

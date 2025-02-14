@@ -27,6 +27,7 @@ class ComplaintSalesDetail extends Model
         'qty_broken',
         'qty_mistake',
         'note',
+        'production_batch_code',
     ];
     public function lookable(){
         return $this->morphTo();

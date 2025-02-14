@@ -489,10 +489,12 @@ class ComplaintSalesController extends Controller
                 }
                 if($query) {
                     foreach($request->arr_lookable_type as $key => $row){
+                        info($request->arr_production_batch_code[$key]);
                         ComplaintSalesDetail::create([
                             'complaint_sales_id'=> $query->id,
-                            'lookable_type'=> $request->arr_lookable_type[$key],
+                            'lookable_type'=> 'marketing_order_delivery_details',
                             'lookable_id'=> $request->arr_lookable_id[$key],
+                            'production_batch_code'=> $request->arr_production_batch_code[$key],
                             'qty_color_mistake'=> str_replace(',', '.',$request->arr_qty_color_mistake[$key]),
                             'qty_motif_mistake'=> str_replace(',', '.',$request->arr_qty_motif_mistake[$key]),
                             'qty_size_mistake'=> str_replace(',', '.',$request->arr_qty_size_mistake[$key]),
@@ -635,6 +637,7 @@ class ComplaintSalesController extends Controller
                 'id'                    => $row->id,
                 'lookable_id'               => $row->lookable_id,
                 'item'                      => $row->lookable->item->name,
+                'production_batch_code'                      => $row->production_batch_code,
                 'qty_color_mistake'                   => CustomHelper::formatConditionalQty($row->qty_color_mistake),
                 'qty_motif_mistake'               => CustomHelper::formatConditionalQty($row->qty_motif_mistake),
                 'qty_size_mistake'                  => CustomHelper::formatConditionalQty($row->qty_size_mistake),

@@ -223,6 +223,7 @@
                                                 <th>{{ __('translations.delete') }}</th>
                                                 <th>{{ __('translations.no') }}.</th>
                                                 <th>Item</th>
+                                                <th>Kode Produksi</th>
                                                 <th>Ketidaksesuaian Warna</th>
                                                 <th>Ketidaksesuaian Motif</th>
                                                 <th>Ketidaksesuaian Ukuran</th>
@@ -752,6 +753,9 @@
                                         </td>
                                         <td>
                                             ` + val.item + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_production_batch_code[]" class="materialize-textarea" type="text" placeholder="Kode Produksi ">
                                         </td>
                                         <td>
                                             <input name="arr_qty_color_mistake[]" class="browser-default qty-input" value="0" type="text" onkeyup="formatRupiahNoMinus(this); countRow('` + count + `'); updateGrandTotal();" style="text-align:right;" id="qty_color_mistake` + count + `" >
@@ -1618,6 +1622,9 @@
                                 </td>
                                 <td>
                                     ` + val.item + `
+                                </td>
+                                <td>
+                                    <input name="arr_production_batch_code[]" class="materialize-textarea" type="text" value="`+val.production_batch_code+`" placeholder="Kode Produksi ">
                                 </td>
                                 <td>
                                     <input name="arr_qty_color_mistake[]" class="browser-default qty-input" value="`+val.qty_color_mistake+`" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');updateGrandTotal();" style="text-align:right;" id="qty_color_mistake` + count + `">

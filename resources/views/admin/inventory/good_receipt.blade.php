@@ -81,6 +81,7 @@
                                                         <option value="5">Ditutup</option>
                                                         <option value="6">Direvisi</option>
                                                         <option value="8">Ditutup Balik</option>
+                                                        <option value="9">Dilock Procurement</option>
                                                     </select>
                                                 </div>
                                             </div>

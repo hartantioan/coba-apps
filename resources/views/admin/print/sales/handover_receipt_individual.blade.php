@@ -172,6 +172,7 @@
                             <tr>
                                 <th>{{ __('translations.no') }}</th>
                                 <th>No.Invoice</th>
+                                <th>No.Faktur Pajak</th>
                                 <th>{{ __('translations.date') }}</th>
                                 <th>{{ __('translations.grandtotal') }}</th>
                                 <th>Dibayar</th>
@@ -184,6 +185,7 @@
                                 <tr class="{{ $key % 35 == 0 && $key > 0 ? 'page-break' : '' }}">
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
+                                    <td>{{ $row->lookable->tax_no ?? '-' }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>

@@ -125,7 +125,7 @@ class MarketingOrderReportController extends Controller
             if ($document_code == 'ARIN') {
                 $data = MarketingOrderInvoice::where('code', $rowunique)->first();
                 if ($data) {
-                    if ($data->tax > 0) {
+                    if ($data->tax_no > 0) {
                         $data->update([
                             'tax_no'    => $uniqueArrSerial[$keymain],
                         ]);
@@ -139,7 +139,7 @@ class MarketingOrderReportController extends Controller
             } elseif ($document_code == 'ARDP') {
                 $data = MarketingOrderDownPayment::where('code', $rowunique)->first();
                 if ($data) {
-                    if ($data->tax > 0) {
+                    if ($data->tax_no > 0) {
                         $data->update([
                             'tax_no'    => $uniqueArrSerial[$keymain],
                         ]);

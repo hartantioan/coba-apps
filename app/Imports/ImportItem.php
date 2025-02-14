@@ -104,32 +104,34 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                     ]);
 
                     //FOR TKTW API Insert
-                    if ($brand->id == 15){
-                        // $konversi=[
-                        //     ['uomCode' => optional(Unit::where('id', $item_unit_id->id)->first())->code, 'qty' => 1 ],
-                        // ];
+                    if($brand){
+                        if ($brand->id == 15){
+                            // $konversi=[
+                            //     ['uomCode' => optional(Unit::where('id', $item_unit_id->id)->first())->code, 'qty' => 1 ],
+                            // ];
 
-                        $payload=[
-                            "code"           => $row['code'],
-                            "name"           => $row['name'],
-                            "uom"            => $item_unit_code,
-                            "desc"           => ($row['note'] == null || $row['note'] == "") ? "-" : $row['note'],
-                            "type"           => $type ? $type->name :  explode('#', $row['type_fg'])[1],
-                            "size"           => $size ? $size->name : explode('#', $row['size_fg'])[1],
-                            "variety"        => $variety ? $variety->name : explode('#', $row['variety_fg'])[1],
-                            "pattern"        => $pattern ? $pattern->name : explode('#', $row['pattern_fg'])[1],
-                            "grade"          => $grade ? $grade->name : explode('#', $row['grade_fg'])[1],
-                            "merk"           => $brand ? $brand->name : explode('#', $row['brand_fg'])[1],
-                            "package"        => $pallet ? $pallet->prefix_code : explode('#', $row['palet_fg'])[1],
-                            "uomConvertions" => [],
-                        ];
-                        $query_syncdata = $query->mitraApiSyncDatas()->create([
-                            'mitra_id'  => 1411,
-                            'operation' => 'store',
-                            'payload'   => json_encode($payload),
-                            'status'    => '0',
-                            'attempts'  => 0,
-                        ]);
+                            $payload=[
+                                "code"           => $row['code'],
+                                "name"           => $row['name'],
+                                "uom"            => $item_unit_code,
+                                "desc"           => ($row['note'] == null || $row['note'] == "") ? "-" : $row['note'],
+                                "type"           => $type ? $type->name :  explode('#', $row['type_fg'])[1],
+                                "size"           => $size ? $size->name : explode('#', $row['size_fg'])[1],
+                                "variety"        => $variety ? $variety->name : explode('#', $row['variety_fg'])[1],
+                                "pattern"        => $pattern ? $pattern->name : explode('#', $row['pattern_fg'])[1],
+                                "grade"          => $grade ? $grade->name : explode('#', $row['grade_fg'])[1],
+                                "merk"           => $brand ? $brand->name : explode('#', $row['brand_fg'])[1],
+                                "package"        => $pallet ? $pallet->prefix_code : explode('#', $row['palet_fg'])[1],
+                                "uomConvertions" => [],
+                            ];
+                            $query_syncdata = $query->mitraApiSyncDatas()->create([
+                                'mitra_id'  => 1411,
+                                'operation' => 'store',
+                                'payload'   => json_encode($payload),
+                                'status'    => '0',
+                                'attempts'  => 0,
+                            ]);
+                        }
                     }
 
                     foreach($query->itemGroup->itemGroupWarehouse as $row){
@@ -200,7 +202,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                 }
             }
             else{
-                return null;
+                info('mbeng');
             }
             DB::commit();
         }catch (\Exception $e) {

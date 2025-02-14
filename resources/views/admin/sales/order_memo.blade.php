@@ -1896,6 +1896,10 @@
                         }
                     });
                     $('#modal7').modal('close');
+                    $('#textTax').show();
+                    if(!$('#tax_no').val()){
+                        getTaxSeries();
+                    }
                 }else{
                     swal({
                         title: 'Ups!',

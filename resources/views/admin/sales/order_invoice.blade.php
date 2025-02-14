@@ -3242,13 +3242,13 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        /* if(total > 0){ */
+        if(total > 0){
             $('#textTax').show();
-            /* getTaxSeries(); */
-        /* }else{
+            getTaxSeries();
+        }else{
             $('#textTax').hide();
             $('#tax_no').val('');
-        } */
+        }
     }
 
     function startIntro(){

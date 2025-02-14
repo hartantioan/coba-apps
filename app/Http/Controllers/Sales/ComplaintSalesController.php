@@ -489,7 +489,6 @@ class ComplaintSalesController extends Controller
                 }
                 if($query) {
                     foreach($request->arr_lookable_type as $key => $row){
-                        info($request->arr_production_batch_code[$key]);
                         ComplaintSalesDetail::create([
                             'complaint_sales_id'=> $query->id,
                             'lookable_type'=> 'marketing_order_delivery_details',

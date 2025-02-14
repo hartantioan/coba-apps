@@ -45,7 +45,7 @@
                                                     </div>
                                                     <div class="col m3 s6 ">
                                                         <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}">
+                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m6 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -137,22 +137,38 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
     });
     function exportExcel(){
-
-        var status = $('#filter_status').val();
-        var type_buy = $('#filter_inventory').val();
-        var type_deliv = $('#filter_delivery').val();
-        var company = $('#filter_company').val();
-        var type_pay = $('#filter_payment').val();
-        var supplier = $('#filter_account').val();
-        var sender = $('#filter_sender').val();
-        var sales = $('#filter_sales').val();
-        var currency = $('#filter_currency').val();
+        var end_date = $('#end_date').val();
         var start_date = $('#start_date').val();
-        var end_date = $('#finish_date').val();
-        var account_id = $('#filter_account').val();
-        var $search = '';
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&start_date=" + start_date;
-
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                end_date : end_date,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
     function exportCsv(){
         var start_date = $('#start_date').val(), end_date = $('#end_date').val();

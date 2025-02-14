@@ -2991,7 +2991,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_production_result')->middleware('operation.access:report_production_result,view')->group(function () {
                         Route::get('/', [ReportProductionResultController::class, 'index']);
                         Route::post('filter', [ReportProductionResultController::class, 'filter']);
-                        Route::get('export', [ReportProductionResultController::class, 'export']);
+                        Route::post('export', [ReportProductionResultController::class, 'export']);
                     });
                 });
             });

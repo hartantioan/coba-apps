@@ -125,7 +125,7 @@ class MarketingOrderReportController extends Controller
             if ($document_code == 'ARIN') {
                 $data = MarketingOrderInvoice::where('code', $rowunique)->first();
                 if ($data) {
-                    if ($data->tax_no > 0) {
+                    /* if ($data->tax > 0) { */
                         $data->update([
                             'tax_no'    => $uniqueArrSerial[$keymain],
                         ]);
@@ -134,12 +134,12 @@ class MarketingOrderReportController extends Controller
                                 'note'  => 'No Seri Pajak : ' . $uniqueArrSerial[$keymain],
                             ]);
                         }
-                    }
+                    /* } */
                 }
             } elseif ($document_code == 'ARDP') {
                 $data = MarketingOrderDownPayment::where('code', $rowunique)->first();
                 if ($data) {
-                    if ($data->tax_no > 0) {
+                    /* if ($data->tax > 0) { */
                         $data->update([
                             'tax_no'    => $uniqueArrSerial[$keymain],
                         ]);
@@ -152,7 +152,7 @@ class MarketingOrderReportController extends Controller
                                 }
                             }
                         }
-                    }
+                    /* } */
                 }
             }
         }

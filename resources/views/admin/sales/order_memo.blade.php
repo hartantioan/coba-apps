@@ -2452,7 +2452,10 @@
                 $('#tax_no').val('');
             }
         }else{
-            
+            $('#textTax').show();
+            if(!$('#tax_no').val()){
+                getTaxSeries();
+            }
         }
     }
 

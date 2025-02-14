@@ -474,7 +474,7 @@ class MarketingOrderDownPaymentController extends Controller
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDownPayment::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    /* $taxno = '';
+                    $taxno = '';
                     if($request->tax_id > 0){
                         $no = TaxSeries::getTaxCode($request->company_id,$request->post_date,$request->prefix_tax);
                         if($no['status'] == 200){
@@ -485,7 +485,7 @@ class MarketingOrderDownPaymentController extends Controller
                                 'message' => 'Nomor seri pajak sudah habis terpakai.'
                             ]);
                         }
-                    } */
+                    }
 
                     $query = MarketingOrderDownPayment::create([
                         'code'			            => $newCode,
@@ -498,7 +498,7 @@ class MarketingOrderDownPaymentController extends Controller
                         'is_include_tax'            => $request->is_include_tax,
                         'percent_tax'               => $request->percent_tax,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/sales_down_payments') : NULL,
-                        'tax_no'                    => $request->tax_no ?? NULL,
+                        'tax_no'                    => /* $request->tax_no ?? NULL */$taxno,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,

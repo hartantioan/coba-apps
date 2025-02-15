@@ -218,7 +218,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     if($finance_kadar_air > 0){
                         $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->qty);
                     }
-                    $total_bayar = $row->goodScale->qty;
+                    $total_bayar = $row->qty;
                     if($finance_kadar_air > 0){
                         $total_bayar = $total_bayar-$finance_kg;
                     }

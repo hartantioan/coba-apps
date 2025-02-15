@@ -230,7 +230,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     'NO PO'=> $row->goodScale->purchaseOrderDetail->purchaseOrder->code??$row->purchaseOrderDetail->purchaseOrder->code,
                     'NAMA ITEM'=> $row->item->name,
                     'NO SJ'=> $row->goodReceipt->delivery_no,
-                    'TGL MASUK'=> date('d/m/Y',strtotime($row->goodScale->post_date)),
+                    'TGL MASUK'=> date('d/m/Y',strtotime($row->goodScale->post_date ?? $row->goodReceipt->post_date)),
                     'NO. KENDARAAN' =>$row->goodScale->vehicle_no,
                     'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance ?? $row->qty,
                     'HASIL QC' =>$row->water_content,

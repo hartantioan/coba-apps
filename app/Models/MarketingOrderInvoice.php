@@ -580,9 +580,9 @@ class MarketingOrderInvoice extends Model
     public function balancePaymentIncoming()
     {
         if ($this->isExport()) {
-            $total = $this->total - $this->totalPayMemo();
+            $total = round($this->total - $this->totalPayMemo(),2);
         } else {
-            $total = $this->grandtotal - $this->totalPayMemo();
+            $total = round($this->grandtotal - $this->totalPayMemo(),2);
         }
 
         return $total;

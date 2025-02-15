@@ -442,7 +442,7 @@ class MarketingOrderInvoice extends Model
 
         foreach ($this->marketingOrderInvoiceDetail as $row) {
             foreach ($row->marketingOrderMemoDetail as $momd) {
-                $total += $momd->grandtotal;
+                $total += round($momd->grandtotal,2);
             }
         }
 
@@ -603,7 +603,7 @@ class MarketingOrderInvoice extends Model
         $total = 0;
 
         foreach ($this->incomingPaymentDetail as $row) {
-            $total += $row->subtotal;
+            $total += round($row->subtotal,2);
         }
 
         return $total;

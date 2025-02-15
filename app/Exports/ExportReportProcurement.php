@@ -177,10 +177,18 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     ->where('account_id',$row->goodScale->account_id)->first();
                 }
                 //sementara pake ini
-                $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
-                ->whereDate('start_effective_date','<=',$row->goodScale->post_date)
-                ->whereDate('effective_date','>=',$row->goodScale->post_date)
-                ->where('account_id',$row->goodScale->account_id)->first();
+                if($row->goodScale()->exists()){
+                    $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
+                    ->whereDate('start_effective_date','<=',$row->goodScale->post_date)
+                    ->whereDate('effective_date','>=',$row->goodScale->post_date)
+                    ->where('account_id',$row->goodScale->account_id)->first();
+                }else{
+                    $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
+                    ->whereDate('start_effective_date','<=',$row->goodReceipt->post_date)
+                    ->whereDate('effective_date','>=',$row->goodReceipt->post_date)
+                    ->where('account_id',$row->goodReceipt->account_id)->first();
+                }
+
                 $percentage_level = 0;
                 $percentage_netto_limit = 0;
                 $finance_kadar_air = 0;

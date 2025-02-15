@@ -137,6 +137,14 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             $querysd
             ->whereIn('status',["2","3","9"]);
         })->get();
+        $queryWithoutGoodScale = GoodReceiptDetail::doesntHave('goodScale')
+        ->whereHas('goodReceipt', function ($querysd) {
+            $querysd->where('post_date', '>=',$this->start_date)
+            ->where('post_date', '<=', $this->finish_date)
+            ->whereIn('status',["2","3","9"]);
+        })
+        ->where('item_id',$this->item_id)->get();
+        $query_data = $query_data->merge($queryWithoutGoodScale);
         if($this->type == 3){
             $query_data = GoodReceiptDetail::whereHas('goodReceipt', function ($querysd) {
                 $querysd->where('post_date', '>=',$this->start_date)
@@ -181,19 +189,36 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     $percentage_level = round($take_item_rule_percent->percentage_level,2);
                     $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
                 }
-                if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
-                    $finance_kadar_air = $row->water_content - $percentage_level;
+                if($row->goodScale()->exists()){
+                    if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                        $finance_kadar_air = $row->water_content - $percentage_level;
+                    }
+                    if($finance_kadar_air > 0){
+                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->goodScale->qty_balance);
+                    }
+                    $total_bayar = $row->goodScale->qty_balance;
+                    if($finance_kadar_air > 0){
+                        $total_bayar = $total_bayar-$finance_kg;
+                    }
+                    $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->water_content/100));
+                    $price = $row->goodScale->purchaseOrderDetail->price;
+                    $finance_price = $price*$total_bayar;
+                }else{
+                    if($row->water_content > $percentage_level && $percentage_level != 0){
+                        $finance_kadar_air = $row->water_content - $percentage_level;
+                    }
+                    if($finance_kadar_air > 0){
+                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->qty);
+                    }
+                    $total_bayar = $row->goodScale->qty;
+                    if($finance_kadar_air > 0){
+                        $total_bayar = $total_bayar-$finance_kg;
+                    }
+                    $total_penerimaan = $row->qty * (1 - ($row->water_content/100));
+                    $price = $row->purchaseOrderDetail->price;
+                    $finance_price = $price*$total_bayar;
                 }
-                if($finance_kadar_air > 0){
-                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->goodScale->qty_balance);
-                }
-                $total_bayar = $row->goodScale->qty_balance;
-                if($finance_kadar_air > 0){
-                    $total_bayar = $total_bayar-$finance_kg;
-                }
-                $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->water_content/100));
-                $price = $row->goodScale->purchaseOrderDetail->price;
-                $finance_price = $price*$total_bayar;
+
 
 
                 $all_penerimaan += $total_penerimaan;
@@ -202,12 +227,12 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 $arr[] = [
                     'no'                => $no,
                     'PLANT'=> $row->place->name,
-                    'NO PO'=> $row->goodScale->purchaseOrderDetail->purchaseOrder->code,
+                    'NO PO'=> $row->goodScale->purchaseOrderDetail->purchaseOrder->code??$row->purchaseOrderDetail->purchaseOrder->code,
                     'NAMA ITEM'=> $row->item->name,
                     'NO SJ'=> $row->goodReceipt->delivery_no,
                     'TGL MASUK'=> date('d/m/Y',strtotime($row->goodScale->post_date)),
                     'NO. KENDARAAN' =>$row->goodScale->vehicle_no,
-                    'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance,
+                    'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance ?? $row->qty,
                     'HASIL QC' =>$row->water_content,
                     'STD POTONGAN QC' =>$percentage_level,
                     'FINANCE Kadar air' =>$finance_kadar_air,

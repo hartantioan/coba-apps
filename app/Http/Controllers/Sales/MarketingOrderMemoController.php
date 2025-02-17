@@ -1292,7 +1292,7 @@ class MarketingOrderMemoController extends Controller
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s'),
-                    /* 'tax_no'    => $newtaxno ?? NULL, */
+                    'tax_no'    => NULL,
                 ]);
 
                 if($query->memo_type == '1'){

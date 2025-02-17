@@ -76,7 +76,7 @@ class StockInRupiahController extends Controller
                 </thead>
                 <tbody id="table_body">';
 
-            $before_date = date('Y-m-d', strtotime('-10 day', strtotime($request->finish_date)));
+            $before_date = date('Y-m-d', strtotime('-1 day', strtotime($request->finish_date)));
             $arr = [];
             $total = 0;
             foreach($item as $key => $row){

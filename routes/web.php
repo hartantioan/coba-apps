@@ -2384,7 +2384,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page', [InventoryTransferInController::class, 'exportFromTransactionPage']);
                 });
 
-                Route::prefix('truck_queue')->middleware(['operation.access:truck_queue,view', 'truck_queue'])->group(function () {
+                Route::prefix('truck_queue')->middleware(['operation.access:truck_queue,view', 'lockacc'])->group(function () {
                     Route::get('/', [TruckQueueController::class, 'index']);
                     Route::get('datatable', [TruckQueueController::class, 'datatable']);
                    Route::post('create', [TruckQueueController::class, 'create'])->middleware('operation.access:truck_queue,update');
@@ -2605,7 +2605,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [ReportInventorySummaryStockFGController::class, 'export']);
 
                     });
-                    Route::prefix('report_truck_queue')->middleware('operation.access:stock_movement,view')->group(function () {
+                    Route::prefix('report_truck_queue')->middleware('operation.access:report_truck_queue,view')->group(function () {
                         Route::get('/', [ReportTruckQueueController::class, 'index']);
                         Route::post('filter', [ReportTruckQueueController::class, 'filter']);
                         Route::get('export', [ReportTruckQueueController::class, 'export']);

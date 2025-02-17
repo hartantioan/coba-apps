@@ -2747,10 +2747,17 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = CostDistribution::where(function($query) use($search){
+        $data = CostDistribution::where(function($query) use($search,$request){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
-                 })
+                })
+                ->where(function($query) use($search,$request){
+                    if($request->place_id){
+                        $query->whereHas('costDistributionDetail',function($query)use($request){
+                            $query->where('place_id',$request->place_id);
+                        });
+                    }
+                })
                 ->where('status','1')
                 ->get();
 
@@ -3213,6 +3220,7 @@ class Select2Controller extends Controller {
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
                 'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
                 'residue'           => CustomHelper::formatConditionalQty($d->residue),
+                'note_qc'           => $d->note_qc,
             ];
         }
 

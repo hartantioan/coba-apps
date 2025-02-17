@@ -1964,7 +1964,7 @@
                                             ` + val.unit_stock + `
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
+                                            <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
                                         </td>
                                         <td>
                                             <input name="arr_note2[]" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;" readonly>
@@ -2174,8 +2174,6 @@
 
     function applyScale(code,oldQty){
         if($('#arr_scale' + code).val()){
-            console.log($('#arr_scale' + code).select2('data')[0]);
-            console.log(code);
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
@@ -2188,6 +2186,7 @@
             $('#arr_netto' + code).val($('#arr_scale' + code).select2('data')[0].netto);
             $('#arr_percentage_limit_netto' + code).val($('#arr_scale' + code).select2('data')[0].percentage_limit_netto);
             $('#arr_rule_id' + code).val($('#arr_scale' + code).select2('data')[0].rule_procurement_id);
+            $('#arr_note' + code).val($('#arr_note' + code).val() + ' - NOTE QC : ' + $('#arr_scale' + code).select2('data')[0].note_qc);
             hitungSelisih(code);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
@@ -2329,7 +2328,7 @@
                                     ` + val.unit_stock + `
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
+                                    <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
                                 </td>
                                 <td>
                                     <input name="arr_note2[]" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;" readonly>

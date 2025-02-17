@@ -61,6 +61,21 @@ class StockInRupiahController extends Controller
                 }
             })->pluck('id');
 
+            $html = '<table class="bordered" style="font-size:10px;">
+                <thead id="t_head">
+                    <tr>
+                        <th class="center-align">No</th>
+                        <th class="center-align">Plant</th>
+                        <th class="center-align">Gudang</th>
+                        <th class="center-align">Kode</th>
+                        <th class="center-align">Nama Item</th>
+                        <th class="center-align">Satuan</th>
+                        <th class="center-align">Cumulative Qty.</th>
+                        <th class="center-align">Cumulative Value</th>
+                    </tr>
+                </thead>
+                <tbody id="table_body">';
+
             $arr = [];
             $total = 0;
             foreach($item as $key => $row){
@@ -76,21 +91,6 @@ class StockInRupiahController extends Controller
                         });
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first(); */
-
-                $html = '<table class="bordered" style="font-size:10px;">
-                        <thead id="t_head">
-                            <tr>
-                                <th class="center-align">No</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Kode</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Cumulative Qty.</th>
-                                <th class="center-align">Cumulative Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table_body">';
 
                 $data = DB::table('item_cogs')->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){

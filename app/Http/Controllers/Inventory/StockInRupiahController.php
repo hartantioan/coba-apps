@@ -80,7 +80,7 @@ class StockInRupiahController extends Controller
                         $query->where('place_id',$request->plant);
                     }
                     if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse_id',$request->warehouse);
+                        $query->where('warehouse_id',$request->warehouse);
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){

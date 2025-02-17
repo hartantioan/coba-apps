@@ -126,32 +126,32 @@ class MarketingOrderReportController extends Controller
                 $data = MarketingOrderInvoice::where('code', $rowunique)->first();
                 if ($data) {
                     /* if ($data->tax > 0) { */
-                    $data->update([
-                        'tax_no'    => $uniqueArrSerial[$keymain],
-                    ]);
-                    if ($data->journalDetail()->exists()) {
-                        $data->journalDetail()->where('coa_id', $data->taxMaster->coaSale->id)->update([
-                            'note'  => 'No Seri Pajak : ' . $uniqueArrSerial[$keymain],
+                        $data->update([
+                            'tax_no'    => $uniqueArrSerial[$keymain],
                         ]);
-                    }
+                        if ($data->journalDetail()->exists()) {
+                            $data->journalDetail()->where('coa_id', $data->taxMaster->coaSale->id)->update([
+                                'note'  => 'No Seri Pajak : ' . $uniqueArrSerial[$keymain],
+                            ]);
+                        }
                     /* } */
                 }
             } elseif ($document_code == 'ARDP') {
                 $data = MarketingOrderDownPayment::where('code', $rowunique)->first();
                 if ($data) {
                     /* if ($data->tax > 0) { */
-                    $data->update([
-                        'tax_no'    => $uniqueArrSerial[$keymain],
-                    ]);
-                    if ($data->incomingPaymentDetail()->exists()) {
-                        foreach ($data->incomingPaymentDetail as $row) {
-                            if ($row->journalDetail()->exists()) {
-                                $row->journalDetail()->where('coa_id', $data->taxId->coaSale->id)->update([
-                                    'note'  => 'No Seri Pajak : ' . $uniqueArrSerial[$keymain],
-                                ]);
+                        $data->update([
+                            'tax_no'    => $uniqueArrSerial[$keymain],
+                        ]);
+                        if ($data->incomingPaymentDetail()->exists()) {
+                            foreach ($data->incomingPaymentDetail as $row) {
+                                if ($row->journalDetail()->exists()) {
+                                    $row->journalDetail()->where('coa_id', $data->taxId->coaSale->id)->update([
+                                        'note'  => 'No Seri Pajak : ' . $uniqueArrSerial[$keymain],
+                                    ]);
+                                }
                             }
                         }
-                    }
                     /* } */
                 }
             }
@@ -355,12 +355,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                if (is_null($rowdetail->description)) {
-                    $Code = $dom->createElement('Code', '690700');
-                } else {
-                    $Code = $dom->createElement('Code', '000000');
-                }
-
+                $Code = $dom->createElement('Code', '000000');
                 $Name = $dom->createElement('Name',   $rowdetail->description);
                 $Unit = $dom->createElement('Unit', 'UM.0033');
                 $Price = $dom->createElement('Price', round($price, 2));
@@ -413,7 +408,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '000000');
+                $Code = $dom->createElement('Code', '690700');
                 $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode);
                 $Unit = $dom->createElement('Unit', 'UM.0012');
                 $Price = $dom->createElement('Price', round($price, 2));

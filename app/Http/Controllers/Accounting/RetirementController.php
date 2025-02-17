@@ -514,6 +514,7 @@ class RetirementController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                $status = $query->status;
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -529,7 +530,7 @@ class RetirementController extends Controller
     
                 CustomHelper::sendNotification('retirements',$query->id,'Retirement No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('retirements',$query->id);
-                if(in_array($query->status,['2','3'])){
+                if(in_array($status,['2','3'])){
                     CustomHelper::removeJournal('retirements',$query->id);
                     foreach($query->retirementDetail as $row){
                         Asset::find($row->asset_id)->update([

@@ -538,6 +538,8 @@ class JournalController extends Controller
             $totalCredit = 0;
             $totalDebitFC = 0;
             $totalCreditFC = 0;
+            $passedPostDate = true;
+
             foreach($request->arr_multi_debit as $key => $row){
                 $totalDebit += round(floatval(str_replace(',', '.', $row)),2);
             }
@@ -566,6 +568,12 @@ class JournalController extends Controller
                     $coaNotAvailable[] = $row;
                 }else{
                     $coaAvailable[] = $coaAda->id;
+                }
+                if(!CustomHelper::checkLockAcc($request->arr_multi_post_date[$key])){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan. Baris : '.($key + 1)
+                    ]);
                 }
             }
 

@@ -36,7 +36,7 @@
                 <td style="{{$mbeng}}">{{ $row->user->name ?? '-' }}</td>
                 <td style="{{$mbeng}}">{{ $row->hardwareItem->code ?? '' }}</td>
                 <td style="{{$mbeng}}">{{ $row->hardwareItem->item ?? '' }}</td>
-                <td style="{{$mbeng}}">{{ $row->hardwareItem->detail1 ?? '' }}</td>
+                <td style="{{$mbeng}}">{{ strtoupper($row->hardwareItem->detail1 ?? '') }}</td>
                 <td style="{{$mbeng}}">{{ $row->area() }}</td>
                 <td style="{{$mbeng}}">{{ $row->location }}</td>
                 <td style="{{$mbeng}}">{{ $row->reception_date }}</td>

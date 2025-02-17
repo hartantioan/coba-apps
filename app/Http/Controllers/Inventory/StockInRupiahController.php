@@ -62,7 +62,8 @@ class StockInRupiahController extends Controller
             })->pluck('id');
 
             $arr = [];
-            foreach($item as $row){
+            $total = 0;
+            foreach($item as $key => $row){
                 /* $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
@@ -75,6 +76,22 @@ class StockInRupiahController extends Controller
                         });
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first(); */
+
+                $html = '<table class="bordered" style="font-size:10px;">
+                        <thead id="t_head">
+                            <tr>
+                                <th class="center-align">No</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Kode</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Cumulative Qty.</th>
+                                <th class="center-align">Cumulative Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_body">';
+
                 $data = DB::table('item_cogs')->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->where('place_id',$request->plant);
@@ -90,37 +107,19 @@ class StockInRupiahController extends Controller
                 ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')
                 ->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
-                    $arr[] = $data;
+                    /* $arr[] = $data; */
+                    $html .= '<tr>
+                        <td>'.($key + 1).'</td>
+                        <td>'.$data->place_code.'</td>
+                        <td>'.$data->warehouse_name.'</td>
+                        <td>'.$data->item_code.'</td>
+                        <td>'.$data->item_name.'</td>
+                        <td>'.$data->unit_code.'</td>
+                        <td class="right-align">'.number_format($data->qty_final,3,',','.').'</td>
+                        <td class="right-align">'.number_format($data->total_final,2,',','.').'</td>
+                    </tr>';
+                    $total += round($data->total_final,2);
                 }
-            }
-
-            $html = '<table class="bordered" style="font-size:10px;">
-                        <thead id="t_head">
-                            <tr>
-                                <th class="center-align">No</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Kode</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Cumulative Qty.</th>
-                                <th class="center-align">Cumulative Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table_body">';
-            $total = 0;
-            foreach($arr as $key => $rowdata){
-                $html .= '<tr>
-                    <td>'.($key + 1).'</td>
-                    <td>'.$rowdata->place_code.'</td>
-                    <td>'.$rowdata->warehouse_name.'</td>
-                    <td>'.$rowdata->item_code.'</td>
-                    <td>'.$rowdata->item_name.'</td>
-                    <td>'.$rowdata->unit_code.'</td>
-                    <td class="right-align">'.number_format($rowdata->qty_final,3,',','.').'</td>
-                    <td class="right-align">'.number_format($rowdata->total_final,2,',','.').'</td>
-                </tr>';
-                $total += round($rowdata->total_final,2);
             }
 
             $end_time = microtime(true);

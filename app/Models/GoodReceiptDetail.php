@@ -261,4 +261,17 @@ class GoodReceiptDetail extends Model
             'grandtotal'=> $grandtotal
         ]);
     }
+
+    public function updateHeaderNominal(){
+        $total = $this->goodReceipt->goodReceiptDetail()->sum('total');
+        $tax = $this->goodReceipt->goodReceiptDetail()->sum('tax');
+        $wtax = $this->goodReceipt->goodReceiptDetail()->sum('wtax');
+        $grandtotal = $this->goodReceipt->goodReceiptDetail()->sum('grandtotal');
+        $this->goodReceipt->update([
+            'total'         => round($total,2),
+            'tax'           => round($tax,2),
+            'wtax'          => round($wtax,2),
+            'grandtotal'    => round($grandtotal,2),
+        ]);
+    }
 }

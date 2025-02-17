@@ -392,7 +392,7 @@ class HardwareItemController extends Controller
                     'code'      => $reception->code,
                     'date'      => $reception->reception_date,
                     'post_date' => $reception->reception_date,
-                    'user'      => $reception->user->name ?? '',
+                    'user'      => $reception->account->name ?? '',
                     'info'      => $reception->info,
                     'action'    =>'Penyerahan'
                 ];
@@ -410,7 +410,7 @@ class HardwareItemController extends Controller
                     'post_date' => $return->return_date,
                     'code'      => $return->code,
                     'date'      => $return->return_date,
-                    'user'      => $return->user->name ?? '',
+                    'user'      => $return->account->name ?? '',
                     'info'      => $return->return_note,
                     'action'    =>'Pengembalian'
                 ];
@@ -484,7 +484,7 @@ class HardwareItemController extends Controller
                     'image'     => $reception->user()->exists() ?  $reception->user->profilePicture(): '',
                     'code'      => $request->code,
                     'date'      => $request->post_date,
-                    'user'      => $request->user->name,
+                    'user'      => $request->account->name,
                     'info'      => $return->complaint,
                     'action'    => 'Request Repair'
                 ];
@@ -497,7 +497,7 @@ class HardwareItemController extends Controller
                         'image'     => $reception->user()->exists() ?  $reception->user->profilePicture(): '',
                         'code'      => $maintenance->code,
                         'date'      => $maintenance->end_date,
-                        'user'      => $maintenance->user->name,
+                        'user'      => $maintenance->account->name,
                         'info'      => $maintenance->solution,
                         'action'    => 'Perbaikan'
                     ];

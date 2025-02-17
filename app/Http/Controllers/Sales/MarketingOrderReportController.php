@@ -408,7 +408,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                $Code = $dom->createElement('Code', '000000');
+                $Code = $dom->createElement('Code', '690700');
                 $Name = $dom->createElement('Name',   $rowdetail->lookable->item->print_name . $boxQty . $hscode);
                 $Unit = $dom->createElement('Unit', 'UM.0012');
                 $Price = $dom->createElement('Price', round($price, 2));

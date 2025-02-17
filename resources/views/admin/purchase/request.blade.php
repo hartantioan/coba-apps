@@ -329,15 +329,10 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($line as $rowline)
-                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                            @endforeach
-                                                        </select>
+                                                        <select class="browser-default" id="arr_line0" name="arr_line[]"></select>
                                                     </td>
                                                     <td>
-                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
+                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]">
                                                             <option value="">--{{ __('translations.empty') }}--</option>
                                                             @foreach ($machine as $row)
                                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>

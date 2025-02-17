@@ -355,7 +355,7 @@ class MarketingOrderReportController extends Controller
                 $ListOfGoodService->appendChild($GoodService);
                 //detail
                 $Opt = $dom->createElement('Opt', 'A');
-                if ($rowdetail->description == null) {
+                if (is_null($rowdetail->description)) {
                     $Code = $dom->createElement('Code', '690700');
                 } else {
                     $Code = $dom->createElement('Code', '000000');

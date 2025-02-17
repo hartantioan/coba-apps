@@ -1078,19 +1078,19 @@ class MarketingOrderDownPaymentController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                $newtaxno = '';
+                /* $newtaxno = '';
                 if($query->tax_no){
                     $array = explode('.',$query->tax_no);
                     $newarray = array_slice($array, 1);
                     $newtaxno = '011.'.implode('.',$newarray);
-                }
+                } */
 
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s'),
-                    'tax_no'    => $newtaxno ?? NULL,
+                    /* 'tax_no'    => $newtaxno ?? NULL, */
                 ]);
 
                 activity()

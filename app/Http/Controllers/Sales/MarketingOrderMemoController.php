@@ -1292,16 +1292,16 @@ class MarketingOrderMemoController extends Controller
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s'),
-                    'tax_no'    => $newtaxno ?? NULL,
+                    /* 'tax_no'    => $newtaxno ?? NULL, */
                 ]);
 
                 if($query->memo_type == '1'){
-                    $newtaxno = '';
+                    /* $newtaxno = '';
                     if($query->tax_no){
                         $array = explode('.',$query->tax_no);
                         $newarray = array_slice($array, 1);
                         $newtaxno = '011.'.implode('.',$newarray);
-                    }
+                    } */
                 }else{
                     foreach($query->marketingOrderMemoDetail as $row){
                         $row->productionBatch()->delete();

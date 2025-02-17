@@ -569,7 +569,7 @@ class JournalController extends Controller
                 }else{
                     $coaAvailable[] = $coaAda->id;
                 }
-                if(!CustomHelper::checkLockAcc($request->arr_multi_post_date[$key])){
+                if(!CustomHelper::checkLockAcc(\DateTime::createFromFormat('d/m/Y', $request->arr_multi_post_date[$key])->format('Y-m-d'))){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan. Baris : '.($key + 1)

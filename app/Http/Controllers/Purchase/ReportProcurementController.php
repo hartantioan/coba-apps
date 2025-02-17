@@ -210,7 +210,7 @@ class ReportProcurementController extends Controller
                                 'NO SJ'=> $detail_gs->goodReceipt->delivery_no,
                                 'TGL MASUK'=> date('d/m/Y',strtotime($detail_gs->goodScale->post_date?? $detail_gs->goodReceipt->post_date)),
                                 'NO. KENDARAAN' =>$detail_gs->goodScale->vehicle_no ?? $detail_gs->goodReceipt->vehicle_no,
-                                'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->goodScale->qty_balance ?? $row->qty,2,',','.'),
+                                'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->goodScale->qty_balance ?? $detail_gs->qty,2,',','.'),
                                 'HASIL QC' =>number_format($detail_gs->water_content,2,',','.'),
                                 'STD POTONGAN QC' =>number_format($percentage_level,2,',','.'),
                                 'FINANCE Kadar air' =>number_format($finance_kadar_air,2,',','.'),

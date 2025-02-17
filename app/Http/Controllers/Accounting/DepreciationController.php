@@ -497,6 +497,7 @@ class DepreciationController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                $status = $query->status;
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -504,7 +505,7 @@ class DepreciationController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($query->status,['2','3'])){
+                if(in_array($status,haystack: ['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     foreach($query->depreciationDetail as $row){
                         CustomHelper::updateBalanceAsset($row->asset_id,$row->nominal,'IN',$query->getTable());

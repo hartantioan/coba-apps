@@ -1938,6 +1938,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [ReportProcurementController::class, 'export']);
                         Route::get('export_transport_service', [ReportProcurementController::class, 'exportTransportService']);
                         Route::get('print_individual', [ReportProcurementController::class, 'PrintIndividual'])->withoutMiddleware('direct.access');
+                        Route::get('print_multi_pdf', [ReportProcurementController::class, 'printMultiItemPDF'])->withoutMiddleware('direct.access');
                     });
 
                     Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {
@@ -2383,7 +2384,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page', [InventoryTransferInController::class, 'exportFromTransactionPage']);
                 });
 
-                Route::prefix('truck_queue')->middleware(['operation.access:truck_queue,view', 'lockacc'])->group(function () {
+                Route::prefix('truck_queue')->middleware(['operation.access:truck_queue,view', 'truck_queue'])->group(function () {
                     Route::get('/', [TruckQueueController::class, 'index']);
                     Route::get('datatable', [TruckQueueController::class, 'datatable']);
                    Route::post('create', [TruckQueueController::class, 'create'])->middleware('operation.access:truck_queue,update');

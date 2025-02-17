@@ -238,10 +238,9 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                             });
                         }
 
-                        if($this->group){
-
+                        if(count($this->group) > 0){
                             $query->whereHas('item',function($query) {
-                                $query->whereIn('item_group_id', explode(',',$this->group));
+                                $query->whereIn('item_group_id', $this->group);
                             });
                         }
                         $array_last_item = collect($array_last_item);
@@ -277,10 +276,9 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                             });
                         }
 
-                        if($this->group){
-
+                        if(count($this->group) > 0){
                             $query->whereHas('item',function($query) {
-                                $query->whereIn('item_group_id', explode(',',$this->group));
+                                $query->whereIn('item_group_id', $this->group);
                             });
                         }
                         $array_last_item = collect($array_last_item);

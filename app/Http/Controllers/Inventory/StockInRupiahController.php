@@ -76,7 +76,6 @@ class StockInRupiahController extends Controller
                 </thead>
                 <tbody id="table_body">';
 
-            $before_date = date('Y-m-d', strtotime('-1 day', strtotime($request->finish_date)));
             $arr = [];
             $total = 0;
             foreach($item as $key => $row){
@@ -93,7 +92,7 @@ class StockInRupiahController extends Controller
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first(); */
 
-                $data = DB::table('item_cogs')->where('date','>=',$before_date)->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                $data = DB::table('item_cogs')->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->where('place_id',$request->plant);
                     }

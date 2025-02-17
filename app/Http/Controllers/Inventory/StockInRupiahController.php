@@ -82,7 +82,13 @@ class StockInRupiahController extends Controller
                     if($request->warehouse != 'all'){
                         $query->where('warehouse_id',$request->warehouse);
                     }
-                })->orderByDesc('date')->orderByDesc('id')->first();
+                })
+                ->join('places', 'places.id', '=', 'item_cogs.place_id')
+                ->join('items', 'items.id', '=', 'items.place_id')
+                ->join('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
+                ->join('units', 'units.id', '=', 'items.uom_unit')
+                ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouses_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')
+                ->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
                     $arr[] = $data;
                 }
@@ -106,11 +112,11 @@ class StockInRupiahController extends Controller
             foreach($arr as $key => $rowdata){
                 $html .= '<tr>
                     <td>'.($key + 1).'</td>
-                    <td>'.$rowdata->place->code.'</td>
-                    <td>'.$rowdata->warehouse->name.'</td>
-                    <td>'.$rowdata->item->code.'</td>
-                    <td>'.$rowdata->item->name.'</td>
-                    <td>'.$rowdata->item->uomUnit->code.'</td>
+                    <td>'.$rowdata->place_code.'</td>
+                    <td>'.$rowdata->warehouse_name.'</td>
+                    <td>'.$rowdata->item_code.'</td>
+                    <td>'.$rowdata->item_name.'</td>
+                    <td>'.$rowdata->unit_code.'</td>
                     <td class="right-align">'.number_format($rowdata->qty_final,3,',','.').'</td>
                     <td class="right-align">'.number_format($rowdata->total_final,2,',','.').'</td>
                 </tr>';

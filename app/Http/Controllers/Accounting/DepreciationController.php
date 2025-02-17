@@ -198,6 +198,8 @@ class DepreciationController extends Controller
     public function preview(Request $request){
         $data = Asset::whereNotNull('book_balance')->where('book_balance','>',0)->whereHas('place', function($query) use($request){
             $query->where('company_id',$request->company_id);
+        })->whereHas('assetGroup',function($query){
+            $query->where('depreciation_period','>',0);
         })->get();
 
         $arr = [];

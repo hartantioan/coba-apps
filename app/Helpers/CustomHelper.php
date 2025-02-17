@@ -3509,7 +3509,7 @@ class CustomHelper {
 								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
 								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
 								'project_id'					=> $row->project_id ? $row->project_id : NULL,
-								'type'                          => '1',
+								'type'                          => '2',
 								'nominal'                       => $nominal * $cp->currency_rate,
 								'nominal_fc'					=> $cp->currency->type == '1' ? $nominal * $cp->currency_rate : $nominal,
 								'lookable_type'					=> $table_name,

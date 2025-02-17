@@ -93,7 +93,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                         'user_id'           => session('bo_id'),
                         'account_id'        => $user->id,
                         'hardware_item_id'  => $item->id,
-                        'info'              => $note,
+                        'info'              => strtoupper($note),
                         'date'              => now(),
                         'division'          => $divisi,
                         'reception_date'    => $dateFormatted1,

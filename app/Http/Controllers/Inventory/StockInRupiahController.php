@@ -87,7 +87,7 @@ class StockInRupiahController extends Controller
                 ->join('items', 'items.id', '=', 'item_cogs.item_id')
                 ->join('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
                 ->join('units', 'units.id', '=', 'items.uom_unit')
-                ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouses_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')
+                ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')
                 ->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
                     $arr[] = $data;

@@ -20,13 +20,11 @@ class ExportTemplateMasterMitraSalesArea implements WithEvents{
         
         // Sheet Data Broker
         $mitra = User::where('status','1')->where('type','5')->get();
-        $arrMitra = array();
         $startrow = 2;
         foreach($mitra as $row){
             $event->getWriter()->getSheetByIndex(1)->setCellValue('A'.$startrow,$row->employee_no);
             $event->getWriter()->getSheetByIndex(1)->setCellValue('B'.$startrow,$row->name);
             $event->getWriter()->getSheetByIndex(1)->setCellValue('C'.$startrow,$row->employee_no."#".$row->name);
-            $arrMitra[] = $row->employee_no."#".$row->name;
             $startrow++;
         }
 
@@ -42,7 +40,7 @@ class ExportTemplateMasterMitraSalesArea implements WithEvents{
         $validation->setShowErrorMessage(true);
         $validation->setErrorTitle('Error');
         $validation->setError('Data tidak ada di list.');
-        $validation->setFormula1('"'.implode(',',$arrMitra).'"');
+        $validation->setFormula1('\'mitra\'!$C$2:$C$'.($startrow>2 ? $startrow-1 : $startrow));
         $validation->setSqref('D2:D4');
 
         // Data Validation Type di main sheet

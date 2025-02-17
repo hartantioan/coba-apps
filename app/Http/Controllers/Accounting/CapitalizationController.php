@@ -660,9 +660,7 @@ class CapitalizationController extends Controller
 
                 CustomHelper::sendNotification('capitalizations',$query->id,'Kapitalisasi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('capitalizations',$query->id);
-                if(in_array($query->status,['2','3'])){
-                    CustomHelper::removeJournal('capitalizations',$query->id);
-                }
+                CustomHelper::removeJournal('capitalizations',$query->id);
                 $response = [
                     'status'  => 200,
                     'message' => 'Data closed successfully.'

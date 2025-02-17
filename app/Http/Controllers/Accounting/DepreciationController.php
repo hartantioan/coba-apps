@@ -200,7 +200,7 @@ class DepreciationController extends Controller
             $query->where('company_id',$request->company_id);
         })->whereHas('assetGroup',function($query){
             $query->where('depreciation_period','>',0);
-        })->get();
+        })->whereRaw("SUBSTRING(date,1,7) >= '$request->period'")->get();
 
         $arr = [];
 

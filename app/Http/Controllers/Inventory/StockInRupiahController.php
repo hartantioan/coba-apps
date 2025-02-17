@@ -84,7 +84,7 @@ class StockInRupiahController extends Controller
                     }
                 })
                 ->join('places', 'places.id', '=', 'item_cogs.place_id')
-                ->join('items', 'items.id', '=', 'items.place_id')
+                ->join('items', 'items.id', '=', 'item_cogs.item_id')
                 ->join('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
                 ->join('units', 'units.id', '=', 'items.uom_unit')
                 ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouses_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')

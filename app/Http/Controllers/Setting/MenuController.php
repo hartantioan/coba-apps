@@ -139,11 +139,11 @@ class MenuController extends Controller
 
         /* CustomHelper::accumulateCogs('2024-09-03',1,1,5388); */
 
-        $data = Item::where('item_group_id',2)->get();
+        /* $data = Item::where('item_group_id',2)->get();
 
         foreach($data as $item){
             ResetCogsNewByDate::dispatch('2024-10-01',1,1,$item->id,NULL,NULL,NULL,'2024-10-31');
-        }
+        } */
 
         $data = [
             'title'     => 'Menu',

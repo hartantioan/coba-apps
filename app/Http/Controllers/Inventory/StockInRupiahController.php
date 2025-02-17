@@ -63,7 +63,7 @@ class StockInRupiahController extends Controller
 
             $arr = [];
             foreach($item as $row){
-                $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                /* $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){
                             $query->where('id',$request->plant);
@@ -73,6 +73,14 @@ class StockInRupiahController extends Controller
                         $query->whereHas('warehouse',function($query) use($request){
                             $query->where('id',$request->warehouse);
                         });
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first(); */
+                $data = DB::table('item_cogs')->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                    if($request->plant != 'all'){
+                        $query->where('place_id',$request->plant);
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->whereHas('warehouse_id',$request->warehouse);
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){

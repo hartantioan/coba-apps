@@ -665,10 +665,10 @@
             beforeSend: function() {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
-                loadingOpen('.modal-content');
+                loadingOpen('#modal1');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#modal1');
                 if(response.status == 200) {
                     success();
                     M.toast({
@@ -706,7 +706,7 @@
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
+                loadingClose('#modal1');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -756,6 +756,30 @@
                     $('#item_id').append(`
                         <option value="` + response.hardware_item_id + `">` + response.item.code+`-`+response.item.item+`</option>
                     `);
+                }
+
+                if(response.cost_distribution_name){
+                    $('#cost_distribution_id').empty().append(`
+                        <option value="` + response.cost_distribution_id + `">` + response.cost_distribution_name +`</option>
+                    `);
+                }
+
+                if(response.project_name){
+                    $('#project_id').empty().append(`
+                        <option value="` + response.project_id + `">` + response.project_name +`</option>
+                    `);
+                }
+
+                if(response.line_id){
+                    $('#line_id').val(response.line_id);
+                }
+
+                if(response.machine_id){
+                    $('#machine_id').val(response.machine_id);
+                }
+
+                if(response.division_id){
+                    $('#division_id').val(response.division_id);
                 }
                 
                 if(response.status == '1'){

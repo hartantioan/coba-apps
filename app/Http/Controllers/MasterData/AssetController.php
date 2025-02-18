@@ -281,7 +281,9 @@ class AssetController extends Controller
     public function show(Request $request){
         $asset = Asset::find($request->id);
         $asset['nominal'] = number_format($asset->nominal,2,',','.');
-        $asset['item'] = $asset->hardwareItem ?? null;				
+        $asset['item'] = $asset->hardwareItem ?? null;
+        $asset['cost_distribution_name'] = $asset->costDistribution()->exists() ? $asset->costDistribution->code.' - '.$asset->costDistribution->name : '';
+        $asset['project_name'] = $asset->project()->exists() ? $asset->project->code.' - '.$asset->project->name : '';
 		return response()->json($asset);
     }
 

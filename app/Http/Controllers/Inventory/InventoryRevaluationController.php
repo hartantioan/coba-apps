@@ -425,7 +425,7 @@ class InventoryRevaluationController extends Controller
                             'warehouse_id'              => $request->arr_warehouse[$key],
                             'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             'coa_id'                    => $request->arr_coa[$key],
-                            'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'cost_distribution_id'      => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'                => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,

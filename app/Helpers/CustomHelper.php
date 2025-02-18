@@ -3345,24 +3345,57 @@ class CustomHelper {
 				foreach($ir->inventoryRevaluationDetail as $rowdetail){
 
 					if($rowdetail->nominal < 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $rowdetail->coa_id,
-							'place_id'		=> $rowdetail->place_id,
-							'warehouse_id'	=> $rowdetail->warehouse_id,
-							'item_id'		=> $rowdetail->item_id,
-							'line_id'		=> $rowdetail->line_id,
-							'machine_id'	=> $rowdetail->machine_id,
-							'department_id'	=> $rowdetail->department_id,
-							'project_id'	=> $rowdetail->project_id,
-							'type'			=> '1',
-							'nominal'		=> -1 * $rowdetail->nominal,
-							'nominal_fc'	=> -1 * $rowdetail->nominal,
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $rowdetail->getTable(),
-							'detailable_id'	=> $rowdetail->id,
-						]);
+
+						if($rowdetail->cost_distribution_id){
+							$total = -1 * $rowdetail->nominal;
+
+							$lastIndex = count($rowdetail->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($rowdetail->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total,2);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'						=> $rowdetail->coa_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($rowdetail->place_id ?? NULL),
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($rowdetail->line_id ?? NULL),
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($rowdetail->machine_id ?? NULL),
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($rowdetail->department_id ?? NULL),
+									'project_id'					=> $rowdetail->project_id ? $rowdetail->project_id : NULL,
+									'type'                          => '1',
+									'nominal'						=> $nominal,
+									'nominal_fc'					=> $nominal,
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $rowdetail->getTable(),
+									'detailable_id'					=> $rowdetail->id,
+								]);
+							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->coa_id,
+								'place_id'		=> $rowdetail->place_id,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
+								'line_id'		=> $rowdetail->line_id,
+								'machine_id'	=> $rowdetail->machine_id,
+								'department_id'	=> $rowdetail->department_id,
+								'project_id'	=> $rowdetail->project_id,
+								'type'			=> '1',
+								'nominal'		=> -1 * $rowdetail->nominal,
+								'nominal_fc'	=> -1 * $rowdetail->nominal,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+						}
 
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -3401,26 +3434,59 @@ class CustomHelper {
 							'detailable_type'=> $rowdetail->getTable(),
 							'detailable_id'	=> $rowdetail->id,
 						]);
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $rowdetail->coa_id,
-							'place_id'		=> $rowdetail->place_id,
-							'warehouse_id'	=> $rowdetail->warehouse_id,
-							'item_id'		=> $rowdetail->item_id,
-							'line_id'		=> $rowdetail->line_id,
-							'machine_id'	=> $rowdetail->machine_id,
-							'department_id'	=> $rowdetail->department_id,
-							'project_id'	=> $rowdetail->project_id,
-							'type'			=> '2',
-							'nominal'		=> $rowdetail->nominal,
-							'nominal_fc'	=> $rowdetail->nominal,
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $rowdetail->getTable(),
-							'detailable_id'	=> $rowdetail->id,
-						]);
+
+						if($rowdetail->cost_distribution_id){
+							$total = $rowdetail->nominal;
+
+							$lastIndex = count($rowdetail->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($rowdetail->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total,2);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'						=> $rowdetail->coa_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($rowdetail->place_id ?? NULL),
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($rowdetail->line_id ?? NULL),
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($rowdetail->machine_id ?? NULL),
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($rowdetail->department_id ?? NULL),
+									'project_id'					=> $rowdetail->project_id ? $rowdetail->project_id : NULL,
+									'type'                          => '2',
+									'nominal'						=> $nominal,
+									'nominal_fc'					=> $nominal,
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $rowdetail->getTable(),
+									'detailable_id'					=> $rowdetail->id,
+								]);
+							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->coa_id,
+								'place_id'		=> $rowdetail->place_id,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
+								'line_id'		=> $rowdetail->line_id,
+								'machine_id'	=> $rowdetail->machine_id,
+								'department_id'	=> $rowdetail->department_id,
+								'project_id'	=> $rowdetail->project_id,
+								'type'			=> '2',
+								'nominal'		=> $rowdetail->nominal,
+								'nominal_fc'	=> $rowdetail->nominal,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
+							]);
+						}
 					}
-					self::sendCogs($ir->getTable(),
+					CustomHelper::sendCogs($ir->getTable(),
 						$ir->id,
 						$rowdetail->place->company_id,
 						$rowdetail->place_id,

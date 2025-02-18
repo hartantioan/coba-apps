@@ -793,31 +793,91 @@ class ResetCogsNewForProduction implements ShouldQueue
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
             ItemCogs::create([
-            'lookable_type'		    => $row->inventoryRevaluation->getTable(),
-            'lookable_id'		      => $row->inventoryRevaluation->id,
-            'detailable_type'	    => $row->getTable(),
-            'detailable_id'		    => $row->id,
-            'company_id'		      => $row->inventoryRevaluation->company_id,
-            'place_id'			      => $row->place_id,
-            'warehouse_id'		    => $row->warehouse_id,
-            'item_id'			        => $row->item_id,
-            'qty_in'			        => 0,
-            'price_in'			      => 0,
-            'total_in'			      => $total,
-            'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
-            'total_final'		      => $total_final,
-            'date'				        => $dateloop,
-            'type'				        => 'IN',
-            'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
-            'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
-            'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+                'lookable_type'		    => $row->inventoryRevaluation->getTable(),
+                'lookable_id'		      => $row->inventoryRevaluation->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		      => $row->inventoryRevaluation->company_id,
+                'place_id'			      => $row->place_id,
+                'warehouse_id'		    => $row->warehouse_id,
+                'item_id'			        => $row->item_id,
+                'qty_in'			        => 0,
+                'price_in'			      => 0,
+                'total_in'			      => $total,
+                'qty_final'			      => $qty_final,
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		      => $total_final,
+                'date'				        => $dateloop,
+                'type'				        => 'IN',
+                'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+                'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+                'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
             ]);
-            foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total < 0 ? -1 * $total : $total,
-                    'nominal'     => $total < 0 ? -1 * $total : $total,
-                ]);
+
+            if($total < 0){
+                if($row->journalDetail()->where('type','1')->count() > 1){
+                    $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+                    $accumulation = 0;
+                    $totalrow = -1 * $total;
+                    $datacost  = $row->costDistribution->costDistributionDetail;
+                    foreach($row->journalDetail()->where('type','1')->get() as $key => $rowjournal){
+                        if($key == $lastIndex){
+                            $nominal = $totalrow - $accumulation;
+                        }else{
+                            $nominal = round(($datacost[$key]->percentage / 100) * $totalrow,2);
+                            $accumulation += $nominal;
+                        }
+                        $rowjournal->update([
+                            'nominal_fc'  => $nominal,
+                            'nominal'     => $nominal,
+                        ]);
+                    }
+                    foreach($row->journalDetail()->where('type','2')->get() as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $totalrow,
+                            'nominal'     => $totalrow,
+                        ]);
+                    }
+                }else{
+                    foreach($row->journalDetail as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $total < 0 ? -1 * $total : $total,
+                            'nominal'     => $total < 0 ? -1 * $total : $total,
+                        ]);
+                    }
+                }
+            }else{
+                if($row->journalDetail()->where('type','2')->count() > 1){
+                    $lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+                    $accumulation = 0;
+                    $totalrow = $total;
+                    $datacost  = $row->costDistribution->costDistributionDetail;
+                    foreach($row->journalDetail()->where('type','2')->get() as $key => $rowjournal){
+                        if($key == $lastIndex){
+                            $nominal = $totalrow - $accumulation;
+                        }else{
+                            $nominal = round(($datacost[$key]->percentage / 100) * $totalrow,2);
+                            $accumulation += $nominal;
+                        }
+                        $rowjournal->update([
+                            'nominal_fc'  => $nominal,
+                            'nominal'     => $nominal,
+                        ]);
+                    }
+                    foreach($row->journalDetail()->where('type','1')->get() as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $totalrow,
+                            'nominal'     => $totalrow,
+                        ]);
+                    }
+                }else{
+                    foreach($row->journalDetail as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $total,
+                            'nominal'     => $total,
+                        ]);
+                    }
+                }
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;

@@ -1215,37 +1215,62 @@ class ResetCogsNewByDate10 implements ShouldQueue
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
             ItemCogs::create([
-            'lookable_type'		    => $row->goodReturnIssue->getTable(),
-            'lookable_id'		      => $row->goodReturnIssue->id,
-            'detailable_type'	    => $row->getTable(),
-            'detailable_id'		    => $row->id,
-            'company_id'		      => $row->goodReturnIssue->company_id,
-            'place_id'			      => $row->goodIssueDetail->itemStock->place_id,
-            'warehouse_id'		    => $row->goodIssueDetail->itemStock->warehouse_id,
-            'item_id'			        => $row->goodIssueDetail->itemStock->item_id,
-            'qty_in'			        => $qty,
-            'price_in'			      => $price,
-            'total_in'			      => $total,
-            'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
-            'total_final'		      => $total_final,
-            'date'				        => $dateloop,
-            'type'				        => 'IN',
-            'area_id'             => $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area_id : NULL,
-            'item_shading_id'     => $row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
-            'production_batch_id' => $row->goodIssueDetail->itemStock->productionBatch()->exists() ? $row->goodIssueDetail->itemStock->production_batch_id : NULL,
+                'lookable_type'		    => $row->goodReturnIssue->getTable(),
+                'lookable_id'		      => $row->goodReturnIssue->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		      => $row->goodReturnIssue->company_id,
+                'place_id'			      => $row->goodIssueDetail->itemStock->place_id,
+                'warehouse_id'		    => $row->goodIssueDetail->itemStock->warehouse_id,
+                'item_id'			        => $row->goodIssueDetail->itemStock->item_id,
+                'qty_in'			        => $qty,
+                'price_in'			      => $price,
+                'total_in'			      => $total,
+                'qty_final'			      => $qty_final,
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		      => $total_final,
+                'date'				        => $dateloop,
+                'type'				        => 'IN',
+                'area_id'             => $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area_id : NULL,
+                'item_shading_id'     => $row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
+                'production_batch_id' => $row->goodIssueDetail->itemStock->productionBatch()->exists() ? $row->goodIssueDetail->itemStock->production_batch_id : NULL,
             ]);
-            foreach($row->journalDetail as $rowjournal){
-            $rowjournal->update([
-                'nominal_fc'  => $total,
-                'nominal'     => $total,
-            ]);
+            if($row->journalDetail()->where('type','2')->count() > 1 && $row->goodIssueDetail->costDistribution()->exists()){
+                $lastIndex = count($row->goodIssueDetail->costDistribution->costDistributionDetail) - 1;
+                $accumulation = 0;
+                $totalrow = $total;
+                $datacost  = $row->goodIssueDetail->costDistribution->costDistributionDetail;
+                foreach($row->journalDetail()->where('type','2')->get() as $key => $rowjournal){
+                    if($key == $lastIndex){
+                        $nominal = $totalrow - $accumulation;
+                    }else{
+                        $nominal = round(($datacost[$key]->percentage / 100) * $totalrow,2);
+                        $accumulation += $nominal;
+                    }
+                    $rowjournal->update([
+                        'nominal_fc'  => $nominal,
+                        'nominal'     => $nominal,
+                    ]);
+                }
+                foreach($row->journalDetail()->where('type','1')->get() as $rowjournal){
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
+                }
+            }else{
+                foreach($row->journalDetail as $rowjournal){
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
+                }
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
             $gri = GoodReturnIssue::find($row->good_return_issue_id);
             if($gri){
-            $gri->updateGrandtotal();
+                $gri->updateGrandtotal();
             }
         }
 

@@ -731,12 +731,7 @@
                                                 </select>    
                                             </td>
                                             <td>
-                                                <select class="browser-default" id="arr_line` + countdetail + `" name="arr_line[]" onchange="changePlace(this);">
-                                                    <option value="">--{{ __('translations.empty') }}--</option>
-                                                    @foreach ($line as $rowline)
-                                                        <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                    @endforeach
-                                                </select>    
+                                                <select class="browser-default" id="arr_line` + countdetail + `" name="arr_line[]" onchange="changePlace(this);"></select>    
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_machine` + countdetail + `" name="arr_machine[]" onchange="changeLine(this);">
@@ -769,8 +764,38 @@
                                     $('#arr_is_include_tax' + countdetail).val(valdetail.is_include_tax);
                                     if(valdetail.place_id){
                                         $('#arr_place' + countdetail).val(valdetail.place_id);
-                                    }                                    
-                                    $('#arr_line' + countdetail).val(valdetail.line_id);
+                                    }
+                                    if(valdetail.line_id){
+                                        $('#arr_line' + countdetail).val(valdetail.line_id);
+                                    }
+                                    if(valdetail.cost_distribution_id){
+                                        $('#arr_line' + countdetail).empty().append(`
+                                            <option value="` + valdetail.cost_distribution_id + `">` + valdetail.cost_distribution_name + `</option> 
+                                        `);
+                                    }
+                                    $('#arr_line' + countdetail).select2({
+                                        placeholder: '-- Pilih ya --',
+                                        allowClear: true,
+                                        cache: true,
+                                        width: 'resolve',
+                                        dropdownParent: $('body').parent(),
+                                        ajax: {
+                                            url: '{{ url("admin/select2/cost_distribution") }}',
+                                            type: 'GET',
+                                            dataType: 'JSON',
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term,
+                                                    place_id: $("#arr_place" + countdetail).val(),
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.items
+                                                }
+                                            }
+                                        }
+                                    });
                                     $('#arr_machine' + countdetail).val(valdetail.machine_id);
                                     $('#arr_division' + countdetail).val(valdetail.division_id);
                                     $('#arr_unit' + countdetail).append(`
@@ -1094,12 +1119,7 @@
                     </select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                        <option value="">--{{ __('translations.empty') }}--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                        @endforeach
-                    </select>    
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);"></select>    
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
@@ -1129,6 +1149,29 @@
         `);
         select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+        $('#arr_line' + count).select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#arr_place" + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function removeUsedData(type,id){

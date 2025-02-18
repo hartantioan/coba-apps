@@ -1231,6 +1231,11 @@
                                         }
                                         select2ServerSide('#arr_coa' + countdetail, '{{ url("admin/select2/coa") }}');
                                         select2ServerSide('#arr_project' + countdetail, '{{ url("admin/select2/project") }}');
+                                        if(value.cost_distribution_id){
+                                            $('#arr_cost_distribution_cost' + countdetail).empty().append(`
+                                                <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option> 
+                                            `);
+                                        }
                                         select2ServerSide('#arr_cost_distribution_cost' + countdetail, '{{ url("admin/select2/cost_distribution") }}');
                                     });
                                 }

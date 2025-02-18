@@ -271,7 +271,7 @@
                                 <td align="center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>
                                 <td align="center">{{ $row->warehouse->name }}</td>
-                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                                <td align="center">{{ $row->line()->exists() ? $row->line->code : ($row->costDistribution()->exists() ? $row->costDistribution->getLine() : '-' ) }}</td>
                                 <td align="center">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                                 <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                                 <td align="center">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>

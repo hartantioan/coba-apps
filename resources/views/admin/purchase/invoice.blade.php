@@ -2295,7 +2295,29 @@
                                                         <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
                                                     `);
                                                 }
-                                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                                $('#arr_cost_distribution' + count).select2({
+                                                    placeholder: '-- Pilih ya --',
+                                                    allowClear: true,
+                                                    cache: true,
+                                                    width: 'resolve',
+                                                    dropdownParent: $('body').parent(),
+                                                    ajax: {
+                                                        url: '{{ url("admin/select2/cost_distribution") }}',
+                                                        type: 'GET',
+                                                        dataType: 'JSON',
+                                                        data: function(params) {
+                                                            return {
+                                                                search: params.term,
+                                                                place_id: $("#arr_place" + count).val(),
+                                                            };
+                                                        },
+                                                        processResults: function(data) {
+                                                            return {
+                                                                results: data.items
+                                                            }
+                                                        }
+                                                    }
+                                                });
 
                                                 $('#due_date').val(val.due_date);
                                             }else if(val.type == 'purchase_order_details'){
@@ -2429,7 +2451,29 @@
                                                         <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
                                                     `);
                                                 }
-                                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                                $('#arr_cost_distribution' + count).select2({
+                                                    placeholder: '-- Pilih ya --',
+                                                    allowClear: true,
+                                                    cache: true,
+                                                    width: 'resolve',
+                                                    dropdownParent: $('body').parent(),
+                                                    ajax: {
+                                                        url: '{{ url("admin/select2/cost_distribution") }}',
+                                                        type: 'GET',
+                                                        dataType: 'JSON',
+                                                        data: function(params) {
+                                                            return {
+                                                                search: params.term,
+                                                                place_id: $("#arr_place" + count).val(),
+                                                            };
+                                                        },
+                                                        processResults: function(data) {
+                                                            return {
+                                                                results: data.items
+                                                            }
+                                                        }
+                                                    }
+                                                });
                                             }
 
                                             else{

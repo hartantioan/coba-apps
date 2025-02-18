@@ -275,15 +275,10 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($line as $rowline)
-                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                                            @endforeach
-                                                        </select>
+                                                        <select class="browser-default" id="arr_line0" name="arr_line[]"></select>
                                                     </td>
                                                     <td>
-                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
+                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]">
                                                             <option value="">--{{ __('translations.empty') }}--</option>
                                                             @foreach ($machine as $row)
                                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -815,6 +810,30 @@
                     };
                 },
                 cache: true,
+            }
+        });
+
+        $('#arr_line0').select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#arr_place0").val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
             }
         });
 
@@ -1481,15 +1500,10 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                        <option value="">--{{ __('translations.empty') }}--</option>
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                        @endforeach
-                                    </select>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1554,6 +1568,36 @@
                         if(val.line_id){
                             $('#arr_line' + count).val(val.line_id);
                         }
+
+                        if(val.cost_distribution_id){
+                            $('#arr_line' + count).append(`
+                                <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_line' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/cost_distribution") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        place_id: $("#arr_place" + count).val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
 
                         if(val.machine_id){
                             $('#arr_machine' + count).val(val.machine_id);
@@ -1711,15 +1755,10 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                                <option value="">--{{ __('translations.empty') }}--</option>
-                                                @foreach ($line as $rowline)
-                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                                @endforeach
-                                            </select>
+                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
                                         </td>
                                         <td>
-                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                                                 <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($machine as $row)
                                                     <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1785,6 +1824,36 @@
                                 if(val.line_id){
                                     $('#arr_line' + count).val(val.line_id);
                                 }
+
+                                if(val.cost_distribution_id){
+                                    $('#arr_line' + count).append(`
+                                        <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                    `);
+                                }
+
+                                $('#arr_line' + count).select2({
+                                    placeholder: '-- Pilih ya --',
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/cost_distribution") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                place_id: $("#arr_place" + count).val(),
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
 
                                 if(val.machine_id){
                                     $('#arr_machine' + count).val(val.machine_id);
@@ -2080,15 +2149,10 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                        <option value="">--{{ __('translations.empty') }}--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                        @endforeach
-                    </select>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -2146,25 +2210,31 @@
             }
         });
 
+        $('#arr_line' + count).select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#arr_place" + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-    }
-
-    function changePlace(element){
-        $(element).parent().next().find('select[name="arr_machine[]"] option').show();
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
-            $(element).parent().next().find('select[name="arr_machine[]"] option[data-line!="' + $(element).val() + '"]').hide();
-        }else{
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
-        }
-    }
-
-    function changeLine(element){
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
-        }else{
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
-        }
     }
 
     String.prototype.replaceAt = function(index, replacement) {

@@ -37,4 +37,14 @@ class CostDistribution extends Model
     public function coa(){
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
+
+    public function getLine(){
+        $arr = [];
+        foreach($this->costDistributionDetail as $row){
+            if($row->line()->exists()){
+                $arr[] = $row->line->code;
+            }
+        }
+        return implode(', ',$arr);
+    }
 }

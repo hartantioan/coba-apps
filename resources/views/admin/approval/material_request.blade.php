@@ -232,7 +232,7 @@
                         <td class="indigo-text center-align">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center-align">{{ $row->place->code }}</td>
                         <td class="center-align">{{ $row->warehouse->name }}</td>
-                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : ($row->costDistribution()->exists() ? $row->costDistribution->getLine() : '-' ) }}</td>
                         <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                         <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                         <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>

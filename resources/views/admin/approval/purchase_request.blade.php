@@ -229,7 +229,7 @@
                         <td>{{ $row->note2 }}</td>
                         <td class="indigo-text center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center">{{ $row->place->code.' - '.$row->place->company->name }}</td>
-                        <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
+                        <td class="center">{{ $row->line()->exists() ? $row->line->code : ($row->costDistribution()->exists() ? $row->costDistribution->getLine() : '-' ) }}</td>
                         <td class="center">{{ $row->warehouse->name }}</td>
                         <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                     </tr>

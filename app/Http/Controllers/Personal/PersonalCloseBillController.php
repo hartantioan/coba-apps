@@ -934,6 +934,8 @@ class PersonalCloseBillController extends Controller
                                     'division_id'       => $rowdetail->division_id ?? '',
                                     'project_id'        => $rowdetail->project_id ?? '',
                                     'project_name'      => $rowdetail->project()->exists() ? $rowdetail->project->code.' - '.$rowdetail->project->name : '',
+                                    'cost_distribution_id'   => $rowdetail->costDistribution()->exists() ? $rowdetail->cost_distribution_id : '',
+                                    'cost_distribution_name' => $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '',
                                 ];
                             }
                             $details[] = [
@@ -1138,7 +1140,7 @@ class PersonalCloseBillController extends Controller
                         'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                         'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                         'place_id'              => $request->arr_place[$key] ?? NULL,
-                        'line_id'               => $request->arr_line[$key] ?? NULL,
+                        'cost_distribution_id'  => $request->arr_line[$key] ?? NULL,
                         'machine_id'            => $request->arr_machine[$key] ?? NULL,
                         'division_id'           => $request->arr_division[$key] ?? NULL,
                         'project_id'            => $request->arr_project[$key] ?? NULL,
@@ -1248,7 +1250,7 @@ class PersonalCloseBillController extends Controller
         $string .= '<div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="14">Daftar Biaya</th>
+                                <th class="center-align" colspan="15">Daftar Biaya</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1261,6 +1263,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="right-align">PPh</th>
                                 <th class="right-align">Grandtotal</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
@@ -1280,6 +1283,7 @@ class PersonalCloseBillController extends Controller
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="">'.($row->division()->exists() ? $row->division->name : '-').'</td>
@@ -1290,7 +1294,7 @@ class PersonalCloseBillController extends Controller
         $string .= '</tbody>
                         <tfoot>
                             <tr>
-                                <th class="right-align" colspan="8">Total</th>
+                                <th class="right-align" colspan="9">Total</th>
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
                             </tr>
                         </tfoot>

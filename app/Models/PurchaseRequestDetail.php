@@ -23,6 +23,7 @@ class PurchaseRequestDetail extends Model
         'note',
         'note2',
         'required_date',
+        'cost_distribution_id',
         'place_id',
         'line_id',
         'machine_id',
@@ -34,6 +35,11 @@ class PurchaseRequestDetail extends Model
         'requester',
         'project_id',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function lookable(){
         return $this->morphTo()->withTrashed();

@@ -273,7 +273,7 @@
                             </tr>
                             <tr>
                                 <td colspan="9">
-                                    <b>{{ __('translations.line') }}</b> : {{ $row->line()->exists() ? $row->line->code : '-' }},  
+                                    <b>{{ __('translations.line') }}</b> : {{ $row->line()->exists() ? $row->line->code : ($row->costDistribution()->exists() ? $row->costDistribution->getLine() : '-' ) }},  
                                     <b>{{ __('translations.engine') }}</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
                                     <b>Requester</b> : {{ $row->requester }},
                                     <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}

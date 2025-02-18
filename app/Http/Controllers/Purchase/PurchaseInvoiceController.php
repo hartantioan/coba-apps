@@ -528,6 +528,8 @@ class PurchaseInvoiceController extends Controller
                             'currency_id'   => $datapo->currency_id,
                             'rounding'      => number_format($datapo->rounding,2,',','.'),
                             'is_expedition' => $datapo->goodScale()->exists() ? '1' : '',
+                            'cost_distribution_id'   => $rowdetail->costDistribution()->exists() ? $rowdetail->cost_distribution_id : '',
+                            'cost_distribution_name' => $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '',
                         ];
                     }
                 }
@@ -589,6 +591,8 @@ class PurchaseInvoiceController extends Controller
                             'currency_id'   => $datafr->currency_id,
                             'rounding'      => 0,
                             'is_expedition' => '',
+                            'cost_distribution_id'   => $rowdetail->costDistribution()->exists() ? $rowdetail->cost_distribution_id : '',
+                            'cost_distribution_name' => $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '',
                         ];
                     }
                 }
@@ -661,6 +665,8 @@ class PurchaseInvoiceController extends Controller
                                 'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
                                 'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),
                                 'is_expedition' => '',
+                                'cost_distribution_id'   => '',
+                                'cost_distribution_name' => '',
                             ];
                         }
                     }
@@ -724,6 +730,8 @@ class PurchaseInvoiceController extends Controller
                             'currency_id'   => $datalc->currency_id,
                             'rounding'      => 0,
                             'is_expedition' => '',
+                            'cost_distribution_id'   => '',
+                            'cost_distribution_name' => '',
                         ];
                     }
                 }

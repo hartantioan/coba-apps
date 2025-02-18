@@ -23,11 +23,17 @@ class InventoryRevaluationDetail extends Model
         'warehouse_id',
         'nominal',
         'coa_id',
+        'cost_distribution_id',
         'line_id',
         'machine_id',
         'department_id',
         'project_id',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function journalDetail(){
         return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){

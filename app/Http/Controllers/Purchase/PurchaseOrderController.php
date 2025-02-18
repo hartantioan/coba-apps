@@ -422,7 +422,7 @@ class PurchaseOrderController extends Controller
                     $note_email = '<span title="Email has already been sent" style="font-size: 10px; font-weight: bold; color: green; text-transform: uppercase;"><sup>SENT</sup></span>';
                 }
                 if (in_array($val->status, ['2','3'])) {
-                    $btn_email = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light black accent-2 white-text btn-small" data-popup="tooltip" title="send/resend Mail" onclick="sendMail(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">contact_mail</i></button>';
+                    $btn_email = ' <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light black accent-2 white-text btn-small" data-popup="tooltip" title="send/resend Mail" onclick="sendMail(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">contact_mail</i></button>';
                 }
                 $btn_close = /* $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' :  */'';
                 $btn_print = in_array($val->status,['2','3']) ? ' <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -557,6 +557,8 @@ class PurchaseOrderController extends Controller
                                 'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
                                 'buy_units'                     => $row->item->arrBuyUnits(),
                                 'uom'                           => $row->item->uomUnit->code,
+                                'cost_distribution_id'          => $row->cost_distribution_id ?? '',
+                                'cost_distribution_name'        => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                             ];
                         }
                     }
@@ -583,6 +585,8 @@ class PurchaseOrderController extends Controller
                             'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
                             'buy_units'                     => $row->itemStock->item->arrBuyUnits(),
                             'uom'                           => $row->itemStock->item->uomUnit->code,
+                            'cost_distribution_id'          => $row->cost_distribution_id ?? '',
+                            'cost_distribution_name'        => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                         ];
                     }
                 }elseif($request->type == 'sj'){
@@ -1014,7 +1018,7 @@ class PurchaseOrderController extends Controller
                                     'tax_id'                        => $request->arr_tax_id[$key],
                                     'wtax_id'                       => $request->arr_wtax_id[$key],
                                     'place_id'                      => $request->arr_place[$key],
-                                    'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'cost_distribution_id'          => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                     'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                     'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
@@ -1078,7 +1082,7 @@ class PurchaseOrderController extends Controller
                                     'tax_id'                                => $request->arr_tax_id[$key],
                                     'wtax_id'                               => $request->arr_wtax_id[$key],
                                     'place_id'                              => $request->arr_place[$key],
-                                    'line_id'                               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'cost_distribution_id'                  => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                     'machine_id'                            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                     'department_id'                         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'requester'                             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
@@ -1131,7 +1135,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.' - '.$data->account->name.$x.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="23">Daftar Item</th>
+                                <th class="center-align" colspan="24">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1152,6 +1156,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Ket. 3</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
                                 <th class="center-align">Gudang</th>
@@ -1197,6 +1202,7 @@ class PurchaseOrderController extends Controller
                 <td class="">'.$row->note3.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
@@ -1358,6 +1364,8 @@ class PurchaseOrderController extends Controller
                 'project_id'                        => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->id : '') : '',
                 'project_name'                      => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->name : '-') : '-',
                 'buy_units'                         => $row->item_id ? $row->item->arrBuyUnits() : [],
+                'cost_distribution_id'              => $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
+                'cost_distribution_name'            => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
             ];
             $used_datas = $row->getParentUsedData();
             $arr_used_codes = array_column($arr_used, 'code');

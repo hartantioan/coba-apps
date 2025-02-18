@@ -312,7 +312,7 @@ class MaterialRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"> <div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="17">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -326,6 +326,7 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Line</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
                                 <th class="center-align">Proyek</th>
@@ -348,6 +349,7 @@ class MaterialRequestController extends Controller
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
@@ -742,7 +744,7 @@ class MaterialRequestController extends Controller
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'cost_distribution_id'  => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
@@ -801,7 +803,9 @@ class MaterialRequestController extends Controller
                 'date'              => $row->required_date,
                 'place_id'          => $row->place_id,
                 'warehouse_id'      => $row->warehouse_id,
-                'line_id'           => $row->line_id,
+                'line_id'           => $row->line()->exists() ? $row->line_id : '',
+                'cost_distribution_id'=> $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
+                'cost_distribution_name' => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
                 'requester'         => $row->requester ? $row->requester : '',

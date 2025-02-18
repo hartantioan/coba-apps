@@ -4692,6 +4692,8 @@ class Select2Controller extends Controller {
                             'place_id'      => $row->place_id,
                             'warehouse_id'  => $row->warehouse_id,
                             'line_id'       => $row->line_id,
+                            'cost_distribution_id'       => $row->cost_distribution_id,
+                            'cost_distribution_name'     => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',

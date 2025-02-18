@@ -322,7 +322,7 @@ class PurchaseRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="13">Daftar Item</th>
+                                <th class="center-align" colspan="14">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -334,6 +334,7 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Tgl.Dipakai</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Divisi</th>
@@ -354,6 +355,7 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.date('d/m/Y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
@@ -762,7 +764,7 @@ class PurchaseRequestController extends Controller
                             'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'cost_distribution_id'  => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
@@ -821,6 +823,8 @@ class PurchaseRequestController extends Controller
                 'warehouse_id'      => $row->warehouse_id,
                 'place_id'          => $row->place_id,
                 'line_id'           => $row->line_id,
+                'cost_distribution_id'=> $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
+                'cost_distribution_name' => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
                 'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',

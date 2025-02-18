@@ -3405,7 +3405,7 @@ class SendJournal implements ShouldQueue
 
 			foreach($cb->closeBillCost as $row){
 				if($row->cost_distribution_id){
-					if($row->nominal_debit_fc !== 0){
+					if($row->nominal_debit_fc > 0 || $row->nominal_debit_fc < 0){
 						$total = $row->nominal_debit_fc;
 						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 						$accumulation = 0;
@@ -3437,7 +3437,7 @@ class SendJournal implements ShouldQueue
 							]);
 						}
 					}
-					if($row->nominal_credit_fc !== 0){
+					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
 						$total = $row->nominal_credit_fc;
 						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 						$accumulation = 0;

@@ -24,6 +24,7 @@ class MaterialRequestDetail extends Model
         'note',
         'note2',
         'required_date',
+        'cost_distribution_id',
         'place_id',
         'line_id',
         'machine_id',
@@ -34,6 +35,11 @@ class MaterialRequestDetail extends Model
         'requester',
         'total',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function materialRequest()
     {

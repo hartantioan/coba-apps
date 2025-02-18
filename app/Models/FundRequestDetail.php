@@ -30,11 +30,17 @@ class FundRequestDetail extends Model
         'wtax',
         'grandtotal',
         'place_id',
+        'cost_distribution_id',
         'line_id',
         'machine_id',
         'division_id',
         'project_id',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();

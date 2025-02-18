@@ -44,6 +44,7 @@ class PurchaseOrderDetail extends Model
         'percent_wtax',
         'tax_id',
         'wtax_id',
+        'cost_distribution_id',
         'place_id',
         'line_id',
         'machine_id',
@@ -53,6 +54,11 @@ class PurchaseOrderDetail extends Model
         'requester',
         'project_id',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {

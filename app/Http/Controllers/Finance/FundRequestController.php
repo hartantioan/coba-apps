@@ -380,6 +380,7 @@ class FundRequestController extends Controller
                                 <th class="right-align">PPh</th>
                                 <th class="right-align">Grandtotal</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
@@ -410,6 +411,7 @@ class FundRequestController extends Controller
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="">'.($row->division()->exists() ? $row->division->name : '-').'</td>
@@ -1301,7 +1303,7 @@ class FundRequestController extends Controller
                             'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                             'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                             'place_id'              => $request->arr_place[$key] ?? NULL,
-                            'line_id'               => $request->arr_line[$key] ?? NULL,
+                            'cost_distribution_id'  => $request->arr_line[$key] ?? NULL,
                             'machine_id'            => $request->arr_machine[$key] ?? NULL,
                             'division_id'           => $request->arr_division[$key] ?? NULL,
                             'project_id'            => $request->arr_project[$key] ?? NULL,
@@ -1397,7 +1399,7 @@ class FundRequestController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item Dokumen '.$data->code.'</th>
+                                <th class="center-align" colspan="10">Daftar Item Dokumen '.$data->code.'</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1410,6 +1412,7 @@ class FundRequestController extends Controller
                                 <th class="right-align">PPh</th>
                                 <th class="right-align">Grandtotal</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
@@ -1429,6 +1432,7 @@ class FundRequestController extends Controller
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
                 <td class="right-align">'.$data->currency->code.'.'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="">'.($row->division()->exists() ? $row->division->name : '-').'</td>
@@ -1439,7 +1443,7 @@ class FundRequestController extends Controller
         $string .= '</tbody>
                         <tfoot>
                             <tr>
-                                <th class="right-align" colspan="8">Total</th>
+                                <th class="right-align" colspan="9">Total</th>
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
                             </tr>
                         </tfoot>
@@ -1561,6 +1565,8 @@ class FundRequestController extends Controller
                 'division_id'       => $row->division_id,
                 'project_id'        => $row->project_id ?? '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
+                'cost_distribution_id'   => $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
+                'cost_distribution_name' => $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
             ];
         }
 

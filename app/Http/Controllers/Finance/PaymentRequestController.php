@@ -660,6 +660,8 @@ class PaymentRequestController extends Controller
                                             'division_id'   => $rowdetail->division_id ?? '',
                                             'project_id'    => $rowdetail->project_id ?? '',
                                             'project_name'  => $rowdetail->project()->exists() ? $rowdetail->project->name : '',
+                                            'cost_distribution_id'   => $rowdetail->costDistribution()->exists() ? $rowdetail->cost_distribution_id : '',
+                                            'cost_distribution_name' => $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '',
                                         ];
                                     }
 
@@ -676,6 +678,8 @@ class PaymentRequestController extends Controller
                                             'division_id'   => '',
                                             'project_id'    => '',
                                             'project_name'  => '',
+                                            'cost_distribution_id'   => '',
+                                            'cost_distribution_name' => '',
                                         ];
                                     }
 
@@ -692,6 +696,8 @@ class PaymentRequestController extends Controller
                                             'division_id'   => '',
                                             'project_id'    => '',
                                             'project_name'  => '',
+                                            'cost_distribution_id'   => '',
+                                            'cost_distribution_name' => '',
                                         ];
                                     }
                                 }

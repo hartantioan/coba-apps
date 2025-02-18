@@ -327,7 +327,9 @@ class TruckQueueController extends Controller
             $gs_time_out=$data->truckQueueDetail->goodScale->time_scale_out;
             $sj_code = $data->truckQueueDetail->goodScale->getSalesSuratJalan();
             $gs_time_out=$data->truckQueueDetail->goodScale->time_scale_out;
-            $sj_keluar=$data->truckQueueDetail->goodScale->getSuratJalanKeluarPabrik();
+            if($data->status == '6'){
+                $sj_keluar=$data->updated_at;
+            }
         }
 
         $string .= '<div class="card-panel">

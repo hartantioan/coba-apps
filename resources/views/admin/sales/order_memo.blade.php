@@ -1161,6 +1161,9 @@
                                     </td>
                                 </tr>
                             `);
+                            if(val.tax_no){
+                                $('#tax_no').val(val.tax_no);
+                            }
                         });
                         $('#marketing_order_delivery_process_id').empty();
                     }else{

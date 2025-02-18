@@ -346,6 +346,7 @@ class MarketingOrderMemoController extends Controller
                     'qty_retur'     => CustomHelper::formatConditionalQty(round($retur,3)),
                     'qty_available' => CustomHelper::formatConditionalQty(round($balance,3)),
                     'unit'          => $row->itemStock->item->uomUnit->code,
+                    'tax_no'        => $row->marketingOrderDeliveryProcess->marketingOrderInvoice()->exists() ? $row->marketingOrderDeliveryProcess->marketingOrderInvoice->tax_no : '',
                 ];
             }
 

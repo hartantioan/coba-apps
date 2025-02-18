@@ -9,6 +9,10 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+
+    .modal {
+        top:0px !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -112,6 +116,11 @@
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
+                                                        <th>Dist.Biaya</th>
+                                                        <th>Line</th>
+                                                        <th>Mesin</th>
+                                                        <th>Divisi</th>
+                                                        <th>Proyek</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -131,7 +140,7 @@
 </div>
 
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;width:80%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -141,114 +150,158 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m4 s12">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">{{ __('translations.code') }}</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <select class="form-control" id="place_id" name="place_id">
-                                <option value="">--{{ __('translations.empty') }}--</option>
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">{{ __('translations.plant') }}</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">{{ __('translations.name') }}</label>
-                        </div>
-                        <div class="input-field col m12 s12">
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
-                                @foreach($group->whereNull('parent_id') as $c)
-                                        @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                        @else
-                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                            @foreach($c->childSub as $bc)
-                                                @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m4 s12">
+                                    <input type="hidden" id="temp" name="temp">
+                                    <input id="code" name="code" type="text" placeholder="Kode">
+                                    <label class="active" for="code">{{ __('translations.code') }}</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="form-control" id="place_id" name="place_id">
+                                        <option value="">--{{ __('translations.empty') }}--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="place_id">{{ __('translations.plant') }}</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <input id="name" name="name" type="text" placeholder="Nama">
+                                    <label class="active" for="name">{{ __('translations.name') }}</label>
+                                </div>
+                                <div class="input-field col m12 s12">
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
+                                        @foreach($group->whereNull('parent_id') as $c)
+                                                @if(!$c->childSub()->exists())
+                                                    <option value="{{ $c->id }}"> - {{ $c->name }}</option>
                                                 @else
-                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                        @foreach($bc->childSub as $bcc)
-                                                            @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                            @else
-                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                    @foreach($bcc->childSub as $bccc)
-                                                                        @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                        @else
-                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            </optgroup>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
+                                                    <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                    @foreach($c->childSub as $bc)
+                                                        @if(!$bc->childSub()->exists())
+                                                            <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                        @else
+                                                            <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                @foreach($bc->childSub as $bcc)
+                                                                    @if(!$bcc->childSub()->exists())
+                                                                        <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                    @else
+                                                                        <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                            @foreach($bcc->childSub as $bccc)
+                                                                                @if(!$bccc->childSub()->exists())
+                                                                                    <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                @else
+                                                                                    <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                        @foreach($bccc->childSub as $bcccc)
+                                                                                            @if(!$bcccc->childSub()->exists())
+                                                                                                <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </optgroup>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endif
+                                                                @endforeach
+                                                            </optgroup>
+                                                        @endif
+                                                    @endforeach
                                                     </optgroup>
                                                 @endif
-                                            @endforeach
-                                            </optgroup>
-                                        @endif
-                                @endforeach
-                            </select>
-                            <label class="active" for="asset_group_id">{{ __('translations.asset_group') }}</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <select class="form-control" id="method" name="method">
-                                <option value="1">Straight Line</option>
-                                <option value="2">Declining Balance</option>
-                            </select>
-                            <label class="" for="method">{{ __('translations.counting_method') }}</label>
-                        </div>
-                       
-                        <div class="input-field col m4 s12">
-                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
-                            <label class="active" for="date">{{ __('translations.capitalization_date') }} ({{ __('translations.from_form_capitalization') }})</label>
-                        </div>
-                        <div class="input-field col m12 s12">
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
-                            <label class="active" for="nominal">{{ __('translations.initial_nominal') }} ({{ __('translations.from_form_capitalization') }})</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
-                            <label class="active" for="note">{{ __('translations.note') }}</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <select class="browser-default" id="item_id" name="item_id">&nbsp;</select>
-                            <label class="active" for="item_id">Pilih Item dari inventory</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <div class="switch mb-1">
-                                <label for="status">{{ __('translations.status') }}</label>
-                                <label>
-                                    {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    {{ __('translations.active') }}
-                                </label>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="asset_group_id">{{ __('translations.asset_group') }}</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="form-control" id="method" name="method">
+                                        <option value="1">Straight Line</option>
+                                        <option value="2">Declining Balance</option>
+                                    </select>
+                                    <label class="" for="method">{{ __('translations.counting_method') }}</label>
+                                </div>
+                               
+                                <div class="input-field col m4 s12">
+                                    <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
+                                    <label class="active" for="date">{{ __('translations.capitalization_date') }} ({{ __('translations.from_form_capitalization') }})</label>
+                                </div>
+                                <div class="input-field col m12 s12">
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
+                                    <label class="active" for="nominal">{{ __('translations.initial_nominal') }} ({{ __('translations.from_form_capitalization') }})</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
+                                    <label class="active" for="note">{{ __('translations.note') }}</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="item_id" name="item_id">&nbsp;</select>
+                                    <label class="active" for="item_id">Pilih Item dari inventory</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <div class="switch mb-1">
+                                        <label for="status">{{ __('translations.status') }}</label>
+                                        <label>
+                                            {{ __('translations.non_active') }}
+                                            <input checked type="checkbox" id="status" name="status" value="1">
+                                            <span class="lever"></span>
+                                            {{ __('translations.active') }}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                        </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>2. Costing Jurnal Kapitalisasi</legend>
+                            <i>Distribusi Biaya akan override komponen biaya lainnya. Hati-hati.</i>
+                            <div class="row">
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
+                                    <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="line_id" name="line_id">
+                                        <option value="">--{{ __('translations.empty') }}--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="line_id">Line</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="machine_id" name="machine_id">
+                                        <option value="">--{{ __('translations.empty') }}--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="machine_id">Mesin</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="division_id" name="division_id">
+                                        <option value="">--{{ __('translations.empty') }}--</option>
+                                        @foreach ($division as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="division_id">Divisi</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="project_id" name="project_id"></select>
+                                    <label class="active" for="project_id">Proyek</label>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1 step24" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -450,7 +503,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#item_id').empty();
+                $('#item_id,#cost_distribution_id,#project_id').empty();
                 $('#asset_group_id').val($('#asset_group_id option:eq(0)').val()).trigger('change');
                 M.updateTextFields();
             }
@@ -475,6 +528,32 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+
+        $('#cost_distribution_id').select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#place_id").val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
     });
 
     function loadDataTable() {
@@ -526,6 +605,11 @@
                 { name: 'item', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'cost', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'line', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'machine', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'division', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'project', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

@@ -4,8 +4,13 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\AssetGroup;
+use App\Models\CostDistribution;
+use App\Models\Division;
 use App\Models\HardwareItem;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Place;
+use App\Models\Project;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -36,6 +41,16 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
         $method =explode('#',$row['method'])[0];
         $inventaris_code =explode('#',$row['inventaris'])[0];
         $inventaris = HardwareItem::where('code',$inventaris_code)->first() ?? null;
+        $cost=explode('#',$row['cost_distribution_id'])[0];
+        $costdata = CostDistribution::where('code',$cost)->first() ?? null;
+        $line=explode('#',$row['line_id'])[0];
+        $linedata = Line::where('code',operator: $line)->first() ?? null;
+        $machine=explode('#',$row['machine_id'])[0];
+        $machinedata = Machine::where('code',operator: $machine)->first() ?? null;
+        $division=explode('#',$row['division_id'])[0];
+        $divisiondata = Division::where('code',operator: $division)->first() ?? null;
+        $project=explode('#',$row['project_id'])[0];
+        $projectdata = Project::where('code',operator: $project)->first() ?? null;
         $row = $row->toArray();
         $query = Asset::create([
             'code' => $row['code'],
@@ -46,6 +61,11 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
             'method' => $method,
             'note' => $row['note'],
             'hardware_item_id' => $inventaris->id ?? null ,
+            'cost_distribution_id' => $costdata->id ?? null ,
+            'line_id' => $linedata->id ?? null ,
+            'machine_id' => $machinedata->id ?? null ,
+            'division_id' => $divisiondata->id ?? null ,
+            'project_id' => $projectdata->id ?? null ,
             'status' => '1',
         ]);
         

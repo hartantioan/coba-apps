@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\AssetGroup;
+use App\Models\Division;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Date;
@@ -46,7 +49,10 @@ class AssetController extends Controller
             'title'         => 'Aset',
             'content'       => 'admin.master_data.asset',
             'place'         => Place::where('status','1')->get(),
-            'group'         => AssetGroup::where('status','1')->get()
+            'group'         => AssetGroup::where('status','1')->get(),
+            'division'      => Division::where('status','1')->get(),
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -66,7 +72,6 @@ class AssetController extends Controller
             'method',
             'note',
             'status',
-            'place_id',
         ];
 
         $start  = $request->start;
@@ -148,6 +153,11 @@ class AssetController extends Controller
                     $val->hardwareItem->code ?? '-',
                     $val->status(),
                     $val->place()->exists() ? $val->place->code : '-',
+                    $val->costDistribution()->exists() ? $val->costDistribution->code : '-',
+                    $val->line()->exists() ? $val->line->code : '-',
+                    $val->machine()->exists() ? $val->machine->code : '-',
+                    $val->division()->exists() ? $val->division->name : '-',
+                    $val->project()->exists() ? $val->project->name : '-',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -207,6 +217,11 @@ class AssetController extends Controller
                     $query->method          = $request->method;
                     $query->note            = $request->note;
                     $query->hardware_item_id            = $request->item_id;
+                    $query->cost_distribution_id  = $request->cost_distribution_id ?? NULL;
+                    $query->line_id         = $request->line_id ?? NULL;
+                    $query->machine_id      = $request->machine_id ?? NULL;
+                    $query->division_id     = $request->division_id ?? NULL;
+                    $query->project_id      = $request->project_id ?? NULL;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -227,6 +242,11 @@ class AssetController extends Controller
                         'method'            => $request->method,
                         'note'              => $request->note,
                         'hardware_item_id'  => $request->item_id,
+                        'cost_distribution_id'  => $request->cost_distribution_id ?? NULL,
+                        'line_id'           => $request->line_id ?? NULL,
+                        'machine_id'        => $request->machine_id ?? NULL,
+                        'division_id'       => $request->division_id ?? NULL,
+                        'project_id'        => $request->project_id ?? NULL,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

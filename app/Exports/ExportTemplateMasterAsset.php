@@ -3,8 +3,13 @@
 namespace App\Exports;
 
 use App\Models\AssetGroup;
+use App\Models\CostDistribution;
+use App\Models\Division;
 use App\Models\HardwareItem;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Place;
+use App\Models\Project;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
@@ -21,9 +26,19 @@ class ExportTemplateMasterAsset implements WithEvents
         $event->writer->getSheetByIndex(1); #place
         $event->writer->getSheetByIndex(2); #asset group
         $event->writer->getSheetByIndex(4);
+        $event->writer->getSheetByIndex(5);
+        $event->writer->getSheetByIndex(6);
+        $event->writer->getSheetByIndex(7);
+        $event->writer->getSheetByIndex(8);
+        $event->writer->getSheetByIndex(9);
         $asset_group = AssetGroup::where('status','1')->orderBy('code')->get();
         $place = Place::where('status','1')->get();
         $inventaris = HardwareItem::where('status','1')->get();
+        $costdist = CostDistribution::where('status','1')->get();
+        $line = Line::where('status','1')->get();
+        $machine = Machine::where('status','1')->get();
+        $division = Division::where('status','1')->get();
+        $project = Project::where('status','1')->get();
         
         $startRow = 2;
         foreach($place as $row){
@@ -42,6 +57,41 @@ class ExportTemplateMasterAsset implements WithEvents
         foreach($inventaris as $row){
             $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->item);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($costdist as $row){
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($line as $row){
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($machine as $row){
+            $event->getWriter()->getSheetByIndex(7)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(7)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($division as $row){
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($project as $row){
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 

@@ -29,7 +29,37 @@ class Asset extends Model
         'book_balance',
         'count_balance',
         'hardware_item_id',
+        'cost_distribution_id',
+        'line_id',
+        'machine_id',
+        'division_id',
+        'project_id',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
+    public function division()
+    {
+        return $this->belongsTo('App\Models\Division', 'division_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
+    }
 
     public function status(){
         $status = match ($this->status) {
@@ -74,6 +104,7 @@ class Asset extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
+
     public function assetGroup()
     {
         return $this->belongsTo('App\Models\AssetGroup', 'asset_group_id', 'id')->withTrashed();

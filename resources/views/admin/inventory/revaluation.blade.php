@@ -551,15 +551,10 @@
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                        <option value="">--{{ __('translations.empty') }}--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                        @endforeach
-                    </select>    
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -588,20 +583,13 @@
         M.updateTextFields();
 
         select2ServerSideLonger('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
+        select2ServerSideLonger('#arr_line' + count, '{{ url("admin/select2/cost_distribution") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         
         $('#arr_item_stock' + count).append(`
             <option value="">--Silahkan pilih item--</option>
         `);
-    }
-
-    function changeLine(element){
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
-        }else{
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
-        }
     }
 
     function countAll(){
@@ -1067,15 +1055,10 @@
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                        <option value="">--{{ __('translations.empty') }}--</option>
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                        @endforeach
-                                    </select>    
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>    
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1108,6 +1091,14 @@
                                 <option value="` + val.project_id + `">` + val.project_name + `</option>
                             `);
                         }
+
+                        if(val.cost_distribution_id){
+                            $('#arr_line' + count).append(`
+                                <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                            `);
+                        }
+
+                        select2ServerSideLonger('#arr_line' + count, '{{ url("admin/select2/cost_distribution") }}');
 
                         $('#arr_itemkuy' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>

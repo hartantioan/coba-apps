@@ -486,6 +486,7 @@ class InventoryRevaluationController extends Controller
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Batch</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Divisi</th>
@@ -509,6 +510,7 @@ class InventoryRevaluationController extends Controller
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-').'</td>
                 <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code : '-').'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>

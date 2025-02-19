@@ -121,7 +121,6 @@ class ComplaintSalesController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_complaint', 'like', "%$search%")
                             ->orWhere('solution', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('complaint_date', 'like', "%$search%")

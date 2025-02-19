@@ -12,6 +12,7 @@ use App\Imports\ImportDeliveryCost;
 use App\Exceptions\RowImportException;
 use App\Exports\ExportDeliveryCost;
 use App\Exports\ExportTemplateDeliveryCost;
+use App\Jobs\reportBiayaKirimExportJob;
 use App\Models\Transportation;
 
 class DeliveryCostController extends Controller
@@ -378,7 +379,8 @@ class DeliveryCostController extends Controller
         return Excel::download(new ExportTemplateDeliveryCost(), 'format_template_delivery_cost_'.uniqid().'.xlsx');
     }
 
-    public function exportFromTransactionPage(Request $request){
+    public function exportFromTransactionPage(Request $request)
+    {
         $search = $request->search? $request->search : '';
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
@@ -388,6 +390,23 @@ class DeliveryCostController extends Controller
         }else{
 		    $account = $request->account ? $request->account : '';
         }
-		return Excel::download(new ExportDeliveryCost($search,$post_date,$end_date,$status,$account), 'delivery_cost_'.uniqid().'.xlsx');
+        $user_id = session('bo_id');
+        reportBiayaKirimExportJob::dispatch($search, $post_date, $end_date, $status, $account,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
+        // return Excel::download(new ExportProfitLoss($month_start,$month_end,$level,$company), 'profit_loss_'.uniqid().'.xlsx');
     }
+
+    // public function exportFromTransactionPage(Request $request){
+    //     $search = $request->search? $request->search : '';
+    //     $post_date = $request->start_date? $request->start_date : '';
+    //     $end_date = $request->end_date ? $request->end_date : '';
+    //     $status = $request->status ? $request->status : '';
+    //     if($request->account == "null"){
+    //         $account = '';
+    //     }else{
+	// 	    $account = $request->account ? $request->account : '';
+    //     }
+	// 	return Excel::download(new ExportDeliveryCost($search,$post_date,$end_date,$status,$account), 'delivery_cost_'.uniqid().'.xlsx');
+    // }
 }

@@ -121,7 +121,6 @@ class ComplaintSalesController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_complaint', 'like', "%$search%")
                             ->orWhere('solution', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('complaint_date', 'like', "%$search%")
@@ -505,13 +504,13 @@ class ComplaintSalesController extends Controller
                         ]);
                     }
 
-                    $resetdata = ApprovalSource::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->get();
-                    foreach($resetdata as $rowreset){
-                        foreach($rowreset->approvalMatrix as $detailmatrix){
-                            $detailmatrix->delete();
-                        }
-                        $rowreset->delete();
-                    }
+                    // $resetdata = ApprovalSource::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->get();
+                    // foreach($resetdata as $rowreset){
+                    //     foreach($rowreset->approvalMatrix as $detailmatrix){
+                    //         $detailmatrix->delete();
+                    //     }
+                    //     $rowreset->delete();
+                    // }
                     $data = DB::table($query->getTable())->where('id',$query->id)->first();
                     $approvalTemplate = ApprovalTemplate::where('status','1')
                     ->whereHas('approvalTemplateMenu',function($querys) use($query){

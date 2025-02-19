@@ -163,7 +163,7 @@
                             </div>
 
                             <div class="input-field col m3 s12 ">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" >
                                 <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                             </div>
                             <div class="input-field col m3 s12 ">
@@ -539,7 +539,6 @@
                 }
                 /* $('#pr-show,#gi-show,#sj-show').show(); */
                 $('#inventory_type').formSelect().trigger('change');
-                changeDateMinimum($('#post_date').val());
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();

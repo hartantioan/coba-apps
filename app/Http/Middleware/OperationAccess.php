@@ -34,7 +34,7 @@ class OperationAccess
             $request->attributes->set('minDate', $minDate);
             $request->attributes->set('maxDate', $maxDate);
             if(isset($request->post_date)){
-                if($url == 'marketing_order_delivery' && isset($request->temp) && $request->temp){
+                if(in_array($url, ['marketing_order_delivery','complaint_sales']) && isset($request->temp) && $request->temp){
 
                 }else{
                     if($request->post_date < $minDate || $request->post_date > $maxDate){
@@ -63,7 +63,7 @@ class OperationAccess
                         'status'  => 500,
                         'message' => 'Ups. Anda tidak boleh menggunakan fitur ini.'
                     ];
-                    
+
                     return response()->json($response);
                 }else{
                     return abort(403);
@@ -73,7 +73,7 @@ class OperationAccess
                     'status'  => 500,
                     'message' => 'Ups. Anda tidak boleh menggunakan fitur ini.'
                 ];
-                
+
                 return response()->json($response);
             }
         }

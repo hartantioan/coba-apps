@@ -59,7 +59,7 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.5em !important;
+                    font-size:0.7em !important;
                 }
                 .tb-header td{
                     font-size:0.5em !important;
@@ -69,16 +69,10 @@
                     vertical-align:top !important;
                 }
                 .table-data-item td{
-                    font-size:0.5em !important;
+                    font-size:0.7em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
-                }
-                .table-bot td{
-                    font-size:0.5em !important;
-                }
-                .table-bot1 td{
-                    font-size:0.6em !important;
                 }
             }
 
@@ -199,14 +193,14 @@
                             <tr>
                                 <th rowspan="2" >NO</th>
                                 <th rowspan="2" >PLANT</th>
-                                <th rowspan="2" >NO PO</th>
-                                <th rowspan="2" >NAMA ITEM</th>
+                                <th rowspan="2" style="width: 20%">NO PO</th>
+                                <th rowspan="2" style="width: 10%">NAMA ITEM</th>
                                 <th rowspan="2" >NO SJ</th>
                                 <th rowspan="2" >TGL MASUK</th>
                                 <th rowspan="2" >NO. KENDARAAN</th>
-                                <th rowspan="2" >NETTO JEMBATAN TIMBANG<br>KG</th>
+                                <th rowspan="2" style="width: 10%">NETTO JEMBATAN TIMBANG<br>KG</th>
                                 <th rowspan="2" >HASIL QC<br> Kadar Air %</th>
-                                <th rowspan="2" >STD POTONGAN QC</th>
+                                <th rowspan="2" style="width: 10%">STD POTONGAN QC</th>
                                 <th colspan="2" >FINANCE</th>
                                 <th rowspan="2">TOTAL BAYAR<br>KG</th>
                                 <th rowspan="2">TOTAL PENERIMAAN<br>KG</th>

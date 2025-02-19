@@ -52,8 +52,8 @@ class ComplaintSales extends Model
 
     public function attachments()
     {
-        if($this->document_po){
-            $arr = explode(',',$this->document_po);
+        if($this->document){
+            $arr = explode(',',$this->document);
             $arrDoc = [];
             foreach($arr as $key => $row){
                 if(Storage::exists($row)){

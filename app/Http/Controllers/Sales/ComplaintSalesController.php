@@ -413,7 +413,6 @@ class ComplaintSalesController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','2','6'])){
-                        info($request);
                         if($request->has('file')) {
 
                             if($query->document){
@@ -506,13 +505,13 @@ class ComplaintSalesController extends Controller
                         ]);
                     }
 
-                    $resetdata = ApprovalSource::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->get();
-                    foreach($resetdata as $rowreset){
-                        foreach($rowreset->approvalMatrix as $detailmatrix){
-                            $detailmatrix->delete();
-                        }
-                        $rowreset->delete();
-                    }
+                    // $resetdata = ApprovalSource::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->get();
+                    // foreach($resetdata as $rowreset){
+                    //     foreach($rowreset->approvalMatrix as $detailmatrix){
+                    //         $detailmatrix->delete();
+                    //     }
+                    //     $rowreset->delete();
+                    // }
                     $data = DB::table($query->getTable())->where('id',$query->id)->first();
                     $approvalTemplate = ApprovalTemplate::where('status','1')
                     ->whereHas('approvalTemplateMenu',function($querys) use($query){

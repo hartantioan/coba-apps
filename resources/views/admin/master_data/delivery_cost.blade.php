@@ -35,7 +35,7 @@
                             <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();" id="export_button">
                             <i class="material-icons hide-on-med-and-up">view_headline</i>
                             <span class="hide-on-small-onl">Export</span>
                             <i class="material-icons right">view_headline</i>
@@ -735,14 +735,71 @@
         $('#modal_import').modal('close');
     }
 
-    function exportExcel(){
+    function exportExcel() {
+
         var search = table.search();
         var status = $('#filter_status').val();
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
         var account_id = $('#filter_account').val();
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&account=" + account_id +"&da_date=" + end_date ;
+        swal({
+            title: 'ALERT',
+            text: 'Mohon Jangan Diketik Terus Menerus untuk export. Excel anda sedang diproses mohon ditunggu di notifikasi untuk mendownload.',
 
+        });
+        $('#validation_alert').show();
+        $('#validation_alert').append(`
+            <div class="card-alert card red">
+                <div class="card-content white-text">
+                    <p>ALERT: MOHON TUNGGU EXPORT SELESAI. KARENA DAPAT MEMBUAT EXCEL KEDOBELAN. TERIMAKASIH</p>
+                </div>
+            </div>
+        `);
+        $('#export_button').hide();
+        $.ajax({
+            url: '{{ Request::url() }}/export_from_page',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                search: search,
+                status: status,
+                start_date: start_date,
+                end_date: end_date,
+                account: account_id,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
+
+
+    // function exportExcel(){
+    //     var search = table.search();
+    //     var status = $('#filter_status').val();
+    //     var start_date = $('#start_date').val();
+    //     var end_date = $('#finish_date').val();
+    //     var account_id = $('#filter_account').val();
+    //     window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&account=" + account_id +"&da_date=" + end_date ;
+
+    // }
 
 </script>

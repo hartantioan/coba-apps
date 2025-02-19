@@ -2775,54 +2775,23 @@ class SendJournal implements ShouldQueue
 					]);
 
 					$coaAyatSilangPembelianAset = Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first();
-
-					if($row->cost_distribution_id){
-						$total = $row->total;
-						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
-						$accumulation = 0;
-						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
-							if($key == $lastIndex){
-								$nominal = $total - $accumulation;
-							}else{
-								$nominal = round(($rowcost->percentage / 100) * $total);
-								$accumulation += $nominal;
-							}
-							JournalDetail::create([
-								'journal_id'                    => $query->id,
-								'cost_distribution_detail_id'   => $rowcost->id,
-								'coa_id'                        => $coaAyatSilangPembelianAset->id,
-								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
-								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
-								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
-								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
-								'project_id'					=> $row->project_id ? $row->project_id : NULL,
-								'type'                          => '2',
-								'nominal'                       => $nominal * $cp->currency_rate,
-								'nominal_fc'					=> $cp->currency->type == '1' ? $nominal * $cp->currency_rate : $nominal,
-								'lookable_type'					=> $table_name,
-								'lookable_id'					=> $table_id,
-								'detailable_type'				=> $row->getTable(),
-								'detailable_id'					=> $row->id,
-							]);
-						}
-					}else{
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coaAyatSilangPembelianAset->id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->total * $cp->currency_rate,
-							'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
-					}
+					
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coaAyatSilangPembelianAset->id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->total * $cp->currency_rate,
+						'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+					]);
 
 					$asset = $row->asset;
                     if($asset){

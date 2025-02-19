@@ -109,7 +109,7 @@ class ExportDeliveryOrderProcessAccountingRecap implements FromCollection, WithT
                 'qtysj' => $row->qty,
                 // 'qty_konversi' => $row->getQtyM2(),
                 'satuan_konversi' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
-                'qty' => $row->marketingOrderDeliveryDetail->qty * $row->marketingOrderDeliveryDetail->getQtyM2(),
+                'qty' => $row->qty * $row->marketingOrderDeliveryDetail->getQtyM2(),
                 'satuan' => 'M2',
                 'gudang' => $row->itemStock->warehouse->name,
                 'area' => $row->itemStock->area->name,

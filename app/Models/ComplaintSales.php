@@ -81,6 +81,19 @@ class ComplaintSales extends Model
 
         return $status;
     }
+    public function statusRaw(){
+        $status = match ($this->status) {
+            '1' => 'Menunggu',
+            '2' => 'Proses',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Direvisi',
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
 
     public function complaintSalesDetail()
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Exports\ExportComplainSalesTransactionPage;
 use Illuminate\Support\Str;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ComplaintSalesController extends Controller
 {
@@ -78,7 +80,6 @@ class ComplaintSalesController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_complaint', 'like', "%$search%")
                             ->orWhere('solution', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('complaint_date', 'like', "%$search%")
@@ -782,5 +783,13 @@ class ComplaintSalesController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		return Excel::download(new ExportComplainSalesTransactionPage($search,$post_date,$end_date,$status), 'complaint_sales_'.uniqid().'.xlsx');
     }
 }

@@ -40,7 +40,7 @@ class DeliveryOrderProcessAccountingJob implements ShouldQueue
             'to_user_id'		=> $this->user_id,
             'lookable_type'		=> 'report',
             'lookable_id'		=> 0,
-            'title'				=> 'Report telah berhasil diproses Stock Summary Fg Penjualan',
+            'title'				=> 'Report telah berhasil diproses REKAP SJ Akunting',
             'note'				=> env('APP_URL').'/storage/report/'.$filename,
             'status'			=> '1'
         ]);

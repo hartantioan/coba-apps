@@ -3798,18 +3798,49 @@ class CustomHelper {
 
 			foreach($dpr->depreciationDetail as $row){
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->asset->assetGroup->cost_coa_id,
-					'place_id'		=> $row->asset->place_id,
-					'type'			=> '1',
-					'nominal'		=> $row->nominal,
-					'nominal_fc'	=> $row->nominal,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-					'detailable_type'=> $row->getTable(),
-					'detailable_id'	=> $row->id,
-				]);
+				if($row->asset->cost_distribution_id){
+					$total = $row->nominal;
+					$lastIndex = count($row->asset->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->asset->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->asset->assetGroup->cost_coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->asset->place_id ?? NULL),
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->asset->line_id ?? NULL),
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->asset->machine_id ?? NULL),
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->asset->division_id ?? NULL),
+							'project_id'					=> $row->asset->place_id ?? NULL,
+							'type'                          => '1',
+							'nominal'                       => $nominal,
+							'nominal_fc'					=> $nominal,
+							'lookable_type'					=> $table_name,
+							'lookable_id'					=> $table_id,
+							'detailable_type'				=> $row->getTable(),
+							'detailable_id'					=> $row->id,
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->asset->assetGroup->cost_coa_id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '1',
+						'nominal'		=> $row->nominal,
+						'nominal_fc'	=> $row->nominal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+					]);
+				}
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,

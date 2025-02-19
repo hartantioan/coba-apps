@@ -34,11 +34,17 @@ class Asset extends Model
         'machine_id',
         'division_id',
         'project_id',
+        'unit_id',
     ];
 
     public function costDistribution()
     {
         return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo('App\Models\Unit', 'unit_id', 'id')->withTrashed();
     }
 
     public function line()

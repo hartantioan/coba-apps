@@ -153,6 +153,7 @@ class AssetController extends Controller
                     $val->hardwareItem->code ?? '-',
                     $val->status(),
                     $val->place()->exists() ? $val->place->code : '-',
+                    $val->unit()->exists() ? $val->unit->code : '-',
                     $val->costDistribution()->exists() ? $val->costDistribution->code : '-',
                     $val->line()->exists() ? $val->line->code : '-',
                     $val->machine()->exists() ? $val->machine->code : '-',
@@ -222,6 +223,7 @@ class AssetController extends Controller
                     $query->machine_id      = $request->machine_id ?? NULL;
                     $query->division_id     = $request->division_id ?? NULL;
                     $query->project_id      = $request->project_id ?? NULL;
+                    $query->unit_id         = $request->unit_id ?? NULL;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -247,6 +249,7 @@ class AssetController extends Controller
                         'machine_id'        => $request->machine_id ?? NULL,
                         'division_id'       => $request->division_id ?? NULL,
                         'project_id'        => $request->project_id ?? NULL,
+                        'unit_id'           => $request->unit_id ?? NULL,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -284,6 +287,7 @@ class AssetController extends Controller
         $asset['item'] = $asset->hardwareItem ?? null;
         $asset['cost_distribution_name'] = $asset->costDistribution()->exists() ? $asset->costDistribution->code.' - '.$asset->costDistribution->name : '';
         $asset['project_name'] = $asset->project()->exists() ? $asset->project->code.' - '.$asset->project->name : '';
+        $asset['unit_name'] = $asset->unit()->exists() ? $asset->unit->code.' - '.$asset->unit->name : '';
 		return response()->json($asset);
     }
 

@@ -10,6 +10,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Place;
 use App\Models\Project;
+use App\Models\Unit;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
@@ -31,6 +32,7 @@ class ExportTemplateMasterAsset implements WithEvents
         $event->writer->getSheetByIndex(7);
         $event->writer->getSheetByIndex(8);
         $event->writer->getSheetByIndex(9);
+        $event->writer->getSheetByIndex(10);
         $asset_group = AssetGroup::where('status','1')->orderBy('code')->get();
         $place = Place::where('status','1')->get();
         $inventaris = HardwareItem::where('status','1')->get();
@@ -39,6 +41,7 @@ class ExportTemplateMasterAsset implements WithEvents
         $machine = Machine::where('status','1')->get();
         $division = Division::where('status','1')->get();
         $project = Project::where('status','1')->get();
+        $unit = Unit::where('status','1')->get();
         
         $startRow = 2;
         foreach($place as $row){
@@ -92,6 +95,13 @@ class ExportTemplateMasterAsset implements WithEvents
         foreach($project as $row){
             $event->getWriter()->getSheetByIndex(9)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(9)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($project as $row){
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 

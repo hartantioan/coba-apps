@@ -116,6 +116,7 @@
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
+                                                        <th>Satuan</th>
                                                         <th>Dist.Biaya</th>
                                                         <th>Line</th>
                                                         <th>Mesin</th>
@@ -292,6 +293,10 @@
                                 <div class="input-field col m4 s12">
                                     <select class="browser-default" id="project_id" name="project_id"></select>
                                     <label class="active" for="project_id">Proyek</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="unit_id" name="unit_id"></select>
+                                    <label class="active" for="unit_id">Satuan</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -488,6 +493,7 @@
         });
 
         select2ServerSide('#item_id', '{{ url("admin/select2/hardware_item") }}');
+        select2ServerSide('#unit_id', '{{ url("admin/select2/unit") }}');
         
         $('#modal1').modal({
             dismissible: false,
@@ -503,7 +509,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#item_id,#cost_distribution_id,#project_id').empty();
+                $('#item_id,#cost_distribution_id,#project_id,#unit_id').empty();
                 $('#asset_group_id').val($('#asset_group_id option:eq(0)').val()).trigger('change');
                 M.updateTextFields();
             }
@@ -605,6 +611,7 @@
                 { name: 'item', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cost', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'machine', searchable: false, orderable: false, className: 'center-align' },
@@ -780,6 +787,12 @@
 
                 if(response.division_id){
                     $('#division_id').val(response.division_id);
+                }
+
+                if(response.unit_name){
+                    $('#unit_id').empty().append(`
+                        <option value="` + response.unit_id + `">` + response.unit_name +`</option>
+                    `);
                 }
                 
                 if(response.status == '1'){

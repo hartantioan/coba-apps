@@ -56,11 +56,11 @@
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
 
-                                                        <a id="export_button_new" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcelNew();">
+                                                        {{-- <a id="export_button_new" class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcelNew();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel New</span>
                                                             <i class="material-icons right">view_list</i>
-                                                        </a>
+                                                        </a> --}}
 
                                                     </div>
                                                 </div>

@@ -413,6 +413,7 @@ class ComplaintSalesController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','2','6'])){
+                        info($request);
                         if($request->has('file')) {
 
                             if($query->document){

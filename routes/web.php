@@ -143,6 +143,7 @@ use App\Http\Controllers\MasterData\TirtaKencanaController;
 use App\Http\Controllers\MasterData\ToleranceScaleController;
 
 use App\Http\Controllers\Finance\FundRequestController;
+use App\Http\Controllers\Finance\HandoverPurchaseInvoiceController;
 use App\Http\Controllers\Finance\PaymentRequestController;
 use App\Http\Controllers\Finance\OutgoingPaymentController;
 use App\Http\Controllers\Finance\CloseBillController;
@@ -3645,6 +3646,25 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
                     Route::get('approval/{id}', [FundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('export_from_page', [FundRequestController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('handover_purchase_invoice')->middleware('operation.access:handover_purchase_invoice,view')->group(function () {
+                    Route::get('/', [HandoverPurchaseInvoiceController::class, 'index']);
+                    Route::get('datatable', [HandoverPurchaseInvoiceController::class, 'datatable']);
+                    Route::post('show', [HandoverPurchaseInvoiceController::class, 'show']);
+                    Route::post('print', [HandoverPurchaseInvoiceController::class, 'print']);
+                    Route::get('export', [HandoverPurchaseInvoiceController::class, 'export']);
+                    Route::get('export_data_table', [HandoverPurchaseInvoiceController::class, 'exportDataTable']);
+                    Route::get('row_detail', [HandoverPurchaseInvoiceController::class, 'rowDetail']);
+                    Route::post('get_code', [HandoverPurchaseInvoiceController::class, 'getCode']);
+                    Route::post('create', [HandoverPurchaseInvoiceController::class, 'create'])->middleware('operation.access:handover_purchase_invoice,update');
+                    Route::post('confirm_scan', [HandoverPurchaseInvoiceController::class, 'confirmScan'])->middleware('operation.access:handover_purchase_invoice,journal');
+                    Route::post('save_detail', [HandoverPurchaseInvoiceController::class, 'saveDetail'])->middleware('operation.access:handover_purchase_invoice,journal');
+                    Route::post('void_status', [HandoverPurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:handover_purchase_invoice,void');
+                    Route::get('print_individual/{id}', [HandoverPurchaseInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('get_apin_handover', [HandoverPurchaseInvoiceController::class, 'getAPINHandover']);
+                    Route::post('store_w_barcode', [HandoverPurchaseInvoiceController::class, 'store_w_barcode'])->middleware('operation.access:handover_purchase_invoice,update');
+                    Route::post('destroy', [HandoverPurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:handover_purchase_invoice,delete');
                 });
 
                 Route::prefix('finance_report')->middleware('direct.access')->group(function () {

@@ -446,6 +446,7 @@ class ComplaintSalesController extends Controller
                         $query->lookable_id = $request->lookable_id;
                         $query->lookable_type = 'marketing_order_delivery_processes';
                         $query->solution = $request->solution;
+                        $query->marketing_order_id_complaint = $request->marketing_order_id_complaint;
 
                         $query->save();
 

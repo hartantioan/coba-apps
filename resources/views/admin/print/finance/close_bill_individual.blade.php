@@ -344,7 +344,7 @@
                                 @foreach($data->closeBillCost as $key => $row)
                                 <tr>
                                     <td>
-                                        {{ $row->coa->code . ' - ' . $row->coa->name . ($row->coa->prefix ? ' - ' . $row->coa->prefix : '') }}
+                                        {{ ($row->coa->prefix ? $row->coa->prefix.' ' : '').$row->coa->code . ' - ' . $row->coa->name }}
                                     </td>
                                     <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
                                     <td>{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>

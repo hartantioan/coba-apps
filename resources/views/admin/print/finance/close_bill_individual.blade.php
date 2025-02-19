@@ -21,7 +21,7 @@
             margin-left:-5px;
             margin-right:-5px;
             }
-            
+
             .column1 {
             float: left;
             width: 50%;
@@ -40,14 +40,14 @@
             display: table;
             }
 
-            
+
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
@@ -80,17 +80,17 @@
                     font-size:0.7em !important;
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:13px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:15px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -98,33 +98,33 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-info {
                     font-size:12px !important;
                 }
-        
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -135,22 +135,22 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 border:1px solid black;
                 min-height: auto;
@@ -158,9 +158,9 @@
 
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
-        
-           
+
+
+
         </style>
     </head>
     <body>
@@ -178,22 +178,22 @@
                                 <h2 class="indigo-text">Tutupan BS</h2>
                             </td>
                         </tr>
-                                
-                        
+
+
                     </td>
                     <td width="33%" class="right-align">
-                        
-                        
-                   
+
+
+
                     </td>
-                    
+
                     <td width="34%" align="right">
-                        
+
                             <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
-                       
+
                     </td>
                 </tr>
-                
+
             </table>
             <hr style="border-top: 3px solid black; margin-top:-2%">
         </header>
@@ -257,20 +257,20 @@
                                         <td>
                                            <br>
                                         </td>
-                                        
+
                                     </tr>
                                     <tr>
                                         <td >
                                             <br>
                                         </td>
-                                        
+
                                     </tr>
                                 </table>
                             </td>
                         </tr>
                     </table>
                     <!-- product details table-->
-                    
+
                     <div class="invoice-product-details mt-2">
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
@@ -343,7 +343,9 @@
                                 @endphp
                                 @foreach($data->closeBillCost as $key => $row)
                                 <tr>
-                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td>
+                                        {{ $row->coa->code . ' - ' . $row->coa->name . ($row->coa->prefix ? ' - ' . $row->coa->prefix : '') }}
+                                    </td>
                                     <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
                                     <td>{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
                                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
@@ -405,16 +407,16 @@
                                                                 $formattedMinute = sprintf('%02d', $minute);
                                                             @endphp
                                                             <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span> dengan keterangan : <span style="font-weight: bold">{{ $row->note }}</span></div>
-                                                      
+
                                                         </td>
                                                     </tr>
                                                     @endforeach
                                                 @endforeach
                                             @endif
-                                        
+
                                         </table>
                                     </td>
-                                    
+
                                 </tr>
                             </table>
                         </div>
@@ -450,9 +452,9 @@
                                     @endforeach
                                 @endif
                             </tr>
-                        </table>  
+                        </table>
                     </div>
-                    
+
                 </div>
             </div>
         </main>

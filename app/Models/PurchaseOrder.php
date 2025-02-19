@@ -438,7 +438,7 @@ class PurchaseOrder extends Model
 
             if($row->goodScaleRealTime()->exists()){
                 foreach($row->goodScaleRealTime as $rowdetail){
-                    $arr[] = $rowdetail->goodScale->code;
+                    $arr[] = $rowdetail->code;
                 }
             }
         }

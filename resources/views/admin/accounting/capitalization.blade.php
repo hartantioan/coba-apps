@@ -243,30 +243,22 @@
                         </div>
                         <div class="col s12">
                             <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
-                                <table class="bordered" id="table-detail" style="min-width:3250px !important;">
+                                <table class="bordered" id="table-detail" style="min-width:1800px !important;">
                                     <thead>
                                         <tr>
                                             <th class="center">{{ __('translations.no') }}.</th>
                                             <th class="center">Kode Aset</th>
                                             <th class="center">Nama Aset</th>
                                             <th class="center">Plant Aset</th>
-                                            <th class="center">Plant Biaya</th>
-                                            <th class="center">{{ __('translations.line') }}</th>
-                                            <th class="center">{{ __('translations.engine') }}</th>
-                                            <th class="center">Departemen</th>
-                                            <th class="center">Proyek</th>
-                                            <th class="center">Dist.Biaya</th>
                                             <th class="center">Harga@</th>
                                             <th class="center">{{ __('translations.qty') }}</th>
-                                            <th class="center">{{ __('translations.unit') }}</th>
                                             <th class="center">{{ __('translations.total') }}</th>
-                                            <th class="center">{{ __('translations.note') }}</th>
                                             <th class="center">{{ __('translations.delete') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-asset">
                                         <tr id="empty-detail">
-                                            <td colspan="16" class="center">
+                                            <td colspan="8" class="center">
                                                 Pilih aset untuk memulai...
                                             </td>
                                         </tr>
@@ -877,44 +869,6 @@
                                                     <td>
                                                         ` +valdetail.place_code + `
                                                     </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($place as $row)
-                                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($line as $rowline)
-                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($machine as $row)
-                                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
-                                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                                            @foreach ($department as $row)
-                                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
-                                                    </td>
                                                     <td class="center">
                                                         <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0" onkeyup="formatRupiah(this);count();">
                                                     </td>
@@ -922,13 +876,7 @@
                                                         <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="1" onkeyup="formatRupiah(this);count();" readonly>
                                                     </td>
                                                     <td class="center">
-                                                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                                                    </td>
-                                                    <td class="center">
                                                         <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                                    </td>
-                                                    <td>
-                                                        <input name="arr_note[]" type="text" placeholder="Keterangan">
                                                     </td>
                                                     <td class="center">
                                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
@@ -937,9 +885,6 @@
                                                     </td>
                                                 </tr>
                                             `);
-                                            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-                                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                                            select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
                                             $('#asset_id').empty();
                                             reInitializedAsset();
                                         });
@@ -1047,7 +992,7 @@
         });
         $('#body-asset').empty().append(`
             <tr id="empty-detail">
-                <td colspan="16" class="center">
+                <td colspan="8" class="center">
                     Pilih aset untuk memulai...
                 </td>
             </tr>
@@ -1074,44 +1019,6 @@
                     <td>
                         ` + $("#asset_id").select2('data')[0].place_code + `
                     </td>
-                    <td>
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
-                            <option value="">--{{ __('translations.empty') }}--</option>
-                            @foreach ($place as $row)
-                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
-                            <option value="">--{{ __('translations.empty') }}--</option>
-                            @foreach ($line as $rowline)
-                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
-                            <option value="">--{{ __('translations.empty') }}--</option>
-                            @foreach ($machine as $row)
-                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
-                            <option value="">--{{ __('translations.empty') }}--</option>
-                            @foreach ($department as $row)
-                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
-                    </td>
                     <td class="center">
                         <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0" onkeyup="formatRupiah(this);count();">
                     </td>
@@ -1119,13 +1026,7 @@
                         <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="1" onkeyup="formatRupiah(this);count();" readonly>
                     </td>
                     <td class="center">
-                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                    </td>
-                    <td class="center">
                         <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                    </td>
-                    <td>
-                        <input name="arr_note[]" type="text" placeholder="Keterangan">
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
@@ -1134,9 +1035,6 @@
                     </td>
                 </tr>
             `);
-            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-            select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
             $('#asset_id').empty();
             reInitializedAsset();
         }
@@ -1309,22 +1207,22 @@
                 formData.delete("arr_project[]");
                 formData.delete("arr_cost_distribution_cost[]");
 
-                $('select[name^="arr_line[]"]').each(function(index){
+                $('input[name^="arr_line[]"]').each(function(index){
                     formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
                 });
-                $('select[name^="arr_place[]"]').each(function(index){
+                $('input[name^="arr_place[]"]').each(function(index){
                     formData.append('arr_place[]',($(this).val() ? $(this).val() : ''));
                 });
-                $('select[name^="arr_machine[]"]').each(function(index){
+                $('input[name^="arr_machine[]"]').each(function(index){
                     formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
                 });
-                $('select[name^="arr_department[]"]').each(function(index){
+                $('input[name^="arr_department[]"]').each(function(index){
                     formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
                 });
-                $('select[name^="arr_project[]"]').each(function(index){
+                $('input[name^="arr_project[]"]').each(function(index){
                     formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
                 });
-                $('select[name^="arr_cost_distribution_cost[]"]').each(function(index){
+                $('input[name^="arr_cost_distribution_cost[]"]').each(function(index){
                     formData.append('arr_cost_distribution_cost[]',($(this).val() ? $(this).val() : ''));
                 });
 
@@ -1455,44 +1353,6 @@
                             <td>
                                 ` + val.place_code + `
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
-                                    <option value="">--{{ __('translations.empty') }}--</option>
-                                    @foreach ($place as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
-                                    <option value="">--{{ __('translations.empty') }}--</option>
-                                    @foreach ($line as $rowline)
-                                        <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
-                                    <option value="">--{{ __('translations.empty') }}--</option>
-                                    @foreach ($machine as $row)
-                                        <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
-                                    <option value="">--{{ __('translations.empty') }}--</option>
-                                    @foreach ($department as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                            </td>
-                            <td class="center">
-                                <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
-                            </td>
                             <td class="center">
                                 <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
                             </td>
@@ -1500,13 +1360,7 @@
                                 <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" onkeyup="formatRupiah(this);count();" readonly>
                             </td>
                             <td class="center">
-                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                            </td>
-                            <td class="center">
                                 <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_note[]" type="text" placeholder="Keterangan" value="` + val.note + `">
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
@@ -1515,26 +1369,6 @@
                             </td>
                         </tr>
                     `);
-                    $('#arr_unit' + count).append(`
-                        <option value="` + val.unit_id + `">` + val.unit_name + `</option>
-                    `);
-                    $('#arr_place' + count).val(val.place_id);
-                    $('#arr_line' + count).val(val.line_id);
-                    $('#arr_machine' + count).val(val.machine_id);
-                    $('#arr_department' + count).val(val.department_id);
-                    if(val.project_id){
-                        $('#arr_project' + count).append(`
-                            <option value="` + val.project_id + `">` + val.project_name + `</option>
-                        `);
-                    }
-                    if(val.cost_distribution_id){
-                        $('#arr_cost_distribution_cost' + count).append(`
-                            <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
-                        `);
-                    }
-                    select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                    select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
-                    select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                     $('#asset_id').empty();
                 });
                 $('#total').text(response.grandtotal);
@@ -1908,24 +1742,6 @@
                 window.open(data, '_blank');
             }
         });
-    }
-
-    function changePlace(element){
-        $(element).parent().next().find('select[name="arr_machine[]"] option').show();
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
-            $(element).parent().next().find('select[name="arr_machine[]"] option[data-line!="' + $(element).val() + '"]').hide();
-        }else{
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
-        }
-    }
-
-    function changeLine(element){
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
-        }else{
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
-        }
     }
 
     function done(id){

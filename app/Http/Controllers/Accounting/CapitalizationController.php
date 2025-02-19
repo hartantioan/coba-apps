@@ -307,7 +307,6 @@ class CapitalizationController extends Controller
             'arr_asset_id'          => 'required|array',
             'arr_price'             => 'required|array',
             'arr_qty'               => 'required|array',
-            'arr_unit'              => 'required|array',
             'arr_total'             => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -323,8 +322,6 @@ class CapitalizationController extends Controller
             'arr_price.array'                   => 'Harga harus dalam bentuk array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong',
             'arr_qty.array'                     => 'Qty harus dalam bentuk array.',
-            'arr_unit.required'                 => 'Satuan tidak boleh kosong',
-            'arr_unit.array'                    => 'Satuan harus dalam bentuk array.',
             'arr_total.required'                => 'Total tidak boleh kosong',
             'arr_total.array'                   => 'Total harus dalam bentuk array.',
 		]);
@@ -415,21 +412,24 @@ class CapitalizationController extends Controller
 			if($query) {
 
                 foreach($request->arr_asset_id as $key => $row){
-                    CapitalizationDetail::create([
-                        'capitalization_id'     => $query->id,
-                        'asset_id'              => $row,
-                        'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                        'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                        'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                        'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                        'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
-                        'cost_distribution_id'  => $request->arr_cost_distribution_cost[$key] ? $request->arr_cost_distribution_cost[$key] : NULL,
-                        'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'unit_id'               => $request->arr_unit[$key],
-                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                        'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'note'                  => $request->arr_note[$key]
-                    ]);
+                    $asset = Asset::find($row);
+                    if($asset){
+                        CapitalizationDetail::create([
+                            'capitalization_id'     => $query->id,
+                            'asset_id'              => $row,
+                            'place_id'              => $asset->place_id ?? NULL,
+                            'line_id'               => $asset->line_id ?? NULL,
+                            'machine_id'            => $asset->machine_id ?? NULL,
+                            'department_id'         => $asset->division_id ?? NULL,
+                            'project_id'            => $asset->project_id ?? NULL,
+                            'cost_distribution_id'  => $asset->cost_distribution_id ?? NULL,
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'unit_id'               => $asset->unit_id ?? NULL,
+                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'note'                  => $asset->note ?? NULL,
+                        ]);
+                    }
                 }
 
                 SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));

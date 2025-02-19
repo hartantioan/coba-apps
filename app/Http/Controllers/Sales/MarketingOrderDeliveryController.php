@@ -267,7 +267,7 @@ class MarketingOrderDeliveryController extends Controller
                     $val->destination_address,
                     $val->district->name,
                     $val->city->name,
-                    $val->transportation()->exist() ? $val->transportation->name : '-',
+                    $val->transportation()->exists() ? $val->transportation->name : '-',
                     $val->costDeliveryType(),
                     $val->deliveryType(),
                     $val->soType(),

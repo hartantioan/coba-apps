@@ -229,7 +229,7 @@ class PurchaseInvoice extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -663,7 +663,7 @@ class PurchaseInvoice extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -711,5 +711,10 @@ class PurchaseInvoice extends Model
 
     public function cancelDocument(){
         return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function handoverPurchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\HandoverPurchaseInvoiceDetail');
     }
 }

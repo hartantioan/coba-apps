@@ -829,7 +829,7 @@ class PurchaseOrderController extends Controller
                     if($query->hasChildDocument()){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Order telah digunakan di dokumen lain, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Purchase Order telah digunakan di dokumen lain, anda tidak bisa melakukan perubahan. Daftarnya : '.$query->listChildDocument(),
                         ]);
                     }
 

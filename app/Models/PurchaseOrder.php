@@ -420,6 +420,38 @@ class PurchaseOrder extends Model
         return $hasRelation;
     }
 
+    public function listChildDocument(){
+        $arr = [];
+
+        foreach($this->purchaseOrderDetail as $row){
+            if($row->goodReceiptDetail()->exists()){
+                foreach($row->goodReceiptDetail as $rowdetail){
+                    $arr[] = $rowdetail->goodReceipt->code;
+                }
+            }
+
+            if($row->purchaseInvoiceDetail()->exists()){
+                foreach($row->purchaseInvoiceDetail as $rowdetail){
+                    $arr[] = $rowdetail->purchaseInvoice->code;
+                }
+            }
+
+            if($row->goodScaleRealTime()->exists()){
+                foreach($row->goodScaleRealTime as $rowdetail){
+                    $arr[] = $rowdetail->goodScale->code;
+                }
+            }
+        }
+
+        if($this->purchaseDownPaymentDetail()->exists()){
+            foreach($this->purchaseDownPaymentDetail as $rowdetail){
+                $arr[] = $rowdetail->purchaseDownPayment->code;
+            }
+        }
+
+        return implode(', ',array_unique($arr));
+    }
+
     public function totalInvoice(){
         $total = 0;
 

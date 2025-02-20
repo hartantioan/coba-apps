@@ -241,6 +241,7 @@
                                                         <th class="center" rowspan="2">BP</th>
                                                         <th class="center" rowspan="2">Coa</th>
                                                         <th class="center" rowspan="2">{{ __('translations.plant') }}</th>
+                                                        <th class="center" rowspan="2">Dist.Biaya</th>
                                                         <th class="center" rowspan="2">{{ __('translations.line') }}</th>
                                                         <th class="center" rowspan="2">{{ __('translations.engine') }}</th>
                                                         <th class="center" rowspan="2">{{ __('translations.division') }}</th>
@@ -259,7 +260,7 @@
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="14">
+                                                        <td colspan="15">
 
                                                         </td>
                                                     </tr>
@@ -757,6 +758,14 @@
         $('#type').val('1').formSelect();
     } */
 
+    function disableLine(code){
+        $('#arr_line' + code).val('');
+        $('#arr_line' + code).attr('disabled',false);
+        if($('#arr_cost_distribution' + code).val()){
+            $('#arr_line' + code).attr('disabled',true);
+        }
+    }
+
     function addCoa(){
         var count = makeid(10);
 
@@ -785,6 +794,9 @@
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
                     </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="disableLine('` + count + `')"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"  onchange="changePlace(this);">
@@ -834,7 +846,30 @@
             </tr>
         `);
 
-        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        $('#arr_cost_distribution' + count).select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#arr_place" + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         $('#arr_place' + count).formSelect();
@@ -1308,6 +1343,7 @@
                     var formData = new FormData($('#form_data')[0]);
 
                     formData.delete("arr_cost_distribution_detail[]");
+                    formData.delete("arr_cost_distribution[]");
                     formData.delete("arr_coa[]");
                     formData.delete("arr_place[]");
                     formData.delete("arr_line[]");
@@ -1321,6 +1357,7 @@
                     $('select[name^="arr_coa[]"]').each(function(index){
                         formData.append('arr_coa[]',($(this).val() ? $(this).val() : 'NULL'));
                         formData.append('arr_cost_distribution_detail[]',($('input[name^="arr_cost_distribution_detail"]').eq(index).val() ? $('input[name^="arr_cost_distribution_detail"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_cost_distribution[]',($('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''));
                         formData.append('arr_place[]',($('select[name^="arr_place"]').eq(index).val() ? $('select[name^="arr_place"]').eq(index).val() : 'NULL'));
                         formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL'));
                         formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : 'NULL'));
@@ -1638,6 +1675,9 @@
                                 </select>
                             </td>
                             <td>
+                                <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="disableLine('` + count + `')"></select>
+                            </td>
+                            <td>
                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" ` + attributeDisable + `>
                                     <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($line as $rowline)
@@ -1684,6 +1724,30 @@
                             </td>
                         </tr>
                     `);
+
+                    $('#arr_cost_distribution' + count).select2({
+                        placeholder: '-- Pilih ya --',
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/cost_distribution") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    place_id: $("#arr_place" + count).val(),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
 
                     $('#arr_coa' + count).select2({
                         placeholder: '-- Pilih ya --',

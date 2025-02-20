@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendApproval;
 use App\Models\Coa;
 use App\Models\Company;
+use App\Models\CostDistribution;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Division;
@@ -177,7 +178,7 @@ class JournalController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
-                    $val->user->name,
+                    $val->user()->exists() ? $val->user->name : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->lookable_id ? $val->lookable->code : '-',
@@ -320,8 +321,8 @@ class JournalController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                /*  'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code', */
@@ -443,49 +444,125 @@ class JournalController extends Controller
                     if($request->arr_coa){
                         foreach($request->arr_coa as $key => $row){
                             if(str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) < 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])) < 0){
-                                JournalDetail::create([
-                                    'journal_id'                    => $query->id,
-                                    'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
-                                    'coa_id'                        => $row ?? NULL,
-                                    'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
-                                    'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
-                                    'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
-                                    'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
-                                    'department_id'                 => $request->arr_department[$key],
-                                    'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
-                                    'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
-                                    'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
-                                    'type'                          => '1',
-                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
-                                    'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
-                                    'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
-                                    'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
-                                    'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
-                                    'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
-                                ]);
+                                if($request->arr_cost_distribution[$key]){
+                                    $distribusiBiaya = CostDistribution::find($request->arr_cost_distribution[$key]);
+                                    if($distribusiBiaya){
+                                        $total = str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key]));
+                                        $totalfc = str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key]));
+                                        $lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
+                                        $accumulation = 0;
+                                        $accumulationfc = 0;
+                                        foreach($distribusiBiaya->costDistributionDetail as $keyc => $rowcost){
+                                            if($keyc == $lastIndex){
+                                                $nominal = $total - $accumulation;
+                                                $nominalfc = $totalfc - $accumulationfc;
+                                            }else{
+                                                $nominal = round(($rowcost->percentage / 100) * $total);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $accumulation += $nominal;
+                                                $accumulationfc += $nominalfc;
+                                            }
+                                            JournalDetail::create([
+                                                'journal_id'                    => $query->id,
+                                                'cost_distribution_detail_id'   => $rowcost->id,
+                                                'coa_id'                        => $row,
+                                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key]),
+                                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key]),
+                                                'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key]),
+                                                'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($request->arr_department[$key] ?? NULL),
+                                                'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                                'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                                'type'                          => '1',
+                                                'nominal'                       => $nominal,
+                                                'nominal_fc'					=> $nominalfc,
+                                                'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                                'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                            ]);
+                                        }
+                                    }
+                                }else{
+                                    JournalDetail::create([
+                                        'journal_id'                    => $query->id,
+                                        'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
+                                        'coa_id'                        => $row ?? NULL,
+                                        'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
+                                        'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                        'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
+                                        'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                        'department_id'                 => $request->arr_department[$key],
+                                        'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                        'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                        'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                        'type'                          => '1',
+                                        'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
+                                        'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
+                                        'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
+                                        'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
+                                        'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
+                                        'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
+                                    ]);
+                                }
                             }
 
                             if(str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) < 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])) < 0){
-                                JournalDetail::create([
-                                    'journal_id'                    => $query->id,
-                                    'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
-                                    'coa_id'                        => $row ?? NULL,
-                                    'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
-                                    'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
-                                    'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
-                                    'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
-                                    'department_id'                 => $request->arr_department[$key],
-                                    'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
-                                    'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
-                                    'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
-                                    'type'                          => '2',
-                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
-                                    'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
-                                    'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
-                                    'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
-                                    'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
-                                    'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
-                                ]);
+                                if($request->arr_cost_distribution[$key]){
+                                    $distribusiBiaya = CostDistribution::find($request->arr_cost_distribution[$key]);
+                                    if($distribusiBiaya){
+                                        $total = str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key]));
+                                        $totalfc = str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key]));
+                                        $lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
+                                        $accumulation = 0;
+                                        $accumulationfc = 0;
+                                        foreach($distribusiBiaya->costDistributionDetail as $keyc => $rowcost){
+                                            if($keyc == $lastIndex){
+                                                $nominal = $total - $accumulation;
+                                                $nominalfc = $totalfc - $accumulationfc;
+                                            }else{
+                                                $nominal = round(($rowcost->percentage / 100) * $total);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $accumulation += $nominal;
+                                                $accumulationfc += $nominalfc;
+                                            }
+                                            JournalDetail::create([
+                                                'journal_id'                    => $query->id,
+                                                'cost_distribution_detail_id'   => $rowcost->id,
+                                                'coa_id'                        => $row,
+                                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key]),
+                                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key]),
+                                                'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key]),
+                                                'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($request->arr_department[$key] ?? NULL),
+                                                'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                                'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                                'type'                          => '2',
+                                                'nominal'                       => $nominal,
+                                                'nominal_fc'					=> $nominalfc,
+                                                'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                                'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                            ]);
+                                        }
+                                    }
+                                }else{
+                                    JournalDetail::create([
+                                        'journal_id'                    => $query->id,
+                                        'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
+                                        'coa_id'                        => $row ?? NULL,
+                                        'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
+                                        'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                        'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
+                                        'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                        'department_id'                 => $request->arr_department[$key],
+                                        'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                        'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                        'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                        'type'                          => '2',
+                                        'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
+                                        'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
+                                        'lookable_type'                 => $request->arr_lookable_type[$key] == '0' ? NULL : $request->arr_lookable_type[$key],
+                                        'lookable_id'                   => $request->arr_lookable_id[$key] == '0' ? NULL : $request->arr_lookable_id[$key],
+                                        'detailable_type'               => $request->arr_detailable_type[$key] == '0' ? NULL : $request->arr_detailable_type[$key],
+                                        'detailable_id'                 => $request->arr_detailable_id[$key] == '0' ? NULL : $request->arr_detailable_id[$key],
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -511,10 +588,10 @@ class JournalController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
         return response()->json($response);
     }

@@ -76,7 +76,7 @@ class MitraCustomer extends Model{
     }
 
     public function statusApproval(){
-        $status = match ($this->status) {
+        $status_approval = match ($this->status_approval) {
           '1' => '<span class="green medium-small white-text padding-3">Approved</span>',
           '2' => '<span class="amber medium-small white-text padding-3">Pending Insert</span>',
           '3' => '<span class="amber medium-small white-text padding-3">Pending Update</span>',
@@ -84,7 +84,7 @@ class MitraCustomer extends Model{
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
-        return $status;
+        return $status_approval;
     }
 
     public function statusRaw(){

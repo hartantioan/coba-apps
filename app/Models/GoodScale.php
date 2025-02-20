@@ -444,7 +444,7 @@ class GoodScale extends Model
                     if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                         $data[] = $row->lookable->marketingOrderDeliveryProcess->code;
                     }
-                    $note = $row->lookable->note;
+                    $note = $row->lookable->note_internal;
                 }
             }
             return implode(', ',$data).' - '.$note;

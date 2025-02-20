@@ -721,6 +721,12 @@ class LandedCostController extends Controller
                                         'message' => 'LC sudah ditarik menjadi LC lainnya.'
                                     ]);
                                 }
+                                if(floatval(str_replace(',','.',str_replace('.','',$request->arr_price[$key]))) <= 0){
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'Mohon maaf nilai barang tidak boleh 0.'
+                                    ]);
+                                }
                             }
                         }
                     }

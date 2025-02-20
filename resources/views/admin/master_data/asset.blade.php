@@ -263,7 +263,7 @@
                                     <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
                                     <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
                                 </div>
-                                <div class="input-field col m4 s12">
+                                {{-- <div class="input-field col m4 s12">
                                     <select class="browser-default" id="line_id" name="line_id">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($line as $rowline)
@@ -271,7 +271,7 @@
                                         @endforeach
                                     </select>
                                     <label class="active" for="line_id">Line</label>
-                                </div>
+                                </div> --}}
                                 <div class="input-field col m4 s12">
                                     <select class="browser-default" id="machine_id" name="machine_id">
                                         <option value="">--{{ __('translations.empty') }}--</option>
@@ -777,9 +777,9 @@
                     `);
                 }
 
-                if(response.line_id){
+                /* if(response.line_id){
                     $('#line_id').val(response.line_id);
-                }
+                } */
 
                 if(response.machine_id){
                     $('#machine_id').val(response.machine_id);

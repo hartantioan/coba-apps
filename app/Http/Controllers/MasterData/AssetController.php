@@ -219,7 +219,7 @@ class AssetController extends Controller
                     $query->note            = $request->note;
                     $query->hardware_item_id            = $request->item_id;
                     $query->cost_distribution_id  = $request->cost_distribution_id ?? NULL;
-                    $query->line_id         = $request->line_id ?? NULL;
+                    /* $query->line_id         = $request->line_id ?? NULL; */
                     $query->machine_id      = $request->machine_id ?? NULL;
                     $query->division_id     = $request->division_id ?? NULL;
                     $query->project_id      = $request->project_id ?? NULL;
@@ -245,7 +245,7 @@ class AssetController extends Controller
                         'note'              => $request->note,
                         'hardware_item_id'  => $request->item_id,
                         'cost_distribution_id'  => $request->cost_distribution_id ?? NULL,
-                        'line_id'           => $request->line_id ?? NULL,
+                        /* 'line_id'           => $request->line_id ?? NULL, */
                         'machine_id'        => $request->machine_id ?? NULL,
                         'division_id'       => $request->division_id ?? NULL,
                         'project_id'        => $request->project_id ?? NULL,

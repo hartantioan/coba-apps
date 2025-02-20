@@ -176,11 +176,11 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer">
+<div id="modal_manual" class="modal modal-fixed-footer">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah No Faktur</h4>
+                <h4>Tambah Manual</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -189,7 +189,19 @@
                         <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
                             <input id="no_factor" name="no_factor" type="text" placeholder="No Faktur">
-                            <label class="active" for="no_factor">No Faktur</label>
+                            <label class="active" for="no_factor">Kode Faktur / Dokumen</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <input id="npwp_name" name="npwp_name" type="text" placeholder="Nama Vendor">
+                            <label class="active" for="npwp_name">Nama Vendor</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <input id="date" name="date" type="date" placeholder="Tanggal">
+                            <label class="active" for="date">Tanggal </label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <input id="tax" name="tax" type="text" placeholder="PPN" onkeyup="formatRupiahNoMinus(this);">
+                            <label class="active" for="tax">PPN</label>
                         </div>
 
                         <div class="col s12 mt-3">
@@ -218,11 +230,11 @@
     </div>
 </div>
 
-{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal_manual">
         <i class="material-icons">add</i>
     </a>
-</div> --}}
+</div>
 
 <!-- END: Page Main-->
 <script>
@@ -241,7 +253,7 @@
             }
         });
 
-        $('#modal1').modal({
+        $('#modal_manual').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
 
@@ -491,7 +503,7 @@
 
     function success(){
         loadDataTable();
-        $('#modal1').modal('close');
+        $('#modal_manual').modal('close');
     }
 
     function rowDetail(data) {
@@ -535,7 +547,7 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
+                $('#modal_manual').modal('open');
 
                 $('#temp').val(id);
                 $('#code').val(response.code);
@@ -575,7 +587,7 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
+                $('#modal_manual').modal('open');
                 console.log(response);
                 $('#temp').val(response.id);
                 M.updateTextFields();
@@ -662,7 +674,7 @@
         var formData = new FormData($('#form_data')[0]);
 
         $.ajax({
-            url: '{{ Request::url() }}/save_no_faktur',
+            url: '{{ Request::url() }}/create',
             type: 'POST',
             dataType: 'JSON',
             data: formData,

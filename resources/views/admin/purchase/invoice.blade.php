@@ -400,7 +400,7 @@
                                                                             <th class="center">NO.PO/GRPO/FR</th>
                                                                             <th class="center">No.SJ</th>
                                                                             <th class="center">Item / Coa Jasa</th>
-                                                                            <th class="center">Dist. Biaya</th>
+                                                                            <th class="center">Line</th>
                                                                             <th class="center">{{ __('translations.unit') }}</th>
                                                                             <th class="center">Qty Diterima</th>
                                                                             <th class="center">Qty Kembali</th>

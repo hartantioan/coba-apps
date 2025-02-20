@@ -438,14 +438,16 @@ class GoodScale extends Model
             return $data;
         }
         if($this->type == '2'){
+            $note = '';
             foreach($this->goodScaleDetail as $row){
                 if($row->lookable_type == 'marketing_order_deliveries'){
                     if($row->lookable->marketingOrderDeliveryProcess()->exists()){
                         $data[] = $row->lookable->marketingOrderDeliveryProcess->code;
                     }
+                    $note = $row->lookable->note;
                 }
             }
-            return implode(', ',$data);
+            return implode(', ',$data).' - '.$note;
         }else{
             return implode(', ',$data);
         }
@@ -553,7 +555,7 @@ class GoodScale extends Model
             'received_date'             => $date,
             'due_date'                  => $date,
             'document_date'             => $date,
-            'note'                      => 'BIAYA KIRIM '.$this->referenceGRPODO(),
+            'note'                      => 'BIAYA KIRIM '.$this->referenceGRPODO().' - ',
             'note_external'             => NULL,
             'subtotal'                  =>0,
             'discount'                  => 0,

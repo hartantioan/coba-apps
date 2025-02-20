@@ -636,7 +636,7 @@ class ComplaintSalesController extends Controller
         foreach($po->complaintSalesDetail as $row){
             $arr[] = [
                 'id'                    => $row->id,
-                'lookable_id'               => $row->lookable->id,
+                'lookable_id'               => $row->lookable_id,
                 'item'                      => $row->lookable->item->name,
                 'production_batch_code'                      => $row->production_batch_code,
                 'qty_color_mistake'                   => CustomHelper::formatConditionalQty($row->qty_color_mistake),

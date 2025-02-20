@@ -807,7 +807,34 @@
             $(this).closest('tr').remove();
         });
 
-        select2ServerSideLonger('#good_issue_request_id', '{{ url("admin/select2/good_issue_request_gi") }}');
+        $('#good_issue_request_id').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 4,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/good_issue_request_gi") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true,
+            }
+        });
     });
 
     String.prototype.replaceAt = function(index, replacement) {

@@ -4814,7 +4814,7 @@ class Select2Controller extends Controller {
         })
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])
-        ->get();
+        ->whereHas('itemShading')->paginate(10);
 
         foreach($data as $d) {
             if($d->hasBalanceQtyGi()){
@@ -4861,7 +4861,12 @@ class Select2Controller extends Controller {
             }
         }
 
-        return response()->json(['items' => $response]);
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ],
+        ]);
     }
 
     public function marketingOrderDeliveryProcessPO(Request $request)

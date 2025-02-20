@@ -4809,6 +4809,9 @@ class Select2Controller extends Controller {
                 });
         })
         ->whereDoesntHave('used')
+        ->whereHas('goodIssueRequestDetail',function($query){
+            $query->whereIn('warehouse_id',$this->datawarehouses);
+        })
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])
         ->get();

@@ -807,7 +807,7 @@
             $(this).closest('tr').remove();
         });
 
-        select2ServerSide('#good_issue_request_id', '{{ url("admin/select2/good_issue_request_gi") }}');
+        select2ServerSideLonger('#good_issue_request_id', '{{ url("admin/select2/good_issue_request_gi") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {

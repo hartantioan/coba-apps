@@ -665,7 +665,6 @@ class GoodIssueRequestController extends Controller
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,

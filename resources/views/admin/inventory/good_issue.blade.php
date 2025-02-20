@@ -268,9 +268,8 @@
                                                         <th class="center">Ket.2</th>
                                                         <th class="center">Tipe Pengeluaran</th>
                                                         <th class="center">Coa</th>
-                                                        <th class="center">Dist.Biaya</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
-                                                        <th class="center">{{ __('translations.line') }}</th>
+                                                        <th class="center">Dist.Biaya</th>
                                                         <th class="center">{{ __('translations.engine') }}</th>
                                                         <th class="center">{{ __('translations.division') }}</th>
                                                         <th class="center">Proyek</th>
@@ -281,7 +280,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="18">
+                                                        <td colspan="17">
 
                                                         </td>
                                                     </tr>
@@ -1075,22 +1074,14 @@
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
-                                    </td>
-                                    <td class="center">
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
                                             @foreach ($place as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                            @foreach ($line as $rowline)
-                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                            @endforeach
-                                        </select>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
@@ -1137,7 +1128,6 @@
 
                             $('#stock' + count).append(optionStock);
                             $('#arr_place' + count).val(val.place_id);
-                            $('#arr_line' + count).val(val.line_id);
                             $('#arr_machine' + count).val(val.machine_id);
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_requester' + count).val(val.requester);
@@ -1154,7 +1144,29 @@
                             }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
-                            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                            $('#arr_cost_distribution' + count).select2({
+                                placeholder: '-- Pilih ya --',
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/cost_distribution") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            place_id: $("#arr_place" + count).val(),
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                             if(val.cost_distribution_id){
                                 $('#arr_cost_distribution' + count).empty().append(`
@@ -1283,21 +1295,14 @@
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
-                </td>
-                <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
                     </select>
                 </td>
-                <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:100px !important;">
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                        @endforeach
-                    </select>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;">
@@ -1334,7 +1339,29 @@
         select2ServerSideLonger('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
         select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        $('#arr_cost_distribution' + count).select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/cost_distribution") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $("#arr_place" + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
     }
 
@@ -1359,23 +1386,6 @@
         let max = parseFloat($('#rowQty' + $(element).data('id')).val().replaceAll(".", "").replaceAll(",","."));
         if(qty > max){
             $(element).val($('#rowQty' + $(element).data('id')).val());
-        }
-    }
-
-    function changePlace(element){
-        $(element).parent().next().find('select[name="arr_machine[]"] option').show();
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
-        }else{
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
-        }
-    }
-
-    function changeLine(element){
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
-        }else{
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
         }
     }
 
@@ -1551,7 +1561,6 @@
                 formData.delete('arr_inventory_coa[]');
                 formData.delete('arr_coa[]');
                 formData.delete('arr_place[]');
-                formData.delete('arr_line[]');
                 formData.delete('arr_machine[]');
                 formData.delete('arr_department[]');
                 formData.delete('arr_project[]');
@@ -1613,7 +1622,6 @@
                     formData.append('arr_coa[]',($('select[name^="arr_coa[]"]').eq(index).val() ? $('select[name^="arr_coa[]"]').eq(index).val() : ''));
                     formData.append('arr_cost_distribution[]',($('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''));
                     formData.append('arr_place[]',($('select[name^="arr_place[]"]').eq(index).val() ? $('select[name^="arr_place[]"]').eq(index).val() : ''));
-                    formData.append('arr_line[]',($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
                     formData.append('arr_machine[]',($('select[name^="arr_machine[]"]').eq(index).val() ? $('select[name^="arr_machine[]"]').eq(index).val() : ''));
                     formData.append('arr_department[]',($('select[name^="arr_department[]"]').eq(index).val() ? $('select[name^="arr_department[]"]').eq(index).val() : ''));
                     formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
@@ -1781,22 +1789,15 @@
                                 <td class="center" id="coa` + count + `">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
                                 </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
-                                </td>
-                                <td class="center">
+                                 <td class="center">
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
                                         @foreach ($place as $row)
                                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:100px !important;">
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                        @endforeach
-                                    </select>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;">
@@ -1866,7 +1867,6 @@
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
                         select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
                         $('#arr_place' + count).val(val.place_id);
-                        $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
                         $('#arr_department' + count).val(val.department_id);
                         if(val.project_id){
@@ -1881,7 +1881,30 @@
                                 <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
                             `);
                         }
-                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                        
+                        $('#arr_cost_distribution' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/cost_distribution") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        place_id: $("#arr_place" + count).val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
 
                         if(val.is_activa){
                             $('#serial' + count).empty();

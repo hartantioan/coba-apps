@@ -1346,7 +1346,7 @@
                     formData.delete("arr_cost_distribution[]");
                     formData.delete("arr_coa[]");
                     formData.delete("arr_place[]");
-                    formData.delete("arr_line[]");
+                    /* formData.delete("arr_line[]"); */
                     formData.delete("arr_machine[]");
                     formData.delete("arr_account[]");
                     formData.delete("arr_department[]");
@@ -1359,7 +1359,7 @@
                         formData.append('arr_cost_distribution_detail[]',($('input[name^="arr_cost_distribution_detail"]').eq(index).val() ? $('input[name^="arr_cost_distribution_detail"]').eq(index).val() : 'NULL'));
                         formData.append('arr_cost_distribution[]',($('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''));
                         formData.append('arr_place[]',($('select[name^="arr_place"]').eq(index).val() ? $('select[name^="arr_place"]').eq(index).val() : 'NULL'));
-                        formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL'));
+                        /* formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL')); */
                         formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : 'NULL'));
                         formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());

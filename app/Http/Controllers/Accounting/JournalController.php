@@ -486,7 +486,7 @@ class JournalController extends Controller
                                         'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
                                         'coa_id'                        => $row ?? NULL,
                                         'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
-                                        'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                        /* 'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key], */
                                         'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
                                         'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                         'department_id'                 => $request->arr_department[$key],
@@ -547,7 +547,7 @@ class JournalController extends Controller
                                         'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
                                         'coa_id'                        => $row ?? NULL,
                                         'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
-                                        'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                        /* 'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key], */
                                         'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
                                         'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                         'department_id'                 => $request->arr_department[$key],

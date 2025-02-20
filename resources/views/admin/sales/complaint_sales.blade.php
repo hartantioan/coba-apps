@@ -1609,7 +1609,7 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item" data-id="` + val.id + `" style="background-color:` + getRandomColor() + `;">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
+                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
                                 <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
                                 <td class="center" >
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

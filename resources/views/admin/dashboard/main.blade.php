@@ -19,7 +19,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                 <div class="section">
                     <div class="row">
                         <div class="col s12 m6 l12">
-                            
+
                             <div class="card padding-2 animate fadeLeft row">
                                  <div class="col s12 m6 l4">
                                     <h6 class="pl-2 pt-1">Absensi {{$start_date}} - {{$end_date}}</h6>
@@ -39,12 +39,12 @@
                                  <div class="col s12 m6 l4">
                                     <label class="" for="period_id">Period</label>
                                     <select class="browser-default" id="period_id" name="period_id" onchange="periodChange()"></select>
-                                    
+
                                  </div>
-                                 
-                                 
+
+
                                  <div class="col s12 m6 l8">
-                                       
+
                                        <div class="row">
                                           <div class="col s12 m6 l4">
                                              <div onclick="ambilefektif()" class="card gradient-45deg-deep-orange-orange gradient-shadow white-text animate fadeLeft" style="cursor: pointer; transition: box-shadow 0.3s;">
@@ -59,89 +59,89 @@
                                                  </div>
                                              </div>
                                           </div>
-                                         
+
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft" onclick="ambilKeluar()" style="cursor: pointer; transition: box-shadow 0.3s;">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
-                                                
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/exit.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                         
+
                                                       </div>
                                                       <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Tepat Keluar &nbsp;</p>
                                                          <h4 class="mb-0 white-text center-align" id="tepatkeluar">{{$tepatkeluar}}</h4>
-                                       
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-purple-amber gradient-shadow min-height-100 white-text animate fadeLeft" onclick="ambilMasuk()" style="cursor: pointer; transition: box-shadow 0.3s;">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
-                                                 
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/arrived.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                         
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Tepat Masuk</p>
                                                          <h4 class="mb-0 white-text center-align" id="tepatmasuk">{{$tepatmasuk}}</h4>
-                                                         
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-blue-indigo gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/absent.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                       
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Alpha</p>
                                                          <h4 class="mb-0 white-text center-align" id="total_absen">{{$total_absen}}</h4>
-                                                         
+
                                                       </div>
-                                                  
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-indigo-blue gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/no-data.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                         
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Tidak Absen Datang</p>
                                                          <h4 class="mb-0 white-text center-align" id="total_tidak_datang">{{$total_tidak_datang}}</h4>
-                                                         
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-indigo-purple gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/no-data (1).png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                       
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Tidak Absen Pulang</p>
                                                          <h4 class="mb-0 white-text center-align" id="total_tidak_pulang">{{$total_tidak_pulang}}</h4>
-                                                      
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
@@ -151,17 +151,17 @@
                                        <div class="app-todo attendance-list">
                                           <div class="content-area" style="margin-top:0%; width:100%">
                                              <div class="app-wrapper">
-                                             
+
                                              <div class="card card card-default scrollspy border-radius-6 fixed-width" >
                                                 <div class="card-content p-0 pb-1" >
                                                    <div class="todo-header">
                                                    <div class="header-checkbox">
-                                                      
+
                                                    </div>
                                                    <div class="list-content"></div>
                                                    <div class="todo-action">
-                                                      
-                                                      
+
+
                                                    </div>
                                                    </div>
                                                    <ul class="collection todo-collection" style="max-height: 18rem; overflow-y: auto; overflow-x: hidden;">
@@ -170,20 +170,20 @@
                                                          <div class="list-content pl-2">
                                                          <div class="list-title-area">
                                                                <div class="list-title">{{$row_date['schedulefirst']}} - {{$row_date['schedulelast']}}</div>
-                                                               
+
                                                          </div>
                                                          <div class="list-desc"> {{$row_date['time']}}</div>
                                                          </div>
                                                          <div class="list-right">
                                                          <div class="list-date"> {{$row_date['date']}} </div>
-                                                         
+
                                                          </div>
                                                       </li>
-                                                         
+
                                                       @endforeach
-                                                      
-                                                   
-                                                   
+
+
+
                                                       <li class="collection-item no-data-found">
                                                          <h6 class="center-align font-weight-500">No Results Found</h6>
                                                       </li>
@@ -194,130 +194,130 @@
                                              </div>
                                           </div>
                                        </div>
-                                       
+
                                  </div>
                                  <div class="col s12 m12 l12">
-                                       
+
                                        <div class="row">
                                           <div class="col s12 m6 l4">
                                              <div class="card  deep-purple gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                  
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/leave.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                        
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Total Cuti</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_cuti">{{$counter_cuti}}</h4>
-                                                         
-                                                        
+
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card deep-purple darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/bed.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                      
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Sakit</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_sakit">{{$counter_sakit}}</h4>
-                                                         
-                                                         
+
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card deep-purple darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                  
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/unemployment.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                     
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Ijin</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_ijin">{{$counter_ijin}}</h4>
-                                                         
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card indigo gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/svg.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                     
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Dinas Luar</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_dinas_luar">{{$counter_dinas_luar}}</h4>
-                                                         
-                                                       
+
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card indigo darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/day.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                        
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Cuti Khsusus</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_cuti_kusus">{{$counter_cuti_kusus}}</h4>
-                                                         
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card  indigo darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/verification.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                         
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">Dispen</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_dispen">{{$counter_dispen}}</h4>
-                                                         
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card  blue darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
-                                                   
+
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/work-from-home.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
-                                                   
+
                                                       </div>
                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                                          <p class="no-margin center-align">WFH</p>
                                                          <h4 class="mb-0 white-text center-align" id="counter_wfh">{{$counter_wfh}}</h4>
-                                                        
+
                                                       </div>
-                                                   
+
                                                 </div>
                                              </div>
                                           </div>
@@ -330,21 +330,21 @@
                            <div class="col s12 m6 l4">
                               <div class="card  gradient-shadow black-text animate fadeLeft" style="cursor: pointer; transition: box-shadow 0.3s;">
                                  <div class="padding-2" style="display: flex; align-items: center;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
-                                 
+
                                        <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
                                           <p class="no-margin center-align">DOWNLOAD PLUGINS &nbsp;</p>
-                                          
-                        
+
+
                                        </div>
-                                       <a class="btn-floating btn-small waves-effect waves-light gradient-45deg-amber-amber gradient-shadow" href="https://porcelain.superiorprimasukses.com/plugins/whb.exe">
+                                       <a class="btn-floating btn-small waves-effect waves-light gradient-45deg-amber-amber gradient-shadow" href="{{ url('whb.exe') }}">
                                           <i class="material-icons">file_download</i>
                                        </a>
-                                    
+
                                  </div>
                               </div>
                            </div>
                         </div>
-                        
+
                         {{-- <div class="col s12 m12 l12">
                             <div class="card padding-4 animate fadeLeft">
                                 <div class="row">
@@ -423,7 +423,7 @@
                 <div id="intro">
                     <div class="row">
                         <div class="col s12">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -450,7 +450,7 @@
                         </tr>
                      </thead>
                      <tbody id="attendance_masuk">
-                        
+
                      </tbody>
                   </table>
                </div>
@@ -475,7 +475,7 @@
                      </tr>
                   </thead>
                   <tbody id="attendance_keluar">
-                     
+
                   </tbody>
                </table>
             </div>
@@ -504,7 +504,7 @@
                      </tr>
                   </thead>
                   <tbody id="shift">
-                     
+
                   </tbody>
                </table>
             </div>
@@ -518,13 +518,13 @@
 
 <script>
    $(function(){
-      
+
       $('#modalmasuk').modal({
          onOpenStart: function(modal,trigger) {
-               
+
          },
-         onOpenEnd: function(modal, trigger) { 
-               
+         onOpenEnd: function(modal, trigger) {
+
          },
          onCloseEnd: function(modal, trigger){
                $('#attendance_masuk').html('');
@@ -533,10 +533,10 @@
 
       $('#modalkeluar').modal({
          onOpenStart: function(modal,trigger) {
-               
+
          },
-         onOpenEnd: function(modal, trigger) { 
-               
+         onOpenEnd: function(modal, trigger) {
+
          },
          onCloseEnd: function(modal, trigger){
                $('#attendance_keluar').html('');
@@ -545,10 +545,10 @@
 
       $('#modalefektif').modal({
          onOpenStart: function(modal,trigger) {
-               
+
          },
-         onOpenEnd: function(modal, trigger) { 
-               
+         onOpenEnd: function(modal, trigger) {
+
          },
          onCloseEnd: function(modal, trigger){
                $('#shift').html('');
@@ -558,7 +558,7 @@
    });
    var originalHtml = $('.todo-collection').html();
    function periodChange(){
-      
+
       $('.todo-collection').empty();
       if($('#period_id').val() != null){
          $.ajax({
@@ -575,7 +575,7 @@
                   loadingOpen('.modal-content');
             },
             success: function(response) {
-               loadingClose('.modal-content');  
+               loadingClose('.modal-content');
                $('#attendance_count').text(response.message['attendance_count']);
                $('#tepatkeluar').text(response.message['tepatkeluar']);
                $('#tepatmasuk').text(response.message['tepatmasuk']);
@@ -593,11 +593,11 @@
                $('#counter_wfh').text(response.message['counter_wfh']);
                $('.modal-content').scrollTop(0);
 
-               
+
                var attendancePerDay = response.message['attendance_perday'];
-               
+
                if (attendancePerDay.length > 0) {
-               
+
                   $.each(attendancePerDay, function(index, rowDate) {
                      var listItem = '<li class="collection-item todo-items">' +
                            '<div class="list-content pl-2">' +
@@ -613,7 +613,7 @@
 
                      $('.todo-collection').append(listItem);
                   });
-               } 
+               }
             },
             error: function() {
                   $('.modal-content').scrollTop(0);
@@ -625,7 +625,7 @@
                   });
             }
          });
-        
+
       }else{
          $('.todo-collection').html(originalHtml);
          $('#attendance_count').text('{{ $attendance_count }}');
@@ -641,7 +641,7 @@
          $('#counter_ijin').text('{{ $counter_ijin }}');
          $('#counter_dinas_luar').text('{{ $counter_dinas_luar }}');
          $('#counter_cuti_kusus').text('{{ $counter_cuti_kusus }}');
-        
+
          $('#counter_dispen').text('{{ $counter_dispen }}');
          $('#counter_wfh').text('{{ $counter_wfh }}');
       }
@@ -665,14 +665,14 @@
             loadingClose('.modal-content');
             var attendancePerDay = response.message;
             if (attendancePerDay.length > 0) {
-               
+
                $.each(attendancePerDay, function(index, rowDate) {
-                 
+
                   var listItem = ' <tr><td>' + rowDate.date + '</td>'+
                         '  <td>' + rowDate.time + '</td>';
                   $('#attendance_masuk').append(listItem);
                });
-            }   
+            }
             $('#modalmasuk').modal('open');
          },
          error: function() {
@@ -705,14 +705,14 @@
             loadingClose('.modal-content');
             var attendancePerDay = response.message;
             if (attendancePerDay.length > 0) {
-               
+
                $.each(attendancePerDay, function(index, rowDate) {
-                 
+
                   var listItem = ' <tr><td>' + rowDate.date + '</td>'+
                         '  <td>' + rowDate.time + '</td>';
                   $('#attendance_keluar').append(listItem);
                });
-            }   
+            }
             $('#modalkeluar').modal('open');
          },
          error: function() {
@@ -745,14 +745,14 @@
             loadingClose('.modal-content');
             var attendancePerDay = response.message;
             if (attendancePerDay.length > 0) {
-               
+
                $.each(attendancePerDay, function(index, rowDate) {
-                 
+
                   var listItem = ' <tr><td>' + rowDate.date + '</td>'+
                         '  <td>' + rowDate.nama_shift + '</td>'+'<td>' + rowDate.jadwal + '</td></tr>';
                   $('#shift').append(listItem);
                });
-            }   
+            }
             $('#modalefektif').modal('open');
          },
          error: function() {

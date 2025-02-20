@@ -1084,7 +1084,7 @@ class LandedCostController extends Controller
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
-                'totalrow'                  => $row->lookable->total,
+                'totalrow'                  => $row->lookable_type == 'good_receipt_details' ? $row->lookable->total : $row->nominal,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,

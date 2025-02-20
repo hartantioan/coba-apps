@@ -351,6 +351,9 @@ class ComplaintSalesController extends Controller
 
     public function create(Request $request){
         DB::beginTransaction();
+
+        $approved = false;
+        $revised = false;
         try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
@@ -386,8 +389,6 @@ class ComplaintSalesController extends Controller
                 if($request->temp){
                     $query = ComplaintSales::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
-                    $revised = false;
                     if($query->marketing_order_id_complaint){
                         if($query->approval()){
                             foreach ($query->approval() as $detail){
@@ -445,7 +446,7 @@ class ComplaintSalesController extends Controller
                         $query->lookable_id = $request->lookable_id;
                         $query->lookable_type = 'marketing_order_delivery_processes';
                         $query->solution = $request->solution;
-                        $query->marketing_order_id_complaint = $request->marketing_order_id_complaint;
+                        $query->marketing_order_id_complaint = $request->marketing_order_id_complaint ?? null;
 
                         $query->save();
 

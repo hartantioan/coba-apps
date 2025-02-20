@@ -3216,6 +3216,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_and_email', [MarketingOrderInvoiceController::class, 'updateAndEmail'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('update_and_upload', [MarketingOrderInvoiceController::class, 'updateAndUpload'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_no_pjb', [MarketingOrderInvoiceController::class, 'updateNoPJB'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::get('approval/{id}', [MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -4084,6 +4085,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [DocumentTaxController::class, 'show']);
                     Route::post('print', [DocumentTaxController::class, 'print']);
                     Route::get('export', [DocumentTaxController::class, 'export']);
+                    Route::post('create', [DocumentTaxController::class, 'create'])->middleware('operation.access:document_tax,update');
                     Route::get('export_data_table', [DocumentTaxController::class, 'exportDataTable']);
                     Route::post('save_no_faktur', [DocumentTaxController::class, 'saveNoFaktur'])->middleware('operation.access:document_tax,update');
                     Route::post('add_no_faktur', [DocumentTaxController::class, 'addNoFaktur']);

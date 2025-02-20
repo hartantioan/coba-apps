@@ -379,6 +379,102 @@ class DocumentTaxController extends Controller
 		return response()->json($response);
     }
 
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+            'no_factor' 			=> 'required',
+            'npwp_name'             => 'required',
+            'tax'                   => 'required',
+        ], [
+            'no_factor.required' 	            => 'Kode tidak boleh kosong.',
+            'npwp_name.required'                 => 'Vendor tidak boleh kosong.',
+            'tax.required'           => 'PPN tidak boleh kosong.',
+        ]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $no_faktur = $request->no_factor;
+            $kdJenisTransaksi = substr($no_faktur, 0, 2);
+            $fgPengganti = substr($no_faktur, 2, 1);
+            $nomorFaktur = substr($no_faktur, 3);
+            $existingRecord = DB::table('document_taxes')
+            ->where('code', $nomorFaktur)
+            ->where('replace', $fgPengganti)
+            ->where('transaction_code', $kdJenisTransaksi)
+            ->whereNull('deleted_at')
+            ->whereIn('status',['1','2','4'])
+            ->exists();
+            if ($existingRecord) {
+                $response = [
+                    'status' => 422,
+                    'error'  => 'kode sudah pernah diinput'
+                ];
+                return response()->json($response);
+            }
+            DB::beginTransaction();
+            try {
+
+                if($request->temp){
+                    $query = DocumentTax::find($request->temp);
+                    $query->code                = $request->code;
+                    $query->user_id             = session('bo_id');
+                    $query->account_id          = $request->account_id;
+                    $query->transportation_id   = $request->transportation_id;
+                    $query->name	            = $request->name;
+                    $query->valid_from          = $request->valid_from;
+                    $query->valid_to            = $request->valid_to;
+                    $query->from_city_id        = $request->from_city_id;
+                    $query->from_subdistrict_id = $request->from_subdistrict_id;
+                    $query->to_city_id          = $request->to_city_id;
+                    $query->to_subdistrict_id   = $request->to_subdistrict_id;
+                    $query->tonnage             = str_replace(',','.',str_replace('.','',$request->tonnage));
+                    $query->ritage              = str_replace(',','.',str_replace('.','',$request->ritage));
+                    $query->qty_tonnage         = str_replace(',','.',str_replace('.','',$request->qty_tonnage));
+                    $query->status              = $request->status ? $request->status : '2';
+                    $query->save();
+                }else{
+                    $query = DocumentTax::create([
+                        'transaction_code'      => $kdJenisTransaksi,
+                        'replace'               => $fgPengganti,
+                        'code'                  => $nomorFaktur,
+                        'user_id'               => session('bo_id'),
+                        'date'                  => $request->date,
+                        'npwp_name'             => $request->npwp_name,
+                        'tax'                   => str_replace(',','.',str_replace('.','',$request->tax)),
+                        'status'                => '1',
+                    ]);
+                }
+
+                if($query) {
+
+                    activity()
+                        ->performedOn(new DocumentTax())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add Manual Dokumen Pajak.');
+
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data successfully saved.'
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
+		}
+
+		return response()->json($response);
+    }
+
     public function show(Request $request){
         $country = DocumentTax::find($request->id);
 

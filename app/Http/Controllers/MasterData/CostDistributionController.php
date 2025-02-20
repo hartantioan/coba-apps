@@ -195,8 +195,8 @@ class CostDistributionController extends Controller
                             'cost_distribution_id'  => $query->id,
                             'place_id'              => $row,
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            /* 'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL, */
                             'percentage'            => str_replace(',','.',str_replace('.','',$request->arr_percentage[$key])),
                         ]);
                     }
@@ -236,8 +236,8 @@ class CostDistributionController extends Controller
             $details[] = [
                 'place_id'      => $cdd->place_id,
                 'line_id'       => $cdd->line_id ? $cdd->line_id : '',
-                'machine_id'    => $cdd->machine_id ? $cdd->machine_id : '',
-                'department_id' => $cdd->department_id ? $cdd->department_id : '',
+                /* 'machine_id'    => $cdd->machine_id ? $cdd->machine_id : '',
+                'department_id' => $cdd->department_id ? $cdd->department_id : '', */
                 'percentage'    => number_format($cdd->percentage,2,',','.'),
             ];
         }

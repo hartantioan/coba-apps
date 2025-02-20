@@ -139,15 +139,15 @@
                                     <tr>
                                         <th class="center">{{ __('translations.plant') }}</th>
                                         <th class="center">{{ __('translations.line') }}</th>
-                                        <th class="center">{{ __('translations.engine') }}</th>
-                                        <th class="center">{{ __('translations.division') }}</th>
+                                        {{-- <th class="center">{{ __('translations.engine') }}</th>
+                                        <th class="center">{{ __('translations.division') }}</th> --}}
                                         <th class="center">{{ __('translations.percentage') }}</th>
                                         <th class="center">{{ __('translations.delete') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="last-row-detail">
-                                        <td colspan="6" class="center">
+                                        <td colspan="4" class="center">
                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> {{ __('translations.add_row') }}
                                             </a>
@@ -302,7 +302,7 @@
                         @endforeach    
                     </select>
                 </td>
-                <td>
+                <!-- <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
@@ -317,7 +317,7 @@
                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                         @endforeach
                     </select>
-                </td>
+                </td> -->
                 <td class="center">
                     <input id="arr_percentage` + count + `" name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:100%;text-align:right;">
                 </td>
@@ -426,18 +426,18 @@
         
         if(passed){
             formData.delete("arr_line[]");
-            formData.delete("arr_machine[]");
-            formData.delete("arr_department[]");
+            /* formData.delete("arr_machine[]");
+            formData.delete("arr_department[]"); */
 
             $('select[name^="arr_place"]').each(function(index){
                 arr_place.push($(this).val());
                 arr_line.push($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : '');
-                arr_machine.push($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''); 
-                arr_department.push($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : '');
+                /* arr_machine.push($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''); 
+                arr_department.push($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : ''); */
 
                 formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
-                formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''));
-                formData.append('arr_department[]',($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : ''));
+                /* formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''));
+                formData.append('arr_department[]',($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : '')); */
             });
 
             for(let i=0;i<arr_place.length;i++){
@@ -589,7 +589,7 @@
                                     @endforeach    
                                 </select>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                     <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($machine as $row)
@@ -604,7 +604,7 @@
                                         <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                     @endforeach
                                 </select>
-                            </td>
+                            </td> -->
                             <td class="center">
                                 <input id="arr_percentage` + count + `" name="arr_percentage[]" class="browser-default" type="text" value="` + val.percentage + `" onkeyup="formatRupiah(this);" style="width:100%;text-align:right;">
                             </td>

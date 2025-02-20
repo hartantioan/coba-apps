@@ -23,7 +23,7 @@ class MarketingARDPRecapController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $data = [
@@ -34,13 +34,17 @@ class MarketingARDPRecapController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-  
+
     public function export(Request $request){
         ob_end_clean();
         ob_start();
-        $response = Excel::download(new ExportMarketingARDPRecap($request->start_date,$request->end_date), 'ardp_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $end_date=now();
+        if($request->end_date){
+            $end_date = $request->end_date;
+        }
+        $response = Excel::download(new ExportMarketingARDPRecap($request->start_date,$end_date), 'ardp_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         return $response;
     }
 
-   
+
 }

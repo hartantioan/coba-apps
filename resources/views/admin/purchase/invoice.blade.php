@@ -2234,7 +2234,7 @@
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                            <select class="browser-default hide" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                                                                 <option value="">--{{ __('translations.empty') }}--</option>
                                                                 @foreach ($line as $rowline)
                                                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -2998,7 +2998,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                    <select class="browser-default hide" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -3958,7 +3958,7 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                            <select class="browser-default hide" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                                                 <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($line as $rowline)
                                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>

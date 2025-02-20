@@ -1180,7 +1180,12 @@ class PurchaseInvoiceController extends Controller
             $grandtotal += $rounding;
 
             $balance = $grandtotal - $downpayment;
-
+            if($balance < 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf! Balance Tidak Boleh Di Bawah 0.',
+                ]);
+            }
             if($request->temp){
                 /* DB::beginTransaction();
                 try { */

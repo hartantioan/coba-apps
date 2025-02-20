@@ -365,7 +365,7 @@ $cogs = ItemCogs::where('lookable_type', $row_x->getTable())
                     'no' =>$keys,
                     'Transaksi'=>$row_x->getTable(),
                     'No Dokumen'=>$row_x->code,
-                    'Grandtotal'=>$row_x->total,
+                    'Grandtotal'=>$row_x->total(),
                     'ID ITEM COGS'=>'tidak punya cogs',
                     'Total Item Cogs'=>'tidak punya cogs',
                 ];

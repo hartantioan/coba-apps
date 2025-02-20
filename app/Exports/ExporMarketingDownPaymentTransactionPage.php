@@ -106,7 +106,7 @@ class ExporMarketingDownPaymentTransactionPage implements FromCollection, WithTi
                 $query->whereIn('currency_id',$this->currency);
             }
         })
-        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
         ->get();
 
         $array = [];

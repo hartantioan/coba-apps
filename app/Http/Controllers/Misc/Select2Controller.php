@@ -4814,7 +4814,7 @@ class Select2Controller extends Controller {
         })
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])
-        ->whereHas('itemShading')->paginate(10);
+        ->paginate(10);
 
         foreach($data as $d) {
             if($d->hasBalanceQtyGi()){

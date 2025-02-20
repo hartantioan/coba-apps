@@ -336,7 +336,7 @@
 
 
                                        </div>
-                                       <a class="btn-floating btn-small waves-effect waves-light gradient-45deg-amber-amber gradient-shadow" href="{{ url('plugins/whb.exe') }}">
+                                       <a class="btn-floating btn-small waves-effect waves-light gradient-45deg-amber-amber gradient-shadow" href="{{ url('public/whb.exe') }}">
                                           <i class="material-icons">file_download</i>
                                        </a>
 

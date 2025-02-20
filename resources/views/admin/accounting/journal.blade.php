@@ -242,7 +242,7 @@
                                                         <th class="center" rowspan="2">Coa</th>
                                                         <th class="center" rowspan="2">{{ __('translations.plant') }}</th>
                                                         <th class="center" rowspan="2">Dist.Biaya</th>
-                                                        <th class="center" rowspan="2">{{ __('translations.line') }}</th>
+                                                        {{-- <th class="center" rowspan="2">{{ __('translations.line') }}</th> --}}
                                                         <th class="center" rowspan="2">{{ __('translations.engine') }}</th>
                                                         <th class="center" rowspan="2">{{ __('translations.division') }}</th>
                                                         <th class="center" rowspan="2">Proyek</th>
@@ -260,7 +260,7 @@
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="15">
+                                                        <td colspan="14">
 
                                                         </td>
                                                     </tr>
@@ -759,11 +759,11 @@
     } */
 
     function disableLine(code){
-        $('#arr_line' + code).val('');
+        /* $('#arr_line' + code).val('');
         $('#arr_line' + code).attr('disabled',false);
         if($('#arr_cost_distribution' + code).val()){
             $('#arr_line' + code).attr('disabled',true);
-        }
+        } */
     }
 
     function addCoa(){
@@ -798,14 +798,14 @@
                 <td>
                     <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="disableLine('` + count + `')"></select>
                 </td>
-                <td>
+                <!-- <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"  onchange="changePlace(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                         @endforeach
                     </select>
-                </td>
+                </td> -->
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]"  onchange="changeLine(this);">
                         <option value="">--{{ __('translations.empty') }}--</option>
@@ -1677,14 +1677,14 @@
                             <td>
                                 <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="disableLine('` + count + `')"></select>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" ` + attributeDisable + `>
                                     <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($line as $rowline)
                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                     @endforeach
                                 </select>
-                            </td>
+                            </td> -->
                             <td>
                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" ` + attributeDisable + `>
                                     <option value="">--{{ __('translations.empty') }}--</option>
@@ -1784,7 +1784,7 @@
                     $('#arr_coa' + count).append(`
                         <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                     `);
-                    $('#arr_line' + count).val(val.line_id);
+                    /* $('#arr_line' + count).val(val.line_id); */
                     $('#arr_machine' + count).val(val.machine_id);
                     if(val.project_id){
                         $('#arr_project' + count).append(`

@@ -809,7 +809,6 @@
 
         $('#good_issue_request_id').select2({
             placeholder: '-- Pilih ya --',
-            minimumInputLength: 4,
             allowClear: true,
             cache: true,
             width: 'resolve',

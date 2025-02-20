@@ -270,7 +270,7 @@
                                                         <th class="center">Coa</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
-                                                        {{-- <th class="center">{{ __('translations.line') }}</th> --}}
+                                                        <th class="center">{{ __('translations.line') }}</th>
                                                         <th class="center">{{ __('translations.engine') }}</th>
                                                         <th class="center">{{ __('translations.division') }}</th>
                                                         <th class="center">Proyek</th>
@@ -281,7 +281,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="17">
+                                                        <td colspan="18">
 
                                                         </td>
                                                     </tr>
@@ -1289,6 +1289,13 @@
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:100px !important;">
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                         @endforeach
                     </select>
                 </td>

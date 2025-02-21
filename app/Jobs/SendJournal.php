@@ -2270,7 +2270,7 @@ class SendJournal implements ShouldQueue
 								);
 							}else{
 								if($distribusiBiaya){
-									$total = $rowtotal;
+									$total = $rowfc;
 									$lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
 									$accumulation = 0;
 									foreach($distribusiBiaya->costDistributionDetail as $key => $rowcost){
@@ -2290,7 +2290,7 @@ class SendJournal implements ShouldQueue
 											'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
 											'type'                          => '1',
 											'nominal'                       => $nominal * $lc->currency_rate,
-											'nominal_fc'					=> $lc->currency_rate == '1' ? $nominal * $lc->currency_rate : $nominal,
+											'nominal_fc'					=> $nominal,
 											'lookable_type'					=> $table_name,
 											'lookable_id'					=> $table_id,
 											'detailable_type'				=> $rowdetail->getTable(),

@@ -3001,6 +3001,7 @@ class CustomHelper {
 				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
 				$coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',$lc->company_id)->where('status','1')->first();
 				$coabiayaekspedisi = Coa::where('code','500.02.01.07.01')->where('company_id',$lc->company_id)->where('status','1')->first();
+				$distribusiBiaya = CostDistribution::where('code','P1.L0')->where('status','1')->first();
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -3078,24 +3079,54 @@ class CustomHelper {
 									$rowdetail->id,
 								);
 							}else{
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $coabiayaekspedisi->id,
-									'place_id'		=> $rowdetail->place_id,
-									'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-									'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-									'account_id'	=> $coabiayaekspedisi->bp_journal ? $lc->account_id : NULL,
-									'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-									'warehouse_id'	=> $rowdetail->warehouse_id,
-									'item_id'		=> $rowdetail->item_id,
-									'type'			=> '1',
-									'nominal'		=> $rowtotal,
-									'nominal_fc'	=> $rowfc,
-									'lookable_type'	=> $table_name,
-									'lookable_id'	=> $table_id,
-									'detailable_type'=> $rowdetail->getTable(),
-									'detailable_id'	=> $rowdetail->id,
-								]);
+								if($distribusiBiaya){
+									$total = $rowfc;
+									$lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
+									$accumulation = 0;
+									foreach($distribusiBiaya->costDistributionDetail as $key => $rowcost){
+										if($key == $lastIndex){
+											$nominal = $total - $accumulation;
+										}else{
+											$nominal = round(($rowcost->percentage / 100) * $total);
+											$accumulation += $nominal;
+										}
+										JournalDetail::create([
+											'journal_id'                    => $query->id,
+											'cost_distribution_detail_id'   => $rowcost->id,
+											'coa_id'                        => $coabiayaekspedisi->id,
+											'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($row->place_id ?? NULL),
+											'line_id'                       => $rowcost->line_id ? $rowcost->line_id : ($row->line_id ?? NULL),
+											'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
+											'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
+											'type'                          => '1',
+											'nominal'                       => round($nominal * $lc->currency_rate,2),
+											'nominal_fc'					=> $nominal,
+											'lookable_type'					=> $table_name,
+											'lookable_id'					=> $table_id,
+											'detailable_type'				=> $rowdetail->getTable(),
+											'detailable_id'					=> $rowdetail->id,
+										]);
+									}
+								}else{
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'coa_id'		=> $coabiayaekspedisi->id,
+										'place_id'		=> $rowdetail->place_id,
+										'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+										'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+										'account_id'	=> $coabiayaekspedisi->bp_journal ? $lc->account_id : NULL,
+										'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+										'warehouse_id'	=> $rowdetail->warehouse_id,
+										'item_id'		=> $rowdetail->item_id,
+										'type'			=> '1',
+										'nominal'		=> $rowtotal,
+										'nominal_fc'	=> $rowfc,
+										'lookable_type'	=> $table_name,
+										'lookable_id'	=> $table_id,
+										'detailable_type'=> $rowdetail->getTable(),
+										'detailable_id'	=> $rowdetail->id,
+									]);
+								}
 							}
 						}
 					}

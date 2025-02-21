@@ -256,7 +256,7 @@
                     Kode Branch Mitra
                 </div>
                 <div class="col s8">
-                    {{ $data->account->mitraCustomer()->exists() ? $data->account->mitraCustomer->code : '-' }}
+                    {{ $data->account->mitraCustomer()->exists() ? $data->account->mitraCustomer->branch_code : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.outlet') }}

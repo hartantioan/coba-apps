@@ -303,7 +303,7 @@ class ReportProcurementController extends Controller
                                 'TGL MASUK'=> date('d/m/Y',strtotime($row_2->goodReceipt->post_date)),
                                 'NO. KENDARAAN' =>$row_2?->goodScale->vehicle_no ?? '-',
                                 'NETTO SJ'=>number_format($netto_sj,2,',','.'),
-                                'NETTO SPS'=>number_format($row_2->qty_sj,2,',','.'),
+                                'NETTO SPS'=>number_format($row_2->qty,2,',','.'),
                                 'SELISIH'=>number_format($selisih,2,',','.'),
                                 'TOTAL BAYAR'=>number_format($total_bayar,2,',','.'),
                                 'TOTAL PENERIMAAN'=>$total_bayar,

@@ -37,6 +37,7 @@ use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -805,6 +806,34 @@ class MarketingOrderDeliveryProcessController extends Controller
                             'grandtotal'                    => $mod->getGrandtotal(),
                             'revision_counter'              => 0,
                         ]);
+
+                        //cek dulu
+                        //input header SJ to API
+                        $detailItem = [];
+                        foreach(MarketingOrderDeliveryDetail::where('marketing_order_delivery_id', $query->marketingOrderDelivery->id)->get() as $row){
+                            $detailItem[] = [
+                                "itemCode" => $row->item->code,
+                                "qty"      => round($row->qty, 2),
+                                "uom"      => $row->marketingOrderDetail->itemUnit->unit->code,
+                            ];
+                        }
+                        Log::info($detailItem);
+
+                        $payload=[
+                            "code"           => $query->code,
+                            "shipDate"       => $query->post_date,
+                            "customerCode"   => $query->marketingOrderDelivery->customer->mitraCustomer->code,
+                            "salesOrderCode" => $query->getSalesModelUnique()[0]->mitraMarketingOrder->document_no,
+                            "details"        => $detailItem,
+                        ];
+                        Log::info($payload);
+                        $query_syncdata = $query->mitraApiSyncDatas()->create([
+                            'mitra_id'  => $query->marketingOrderDelivery->customer->mitraCustomer->mitra_id,
+                            'operation' => 'store',
+                            'payload'   => json_encode($payload),
+                            'status'    => '0',
+                            'attempts'  => 0,
+                        ]);
                     }
                 }
 
@@ -879,6 +908,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
             DB::commit();
         }catch(\Exception $e){
+            Log::error($e);
             DB::rollback();
         }
 

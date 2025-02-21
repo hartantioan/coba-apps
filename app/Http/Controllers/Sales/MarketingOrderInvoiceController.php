@@ -36,6 +36,7 @@ use App\Models\MenuUser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -45,6 +46,8 @@ use Illuminate\Support\Facades\Process;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Str;
 use App\Models\UsedData;
+use App\Models\MitraApiSyncData;
+
 class MarketingOrderInvoiceController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -534,6 +537,8 @@ class MarketingOrderInvoiceController extends Controller
                         foreach($query->marketingOrderInvoiceDetail as $row){
                             $row->delete();
                         }
+
+                        //update header Invoice to API
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -584,6 +589,24 @@ class MarketingOrderInvoiceController extends Controller
 
                     ]);
 
+                    //input header Invoice to API
+                    $payload=[
+                        "code"              => $query->code,
+                        "invDate"           => $query->post_date,
+                        "totalAmount"       => $query->grandtotal,
+                        "salesOrderCode"    => $query->marketingOrderDeliveryProcess->getSalesModelUnique()[0]->mitraMarketingOrder->document_no,
+                        "deliveryOrderCode" => $query->marketingOrderDeliveryProcess->code,
+                        "customerCode"      => $query->account->mitraCustomer->code,
+                        "details"           => [],
+                    ];
+                    Log::info($payload);
+                    $query_syncdata = $query->mitraApiSyncDatas()->create([
+                        'mitra_id'  => $query->account->mitraCustomer->mitra_id,
+                        'operation' => 'store',
+                        'payload'   => json_encode($payload),
+                        'status'    => '0',
+                        'attempts'  => 0,
+                    ]);
                 }
 
                 if($query) {
@@ -663,6 +686,23 @@ class MarketingOrderInvoiceController extends Controller
                             ]);
                         }
                     }
+
+                    $arrDetailItem = MarketingOrderInvoiceDetail::where('marketing_order_invoice_id', $query->id)->get();
+                    $detailItem=[];
+                    foreach($arrDetailItem as $row){
+                        $detailItem[] = [
+                            "itemCode" => $row->getItemCode(),
+                            "qty"      => round($row->qty, 2),
+                            "uom"      => $row->getItemReal()->unit->code,
+                        ];
+                    }
+                    Log::info($detailItem);
+                    $sync_data = MitraApiSyncData::find($query_syncdata->id);
+                    $temp_payload                 = json_decode($sync_data->payload);
+                    $temp_payload->details        = $detailItem;
+                    //save kembali konversi ke payload
+                    $sync_data->payload           = json_encode($temp_payload);
+                    $sync_data->save();
                     
                     SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
@@ -689,6 +729,7 @@ class MarketingOrderInvoiceController extends Controller
         }catch(\Exception $e){
             DB::rollback();
             info($e->getMessage());
+            Log::error($e);
         }
 
 		return response()->json($response);

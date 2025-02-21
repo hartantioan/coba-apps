@@ -1275,11 +1275,11 @@ class MarketingOrderController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                /* if($query->mitraMarketingOrder()->exists()){
+                if($query->mitraMarketingOrder()->exists()){
                     $query->mitraMarketingOrder->update([
                         'status'    => '5'
                     ]);
-                } */
+                }
 
                 activity()
                     ->performedOn(new MarketingOrder())

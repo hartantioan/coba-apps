@@ -71,7 +71,8 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
         'Discount 2',
         'Discount 3',
         'Harga Setelah Diskon',
-        'Total'
+        'Total',
+        'Total HPP'
     ];
 
 
@@ -196,7 +197,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'Discount 3' => $row->getMoDetail()->discount_3 ?? '-',
                     'Harga Setelah Diskon' => $price,
                     'Total' =>  $total,
-
+                    'Total HPP' =>$row->getHPP(),
                 ];
             }
 

@@ -36,7 +36,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
         if($this->type == 'final'){
             $perlu = 0 ;
             $combinedArray = [];
-            $item = Item::where(function($query){
+            /* $item = Item::where(function($query){
                 if($this->item) {
                     $query->where('id',$this->item);
                 }
@@ -53,7 +53,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
             })->pluck('id');
 
             foreach($item as $row){
-                /* $start_time = microtime(true); */
+                $start_time = microtime(true);
                 
                 $data = DB::table('item_cogs')->select('item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
                 ->where('item_cogs.date','<=',$this->finish_date)->where('item_cogs.item_id',$row)->where(function($query){
@@ -69,12 +69,12 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 
-                /* $end_time = microtime(true);
+                $end_time = microtime(true);
 
-                $execution_time = ($end_time - $start_time); */
+                $execution_time = ($end_time - $start_time);
                 
                 if($data){
-                    /* info($execution_time.' - '.$data->item_code.' - '.$data->item_name); */
+                    info($execution_time.' - '.$data->item_code.' - '.$data->item_name);
                     $combinedArray[] = [
                         'plant'     => $data->place_code,
                         'warehouse' => $data->warehouse_name,
@@ -88,6 +88,77 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                         'cum_val'   => $data->total_final,
                     ];
                 }
+            } */
+
+            $where_group = count($this->group) > 0 ? " AND i.item_group_id IN (".implode(",",$this->group).")" : "";
+            $where_warehouse = $this->warehouse != 'all' ? " AND ic.warehouse_id = ".$this->warehouse : "";
+            $where_warehouse_main = $this->warehouse != 'all' ? " AND igw.warehouse_id = ".$this->warehouse : "";
+            $where_place = $this->plant != 'all' ? " AND ic.place_id = ".$this->plant : "";
+            $where_item = $this->item ? " AND i.id = ".$this->item : "";
+
+            $data = DB::select("
+                    SELECT 
+                        i.code AS item_code,
+                        i.name AS item_name,
+                        p.code AS place_code,
+                        u.code AS unit_code,
+                        w.name AS warehouse_name,
+                        COALESCE((
+                            SELECT 
+                                ic.qty_final
+                            FROM 
+                                item_cogs ic
+                            WHERE 
+                                ic.item_id = i.id
+                                AND ic.date <= :date1
+                                AND ic.deleted_at IS NULL
+                            	".$where_warehouse."
+                                ".$where_place."
+                            ORDER BY ic.date DESC, ic.id DESC LIMIT 1
+                        ),0) AS qty_final,
+                        COALESCE((
+                            SELECT 
+                                ic.total_final
+                            FROM 
+                                item_cogs ic
+                            WHERE 
+                                ic.item_id = i.id
+                                AND ic.date <= :date2
+                                AND ic.deleted_at IS NULL
+                            	".$where_warehouse."
+                                ".$where_place."
+                            ORDER BY ic.date DESC, ic.id DESC LIMIT 1
+                        ),0) AS total_final
+                    FROM
+                        items i
+                    LEFT JOIN item_group_warehouses igw ON igw.item_group_id = i.item_group_id
+                    LEFT JOIN units u ON u.id = i.uom_unit
+                    LEFT JOIN places p ON p.id = :place
+                    LEFT JOIN warehouses w ON w.id = :warehouse
+                    WHERE i.deleted_at IS NULL
+                    ".$where_warehouse_main."
+                    ".$where_group."
+                    ".$where_item."
+                ", array(
+                    'date1'     => $this->finish_date,
+                    'date2'     => $this->finish_date,
+                    'place'     => $this->plant,
+                    'warehouse' => $this->warehouse,
+                ));
+
+            foreach($data as $row){
+                $combinedArray[] = [
+                    'plant'     => $row->place_code,
+                    'warehouse' => $row->warehouse_name,
+                    'kode'      => $row->item_code,
+                    'item'      => $row->item_name,
+                    'satuan'    => $row->unit_code,
+                    'requester' => '-',
+                    'area'      => '-',
+                    'shading'   => '-',
+                    'cum_qty'   => $row->qty_final,
+                    'cum_val'   => $row->total_final,
+                ];
             }
 
             activity()

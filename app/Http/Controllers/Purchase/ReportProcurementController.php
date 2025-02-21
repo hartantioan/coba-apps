@@ -41,9 +41,16 @@ class ReportProcurementController extends Controller
         $parentSegment = request()->segment(2);
 
         $data = [
-            'title'     => 'Report Summary Stock Accounting',
+            'title'     => 'Report Procurement RM SM',
             'content'   => 'admin.purchase.report_procurement',
             'shading'      => ItemShading::get(),
+            'item'      => Item::where('status','1')
+            ->whereHas('itemGroup',function($query){
+                $query->whereHas('itemGroupWarehouse',function($query){
+                    $query->whereIn('warehouse_id',['2','3']);
+                });
+            })
+            ->get(),
             'company'       => Company::where('status','1')->get(),
             'area'       => Area::where('status','1')->get(),
             'place'       => Place::where('status','1')->get(),
@@ -255,13 +262,15 @@ class ReportProcurementController extends Controller
                                 $satuan = $row_2->itemUnit->unit->code;
                             }
                             if($row_2->goodScale()->exists()){
-                                $netto_sj = $row_2->goodScale->qty_balance;
+                                $netto_sj = $row_2->goodReceipt->qty_sj;
 
+                            }else{
+                                $netto_sj = $row_2->qty_sj;
                             }
                             if($netto_sj > 0){
                                 $selisih = $row_2->qty - $netto_sj;
                             }
-                            $total_bayar = $row_2->qty;
+                            $total_bayar = $row_2->qty_balance;
                             $price = $row_2->purchaseOrderDetail->price;
                             $finance_price = $price*$total_bayar;
 
@@ -576,6 +585,7 @@ class ReportProcurementController extends Controller
         $array_item = [];
         $pdfFileNameArray = [];
         $contentArray = [];
+        info($request);
         if($request->item_multi){
             $array_item = explode(',', $request->item_multi);
         }

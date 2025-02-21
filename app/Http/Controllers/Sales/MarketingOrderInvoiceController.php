@@ -590,7 +590,8 @@ class MarketingOrderInvoiceController extends Controller
                     ]);
 
                     //cek apakah SO punya mitraMarketingOrder
-                    if(optional(($query->marketingOrderDeliveryProcess->getSalesModelUnique()[0] ?? null)->mitraMarketingOrder)){
+                    $query_syncdata = null;
+                    if(optional($query->marketingOrderDeliveryProcess->getSalesModelUnique()[0] ?? null)->mitraMarketingOrder){
                         //input header Invoice to API
                         $payload=[
                             "code"              => $query->code,

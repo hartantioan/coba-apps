@@ -1041,6 +1041,7 @@ class GoodReceiptPOController extends Controller
             }
             $arr[] = [
                 'id'                        => $row->id,
+                'rule_id'                   => $row->rule_procurement_id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
                 'netto'                     => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($row->goodScale->qty_balance) : '',

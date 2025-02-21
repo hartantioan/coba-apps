@@ -275,10 +275,10 @@ class ReportProcurementController extends Controller
                                 $selisih = $row_2->qty - $netto_sj;
                             }
                             if($take_item_rule_percent->rule_procurement_id == 3){
-                                if($row_2->qty<$row_2->qty_balance){
+                                if($row_2->qty<$row_2->qty_sj){
                                     $total_bayar = $row_2->qty;
                                 }else{
-                                    $total_bayar = $row_2->qty_balance;
+                                    $total_bayar = $row_2->qty_sj;
                                 }
                             }else{
                                 $total_bayar = $row_2->qty_balance;

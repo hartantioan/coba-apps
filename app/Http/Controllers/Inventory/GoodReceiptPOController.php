@@ -2024,9 +2024,11 @@ class GoodReceiptPOController extends Controller
                                     'qty_sj'    => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
                                     'qty_balance'    => str_replace(',','.',str_replace('.','',$request->arr_qty_balance[$key])),
                                 ]);
-                                $query_detail_id->goodscale->update([
-                                    'qty_sj' => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
-                                ]);
+                                if($query_detail_id->goodScale()->exists()){
+                                    $query_detail_id->goodScale->update([
+                                        'qty_sj' => str_replace(',','.',str_replace('.','',$request->arr_qty_sj[$key])),
+                                    ]);
+                                }
                             }
 
                         }

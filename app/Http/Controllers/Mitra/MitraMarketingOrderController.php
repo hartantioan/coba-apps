@@ -190,6 +190,7 @@ class MitraMarketingOrderController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $btn_approve = !$val->marketingOrderWithPending()->exists() ? '<button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Setuju & Pindah ke SO" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">forward</i></button> ' : ''; 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
@@ -230,7 +231,6 @@ class MitraMarketingOrderController extends Controller
                     date('d/m/Y H:i:s',strtotime($val->created_at)),
                     date('d/m/Y H:i:s',strtotime($val->updated_at)),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Setuju & Pindah ke SO" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">forward</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -273,7 +273,7 @@ class MitraMarketingOrderController extends Controller
                 if($request->temp){
                     $query = MitraMarketingOrder::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    if($query->status == '1'){
+                    if($query->status == '1' && !$query->marketingOrderWithPending()->exists()){
                         $response = [
                             'status'    => 200,
                             'message'   => 'Data successfully saved.',

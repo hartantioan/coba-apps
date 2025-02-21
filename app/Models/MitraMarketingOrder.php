@@ -116,6 +116,10 @@ class MitraMarketingOrder extends Model
         return $this->hasOne('App\Models\MarketingOrder','document_no','code')->whereIn('status',['2','3']);
     }
 
+    public function marketingOrderWithPending(){
+        return $this->hasOne('App\Models\MarketingOrder','document_no','code')->whereIn('status',['1','2','3']);
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

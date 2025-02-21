@@ -1029,9 +1029,10 @@ class GoodReceiptPOController extends Controller
             $percentage_limit_netto = 0;
             if($row->goodScale()->exists()){
                 $getRules = RuleBPScale::where('account_id',$row->goodScale->account_id)
-                ->whereDate('start_effective_date','<=',date('Y-m-d'))
-                ->whereDate('effective_date','>=',date('Y-m-d'))
+                ->whereDate('start_effective_date','<=',$row->goodReceipt->post_date)
+                ->whereDate('effective_date','>=',$row->goodReceipt->post_date)
                 ->where('item_id',$row->goodScale->item_id)->first();
+
                 if($getRules){
                     $id_rules = $getRules->id;
                     $percentage_mod = $getRules->percentage_level;
@@ -1041,7 +1042,7 @@ class GoodReceiptPOController extends Controller
             }
             $arr[] = [
                 'id'                        => $row->id,
-                'rule_id'                   => $row->rule_procurement_id,
+                'rule_id'                   => $rule_procurement_id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
                 'netto'                     => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($row->goodScale->qty_balance) : '',

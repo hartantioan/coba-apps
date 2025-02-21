@@ -262,7 +262,7 @@ class ReportProcurementController extends Controller
                                 $satuan = $row_2->itemUnit->unit->code;
                             }
                             if($row_2->goodScale()->exists()){
-                                $netto_sj = $row_2->goodReceipt->qty_sj;
+                                $netto_sj = $row_2->goodScale->qty_sj;
 
                             }else{
                                 $netto_sj = $row_2->qty_sj;

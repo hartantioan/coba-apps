@@ -36,7 +36,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
         if($this->type == 'final'){
             $perlu = 0 ;
             $combinedArray = [];
-            /* $item = Item::where(function($query){
+            $item = Item::where(function($query){
                 if($this->item) {
                     $query->where('id',$this->item);
                 }
@@ -88,9 +88,9 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                         'cum_val'   => $data->total_final,
                     ];
                 }
-            } */
+            }
 
-            $where_group = count($this->group) > 0 ? " AND i.item_group_id IN (".implode(",",$this->group).")" : "";
+            /* $where_group = count($this->group) > 0 ? " AND i.item_group_id IN (".implode(",",$this->group).")" : "";
             $where_warehouse = $this->warehouse != 'all' ? " AND ic.warehouse_id = ".$this->warehouse : "";
             $where_warehouse_main = $this->warehouse != 'all' ? " AND igw.warehouse_id = ".$this->warehouse : "";
             $where_place = $this->plant != 'all' ? " AND ic.place_id = ".$this->plant : "";
@@ -159,7 +159,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                     'cum_qty'   => $row->qty_final,
                     'cum_val'   => $row->total_final,
                 ];
-            }
+            } */
 
             activity()
                 ->performedOn(new ItemCogs())

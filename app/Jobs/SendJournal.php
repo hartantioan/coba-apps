@@ -2289,7 +2289,7 @@ class SendJournal implements ShouldQueue
 											'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($row->machine_id ?? NULL),
 											'department_id'                 => $rowcost->department_id ? $rowcost->department_id : ($row->department_id ?? NULL),
 											'type'                          => '1',
-											'nominal'                       => $nominal * $lc->currency_rate,
+											'nominal'                       => round($nominal * $lc->currency_rate,2),
 											'nominal_fc'					=> $nominal,
 											'lookable_type'					=> $table_name,
 											'lookable_id'					=> $table_id,

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Jobs\AccumulateCogsByItem;
+use App\Jobs\ResetCogsNewByDate11;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -937,6 +939,141 @@ class MarketingOrderDeliveryProcess extends Model
                 $row->itemStock->item_shading_id,
                 $row->itemStock->production_batch_id,
             );
+        }
+    }
+
+    public function createJournalSentDocumentWithFastCogs()
+    {
+        $modp = $this;
+
+        $query = Journal::create([
+            'user_id'        => $modp->user_id,
+            'company_id'    => $modp->company_id,
+            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->post_date)) . '00'),
+            'lookable_type'    => $modp->getTable(),
+            'lookable_id'    => $modp->id,
+            'post_date'        => $modp->post_date,
+            'note'            => $modp->note_internal . ' - ' . $modp->note_external,
+            'status'        => '3'
+        ]);
+
+        $coabdp = Coa::where('code', '100.01.04.05.01')->where('company_id', $modp->company_id)->first();
+
+        $items = [];
+        foreach ($modp->marketingOrderDeliveryProcessDetail as $row) {
+            if(!in_array($row->itemStock->item_id,$items)){
+                $items[] = $row->itemStock->item_id;
+            }
+
+            $hpp = $row->getHpp();
+
+            JournalDetail::create([
+                'journal_id'    => $query->id,
+                'account_id'    => $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coabdp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '1',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
+            ]);
+
+            JournalDetail::create([
+                'journal_id'    => $query->id,
+                'coa_id'        => $row->itemStock->item->itemGroup->coa_id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '2',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
+            ]);
+
+            ResetCogsNewByDate11::dispatch($this->post_date,1,$row->itemStock->place_id,$row->itemStock->item_id,$row->itemStock->area_id,$row->itemStock->item_shading_id,$row->itemStock->id,date('Y-m-d'));
+        }
+
+        foreach($items as $rowitem){
+            AccumulateCogsByItem::dispatch($this->post_date,1,1,$rowitem);
+        }
+    }
+
+    public function createJournalReceiveDocumentWithFastCogs()
+    {
+        $modp = MarketingOrderDeliveryProcess::find($this->id);
+
+        $query = Journal::create([
+            'user_id'        => $modp->user_id,
+            'company_id'    => $modp->company_id,
+            'code'            => Journal::generateCode('JOEN-' . date('y', strtotime($modp->receive_date)) . '00'),
+            'lookable_type'    => 'marketing_order_delivery_processes',
+            'lookable_id'    => $modp->id,
+            'post_date'        => $modp->receive_date,
+            'note'            => 'PENGIRIMAN ' . $modp->marketingOrderDelivery->code,
+            'status'        => '3'
+        ]);
+
+        $coabdp = Coa::where('code', '100.01.04.05.01')->where('company_id', $modp->company_id)->first();
+        $coahpp = Coa::where('code', '500.01.01.01.01')->where('company_id', $modp->company_id)->first();
+
+        $items = [];
+        foreach ($modp->marketingOrderDeliveryProcessDetail as $row) {
+            if(!in_array($row->itemStock->item_id,$items)){
+                $items[] = $row->itemStock->item_id;
+            }
+            
+            $hpp = $row->total;
+
+            JournalDetail::create([
+                'journal_id'    => $query->id,
+                'account_id'    => $coahpp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coahpp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '1',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                'note2'         => $modp->marketingOrderDelivery->goodScaleDetail()->exists() ? $modp->marketingOrderDelivery->goodScaleDetail->goodScale->code : '-',
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
+            ]);
+
+            JournalDetail::create([
+                'journal_id'    => $query->id,
+                'account_id'    => $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
+                'coa_id'        => $coabdp->id,
+                'place_id'        => $row->itemStock->place_id,
+                'item_id'        => $row->itemStock->item_id,
+                'warehouse_id'    => $row->itemStock->warehouse_id,
+                'type'            => '2',
+                'nominal'        => $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.',
+                'lookable_type'    => $modp->getTable(),
+                'lookable_id'    => $modp->id,
+                'detailable_type' => $row->getTable(),
+                'detailable_id'    => $row->id,
+            ]);
+
+            ResetCogsNewByDate11::dispatch($this->post_date,1,$row->itemStock->place_id,$row->itemStock->item_id,$row->itemStock->area_id,$row->itemStock->item_shading_id,$row->itemStock->id,date('Y-m-d'));
+        }
+
+        foreach($items as $rowitem){
+            AccumulateCogsByItem::dispatch($this->post_date,1,1,$rowitem);
         }
     }
 

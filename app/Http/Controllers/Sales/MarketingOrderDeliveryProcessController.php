@@ -808,7 +808,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         ]);
 
                         //cek apakah SO punya mitraMarketingOrder
-                        if(optional(($query->getSalesModelUnique()[0] ?? null)->mitraMarketingOrder)){
+                        if($query->marketingOrderDelivery->customer->mitraCustomer()->exists()){
                             //input header SJ to API
                             $detailItem = [];
                             foreach(MarketingOrderDeliveryDetail::where('marketing_order_delivery_id', $query->marketingOrderDelivery->id)->get() as $row){

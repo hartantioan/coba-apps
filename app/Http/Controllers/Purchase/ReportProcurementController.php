@@ -253,6 +253,10 @@ class ReportProcurementController extends Controller
                         $randomString = Str::random(10);
                     }else{
                         foreach($row as $row_2){
+                            $take_item_rule_percent = RuleBpScale::where('item_id',$request->item_id)
+                            ->whereDate('start_effective_date','<=',$row_2->goodReceipt->post_date)
+                            ->whereDate('effective_date','>=',$row_2->goodReceipt->post_date)
+                            ->where('account_id',$row_2->goodReceipt->account_id)->first();
                             $netto_sj = 0;
                             $selisih = 0;
                             if($account== ''){
@@ -270,7 +274,15 @@ class ReportProcurementController extends Controller
                             if($netto_sj > 0){
                                 $selisih = $row_2->qty - $netto_sj;
                             }
-                            $total_bayar = $row_2->qty_balance;
+                            if($take_item_rule_percent->rule_procurement_id == 3){
+                                if($row_2->qty<$row_2->qty_balance){
+                                    $total_bayar = $row_2->qty;
+                                }else{
+                                    $total_bayar = $row_2->qty_balance;
+                                }
+                            }else{
+                                $total_bayar = $row_2->qty_balance;
+                            }
                             $price = $row_2->purchaseOrderDetail->price;
                             $finance_price = $price*$total_bayar;
 

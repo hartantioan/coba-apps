@@ -194,7 +194,7 @@
                     {{ $data->sales->name }}
                 </div>
                 <div class="col s4">
-                    {{ __('translations.name') }}
+                    Dokumen Referensi
                 </div>
                 <div class="col s8">
                     {{ $data->document_no }}
@@ -245,6 +245,18 @@
                 </div>
                 <div class="col s8">
                     {{ $data->billing_address }}
+                </div>
+                <div class="col s4">
+                    {{ __('translations.outlet') }}
+                </div>
+                <div class="col s8">
+                    {{ $data->outlet()->exists() ? $data->outlet->name : '-' }}
+                </div>
+                <div class="col s4">
+                    Kode Branch Mitra
+                </div>
+                <div class="col s8">
+                    {{ $data->account->mitraCustomer()->exists() ? $data->account->mitraCustomer->code : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.outlet') }}

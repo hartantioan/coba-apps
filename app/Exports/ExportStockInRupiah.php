@@ -52,9 +52,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                 }
             })->pluck('id');
 
-            foreach($item as $row){
-                $start_time = microtime(true);
-                
+            foreach($item as $row){                
                 $data = DB::table('item_cogs')->select('item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
                 ->where('item_cogs.date','<=',$this->finish_date)->where('item_cogs.item_id',$row)->where(function($query){
                     if($this->plant != 'all'){
@@ -69,12 +67,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 
-                $end_time = microtime(true);
-
-                $execution_time = ($end_time - $start_time);
-                
                 if($data){
-                    info($execution_time.' - '.$data->item_code.' - '.$data->item_name);
                     $combinedArray[] = [
                         'plant'     => $data->place_code,
                         'warehouse' => $data->warehouse_name,

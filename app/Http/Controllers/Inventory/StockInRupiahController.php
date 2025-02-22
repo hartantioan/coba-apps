@@ -56,8 +56,12 @@ class StockInRupiahController extends Controller
                 if($request->item_id) {
                     $query->where('id',$request->item_id);
                 }
-                if($request->filter_group){
-                    $query->whereIn('item_group_id', $request->filter_group);
+                if($request->warehouse != 'all'){
+                    $query->whereHas('itemGroup',function($query)use($request){
+                        $query->whereHas('itemGroupWarehouse',function($query)use($request){
+                            $query->where('warehouse_id',$request->warehouse);
+                        });
+                    });
                 }
             })->pluck('id');
 
@@ -79,42 +83,27 @@ class StockInRupiahController extends Controller
             $arr = [];
             $total = 0;
             foreach($item as $key => $row){
-                /* $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                $data = DB::table('item_cogs')->select('item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
+                ->where('item_cogs.date','<=',$request->finish_date)->where('item_cogs.item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
-                    }
-                    if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query) use($request){
-                            $query->where('id',$request->warehouse);
-                        });
-                    }
-                })->orderByDesc('date')->orderByDesc('id')->first(); */
-
-                $data = DB::table('item_cogs')->where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
-                    if($request->plant != 'all'){
-                        $query->where('place_id',$request->plant);
-                    }
-                    if($request->warehouse != 'all'){
-                        $query->where('warehouse_id',$request->warehouse);
+                        $query->where('item_cogs.place_id',$request->plant);
                     }
                 })
-                ->join('places', 'places.id', '=', 'item_cogs.place_id')
-                ->join('items', 'items.id', '=', 'item_cogs.item_id')
-                ->join('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
-                ->join('units', 'units.id', '=', 'items.uom_unit')
-                ->select('item_cogs.*', 'places.code AS place_code', 'warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS unit_code')
-                ->orderByDesc('date')->orderByDesc('id')->first();
+                ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')
+                ->leftJoin('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
+                ->leftJoin('items', 'items.id', '=', 'item_cogs.item_id')
+                ->leftJoin('units', 'units.id', '=', 'items.uom_unit')
+                ->leftJoin('areas', 'areas.id', '=', 'item_cogs.area_id')
+                ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
+                ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 if($data){
-                    /* $arr[] = $data; */
                     $html .= '<tr>
                         <td>'.($key + 1).'</td>
                         <td>'.$data->place_code.'</td>
                         <td>'.$data->warehouse_name.'</td>
                         <td>'.$data->item_code.'</td>
                         <td>'.$data->item_name.'</td>
-                        <td>'.$data->unit_code.'</td>
+                        <td>'.$data->uom_unit.'</td>
                         <td class="right-align">'.number_format($data->qty_final,3,',','.').'</td>
                         <td class="right-align">'.number_format($data->total_final,2,',','.').'</td>
                     </tr>';

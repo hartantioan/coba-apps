@@ -447,7 +447,7 @@ class DocumentTaxHandoverController extends Controller
                 'id'                => $row->document_tax_id,
                 'no'                => $angka,
                 'post_date'         => $row->documentTax->date??'-',
-                'code'              => $row->documentTax->transaction_code??''.$row->documentTax->code??'',
+                'code'              => $row->documentTax?->transaction_code??''.$row->documentTax?->code??'',
                 'npwp_number'       => $row->documentTax->npwp_number??'-',
                 'npwp_name'         => $row->documentTax->npwp_name??'-',
                 'npwp_address'      => $row->documentTax->npwp_address??'-',

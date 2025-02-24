@@ -2178,8 +2178,7 @@ class MarketingOrderInvoiceController extends Controller
         $arrProforma = $selectedData['arr_proforma'] ?? [];
 
         $finalArray = array_values(array_unique(array_merge($arrFaktur, $arrSj, $arrProforma)));
-        info($arrFaktur);info($arrSj);info($arrProforma);
-        info($finalArray);
+
         $array_mail=[];
         foreach($finalArray as $row){
             if(!isset($array_mail[$row])){

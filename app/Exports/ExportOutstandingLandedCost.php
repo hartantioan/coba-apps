@@ -45,7 +45,10 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
         })
         ->get();
 
-        $coabiayaharusdibayarkan = Coa::where('code','200.01.05.01.11')->where('company_id',1)->where('status','1')->first();
+        $coabiayaharusdibayarkanimport = Coa::where('code','200.01.05.01.11')->where('company_id',1)->where('status','1')->first();
+        $coabiayaharusdibayarkanlocal = Coa::where('code','200.01.05.01.10')->where('company_id',1)->where('status','1')->first();
+
+
 
         $array=[];
         $total = 0;
@@ -77,8 +80,8 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
                     $entry["nama_bp"] = $row->landedCost->supplier->name;
                     /* $entry["kode_biaya"] = $row->landedCostFee->code;
                     $entry["nama_biaya"] = $row->landedCostFee->name; */
-                    $entry["kode_biaya"] = $coabiayaharusdibayarkan->code;
-                    $entry["nama_biaya"] = $coabiayaharusdibayarkan->name;
+                    $entry["kode_biaya"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanlocal->code : $coabiayaharusdibayarkanlocal->code;
+                    $entry["nama_biaya"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanimport->code : $coabiayaharusdibayarkanimport->code;
                     $entry["kode_coa"] = $row->landedCostFee->coa->code;
                     $entry["nama_coa"] = $row->landedCostFee->coa->name;
                     $entry["total_rupiah"] = number_format($row->landedCost->total*$row->landedCost->currency_rate,2,',','.');

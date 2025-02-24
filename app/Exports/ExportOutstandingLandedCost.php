@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\LandedCost;
 use App\Models\LandedCostFee;
+use App\Models\Coa;
 use App\Models\LandedCostFeeDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;

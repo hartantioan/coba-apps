@@ -65,6 +65,12 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
+
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                <span class="hide-on-small-onl">Excel</span>
+                                                <i class="material-icons right">view_list</i>
+                                            </a>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
@@ -88,7 +94,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -196,13 +202,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -248,7 +254,7 @@
                         $('.modal-content').scrollTop(0);
 
                         $.each(response.error, function(i, val) {
-                            
+
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -290,7 +296,7 @@
                     if(response.status == 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
@@ -319,19 +325,19 @@
                     `).show();
 
                     }
-                    
-                   
+
+
                 }
             });
 
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -348,9 +354,9 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alertImport').hide();
                 $('#validation_alertImport').html('');
             },
@@ -368,7 +374,7 @@
         loadDataTable();
         $('#modal2').modal('close');
     }
-    
+
     function applyCode(element){
         if($(element).val()){
             let code = $(element).select2().find(":selected").data("code") + '.';
@@ -427,7 +433,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -435,7 +441,7 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
         let nameWithoutSpace = $('#name').val().replace(/\s/g, '');
         formData.append('nameWithoutSpace',nameWithoutSpace);
@@ -465,7 +471,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -592,5 +598,11 @@
                 });
             }
         });
+    }
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

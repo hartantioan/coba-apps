@@ -37,6 +37,16 @@ class Pattern extends Model
         return $status;
     }
 
+    public function statusRaw(){
+        $status = match ($this->status) {
+          '1' => 'Active',
+          '2' => 'Not Active',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
+
     public function brand()
     {
         return $this->belongsTo('App\Models\Brand', 'brand_id', 'id')->withTrashed();

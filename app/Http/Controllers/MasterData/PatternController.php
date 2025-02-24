@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Exports\ExportPattern;
 use App\Exports\ExportTemplateMasterPattern;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportPattern;
@@ -42,7 +43,7 @@ class PatternController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Pattern::count();
-        
+
         $query_data = Pattern::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -86,7 +87,7 @@ class PatternController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->brand->name,
@@ -181,7 +182,7 @@ class PatternController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -201,19 +202,19 @@ class PatternController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $pattern = Pattern::find($request->id);
-        				
+
 		return response()->json($pattern);
     }
 
     public function destroy(Request $request){
         $query = Pattern::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Pattern())
@@ -237,6 +238,13 @@ class PatternController extends Controller
 
     public function getImportExcel(){
         return Excel::download(new ExportTemplateMasterPattern(), 'format_master_pattern'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+		$status = $request->status ? $request->status : '';
+
+		return Excel::download(new ExportPattern($search,$status), 'pattern_'.uniqid().'.xlsx');
     }
 
     public function import(Request $request)
@@ -270,7 +278,7 @@ class PatternController extends Controller
                 'status'    => 200,
                 'message'   => 'Import sukses!'
             ]);
-            
+
         } catch (ValidationException $e) {
             $failures = $e->failures();
 
@@ -290,7 +298,7 @@ class PatternController extends Controller
 
             return response()->json($response);
         } catch (\Exception $e) {
-          
+
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"

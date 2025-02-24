@@ -453,7 +453,7 @@ class DocumentTaxHandoverController extends Controller
                 'npwp_address'      => $row->documentTax->npwp_address??'-',
                 'total'             => $row->documentTax->total??'-',
                 'tax'               => $row->documentTax->tax??'-',
-                'item'              => $row->documentTax->documentTaxDetail->first()->item ?? '-',
+                'item'              => $row->documentTax?->documentTaxDetail?->first()->item ?? '-',
                 'check'             => $checkIcon,
             ];
             $angka++;

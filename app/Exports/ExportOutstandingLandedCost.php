@@ -78,12 +78,12 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
                     $entry["nama_vendor"] = $row->landedCost->vendor->name ?? '';
                     $entry["kode_bp"] = $row->landedCost->supplier->employee_no;
                     $entry["nama_bp"] = $row->landedCost->supplier->name;
-                    /* $entry["kode_biaya"] = $row->landedCostFee->code;
-                    $entry["nama_biaya"] = $row->landedCostFee->name; */
-                    $entry["kode_biaya"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanlocal->code : $coabiayaharusdibayarkanlocal->code;
-                    $entry["nama_biaya"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanimport->code : $coabiayaharusdibayarkanimport->code;
-                    $entry["kode_coa"] = $row->landedCostFee->coa->code;
-                    $entry["nama_coa"] = $row->landedCostFee->coa->name;
+                    $entry["kode_biaya"] = $row->landedCostFee->code;
+                    $entry["nama_biaya"] = $row->landedCostFee->name;
+                    $entry["kode_coa"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanlocal->code : $coabiayaharusdibayarkanlocal->code;
+                    $entry["nama_coa"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanimport->code : $coabiayaharusdibayarkanimport->code;
+                    /* $entry["kode_coa"] = $row->landedCostFee->coa->code;
+                    $entry["nama_coa"] = $row->landedCostFee->coa->name; */
                     $entry["total_rupiah"] = number_format($row->landedCost->total*$row->landedCost->currency_rate,2,',','.');
                     $entry["tagihan"] = number_format($row->total * $row->landedCost->currency_rate,2,',','.');
                     $entry["dibayar"] = number_format($row->totalInvoiceByDate($this->date) * $row->landedCost->currency_rate,2,',','.');

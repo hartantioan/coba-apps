@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'no' => 'No',
+    'no' => 'Tidak',
     'batch_no' => 'No. Batch',
     'tank' => 'Tangki',
     'email' => 'Email',

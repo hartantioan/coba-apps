@@ -601,11 +601,11 @@
                             <br>
                             <hr>
                             <div class="center mt-3">
-                                <h6>Isi jika ada pengecekan QC</h6>
+                                <h6>Isi jika ada pengecekan QC & Link Timbangan</h6>
                             </div>
                             <div class="row">
                                 <div class="input-field col s12 m12">
-                                    <div class="switch mb-1">
+                                    <div class="switch">
                                         <label for="is_quality_check">{{ __('translations.quality_check') }}</label>
                                         <label class="right">
                                             {{ __('translations.no') }}
@@ -615,7 +615,17 @@
                                         </label>
                                     </div>
                                 </div>
-
+                                <div class="input-field col s12 m12">
+                                    <div class="switch mb-1">
+                                        <label for="qty_good_scale">Qty GRPO dari Timbangan?</label>
+                                        <label class="right">
+                                            {{ __('translations.no') }}
+                                            <input type="checkbox" id="qty_good_scale" name="qty_good_scale" value="1">
+                                            <span class="lever"></span>
+                                            {{ __('translations.yes') }}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -1655,6 +1665,12 @@
                     $('#is_quality_check').prop( "checked", true);
                 }else{
                     $('#is_quality_check').prop( "checked", false);
+                }
+
+                if(response.qty_good_scale == '1'){
+                    $('#qty_good_scale').prop( "checked", true);
+                }else{
+                    $('#qty_good_scale').prop( "checked", false);
                 }
 
                 if(response.is_hide_supplier == '1'){

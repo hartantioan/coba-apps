@@ -364,6 +364,7 @@ class ItemController extends Controller
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->bom_calculator_id   = $request->bom_calculator_id ?? NULL;
                     $query->print_name          = $request->print_name ?? NULL;
+                    $query->qty_good_scale      = $request->qty_good_scale ?? NULL;
                     $query->save();
 
                     if($request->arr_unit){
@@ -453,6 +454,7 @@ class ItemController extends Controller
                         'brand_id'          => $request->brand_id ?? NULL,
                         'bom_calculator_id' => $request->bom_calculator_id ?? NULL,
                         'print_name'        => $request->print_name ?? NULL,
+                        'qty_good_scale'    => $request->qty_good_scale ?? NULL,
                     ]);
 
                     //FOR TKTW API Insert
@@ -768,6 +770,11 @@ class ItemController extends Controller
                             <tr>
                                 <th>Pengecekan QC</th>
                                 <th>'.($data->is_quality_check ? '&#10003;' : '&#10005;').'</th>
+                            </tr>
+
+                            <tr>
+                                <th>Qty Timbang?</th>
+                                <th>'.($data->qty_good_scale ? '&#10003;' : '&#10005;').'</th>
                             </tr>
                             <tr>
                                 <th>Item Top Secret</th>

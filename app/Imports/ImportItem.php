@@ -101,6 +101,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         'min_stock'         => $row['min_stock'],
                         'max_stock'         => $row['max_stock'],
                         'status'            => '1',
+                        'qty_good_scale'    => $row['qty_good_scale'],
                     ]);
 
                     //FOR TKTW API Insert
@@ -173,6 +174,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         $check->note =  $row['note'];
                         $check->min_stock = $row['min_stock'];
                         $check->max_stock = $row['max_stock'];
+                        $check->qty_good_scale = $row['qty_good_scale'];
 
                         $check->save();
 

@@ -92,6 +92,7 @@ use App\Models\PurchaseRequest;
 use App\Models\UsedData;
 use App\Models\IssueGlaze;
 use App\Models\ReceiveGlaze;
+use App\Models\CostDistribution;
 use App\Models\UserBrand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;

@@ -6128,4 +6128,130 @@ class Select2Controller extends Controller {
             ],
         ]);
     }
+
+    public function sampleTestInputProc(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = SampleTestInput::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%");
+            if($request->sample_type_id){
+                $query->whereHas('sampleType',function($query)use($request){
+                    $query->where('id',$request->sample_type_id);
+                });
+            }
+            $query->where('type','1');
+        })->paginate(10);
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
+                'code' 			=> $d->code,
+                'user_id'              => $d->user_id,
+                'sample_type_id'       => $d->sample_type_id,
+                'sample_type_name'     => $d->sampleType->name,
+                'province_id'          => $d->province_id,
+                'city_id'              => $d->city_id,
+                'subdistrict_id'       => $d->subdistrict_id,
+                'province_name'        => $d->province->name,
+                'city_name'            => $d->city->name,
+                'subdistrict_name'     => $d->subdistrict->name,
+                'village_name'         => $d->village_name,
+                'supplier'             => $d->supplier,
+                'sample_date'          => $d->sample_date,
+                'supplier_name'        => $d->supplier_name,
+                'supplier_phone'       => $d->supplier_phone,
+                'post_date'            => $d->post_date,
+                'link_map'             => $d->link_map,
+                'permission_type'      => $d->permission_type,
+                'permission_name'      => $d->permission_name,
+                'commodity_permits'    => $d->commodity_permits,
+                'permits_period'       => $d->permits_period,
+                'receiveable_capacity' => $d->receiveable_capacity,
+                'price_estimation'     => $d->price_estimation,
+                'supplier_sample_code' => $d->supplier_sample_code,
+                'company_sample_code'  => $d->company_sample_code,
+                'document'             => $d->document,
+                'note'                 => $d->note,
+                'lab_type'             => $d->lab_type,
+                'lab_name'             => $d->lab_name,
+                'wet_whiteness_value'  => $d->wet_whiteness_value,
+                'dry_whiteness_value'  => $d->dry_whiteness_value,
+                'document_test_result' => $d->document_test_result,
+                'item_name'            => $d->item_name,
+                'test_result_note'     => $d->test_result_note,
+                'status'               => $d->status,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
+    public function sampleTestInputQc(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = SampleTestInput::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%");
+            if($request->sample_type_id){
+                $query->whereHas('sampleType',function($query)use($request){
+                    $query->where('id',$request->sample_type_id);
+                });
+            }
+            $query->where('type','2');
+        })->paginate(10);
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
+                'code' 			=> $d->code,
+                'user_id'              => $d->user_id,
+                'sample_type_id'       => $d->sample_type_id,
+                'sample_type_name'     => $d->sampleType->name,
+                'province_id'          => $d->province_id,
+                'city_id'              => $d->city_id,
+                'subdistrict_id'       => $d->subdistrict_id,
+                'province_name'        => $d->province->name,
+                'city_name'            => $d->city->name,
+                'subdistrict_name'     => $d->subdistrict->name,
+                'village_name'         => $d->village_name,
+                'supplier'             => $d->supplier,
+                'sample_date'          => $d->sample_date,
+                'supplier_name'        => $d->supplier_name,
+                'supplier_phone'       => $d->supplier_phone,
+                'post_date'            => $d->post_date,
+                'link_map'             => $d->link_map,
+                'permission_type'      => $d->permission_type,
+                'permission_name'      => $d->permission_name,
+                'commodity_permits'    => $d->commodity_permits,
+                'permits_period'       => $d->permits_period,
+                'receiveable_capacity' => $d->receiveable_capacity,
+                'price_estimation'     => $d->price_estimation,
+                'supplier_sample_code' => $d->supplier_sample_code,
+                'company_sample_code'  => $d->company_sample_code,
+                'document'             => $d->document,
+                'note'                 => $d->note,
+                'lab_type'             => $d->lab_type,
+                'lab_name'             => $d->lab_name,
+                'wet_whiteness_value'  => $d->wet_whiteness_value,
+                'dry_whiteness_value'  => $d->dry_whiteness_value,
+                'document_test_result' => $d->document_test_result,
+                'item_name'            => $d->item_name,
+                'test_result_note'     => $d->test_result_note,
+                'status'               => $d->status,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
 }

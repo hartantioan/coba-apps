@@ -539,6 +539,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('sample_type', [Select2Controller::class, 'sampleType']);
                 Route::get('sample_test_input', [Select2Controller::class, 'sampleTestInput']);
                 Route::get('marketing_order_complaint', [Select2Controller::class, 'marketingOrderComplaint']);
+                Route::get('sample_test_input_proc', [Select2Controller::class, 'sampleTestInputProc']);
+                Route::get('sample_test_input_qc', [Select2Controller::class, 'sampleTestInputQc']);
             });
 
             Route::prefix('dashboard')->group(function () {

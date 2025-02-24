@@ -40,6 +40,8 @@ class ExportDeliveryCost implements FromCollection, WithTitle, WithHeadings, Sho
         'Kecamatan Asal',
         'Kota Tujuan',
         'Kecamatan Tujuan',
+        'Tanggal Dibuat',
+        'Tanggal Diedit',
     ];
     public function collection()
     {
@@ -112,6 +114,8 @@ class ExportDeliveryCost implements FromCollection, WithTitle, WithHeadings, Sho
                 'Kecamatan Asal'=>  $row->fromSubdistrict->name,
                 'Kota Tujuan'=>  $row->toCity->name,
                 'Kecamatan Tujuan'=>  $row->toSubdistrict->name,
+                'Tanggal Dibuat'=>  $row->created_at,
+                'Tanggal Diedit'=>  $row->updated_at,
 
             ];
         }

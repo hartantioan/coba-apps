@@ -191,11 +191,11 @@ class ReportProcurementController extends Controller
                                 if($finance_kadar_air > 0){
                                     $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
                                 }
-                                $total_bayar = $detail_gs->qty;
+                                $total_bayar = $detail_gs->qty_balance;
                                 if($finance_kadar_air > 0){
                                     $total_bayar = $total_bayar-$finance_kg;
                                 }
-                                $total_penerimaan = $detail_gs->qty * (1 - ($detail_gs->water_content/100));
+                                $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
                                 $price = $detail_gs->purchaseOrderDetail->price;
                                 $finance_price = $price*$total_bayar;
                                 $all_netto += $detail_gs->qty;
@@ -597,7 +597,6 @@ class ReportProcurementController extends Controller
         $array_item = [];
         $pdfFileNameArray = [];
         $contentArray = [];
-        info($request);
         if($request->item_multi){
             $array_item = explode(',', $request->item_multi);
         }

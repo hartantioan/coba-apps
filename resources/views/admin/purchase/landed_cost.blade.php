@@ -1092,6 +1092,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#btn-show').attr('disabled',false);
             }
         });
 

@@ -542,6 +542,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#temp').val('');
                 $('.row_item').remove();
                 $('#percentage_value').text('0%');
                 $('#grandtotal_detail').text(0);

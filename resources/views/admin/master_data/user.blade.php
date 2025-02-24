@@ -3090,9 +3090,9 @@
 
                 $('.row_bank').remove();
 
-                if(response.has_document){
+                /* if(response.has_document){
                     $('#name').prop('readonly',true);
-                }
+                } */
 
                 if(response.banks.length > 0){
                     $.each(response.banks, function(i, val) {

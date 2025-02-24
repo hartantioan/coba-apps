@@ -2556,6 +2556,7 @@
                     });
                 }else{
                     $('#modal1').modal('open');
+                    $('#btn-show').attr('disabled','disabled');
                     if(response.document){
                         const baseUrl = '{{ URL::to("/") }}/storage/';
                         const filePath = response.document.replace('public/', '');

@@ -496,11 +496,11 @@ class ComplaintSalesController extends Controller
                             'lookable_type'=> 'marketing_order_delivery_details',
                             'lookable_id'=> $request->arr_lookable_id[$key],
                             'production_batch_code'=> $request->arr_production_batch_code[$key],
-                            'qty_color_mistake'=> str_replace(',', '.',$request->arr_qty_color_mistake[$key]),
-                            'qty_motif_mistake'=> str_replace(',', '.',$request->arr_qty_motif_mistake[$key]),
-                            'qty_size_mistake'=> str_replace(',', '.',$request->arr_qty_size_mistake[$key]),
-                            'qty_broken'=> str_replace(',', '.', $request->arr_qty_broken[$key]),
-                            'qty_mistake'=> str_replace(',', '.',$request->arr_qty_mistake[$key]),
+                            'qty_color_mistake'=> str_replace(',','.',str_replace('.','',$request->arr_qty_color_mistake[$key])),
+                            'qty_motif_mistake'=> str_replace(',','.',str_replace('.','',$request->arr_qty_motif_mistake[$key])),
+                            'qty_size_mistake'=> str_replace(',','.',str_replace('.','',$request->arr_qty_size_mistake[$key])),
+                            'qty_broken'=> str_replace(',','.',str_replace('.','', $request->arr_qty_broken[$key])),
+                            'qty_mistake'=> str_replace(',','.',str_replace('.','',$request->arr_qty_mistake[$key])),
                             'note'=> $request->arr_note[$key],
                         ]);
                     }

@@ -1085,7 +1085,7 @@ class LandedCostController extends Controller
         $arr = [];
         $fees = [];
 
-        foreach($lc->landedCostDetail as $row){
+        foreach($lc->landedCostDetail()->orderBy('id')->get() as $row){
             $arr[] = [
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,

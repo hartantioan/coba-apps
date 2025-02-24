@@ -225,6 +225,7 @@
                     </div>
                     <div class="col s12">
                         <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO & LC. Untuk Inventori Transfer, supplier / vendor kosong dan tekan tombol Tampilkan Data.</i>
+                        <h4>FITUR EDIT SAAT INI BELUM BISA DIGUNAKAN UNTUK MENAMBAHKAN / MENGURANGI GRPO YANG SUDAH MASUK KE LC. SILAHKAH HAPUS JIKA LC MASIH STATUS MENUNGGU, ATAU VOID JIKA SUDAH DIPROSES. MOHON MAAF ATAS KETIDAKNYAMANANNYA.</h4>
                         <div class="row">
                             <div class="col m12 s12 ">
                                 <fieldset>

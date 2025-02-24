@@ -23,13 +23,16 @@ use Illuminate\Support\Facades\Storage;
 class SendMailWithAttachmenJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $table_id,$table_name,$user_id;
+    protected $table_id,$table_name,$user_id, $document,$document2,$document3;
 
-    public function __construct(string $table_id = null,string $user_id = null,string $table_name = null)
+    public function __construct(string $table_id = null,string $user_id = null,string $table_name = null,string $document= null,string $document2= null,string $document3= null)
     {
         $this->table_id = $table_id ? $table_id : '';
         $this->user_id = $user_id;
         $this->table_name = $table_name;
+        $this->document = $document;
+        $this->document2 = $document2;
+        $this->document3 = $document3;
         $this->queue = 'email_transaction';
     }
 
@@ -132,7 +135,9 @@ class SendMailWithAttachmenJob implements ShouldQueue
                 ]);
             }
         }elseif($this->table_name == 'marketing_order_invoices'){
+            info('han');
             $moi = MarketingOrderInvoice::find($this->table_id);
+            info($moi);
             if($moi){
                 if($moi->account->email){
                     $data = [
@@ -147,8 +152,28 @@ class SendMailWithAttachmenJob implements ShouldQueue
                     );
                     $po_array = array_map('trim', explode(';', $moi->account->email));
                     $ccEmails = [
-                        'windykuro@gmail.com',
                     ];
+                    $file_path=[];
+                    $file_name = [];
+                    info($this->document);
+                    info($this->document2);
+                    info($this->document3);
+                    if ($this->document == 1 && !empty($moi->document)) {
+                        info('masuk');
+                        $file_path[] = storage_path('app/' . $moi->document);
+                        $file_name[] = 'dokumen_pajak.pdf';
+                    }
+
+                    if ($this->document2 == 1 && !empty($moi->document2)) {
+                        $file_path[] = storage_path('app/' . $moi->document2);
+                        $file_name[] = 'dokumen_sj.pdf';
+                    }
+
+                    if ($this->document3 == 1 && !empty($moi->document3)) {
+                        $file_path[] = storage_path('app/' . $moi->document3);
+                        $file_name[] = 'dokumen_pro.pdf';
+                    }
+                    info($file_path);
                     $fullPathRule = $moi->document ? storage_path('app/' . $moi->document) : '';
                     $newAttachmentName = $moi->document ? 'dokumen_pajak.pdf' : '';
                     $data = [
@@ -158,18 +183,18 @@ class SendMailWithAttachmenJob implements ShouldQueue
                         'supplier' 	=> $moi->account->name,
                         'user' 		=> $moi->user,
                         'company' 	=> $moi->user->company,
-                        'attachmentPath' => $fullPathRule,
-                        'attachmentName' => $newAttachmentName,
-                        'newAttachmentPath' => '',
-                        'newAttachmentName' => '',
+                        'attachmentPath' => $file_path ?: null,
+                        'attachmentName' => $file_name ?: null,
+                        'newAttachmentPath' => null,
+                        'newAttachmentName' => null,
                     ];
                     $status_send = '1';
                     try {
-                        Mail::to($po_array)->cc($ccEmails)->send(new SendMail($data));
-    
+                        Mail::to('hajesan@gmail.com')->cc($ccEmails)->send(new SendMail($data));
+
                     } catch (\Exception $e) {
                         $status_send = '2';
-    
+
                         TransactionEmail::create([
                             'user_id'		=> $moi->user_id,
                             'account_id'	=> $moi->account_id,
@@ -182,7 +207,7 @@ class SendMailWithAttachmenJob implements ShouldQueue
                         Log::error('Error sending email: ' . $e->getMessage());
                         throw $e;
                     }
-    
+
                     TransactionEmail::create([
                         'user_id'		=> $moi->user_id,
                         'account_id'	=> $moi->account_id,
@@ -192,7 +217,7 @@ class SendMailWithAttachmenJob implements ShouldQueue
                         'email_to'		=> $moi->account->email,
                         'cc_email_to'   => implode($ccEmails),
                     ]);
-    
+
                     HistoryEmailDocument::create([
                         'user_id'		=> $moi->user_id,
                         'account_id'	=> $moi->account_id,

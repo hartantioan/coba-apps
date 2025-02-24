@@ -31,6 +31,9 @@ use App\Helpers\PrintHelper;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\CancelDocument;
+use App\Models\GoodReceipt;
+use App\Models\InventoryTransferIn;
+use App\Models\LandedCost;
 use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\MenuUser;
 use Illuminate\Support\Carbon;
@@ -265,7 +268,7 @@ class MarketingOrderInvoiceController extends Controller
                     $val->due_date_internal ? date('d/m/Y',strtotime($val->due_date_internal)) : '-',
                     $val->type(),
                     $val->invoiceType(),
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->attachment(),
                     $val->tax_no,
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
@@ -302,7 +305,7 @@ class MarketingOrderInvoiceController extends Controller
 
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment dan Email" onclick="uploadAndEmail(`' . CustomHelper::encrypt($val->code) . '`,`'.($val->account->employee_no.' - '.$val->account->name).'`,`'.($val->account->email ?? '-').'`,`'.($val->code).'`,`'.($val->marketingOrderDeliveryProcess->code ?? '').'`)"><i class="material-icons dp48">email</i></button>
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Upload Pajak/Attachment" onclick="uploadGet(`' . CustomHelper::encrypt($val->code) . '`,`'.($val->account->employee_no.' - '.$val->account->name).'`,`'.($val->account->email ?? '-').'`,`'.($val->code).'`,`'.($val->marketingOrderDeliveryProcess->code ?? '').'`)"><i class="material-icons dp48">assignment_return</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -393,7 +396,13 @@ class MarketingOrderInvoiceController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-
+                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                if($grandtotal < 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf! Grandtotal Tidak Boleh Di Bawah 0.',
+                    ]);
+                }
                 /* $user = User::find($request->account_id);
 
                 $limit = $user->limit_credit;
@@ -708,7 +717,7 @@ class MarketingOrderInvoiceController extends Controller
                         $sync_data->payload    = json_encode($temp_payload);                   //payload disimpan dan diencode kembali
                         $sync_data->save();
                     }
-                    
+
                     SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
 
@@ -739,7 +748,8 @@ class MarketingOrderInvoiceController extends Controller
 		return response()->json($response);
     }
 
-    public function updateAndEmail(Request $request){
+    public function updateAndUpload(Request $request){
+        info($request);
         DB::beginTransaction();
         try {
             $validation = Validator::make($request->all(), [
@@ -777,26 +787,50 @@ class MarketingOrderInvoiceController extends Controller
                     } else {
                         $document = $query->document;
                     }
-                    $query->document = $document;
+
+                    if($request->document2) {
+                        if($query->document2){
+                            if(Storage::exists($query->document2)){
+                                Storage::delete($query->document2);
+                            }
+                        }
+                        $document = $request->document2->store('public/marketing_order_invoices');
+                    } else {
+                        $document = $query->document2;
+                    }
+                    $query->document2 = $document;
                     $query->save();
 
-                    SendMailWithAttachmenJob::dispatch($query->id,session('bo_id'),$query->getTable());
+                    if($request->document3) {
+                        if($query->document3){
+                            if(Storage::exists($query->document3)){
+                                Storage::delete($query->document3);
+                            }
+                        }
+                        $document = $request->document3->store('public/marketing_order_invoices');
+                    } else {
+                        $document = $query->document3;
+                    }
+                    $query->document3 = $document;
+                    $query->save();
+
+                    // SendMailWithAttachmenJob::dispatch($query->id,session('bo_id'),$query->getTable());
                 }else{
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Fitur update dan email hanya untuk ARIN dengan status PROSES / SELESAI.'
+                        'message' => 'Fitur update hanya untuk ARIN dengan status PROSES / SELESAI.'
                     ]);
                 }
 
                 if($query) {
 
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Update dan Email AR Invoice No. '.$query->code,'Email dan update telah dikirimkan ke customer.',session('bo_id'));
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Update FP AR Invoice No. '.$query->code,'Upload FP di ARIN.',session('bo_id'));
 
                     activity()
                         ->performedOn(new MarketingOrderInvoice())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Update and send email AR Invoice.');
+                        ->log('Update AR Invoice.');
 
                     $response = [
                         'status'    => 200,
@@ -2102,4 +2136,78 @@ class MarketingOrderInvoiceController extends Controller
 
         return response()->json($response);
     }
+
+    public function getUserAPIN(Request $request){
+        $data = User::find($request->id);
+
+        $details = [];
+        $filteredInvoices = $data->marketingOrderInvoice->filter(function ($row) use ($request) {
+            if ($request->start_date && $request->finish_date) {
+                return $row->post_date >= $request->start_date && $row->post_date <= $request->finish_date;
+            } elseif ($request->start_date) {
+                return $row->post_date >= $request->start_date;
+            } elseif ($request->finish_date) {
+                return $row->post_date <= $request->finish_date;
+            }
+            return true;
+        });
+        foreach($filteredInvoices as $row){
+            if(!$row->used()->exists() && $row->balancePaymentIncoming() > 0){
+                $details[] = [
+                    'id'                    => $row->id,
+                    'type'                  => $row->getTable(),
+                    'code'                  => $row->code,
+                    'post_date'             => date('d/m/Y',strtotime($row->post_date)),
+                    'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                    'memo'                  => number_format($row->totalPayMemo(),2,',','.'),
+                    'balance'               => number_format($row->balancePaymentIncoming(),2,',','.'),
+                ];
+            }
+        }
+
+        $data['details'] = $details;
+
+        return response()->json($data);
+    }
+
+    public function sendMail(Request $request){
+        $data = User::find($request);
+        $selectedData = $request->input('selectedData', []);
+        $arrFaktur = $selectedData['arr_faktur'] ?? [];
+        $arrSj = $selectedData['arr_sj'] ?? [];
+        $arrProforma = $selectedData['arr_proforma'] ?? [];
+
+        $finalArray = array_values(array_unique(array_merge($arrFaktur, $arrSj, $arrProforma)));
+        info($arrFaktur);info($arrSj);info($arrProforma);
+        info($finalArray);
+        $array_mail=[];
+        foreach($finalArray as $row){
+            if(!isset($array_mail[$row])){
+                $array_mail[$row] = [0,0,0];
+            }
+            foreach($arrFaktur as $faktur){
+                if($row == $faktur){
+                    $array_mail[$row][0] = 1;
+                }
+            }
+            foreach($arrSj as $sj){
+                if($row == $sj){
+                    $array_mail[$row][1] = 1;
+                }
+            }
+            foreach($arrProforma as $pro){
+                if($row == $pro){
+                    $array_mail[$row][2] = 1;
+                }
+            }
+        }
+
+        foreach($array_mail as $id_mail=>$row_document){
+            SendMailWithAttachmenJob::dispatch($id_mail,session('bo_id'),'marketing_order_invoices',$row_document[0],$row_document[1],$row_document[2]);
+        }
+
+
+        return response()->json($data);
+    }
+
 }

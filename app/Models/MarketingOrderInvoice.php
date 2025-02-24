@@ -30,6 +30,8 @@ class MarketingOrderInvoice extends Model
         'type',
         'invoice_type',
         'document',
+        'document2',
+        'document3',
         'tax_no',
         'tax_id',
         'note',
@@ -98,7 +100,7 @@ class MarketingOrderInvoice extends Model
         if ($this->account->type_body == 3) {
 
             $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
-        
+
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         }
@@ -117,7 +119,7 @@ class MarketingOrderInvoice extends Model
             //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
             //coretax pakai 16 digit
             $npwp = '0000000000000000';
-           
+
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->userData->npwp));
         }
@@ -132,7 +134,7 @@ class MarketingOrderInvoice extends Model
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $nitku = '000000';
         } else {
@@ -149,7 +151,7 @@ class MarketingOrderInvoice extends Model
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $doc = 'National ID';
         } else {
@@ -166,7 +168,7 @@ class MarketingOrderInvoice extends Model
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $doc = $this->account->id_card;
         } else {
@@ -290,10 +292,24 @@ class MarketingOrderInvoice extends Model
 
     public function attachment()
     {
+        $arrDoc = [];
         if ($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
+            $arrDoc[] = '<a href="'.asset(Storage::url($this->document)).'" target="_blank">Faktur Pajak</a>';
+
+        }
+        if ($this->document2 !== NULL && Storage::exists($this->document2)) {
+            $arrDoc[] = '<a href="'.asset(Storage::url($this->document2)).'" target="_blank">SJ</a>';
+
+        }
+        if ($this->document3 !== NULL && Storage::exists($this->document3)) {
+            $arrDoc[] = '<a href="'.asset(Storage::url($this->document3)).'" target="_blank">Proforma</a>';
+
+        }
+
+        if (empty($arrDoc)) {
+            $document = 'Tidak ada';
         } else {
-            $document = asset('website/empty.png');
+            $document = implode(' ',$arrDoc);
         }
 
         return $document;

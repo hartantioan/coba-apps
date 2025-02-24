@@ -3213,9 +3213,12 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree', [MarketingOrderInvoiceController::class, 'viewStructureTree']);
                     Route::get('simplestructuretree', [MarketingOrderInvoiceController::class, 'simpleStructrueTree']);
                     Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
+                    Route::post('get_account_apin', [MarketingOrderInvoiceController::class, 'getUserAPIN']);
+                    Route::post('get_account_data', [MarketingOrderInvoiceController::class, 'getAccountData']);
                     Route::get('view_journal/{id}', [MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_and_email', [MarketingOrderInvoiceController::class, 'updateAndEmail'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('send_mail', [MarketingOrderInvoiceController::class, 'sendMail'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_and_upload', [MarketingOrderInvoiceController::class, 'updateAndUpload'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('update_no_pjb', [MarketingOrderInvoiceController::class, 'updateNoPJB'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');

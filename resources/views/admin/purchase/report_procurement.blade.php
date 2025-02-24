@@ -110,7 +110,7 @@
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }} MULTI</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">
@@ -118,9 +118,34 @@
                                             </div>
                                             <div class="col s12">
                                                 <div class="row">
+                                                    <label>Item RM / SM</label>
                                                     <div class="input-field col m12 s12 step3">
-                                                        <select class="browser-default" id="item_id_multi" name="item_id_multi"  multiple></select>
-                                                        <label class="active" for="item_id_multi">Item RM / SM</label>
+
+                                                        @php
+                                                            $groupedItems = $item->groupBy(function($item) {
+                                                                $firstWord = strtok($item->name, ' ');
+                                                                return ucfirst(strtolower($firstWord));
+                                                            });
+                                                        @endphp
+
+                                                        @foreach($groupedItems as $group => $items)
+                                                            <div class="group">
+                                                                <h5>{{ $group }}</h5>
+                                                                <div class="row">
+                                                                    @foreach($items as $index => $i)
+                                                                        @if($index % 4 == 0 && $index > 0)
+                                                                            </div><div class="row">
+                                                                        @endif
+                                                                        <div class="col s3">
+                                                                            <label>
+                                                                                <input type="checkbox" name="item_id_multi[]" value="{{ $i->id }}" />
+                                                                                <span>{{ $i->name }}</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
                                                     </div>
                                                     <div class="col m12 s12"></div>
                                                     <div class="col m3 s6 ">
@@ -229,18 +254,22 @@
     }
 
     function whatPrintingPDF() {
-        var item_id = $('#item_id_multi').val();
-        if (!item_id) {
+        var item_ids = $('input[name="item_id_multi[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (item_ids.length === 0) {
             alert("Item ID cannot be empty. Please select an item.");
             return false;
         }
+
         var start_date = $('#start_date_multi').val();
         var end_date = $('#finish_date_multi').val();
 
         var url = '{{ Request::url() }}/print_multi_pdf' +
             '?start_date=' + encodeURIComponent(start_date) +
             '&finish_date=' + encodeURIComponent(end_date) +
-            '&item_multi=' + encodeURIComponent(item_id);
+            '&item_multi=' + encodeURIComponent(item_ids);
 
         $.ajax({
             url: url,

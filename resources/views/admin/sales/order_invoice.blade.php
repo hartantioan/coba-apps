@@ -168,6 +168,11 @@
                                                 <span class="hide-on-small-onl">Export</span>
                                                 <i class="material-icons right">view_headline</i>
                                             </a>
+                                            <a class="btn btn-small waves-effect lime waves-light breadcrumbs-btn right mr-2 modal-trigger" href="#modalEmail">
+                                                <i class="material-icons hide-on-med-and-up">mail</i>
+                                                <span class="hide-on-small-onl">Kirim Email</span>
+                                                <i class="material-icons right">mail</i>
+                                            </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
@@ -512,17 +517,17 @@
     </div>
 </div>
 
-<div id="modalEmail" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modalUpload" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Upload Bukti dan Email ke Customer</h4>
-                <form class="row" id="form_data_email" onsubmit="return false;">
+                <h4>Upload Bukti</h4>
+                <form class="row" id="form_data_upload" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_email" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        Silahkan kosongi file untuk email tanpa attachment (jika kosong file) atau silahkan isi file tapi akan menimpa data yang sudah ada. Data yang diupload adalah dokumen FP dan ARIN dengan tanda tangan basah + stempel.
+                       {{--  Silahkan kosongi file untuk email tanpa attachment (jika kosong file) atau silahkan isi file tapi akan menimpa data yang sudah ada. Data yang diupload adalah dokumen FP dan ARIN dengan tanda tangan basah + stempel. --}}
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
@@ -537,15 +542,11 @@
                                         <label class="active" for="account_name">{{ __('translations.customer') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <b id="account_email">-</b>
-                                        <label class="active" for="account_email">Email (Master BP)</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <b id="marketing_order_delivery_process_code">-</b>
                                         <label class="active" for="marketing_order_delivery_process_code">Surat Jalan</label>
                                     </div>
                                     <div class="col m4 s12 step10">
-                                        <label class="">Bukti Upload</label>
+                                        <label class="">Bukti Upload FP</label>
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="application/pdf" style="display: none;">
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
@@ -561,10 +562,30 @@
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
+                                    <div class="col m12 s12"></div>
+                                    <div class="file-field input-field col m4 s12 step18">
+                                        <div class="btn">
+                                            <span>Upload SJ</span>
+                                            <input type="file" name="document2" id="document2">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col m12 s12"></div>
+                                    <div class="file-field input-field col m4 s12">
+                                        <div class="btn">
+                                            <span>Upload Proforma Invoice</span>
+                                            <input type="file" name="document3" id="document3">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step18" onclick="saveUpdateEmail();">Simpan & Kirim <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step18" onclick="saveUpdateEmail();">Simpan & Upload <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -576,6 +597,86 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
+
+<div id="modalEmail" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>Kirim Email</h4>
+                <form class="row" id="form_data_mail" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_email" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <p class="mt-2 mb-2">
+                                        <h5>User</h5>
+                                        <div class="row">
+                                            <div class="input-field col m4 s12">
+                                                <select class="browser-default" id="customer_id" name="customer_id"></select>
+                                                <label class="active" for="customer_id">Customer</label>
+                                            </div>
+                                            <div class="col s12 m12"></div>
+                                            <div class="col m6 s6 ">
+                                                <label for="start_date_email" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
+                                                <div class="input-field col s12">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date_email" name="start_date_email">
+                                                </div>
+                                            </div>
+                                            <div class="col m6 s6 ">
+                                                <label for="finish_date_email" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
+                                                <div class="input-field col s12">
+                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date_email" name="finish_date_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="col m8 12">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getAccountApin()" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i>Tambah User
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </fieldset>
+                            </div>
+
+                            <div class="col s12 m12">
+                                <div class="mt-2 mb-2">
+                                    <div id="datatable_buttons_arin"></div>
+
+                                    <table id="table_arin" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('translations.no') }}.</th>
+                                                <th>ARIN</th>
+                                                <th>FP</th>
+                                                <th>SJ</th>
+                                                <th>Proforma Invoice</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item-mail">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step18" onclick="sendMail();">Send Mail <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 
 <div id="modal_update_pjb" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
@@ -1067,8 +1168,152 @@
                 `);
             }
         });
+        select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
 
         $('#modalEmail').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_goods_receipt = $('#table_goods_receipt').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'multi'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    }
+                });
+                table_landed_cost = $('#table_landed_cost').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'single'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    }
+                });
+                table_inventory_transfer_in = $('#table_inventory_transfer_in').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'multi'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    }
+                });
+                $('#table_goods_receipt_wrapper > .dt-buttons').appendTo('#datatable_buttons_goods_receipt');
+                $('#table_landed_cost_wrapper > .dt-buttons').appendTo('#datatable_buttons_landed_cost');
+                $('#table_inventory_transfer_in_wrapper > .dt-buttons').appendTo('#datatable_buttons_inventory_transfer_in');
+                $('select[name="table_goods_receipt_length"]').addClass('browser-default');
+                $('select[name="table_landed_cost_length"]').addClass('browser-default');
+                $('select[name="table_inventory_transfer_in_length"]').addClass('browser-default');
+                $('.collapsible').on('shown.bs.collapse', function () {
+                    table_goods_receipt.columns.adjust().draw();
+                    table_landed_cost.columns.adjust().draw();
+                    table_inventory_transfer_in.columns.adjust().draw();
+                });
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+
+                $('#table_goods_receipt,#table_landed_cost,#table_inventory_transfer_in').DataTable().clear().destroy();
+                $('#body-item-mail').empty();
+                $('#customer_id').empty();
+                $('#form_data_mail')[0].reset();
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return null;
+                };
+            }
+        });
+
+        $('#modalUpload').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
 
@@ -1083,9 +1328,9 @@
             },
             onCloseEnd: function(modal, trigger){
                 clearButton.click();
-                $('#form_data_email')[0].reset();
+                $('#form_data_upload')[0].reset();
                 $('#tempEmail').val('');
-                $('#codeEmail,#account_name,#account_email,#marketing_order_delivery_process_code').text('-');
+                $('#codeEmail,#account_name,#marketing_order_delivery_process_code').text('-');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
@@ -1270,6 +1515,144 @@
         }
     }
 
+    function getAccountData(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
+        let val = $('#supplier_id').val();
+        $.ajax({
+            url: '{{ Request::url() }}/get_account_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: val
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#modal4').modal('open');
+
+                if(val){
+                    if(response.goods_receipt.length > 0){
+                        $.each(response.goods_receipt, function(i, val) {
+                            $('#body-detail-goods-receipt').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.delivery_no + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    if(response.landed_cost.length > 0){
+                        $.each(response.landed_cost, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-landed-cost').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                }else{
+
+                    if(response.inventory_transfer_in.length > 0){
+                        $.each(response.inventory_transfer_in, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-inventory-transfer-in').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center-align">
+                                        ` + val.code_iti + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.code_ito + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    setTimeout(function() {
+                        $('ul.tabs').tabs("select", "inventorytransferin");
+                    }, 1000);
+                }
+
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    }
+
+
     function getDataCustomer(){
         $('#user_data_id').empty();
         if($('#account_id').val()){
@@ -1290,6 +1673,176 @@
             `);
         }
     }
+
+    function sendMail(){
+        if($('#customer_id').val()){
+            let selectedData = {
+                arr_faktur: [],
+                arr_sj: [],
+                arr_proforma: []
+            };
+            $('input[type="checkbox"]:checked').each(function () {
+                let dataId = $(this).closest('tr').attr('data-id');
+                let name = $(this).attr('name').replace('[]', '');
+
+                if (selectedData[name]) {
+                    selectedData[name].push(dataId);
+                }
+            });
+            $.ajax({
+                url: '{{ Request::url() }}/send_mail',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    selectedData:selectedData,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    $('#body-item-mail').empty();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'belum pilih Customer',
+                icon: 'error'
+            });
+        }
+    }
+
+
+    function getAccountApin(){
+        if($('#customer_id').val()){
+
+            $('#table_arin').DataTable().clear().destroy();
+            $.ajax({
+                url: '{{ Request::url() }}/get_account_apin',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#customer_id').val(),
+                    start_date: $('#start_date_email').val(),
+                    finish_date: $('#finish_date_email').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    $('#body-item-mail').empty();
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item-mail').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + i + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="arr_faktur[]" id="arr_faktur`+count+`"/>
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox"  name="arr_sj" id="arr_sj`+count+`"/>
+                                            <span></span>
+                                        </label>
+
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="arr_proforma" id="arr_proforma`+count+`" />
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+
+                    table_arin = $('#table_arin').DataTable({
+                        "responsive": true,
+                        scrollY: '50vh',
+                        scrollCollapse: true,
+                        "iDisplayInLength": 10,
+                        "order": [[0, 'desc']],
+                        dom: 'Blfrtip',
+                        buttons: [
+                            'selectAll',
+                            'selectNone'
+                        ],
+                        select: {
+                            style: 'multi'
+                        },
+                        "language": {
+                            "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                            "zeroRecords": "Data tidak ditemukan / kosong",
+                            "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                            "infoEmpty": "Data tidak ditemukan / kosong",
+                            "infoFiltered": "(disaring dari _MAX_ total data)",
+                            "search": "Cari",
+                            "paginate": {
+                                first:      "<<",
+                                previous:   "<",
+                                next:       ">",
+                                last:       ">>"
+                            },
+                            "buttons": {
+                                selectAll: "Pilih semua",
+                                selectNone: "Hapus pilihan"
+                            },
+                            "select": {
+                                rows: "%d baris terpilih"
+                            }
+                        }
+                    });
+                    $('#table_arin_wrapper > .dt-buttons').appendTo('#datatable_buttons_arin');
+                    $('select[name="table_arin_length"]').addClass('browser-default');
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
+        }
+    }
+
 
     function count(){
         let total = 0, tax = 0, grandtotal = 0;
@@ -2594,7 +3147,7 @@
 
     function saveUpdateEmail(){
 		swal({
-            title: "Apakah anda yakin ingin update dan kirim email?",
+            title: "Apakah anda yakin ingin update ?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
             dangerMode: true,
@@ -2604,17 +3157,11 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data_email')[0]), passed = true;
-
-                let email = $('#account_email').text();
-
-                if(!email.includes("@", 0)){
-                    passed = false;
-                }
+                var formData = new FormData($('#form_data_upload')[0]), passed = true;
 
                 if(passed){
                     $.ajax({
-                        url: '{{ Request::url() }}/update_and_email',
+                        url: '{{ Request::url() }}/update_and_upload',
                         type: 'POST',
                         dataType: 'JSON',
                         data: formData,
@@ -2627,12 +3174,12 @@
                         beforeSend: function() {
                             $('#validation_alert_email').hide();
                             $('#validation_alert_email').html('');
-                            loadingOpen('#modalEmail');
+                            loadingOpen('#modalUpload');
                         },
                         success: function(response) {
-                            loadingClose('#modalEmail');
+                            loadingClose('#modalUpload');
                             if(response.status == 200) {
-                                successEmail();
+                                successUpload();
                                 M.toast({
                                     html: response.message
                                 });
@@ -2674,7 +3221,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('#modalEmail');
+                            loadingClose('#modalUpload');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',
@@ -2698,9 +3245,9 @@
         $('#modal1').modal('close');
     }
 
-    function successEmail(){
+    function successUpload(){
         loadDataTable();
-        $('#modalEmail').modal('close');
+        $('#modalUpload').modal('close');
     }
 
     function show(id){
@@ -3242,7 +3789,7 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        if(total >= 0){
+        if(total > 0){
             $('#textTax').show();
             getTaxSeries();
         }else{
@@ -3435,13 +3982,12 @@
         });
     }
 
-    function uploadAndEmail(id,user,email,invoice,sj){
-        $('#modalEmail').modal('open');
+    function uploadGet(id,user,email,invoice,sj){
+        $('#modalUpload').modal('open');
         $('#tempEmail').val(id);
         $('#account_name').text(user);
         $('#codeEmail').text(invoice);
         $('#marketing_order_delivery_process_code').text(sj);
-        $('#account_email').text(email);
     }
 
     function exportExcel(){

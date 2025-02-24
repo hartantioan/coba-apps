@@ -81,7 +81,7 @@ class ExportOutstandingLandedCost implements FromView,ShouldAutoSize
                     $entry["kode_biaya"] = $row->landedCostFee->code;
                     $entry["nama_biaya"] = $row->landedCostFee->name;
                     $entry["kode_coa"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanlocal->code : $coabiayaharusdibayarkanlocal->code;
-                    $entry["nama_coa"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanimport->code : $coabiayaharusdibayarkanimport->code;
+                    $entry["nama_coa"] = $row->landedCostFee->type == '1' ? $coabiayaharusdibayarkanimport->name : $coabiayaharusdibayarkanimport->name;
                     /* $entry["kode_coa"] = $row->landedCostFee->coa->code;
                     $entry["nama_coa"] = $row->landedCostFee->coa->name; */
                     $entry["total_rupiah"] = number_format($row->landedCost->total*$row->landedCost->currency_rate,2,',','.');

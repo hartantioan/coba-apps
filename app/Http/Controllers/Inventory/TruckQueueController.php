@@ -253,6 +253,7 @@ class TruckQueueController extends Controller
                     $query->expedition = $request->expedition;
                     $query->code_barcode = $request->code_barcode;
                     $query->no_container = $request->no_container;
+                    $query->destination_address = $request->destination_address;
                     $query->note = $request->note;
                     $query->save();
                 }
@@ -271,6 +272,7 @@ class TruckQueueController extends Controller
                     'type'              => $request->type,
                     'expedition'        => $request->expedition,
                     'no_container'      => $request->no_container,
+                    'destination_address'      => $request->destination_address,
                     'note'              => $request->note,
                     'status'            => '1',
                     'user_id'           => session('bo_id'),
@@ -340,6 +342,10 @@ class TruckQueueController extends Controller
                     <div class="col s12 m6 l4">
                         <p><strong>Kode Barcode</strong><br>'.$data->code_barcode.'</p>
                     </div>
+                    <div class="col s12 m6 l4">
+                        <p><strong>Alamat Kirim</strong><br>'.$data->destination_address.'</p>
+                    </div>
+                    <div class="col s12"></div>
                     <div class="col s12 m6 l4">
                         <p><strong>Antri</strong><br>'.$data->date.'</p>
                     </div>

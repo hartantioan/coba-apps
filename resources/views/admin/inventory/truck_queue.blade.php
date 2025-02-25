@@ -218,6 +218,10 @@
                             <input id="note" name="note" type="text">
                             <label class="active" for="note">Keterangan: </label>
                         </div>
+                        <div class="input-field col s12 m3 step7">
+                            <input id="destination_address" name="destination_address" type="text" placeholder=" ">
+                            <label class="active" for="destination_address">Alamat Kirim</label>
+                        </div>
                         <div class="col s12"></div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -623,6 +627,7 @@
                 $('#document_status').val(response.document_status).formSelect();
                 $('#note').val(response.note);
                 $('#expedition').val(response.expedition);
+                $('#destination_address').val(response.destination_address);
                 $('#no_container').val(response.no_container);
                 $('#document_status').prop('disabled', true);
                 $('#document_status').formSelect();

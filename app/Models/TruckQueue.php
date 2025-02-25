@@ -32,6 +32,7 @@ class TruckQueue extends Model
         'time_done_load_fg',
         'expedition',
 
+        'destination_address',
         'note',
         'no_container',
         'change_status',

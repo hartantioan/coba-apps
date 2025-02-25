@@ -91,17 +91,20 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $year = date('Y', strtotime($row->post_date));
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
-                $arr[] = [
+                /* $arr[] = [
                     '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
+                ]; */
+                $arr[] = [
+                    '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . $row->totalDpp2025() . ';' . $row->totalTax2025() . ';0;' . $freeAreaTax . ';0;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
-                $balance = floor($row->tax);
+                /* $balance = floor($row->tax); */
             } else {
                 $arr[] = [
                     '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal * ($row->taxMaster->percentage / 100)) . ';0;' . $freeAreaTax . ';2;0;0;0;' . $row->code . ';' . ($row->no_pjb ?? '') . ';'
                 ];
-                $balance = floor($row->subtotal * ($row->taxMaster->percentage / 100));
+                /* $balance = floor($row->subtotal * ($row->taxMaster->percentage / 100)); */
             }
-            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key2 => $rowdetail) {
+            /* foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $key2 => $rowdetail) {
                 if ($key2 == ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->count() - 1)) {
                     $tax = $balance;
                 } else {
@@ -130,15 +133,14 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
                 $balance -= $tax;
-            }
+            } */
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key2 => $rowdetail) {
 
-                if ($key2 == ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->count() - 1)) {
+                /* if ($key2 == ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->count() - 1)) {
                     $tax = $balance;
                 } else {
                     $tax = $rowdetail->proportionalTaxFromHeader();
-                }
-
+                } */
 
                 $hscode = '';
                 if ($freeAreaTax) {
@@ -158,18 +160,28 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $price = $rowdetail->priceBeforeTax();
                 $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
+                $totalDpp = $rowdetail->totalDpp2025();
+                $tax = $rowdetail->totalTax2025();
 
-                $arr[] = [
+                /* $arr[] = [
                     '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                ]; */
+                $arr[] = [
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->print_name . $boxQty . $hscode . ';' . round($price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . $totalBeforeTax . ';' . $totalDiscountBeforeTax . ';' . $totalDpp . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
-                $balance -= $tax;
+                /* $balance -= $tax; */
             }
             foreach ($row->marketingOrderInvoiceDetail()->whereNull('lookable_type')->get() as $key2 => $rowdetail) {
                 $price = $rowdetail->priceBeforeTax();
                 $totalBeforeTax = round($rowdetail->totalBeforeTax(), 2);
                 $totalDiscountBeforeTax = round($rowdetail->totalDiscountBeforeTax(), 2);
-                $arr[] = [
+                $totalDpp = $rowdetail->totalDpp2025();
+                $tax = $rowdetail->totalTax2025();
+                /* $arr[] = [
                     '1'     => 'OF;;' . $rowdetail->description . ';' . round($price, 2) . ';' . round($rowdetail->qty, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . round($rowdetail->tax,2) . ';0;0;;;;;;;;;;',
+                ]; */
+                $arr[] = [
+                    '1'     => 'OF;;' . $rowdetail->description . ';' . round($price, 2) . ';' . round($rowdetail->qty, 2) . ';' . $totalBeforeTax . ';0;' . $totalDpp . ';' . $tax . ';0;0;;;;;;;;;;',
                 ];
             }
         }

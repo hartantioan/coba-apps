@@ -646,6 +646,22 @@ class MarketingOrderInvoice extends Model
         return $total;
     }
 
+    public function totalDpp2025(){
+        $total = 0;
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            $total += $row->totalDpp2025();
+        }
+        return floor($total);
+    }
+
+    public function totalTax2025(){
+        $total = 0;
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            $total += $row->totalTax2025();
+        }
+        return floor($total);
+    }
+
     public function totalPayMemo()
     {
         $total = $this->totalPay() + $this->totalMemo();

@@ -80,6 +80,16 @@ class MarketingOrderInvoiceDetail extends Model
         return $price;
     }
 
+    public function totalDpp2025(){
+        $totalDpp = 11/12 * (round($this->totalBeforeTax(), 2) - round($this->totalDiscountBeforeTax(), 2));
+        return round($totalDpp,2);
+    }
+    
+    public function totalTax2025(){
+        $totalTax = $this->totalDpp2025() * (12 / 100);
+        return round($totalTax,2);
+    }
+
     public function discountBeforeTax(){
         $discount = $this->discount();
         if($discount > 0){

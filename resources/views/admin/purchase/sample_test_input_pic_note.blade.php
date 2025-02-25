@@ -266,8 +266,11 @@
                                         <label class="active" for="receiveable_capacity">Kapasitas yang bisa didapatkan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step26">
-                                        <input id="price_estimation" name="price_estimation" type="text" value="0" onkeyup="formatRupiah(this)">
-                                        <label class="active" for="price_estimation">Estimasi Harga</label>
+                                        <input id="price_estimation_loco" name="price_estimation_loco" type="text" value="0" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="price_estimation_loco">Estimasi Harga Loco</label>
+                                    </div><div class="input-field col m3 s12 step26">
+                                        <input id="price_estimation_franco" name="price_estimation_franco" type="text" value="0" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="price_estimation_franco">Estimasi Harga Franco</label>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
                                         <input id="supplier_sample_code" name="supplier_sample_code" type="text" placeholder="Kode dari Supplier">
@@ -299,57 +302,6 @@
                                         <input id="note" name="note" type="text" placeholder="Catatan Sampel">
                                         <label class="active" for="note"> Catatan Sampel</label>
                                     </div>
-                                </fieldset>
-                            </div>
-                            <div class="col s12">
-                                <fieldset id="modal-fieldset">
-                                    <legend>2. Hasil Uji</legend>
-                                    <div class="input-field col m3 s12 step12">
-                                        <label class="active" for="lab_type">Laboratorium</label>
-                                        <select class="form-control" id="lab_type" name="lab_type">
-                                            <option value="1">Pabrik</option>
-                                            <option value="2">Luar</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12" id="lab_name_field">
-                                        <label class="active" for="lab_name">Nama Lab.</label>
-                                        <input  type="text" id="lab_name" name="lab_name"></input>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  type="text" id="wet_whiteness_value" name="wet_whiteness_value" placeholder="Nilai wet whiteness"></input>
-                                        <label class="active" for="wet_whiteness_value">Nilai wet whiteness</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  type="text" id="dry_whiteness_value" name="dry_whiteness_value" placeholder="Nilai dry whiteness"></input>
-                                        <label class="active" for="dry_whiteness_value">Nilai dry whiteness.</label>
-                                    </div>
-                                    <div class="col m4 s12 step6">
-                                        <label class="">Bukti Upload</label>
-                                        <br>
-                                        <input type="file" name="file_test_result" id="fileInput_test_result" style="display: none;">
-                                        <div  class="col m8 s12 " id="dropZone_test_result" ondrop="dropHandlerTestResult(event);" ondragover="dragOverHandlerTestResult(event);" style="margin-top: 0.5em;height: 5em;">
-                                            Drop image here or <a href="javascript:void(0);" id="uploadLink_test_result">upload</a>
-                                            <br>
-
-                                        </div>
-                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton_testresult" href="javascript:void(0);">
-                                           Clear
-                                        </a>
-                                    </div>
-                                    <div class="col m4 s12">
-                                        <div id="fileName_test_result"></div>
-                                        <img src="" alt="Preview" id="imagePreview_test_result" style="display: none;">
-                                    </div>
-                                    <div class="col s12 m12 l12"></div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  id="item_name" type="text" name="item_name"  placeholder="Nama Item"></input>
-                                        <label class="active" for="item_name">Nama Item</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  id="test_result_note" type="text" name="test_result_note" placeholder="Keterangan Hasil Uji"></input>
-                                        <label class="active" for="test_result_note">Keterangan Hasil Uji</label>
-                                    </div>
-
                                 </fieldset>
                             </div>
                         </div>
@@ -570,26 +522,13 @@
     const clearButton = document.getElementById('clearButton');
     const fileNameDiv = document.getElementById('fileName');
 
-    const dropZone_test_result = document.getElementById('dropZone_test_result');
-    const uploadLink_test_result = document.getElementById('uploadLink_test_result');
-    const fileInput_test_result = document.getElementById('fileInput_test_result');
-    const imagePreview_test_result = document.getElementById('imagePreview_test_result');
-    const clearButton_testresult = document.getElementById('clearButton_testresult');
-    const fileNameDiv_test_result = document.getElementById('fileName_test_result');
-
     dropZone.addEventListener('click', () => {
         fileInput.click();
     });
 
-    dropZone_test_result.addEventListener('click', () => {
-        fileInput_test_result.click();
-    });
 
     fileInput.addEventListener('change', (e) => {
         handleFile(e.target.files[0]);
-    });
-    fileInput_test_result.addEventListener('change', (e) => {
-        handleFileTestResult(e.target.files[0]);
     });
 
     function dragOverHandler(event) {
@@ -597,10 +536,6 @@
         dropZone.style.backgroundColor = '#f0f0f0';
     }
 
-    function dragOverHandlerTestResult(event) {
-        event.preventDefault();
-        dropZone_test_result.style.backgroundColor = '#f0f0f0';
-    }
 
     function dropHandler(event) {
         event.preventDefault();
@@ -609,48 +544,6 @@
         handleFile(event.dataTransfer.files[0]);
     }
 
-    function dropHandlerTestResult(event) {
-        event.preventDefault();
-        dropZone_test_result.style.backgroundColor = '#fff';
-
-        handleFileTestResult(event.dataTransfer.files[0]);
-    }
-
-    function handleFileTestResult(file) {
-        if (file) {
-        const reader = new FileReader();
-        const fileType = file.type.split('/')[0];
-        const maxSize = 10 * 1024 * 1024;
-        if (file.size > maxSize) {
-            alert('File size exceeds the maximum limit of 10 MB.');
-            return;
-        }
-
-        reader.onload = () => {
-
-            fileNameDiv_test_result.textContent = 'File uploaded: ' + file.name;
-
-            if (fileType === 'image') {
-
-                imagePreview_test_result.src = reader.result;
-                imagePreview_test_result.style.display = 'inline-block';
-                clearButton_testresult.style.display = 'inline-block';
-            } else {
-
-                imagePreview_test_result.style.display = 'none';
-
-            }
-        };
-
-        reader.readAsDataURL(file);
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-
-
-        fileInput_test_result.files = dataTransfer.files;
-
-        }
-    }
 
 
 
@@ -698,12 +591,6 @@
         fileNameDiv.textContent = '';
     });
 
-    clearButton_testresult.addEventListener('click', () => {
-        imagePreview_test_result.src = '';
-        imagePreview_test_result.style.display = 'none';
-        fileInput_test_result.value = '';
-        fileNameDiv_test_result.textContent = '';
-    });
 
     document.addEventListener('paste', (event) => {
         const items = event.clipboardData.items;
@@ -741,33 +628,6 @@
                 downloadLink.download = getFileName(fileLink);
                 downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
                 fileNameDiv.appendChild(downloadLink);
-            }
-        }
-    }
-
-    function displayFileTestResult(fileLink) {
-        const fileType = getFileType(fileLink);
-
-        fileNameDiv_test_result.textContent = 'File uploaded: ' + getFileName(fileLink);
-
-        if (fileType === 'image') {
-
-            imagePreview_test_result.src = fileLink;
-            imagePreview_test_result.style.display = 'inline-block';
-
-        } else {
-
-            imagePreview_test_result.style.display = 'none';
-
-
-            const fileExtension = getFileExtension(fileLink);
-            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-
-                const downloadLink = document.createElement('a');
-                downloadLink.href = fileLink;
-                downloadLink.download = getFileName(fileLink);
-                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
-                fileNameDiv_test_result.appendChild(downloadLink);
             }
         }
     }
@@ -886,6 +746,7 @@
                 $('input').css('border', 'none');
                 $('input').css('border-bottom', '0.5px solid black');
                 $('#temp').val('');
+                $('#sample_test_input_id').empty();
                 $('#supplier_id').empty();
                 $('#province_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
@@ -1361,18 +1222,13 @@
                 $('#permission_name').val(response.permission_name);
                 $('#commodity_permits').val(response.commodity_permits);
                 $('#permits_period').val(response.permits_period);
-                $('#price_estimation').val(response.price_estimation);
+                $('#price_estimation_loco').val(response.price_estimation_loco);
+                $('#price_estimation_franco').val(response.price_estimation_franco);
                 $('#receiveable_capacity').val(response.receiveable_capacity);
                 $('#supplier_sample_code').val(response.supplier_sample_code);
                 $('#company_sample_code').val(response.company_sample_code);
-                $('#lab_type').val(response.lab_type).formSelect();
-                $('#lab_name').val(response.lab_name);
-                $('#wet_whiteness_value').val(response.wet_whiteness_value);
-                $('#dry_whiteness_value').val(response.dry_whiteness_value);
-                $('#item_name').val(response.item_name);
 
                 $('#note').val(response.note);
-                $('#test_result_note').val(response.test_result_note);
 
                 $('#note').focus();
                 M.updateTextFields();
@@ -1608,16 +1464,11 @@
             $('#commodity_permits').val($('#sample_test_input_id').select2('data')[0].commodity_permits);
             $('#permits_period').val($('#sample_test_input_id').select2('data')[0].permits_period);
             $('#receiveable_capacity').val($('#sample_test_input_id').select2('data')[0].receiveable_capacity);
-            $('#price_estimation').val($('#sample_test_input_id').select2('data')[0].price_estimation);
+            $('#price_estimation_loco').val($('#sample_test_input_id').select2('data')[0].price_estimation_loco);
+            $('#price_estimation_franco').val($('#sample_test_input_id').select2('data')[0].price_estimation_franco);
             $('#supplier_sample_code').val($('#sample_test_input_id').select2('data')[0].supplier_sample_code);
             $('#company_sample_code').val($('#sample_test_input_id').select2('data')[0].company_sample_code);
-            $('#lab_type').val($('#sample_test_input_id').select2('data')[0].lab_type).formSelect();
-            $('#lab_name').val($('#sample_test_input_id').select2('data')[0].lab_name);
-            $('#wet_whiteness_value').val($('#sample_test_input_id').select2('data')[0].wet_whiteness_value);
-            $('#dry_whiteness_value').val($('#sample_test_input_id').select2('data')[0].dry_whiteness_value);
-            $('#item_name').val($('#sample_test_input_id').select2('data')[0].item_name);
             $('#note').val($('#sample_test_input_id').select2('data')[0].note);
-            $('#test_result_note').val($('#sample_test_input_id').select2('data')[0].test_result_note);
 
         }else{
             $('#sample_type_id').val('').empty();
@@ -1642,13 +1493,7 @@
             $('#price_estimation').val('');
             $('#supplier_sample_code').val('');
             $('#company_sample_code').val('');
-            $('#lab_type').val('').formSelect();
-            $('#lab_name').val('');
-            $('#wet_whiteness_value').val('');
-            $('#dry_whiteness_value').val('');
-            $('#item_name').val('');
             $('#note').val('');
-            $('#test_result_note').val('');
         }
     }
 

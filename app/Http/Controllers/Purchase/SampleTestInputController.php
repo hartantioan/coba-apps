@@ -62,18 +62,13 @@ class SampleTestInputController extends Controller
             'commodity_permits',
             'permits_period',
             'receiveable_capacity',
-            'price_estimation',
+            'price_estimation_loco',
             'supplier_sample_code',
             'company_sample_code',
             'document',
             'note',
-            'lab_type',
-            'lab_name',
-            'wet_whiteness_value',
-            'dry_whiteness_value',
-            'document_test_result',
-            'item_name',
-            'test_result_note',
+            'type',
+            'price_estimation_franco',
             'status',
         ];
 
@@ -161,12 +156,13 @@ class SampleTestInputController extends Controller
                     $val->permission_name,
                     $val->commodity_permits,
                     $val->permits_period,
-                    $val->receiveable_capacity,
-                    $val->price_estimation,
+
+                    number_format($val->receiveable_capacity,2,',','.'),
+                    number_format($val->price_estimation_loco,2,',','.'),
+                    number_format($val->price_estimation_franco,2,',','.'),
                     $val->supplier_sample_code,
                     $val->company_sample_code,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
-                    $val->document_test_result ? '<a href="'.$val->attachmentResult().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -250,27 +246,6 @@ class SampleTestInputController extends Controller
                     } else {
                         $document = $query->document;
                     }
-                    if($request->has('wet_whiteness_value')){
-                        if($request->has('file_test_result')) {
-                            if($query->document_test_result){
-                                if(Storage::exists($query->document_test_result)){
-                                    Storage::delete($query->document_test_result);
-                                }
-                            }
-                            $document_test_result = $request->file('file_test_result')->store('public/sample_test_input');
-                        } else {
-                            if(!$query->document_test_result){
-                                $kambing["kambing"][]="Belum punya file hasil input harap isi hasil input";
-                                $response = [
-                                    'status' => 422,
-                                    'error'  => $kambing
-                                ];
-                                return response()->json($response);
-                            }else{
-                                $document_test_result = $query->document_test_result;
-                            }
-                        }
-                    }
 
                     $query->user_id = session('bo_id');
                     $query->sample_type_id = $request->sample_type_id;
@@ -288,19 +263,13 @@ class SampleTestInputController extends Controller
                     $query->commodity_permits = $request->commodity_permits;
                     $query->permits_period = $request->permits_period;
                     $query->receiveable_capacity = $request->receiveable_capacity;
-                    $query->price_estimation = $request->price_estimation;
+                    $query->price_estimation_loco = str_replace(',','.',str_replace('.','',$request->price_estimation_loco));
+                    $query->price_estimation_franco = str_replace(',','.',str_replace('.','',$request->price_estimation_franco));
+                    $query->type = $request->type;
                     $query->supplier_sample_code = $request->supplier_sample_code;
                     $query->company_sample_code = $request->company_sample_code;
                     $query->document = $document;
                     $query->note = $request->note;
-                    $query->lab_type = $request->lab_type;
-                    $query->lab_name = $request->lab_name;
-                    $query->wet_whiteness_value = $request->wet_whiteness_value;
-                    $query->dry_whiteness_value = $request->dry_whiteness_value;
-                    $query->document_test_result = $document_test_result;
-                    $query->item_name = $request->item_name;
-                    $query->test_result_note = $request->test_result_note;
-                    $query->status = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
 
@@ -326,19 +295,14 @@ class SampleTestInputController extends Controller
                         'commodity_permits'   => $request->commodity_permits,
                         'permits_period'      => $request->permits_period,
                         'receiveable_capacity'=> $request->receiveable_capacity,
-                        'price_estimation'    => $request->price_estimation,
+                        'price_estimation_loco'      => str_replace(',','.',str_replace('.','',$request->price_estimation_loco)),
+                        'price_estimation_franco'    => str_replace(',','.',str_replace('.','',$request->price_estimation_franco)),
+                        'type'                => $request->type,
                         'supplier_sample_code'=> $request->supplier_sample_code,
                         'company_sample_code' => $request->company_sample_code,
                         'document'            => $request->file('file') ? $request->file('file')->store('public/sample_test_input') : NULL,
                         'note'                => $request->note,
-                        'lab_type'            => $request->lab_type,
-                        'lab_name'            => $request->lab_name,
-                        'wet_whiteness_value' => $request->wet_whiteness_value,
-                        'dry_whiteness_value' => $request->dry_whiteness_value,
-                        'document_test_result'=> $request->file('file_test_result') ? $request->file('file_test_result')->store('public/sample_test_input') : NULL,
-                        'item_name'           => $request->item_name,
-                        'test_result_note'    => $request->test_result_note,
-                        'status'              => $request->status ? $request->status : '2'
+                        'status'              => 1,
                     ]);
 
                     DB::commit();

@@ -121,6 +121,8 @@
                                                     <label>Item RM / SM</label>
                                                     <div class="input-field col m12 s12 step3">
 
+                                                        <input type="text" id="searchItem" placeholder="Search Item..." class="browser-default" />
+
                                                         @php
                                                             $groupedItems = $item->groupBy(function($item) {
                                                                 $firstWord = strtok($item->name, ' ');
@@ -129,16 +131,16 @@
                                                         @endphp
 
                                                         @foreach($groupedItems as $group => $items)
-                                                            <div class="group">
-                                                                <h5>{{ $group }}</h5>
+                                                            <div class="group" style="display:none;">
+                                                                <h5 class="group-title">{{ $group }}</h5>
                                                                 <div class="row">
                                                                     @foreach($items as $index => $i)
                                                                         @if($index % 4 == 0 && $index > 0)
                                                                             </div><div class="row">
                                                                         @endif
-                                                                        <div class="col s3">
+                                                                        <div class="col s3 item-container">
                                                                             <label>
-                                                                                <input type="checkbox" name="item_id_multi[]" value="{{ $i->id }}" />
+                                                                                <input type="checkbox" name="item_id_multi[]" value="{{ $i->id }}" class="item-checkbox" data-name="{{ strtolower($i->name) }}" />
                                                                                 <span>{{ $i->name }}</span>
                                                                             </label>
                                                                         </div>
@@ -189,6 +191,33 @@
     $(function() {
         select2ServerSide('#item_id', '{{ url("admin/select2/item_rm_sm") }}');
         select2ServerSide('#item_id_multi', '{{ url("admin/select2/item_rm_sm") }}');
+    });
+    document.getElementById('searchItem').addEventListener('input', function () {
+        let searchValue = this.value.toLowerCase();
+
+        document.querySelectorAll('.group').forEach(function (group) {
+            let items = group.querySelectorAll('.item-container');
+            let groupTitle = group.querySelector('.group-title');
+            let hasVisibleItem = false;
+
+            items.forEach(function (container) {
+                let itemName = container.querySelector('.item-checkbox').getAttribute('data-name');
+                if (itemName.includes(searchValue)) {
+                    container.style.display = 'block';
+                    hasVisibleItem = true;
+                } else {
+                    container.style.display = 'none';
+                }
+            });
+
+            if (hasVisibleItem) {
+                groupTitle.style.display = 'block';
+                group.style.display = 'block';
+            } else {
+                groupTitle.style.display = 'none';
+                group.style.display = 'none';
+            }
+        });
     });
     function exportExcel(){
 

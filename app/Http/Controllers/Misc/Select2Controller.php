@@ -6053,18 +6053,12 @@ class Select2Controller extends Controller {
                 'commodity_permits'    => $d->commodity_permits,
                 'permits_period'       => $d->permits_period,
                 'receiveable_capacity' => $d->receiveable_capacity,
-                'price_estimation'     => $d->price_estimation,
+                'price_estimation_loco'     => $d->price_estimation_loco,
+                'price_estimation_franco'     => $d->price_estimation_franco,
                 'supplier_sample_code' => $d->supplier_sample_code,
                 'company_sample_code'  => $d->company_sample_code,
                 'document'             => $d->document,
                 'note'                 => $d->note,
-                'lab_type'             => $d->lab_type,
-                'lab_name'             => $d->lab_name,
-                'wet_whiteness_value'  => $d->wet_whiteness_value,
-                'dry_whiteness_value'  => $d->dry_whiteness_value,
-                'document_test_result' => $d->document_test_result,
-                'item_name'            => $d->item_name,
-                'test_result_note'     => $d->test_result_note,
                 'status'               => $d->status,
             ];
         }
@@ -6140,7 +6134,8 @@ class Select2Controller extends Controller {
                     $query->where('id',$request->sample_type_id);
                 });
             }
-            $query->where('type','1');
+            $query->where('type','2')
+            ->whereDoesntHave('sampleTestResultProc');
         })->paginate(10);
         foreach($data as $d) {
             $response[] = [
@@ -6203,7 +6198,8 @@ class Select2Controller extends Controller {
                     $query->where('id',$request->sample_type_id);
                 });
             }
-            $query->where('type','2');
+            $query->where('type','1')
+            ->whereDoesntHave('sampleTestResultQc');
         })->paginate(10);
         foreach($data as $d) {
             $response[] = [
@@ -6236,13 +6232,6 @@ class Select2Controller extends Controller {
                 'company_sample_code'  => $d->company_sample_code,
                 'document'             => $d->document,
                 'note'                 => $d->note,
-                'lab_type'             => $d->lab_type,
-                'lab_name'             => $d->lab_name,
-                'wet_whiteness_value'  => $d->wet_whiteness_value,
-                'dry_whiteness_value'  => $d->dry_whiteness_value,
-                'document_test_result' => $d->document_test_result,
-                'item_name'            => $d->item_name,
-                'test_result_note'     => $d->test_result_note,
                 'status'               => $d->status,
             ];
         }

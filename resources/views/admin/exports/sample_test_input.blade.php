@@ -18,13 +18,16 @@
             <th rowspan="2">LINK FOTO SAMPEL</th>
             <th rowspan="2">CATATAN SAMPEL</th>
             <th rowspan="2">TGL UPDATE</th>
-            <th rowspan="2">LABORATORIUM TIPE</th>
-            <th rowspan="2">LABORATORIUM NAMA</th>
+            <th rowspan="2">TIPE LABORATORIUM</th>
+            <th rowspan="2">NAMA LAB</th>
             <th rowspan="2">NILAI WET WHITENESS</th>
             <th rowspan="2">NILAI DRY WHITENESS</th>
             <th rowspan="2">LINK FOTO HASIL UJI</th>
             <th rowspan="2">NAMA ITEM PORCELAIN</th>
             <th rowspan="2">CATATAN HASIL UJI</th>
+            <th rowspan="2">TANGGAL DATA CATATAN KUSUS</th>
+            <th rowspan="2">PENGGUNA</th>
+            <th rowspan="2">CATATAN KUSUS</th>
         </tr>
         <tr>
             <th>PROVINSI</th>
@@ -39,6 +42,29 @@
     </thead>
     <tbody>
         @foreach($data as $key => $row)
+        @php
+            if($row->type == 1){
+                $nama_lab = '';
+                $wet_white_val = $row->sampleTestResultQc->wet_whiteness_value ?? ''; // ✅ Handle null
+                $dry_white_val = $row->sampleTestResultQc->dry_whiteness_value ?? '';
+                $item_name = $row->sampleTestResultQc->item_name ?? '';
+                $note = $row->sampleTestResultQc->note ?? '';
+            }
+            elseif($row->type == 2){ // ✅ Use elseif instead of if
+                $nama_lab = $row->sampleTestResultProc->lab_name ?? '';
+                $wet_white_val = $row->sampleTestResultProc->wet_whiteness_value ?? '';
+                $dry_white_val = $row->sampleTestResultProc->dry_whiteness_value ?? '';
+                $item_name = $row->sampleTestResultProc->item_name ?? '';
+                $note = $row->sampleTestResultProc->note ?? '';
+            }
+            else {
+                $nama_lab = '';
+                $wet_white_val = '';
+                $dry_white_val = '';
+                $item_name = '';
+                $note = '';
+            }
+        @endphp
             <tr>
                 <td>{{ $row->post_date }}</td>
                 <td>{{ $row->user->name }}</td>
@@ -60,16 +86,19 @@
                 <td>{{ $row->price_estimation }}</td>
                 <td>{{ $row->supplier_sample_code }}</td>
                 <td>{{ $row->company_sample_code }}</td>
-                <td>{{ $row->document }}</td>
+                <td></td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->update_at }}</td>
-                <td>{{ $row->labType() }}</td>
-                <td>{{ $row->lab_name?? '-'}}</td>
-                <td>{{ $row->wet_whiteness_value }}</td>
-                <td>{{ $row->dry_whiteness_value }}</td>
-                <td>{{ $row->document_test_result }}</td>
-                <td>{{ $row->item_name }}</td>
-                <td>{{ $row->test_result_note }}</td>
+                <td>{{ $row->type() }}</td>
+                <td>{{ $nama_lab}}</td>
+                <td>{{ $wet_white_val}}</td>
+                <td>{{ $dry_white_val }}</td>
+                <td></td>
+                <td>{{ $item_name }}</td>
+                <td>{{ $note }}</td>
+                <td>{{ $row->sampleTestInputPICNote?->created_at ?? '' }}</td>
+                <td>{{ $row->sampleTestInputPICNote?->user->name ?? ''}}</td>
+                <td>{{ $row->sampleTestInputPICNote?->note ?? ''}}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

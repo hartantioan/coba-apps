@@ -62,6 +62,7 @@ use App\Http\Controllers\Purchase\OutstandingPurchaseOrderController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Purchase\ReportProcurementController;
+use App\Http\Controllers\Purchase\ReportTestResultController;
 use App\Http\Controllers\Setting\ChangeLogController;
 use App\Http\Controllers\Setting\AnnouncementController;
 use App\Http\Controllers\Setting\UsedDataController;
@@ -153,6 +154,8 @@ use App\Http\Controllers\Finance\EmployeeReceivableController;
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
 use App\Http\Controllers\Purchase\SampleTestInputController;
+use App\Http\Controllers\Purchase\SampleTestResultController;
+use App\Http\Controllers\Purchase\SampleTestQcResultController;
 use App\Http\Controllers\Purchase\SpecialNotePICSampleController;
 use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
 use App\Http\Controllers\Purchase\LandedCostController;
@@ -1945,6 +1948,15 @@ Route::prefix('admin')->group(function () {
                         Route::get('print_multi_pdf', [ReportProcurementController::class, 'printMultiItemPDF'])->withoutMiddleware('direct.access');
                     });
 
+                    Route::prefix('report_test_result')->middleware('operation.access:report_test_result,view')->group(function () {
+                        Route::get('/', [ReportTestResultController::class, 'index']);
+                        Route::post('filter', [ReportTestResultController::class, 'filter']);
+                        Route::get('export', [ReportTestResultController::class, 'export']);
+                        Route::get('export_transport_service', [ReportTestResultController::class, 'exportTransportService']);
+                        Route::get('print_individual', [ReportTestResultController::class, 'PrintIndividual'])->withoutMiddleware('direct.access');
+                        Route::get('print_multi_pdf', [ReportTestResultController::class, 'printMultiItemPDF'])->withoutMiddleware('direct.access');
+                    });
+
                     Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {
                         Route::get('/', [PurchasePaymentHistoryController::class, 'index']);
                         Route::get('datatable', [PurchasePaymentHistoryController::class, 'datatable']);
@@ -2030,6 +2042,56 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual_chi/{id}', [SampleTestInputController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [SampleTestInputController::class, 'voidStatus'])->middleware('operation.access:sample_test_input,void');
                     Route::post('destroy', [SampleTestInputController::class, 'destroy'])->middleware('operation.access:sample_test_input,delete');
+                });
+
+                Route::prefix('sample_test_result')->middleware(['operation.access:sample_test_result,view'])->group(function () {
+                    Route::get('/', [SampleTestResultController::class, 'index']);
+                    Route::get('datatable', [SampleTestResultController::class, 'datatable']);
+                    Route::get('row_detail', [SampleTestResultController::class, 'rowDetail']);
+                    Route::post('show', [SampleTestResultController::class, 'show']);
+                    Route::post('done', [SampleTestResultController::class, 'done'])->middleware('operation.access:sample_test_result,update');
+                    Route::post('get_items', [SampleTestResultController::class, 'getItems']);
+                    Route::post('get_code', [SampleTestResultController::class, 'getCode']);
+                    Route::post('print', [SampleTestResultController::class, 'print']);
+                    Route::post('print_by_range', [SampleTestResultController::class, 'printByRange']);
+                    Route::get('export_from_page', [SampleTestResultController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [SampleTestResultController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [SampleTestResultController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [SampleTestResultController::class, 'getDetails']);
+                    Route::post('send_email', [SampleTestResultController::class, 'sendEmail']);
+                    Route::post('remove_used_data', [SampleTestResultController::class, 'removeUsedData']);
+                    Route::post('create', [SampleTestResultController::class, 'create'])->middleware('operation.access:sample_test_result,update');
+                    Route::post('create_done', [SampleTestResultController::class, 'createDone'])->middleware('operation.access:sample_test_result,update');
+                    Route::get('approval/{id}', [SampleTestResultController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [SampleTestResultController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [SampleTestResultController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [SampleTestResultController::class, 'voidStatus'])->middleware('operation.access:sample_test_result,void');
+                    Route::post('destroy', [SampleTestResultController::class, 'destroy'])->middleware('operation.access:sample_test_result,delete');
+                });
+
+                Route::prefix('sample_test_qc_result')->middleware(['operation.access:sample_test_qc_result,view'])->group(function () {
+                    Route::get('/', [SampleTestQcResultController::class, 'index']);
+                    Route::get('datatable', [SampleTestQcResultController::class, 'datatable']);
+                    Route::get('row_detail', [SampleTestQcResultController::class, 'rowDetail']);
+                    Route::post('show', [SampleTestQcResultController::class, 'show']);
+                    Route::post('done', [SampleTestQcResultController::class, 'done'])->middleware('operation.access:sample_test_qc_result,update');
+                    Route::post('get_items', [SampleTestQcResultController::class, 'getItems']);
+                    Route::post('get_code', [SampleTestQcResultController::class, 'getCode']);
+                    Route::post('print', [SampleTestQcResultController::class, 'print']);
+                    Route::post('print_by_range', [SampleTestQcResultController::class, 'printByRange']);
+                    Route::get('export_from_page', [SampleTestQcResultController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [SampleTestQcResultController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [SampleTestQcResultController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [SampleTestQcResultController::class, 'getDetails']);
+                    Route::post('send_email', [SampleTestQcResultController::class, 'sendEmail']);
+                    Route::post('remove_used_data', [SampleTestQcResultController::class, 'removeUsedData']);
+                    Route::post('create', [SampleTestQcResultController::class, 'create'])->middleware('operation.access:sample_test_qc_result,update');
+                    Route::post('create_done', [SampleTestQcResultController::class, 'createDone'])->middleware('operation.access:sample_test_qc_result,update');
+                    Route::get('approval/{id}', [SampleTestQcResultController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [SampleTestQcResultController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [SampleTestQcResultController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [SampleTestQcResultController::class, 'voidStatus'])->middleware('operation.access:sample_test_qc_result,void');
+                    Route::post('destroy', [SampleTestQcResultController::class, 'destroy'])->middleware('operation.access:sample_test_qc_result,delete');
                 });
 
                 Route::prefix('sample_test_input_pic_note')->middleware(['operation.access:sample_test_input,view', 'lockacc'])->group(function () {

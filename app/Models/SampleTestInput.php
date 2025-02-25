@@ -33,28 +33,24 @@ class SampleTestInput extends Model
         'commodity_permits',
         'permits_period',
         'receiveable_capacity',
-        'price_estimation',
+        'price_estimation_loco',
         'supplier_sample_code',
         'company_sample_code',
         'document',
         'note',
-        'lab_type',
-        'lab_name',
-        'wet_whiteness_value',
-        'dry_whiteness_value',
-        'document_test_result',
-        'item_name',
-        'test_result_note',
         'status',
+        'price_estimation_franco',
+        'type',
+
     ];
 
     public function status(){
         switch($this->status) {
             case '1':
-                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                $status = '<span class="gradient-45deg-yellow-teal medium-small white-text padding-3">Belum Diuji</span>';
                 break;
             case '2':
-                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>';
+                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Done</span>';
                 break;
             default:
                 $status = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
@@ -132,9 +128,15 @@ class SampleTestInput extends Model
     public function sampleTestInputPICNote(){
         return $this->hasOne('App\Models\SampleTestInputPICNote','sample_test_input_id','id');
     }
+    public function sampleTestResultProc(){
+        return $this->hasOne('App\Models\SampleTestResult','sample_test_input_id','id');
+    }
+    public function sampleTestResultQc(){
+        return $this->hasOne('App\Models\SampleTestQcResult','sample_test_input_id','id');
+    }
 
-    public function labType(){
-        $status = match ($this->lab_type) {
+    public function type(){
+        $status = match ($this->type) {
             '1' => 'Pabrik',
             '2' => 'Luar',
             default => '-',

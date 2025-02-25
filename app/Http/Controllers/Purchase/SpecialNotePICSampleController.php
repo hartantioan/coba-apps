@@ -26,7 +26,7 @@ class SpecialNotePICSampleController extends Controller
 
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'         => 'Hasil Uji & Input Sampel',
+            'title'         => 'Catatan PIC',
             'place'         => Place::where('status','1')->get(),
             'content'       => 'admin.purchase.sample_test_input_pic_note',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',

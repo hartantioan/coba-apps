@@ -629,7 +629,7 @@ class PurchaseInvoiceController extends Controller
                                 'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                                 'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                                 'info'          => $info,
-                                'note'          => $rowdetail->note ? $rowdetail->note : '',
+                                'note'          => $rowdetail->note ? $rowdetail->note.' - '.$rowdetail->remark : '',
                                 'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
                                 'top'           => $top,
                                 'delivery_no'   => $datagr->delivery_no,

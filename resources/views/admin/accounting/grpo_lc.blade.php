@@ -94,6 +94,14 @@
         $('#date_start,#date_end').val('{{ date("Y-m-d") }}');
     }
 
+    function daysdifference(firstDate, secondDate){
+        var startDay = new Date(firstDate);
+        var endDay = new Date(secondDate);
+        var millisBetween = startDay.getTime() - endDay.getTime();
+        var days = millisBetween / (1000 * 3600 * 24);
+        return Math.round(Math.abs(days));
+    }
+
     function exportExcel(){
         swal({
             title: 'ALERT',
@@ -111,35 +119,44 @@
         $('#export_button').hide();
         var datestart = $('#date_start').val();
         var dateend = $('#date_end').val();
-        $.ajax({
-            url: '{{ Request::url() }}/export',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                datestart : datestart,
-                dateend: dateend,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main-display');
-            },
-            success: function(response) {
-                loadingClose('#main-display');
-                M.toast({
-                    html: response.message
-                });
-            },
-            error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
+        var days = daysdifference(datestart, dateend);
+        if(days > 30){
+            swal({
+                title: 'Hayo!',
+                text: 'Maksimal penarikan data adalah 30 hari.',
+                icon: 'info'
+            });
+        }else{
+            $.ajax({
+                url: '{{ Request::url() }}/export',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    datestart : datestart,
+                    dateend: dateend,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#main-display');
+                },
+                success: function(response) {
+                    loadingClose('#main-display');
+                    M.toast({
+                        html: response.message
+                    });
+                },
+                error: function() {
+                    $('#main-display').scrollTop(0);
+                    loadingClose('#main-display');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 </script>

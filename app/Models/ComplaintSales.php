@@ -122,6 +122,23 @@ class ComplaintSales extends Model
         }
     }
 
+    public function getPercentageComplaint(){
+        $sj = MarketingOrderDeliveryProcess::find($this->lookable_id);
+        $total_volume = $sj->totalQty();$total =0;
+        $total = 0;
+        foreach ($this->complaintSalesDetail as $row_detail) {
+            $total += ($row_detail->qty_color_mistake ?? 0)
+                    + ($row_detail->qty_motif_mistake ?? 0)
+                    + ($row_detail->qty_size_mistake ?? 0)
+                    + ($row_detail->qty_broken ?? 0)
+                    + ($row_detail->qty_mistake ?? 0);
+        }
+        $percentage = ($total / $total_volume) * 100;
+
+        return $percentage;
+
+    }
+
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);

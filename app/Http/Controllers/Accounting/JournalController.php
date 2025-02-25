@@ -821,45 +821,113 @@ class JournalController extends Controller
                             if($query) {
                                 $account = User::where('employee_no',explode('|',$request->arr_multi_bp[$key])[0])->first();
                                 $place = Place::where('code',explode('|',$request->arr_multi_place[$key])[0])->first();
-                                $line = Line::where('code',explode('|',$request->arr_multi_line[$key])[0])->first();
+                                $distribusiBiaya = CostDistribution::where('code',explode('|',$request->arr_multi_line[$key])[0])->first();
                                 $machine = Machine::where('code',explode('|',$request->arr_multi_machine[$key])[0])->first();
                                 $project = Project::where('code',explode('|',$request->arr_multi_project[$key])[0])->first();
-                                $department = Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first();
+                                $department = Division::where('code',explode('|',$request->arr_multi_department[$key])[0])->first();
         
                                 if(floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_debit[$key])) < 0){
-                                    JournalDetail::create([
-                                        'journal_id'        => $query->id,
-                                        'coa_id'            => $coaAvailable[$key],
-                                        'account_id'        => $account ? $account->id : NULL,
-                                        'place_id'          => $place ? $place->id : NULL,
-                                        'line_id'           => $line ? $line->id : NULL,
-                                        'machine_id'        => $machine ? $machine->id : NULL,
-                                        'project_id'        => $project ? $project->id : NULL,
-                                        'department_id'     => $department ? $department->id : NULL,
-                                        'type'              => '1',
-                                        'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_debit[$key])),
-                                        'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_debit_fc[$key])),
-                                        'note'              => $request->arr_multi_note_detail[$key],
-                                        'note2'             => $request->arr_multi_note_detail2[$key],
-                                    ]);
+                                    if($distribusiBiaya){
+                                        $total = floatval(str_replace(',', '.', $request->arr_multi_debit[$key]));
+                                        $totalfc = floatval(str_replace(',', '.', $request->arr_multi_debit_fc[$key]));
+                                        $lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
+                                        $accumulation = 0;
+                                        $accumulationfc = 0;
+                                        foreach($distribusiBiaya->costDistributionDetail as $keyc => $rowcost){
+                                            if($keyc == $lastIndex){
+                                                $nominal = $total - $accumulation;
+                                                $nominalfc = $totalfc - $accumulationfc;
+                                            }else{
+                                                $nominal = round(($rowcost->percentage / 100) * $total);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $accumulation += $nominal;
+                                                $accumulationfc += $nominalfc;
+                                            }
+                                            JournalDetail::create([
+                                                'journal_id'                    => $query->id,
+                                                'cost_distribution_detail_id'   => $rowcost->id,
+                                                'coa_id'                        => $coaAvailable[$key],
+                                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($place ? $place->id : NULL),
+                                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+                                                'machine_id'                    => $machine ? $machine->id : NULL,
+                                                'department_id'                 => $department ? $department->id : NULL,
+                                                'note'                          => $request->arr_multi_note_detail[$key],
+                                                'note2'                         => $request->arr_multi_note_detail2[$key],
+                                                'type'                          => '1',
+                                                'nominal'                       => $nominal,
+                                                'nominal_fc'					=> $nominalfc,
+                                                'account_id'                    => $account ? $account->id : NULL,
+                                                'project_id'                    => $project ? $project->id : NULL,
+                                            ]);
+                                        }
+                                    }else{
+                                        JournalDetail::create([
+                                            'journal_id'        => $query->id,
+                                            'coa_id'            => $coaAvailable[$key],
+                                            'account_id'        => $account ? $account->id : NULL,
+                                            'place_id'          => $place ? $place->id : NULL,
+                                            'machine_id'        => $machine ? $machine->id : NULL,
+                                            'project_id'        => $project ? $project->id : NULL,
+                                            'department_id'     => $department ? $department->id : NULL,
+                                            'type'              => '1',
+                                            'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_debit[$key])),
+                                            'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_debit_fc[$key])),
+                                            'note'              => $request->arr_multi_note_detail[$key],
+                                            'note2'             => $request->arr_multi_note_detail2[$key],
+                                        ]);
+                                    }
                                 }
         
                                 if(floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) > 0 || floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])) < 0){
-                                    JournalDetail::create([
-                                        'journal_id'        => $query->id,
-                                        'coa_id'            => $coaAvailable[$key],
-                                        'account_id'        => $account ? $account->id : NULL,
-                                        'place_id'          => $place ? $place->id : NULL,
-                                        'line_id'           => $line ? $line->id : NULL,
-                                        'machine_id'        => $machine ? $machine->id : NULL,
-                                        'project_id'        => $project ? $project->id : NULL,
-                                        'department_id'     => $department ? $department->id : NULL,
-                                        'type'              => '2',
-                                        'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])),
-                                        'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_kredit_fc[$key])),
-                                        'note'              => $request->arr_multi_note_detail[$key],
-                                        'note2'             => $request->arr_multi_note_detail2[$key],
-                                    ]);
+                                    if($distribusiBiaya){
+                                        $total = floatval(str_replace(',', '.', $request->arr_multi_kredit[$key]));
+                                        $totalfc = floatval(str_replace(',', '.', $request->arr_multi_kredit_fc[$key]));
+                                        $lastIndex = count($distribusiBiaya->costDistributionDetail) - 1;
+                                        $accumulation = 0;
+                                        $accumulationfc = 0;
+                                        foreach($distribusiBiaya->costDistributionDetail as $keyc => $rowcost){
+                                            if($keyc == $lastIndex){
+                                                $nominal = $total - $accumulation;
+                                                $nominalfc = $totalfc - $accumulationfc;
+                                            }else{
+                                                $nominal = round(($rowcost->percentage / 100) * $total);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $accumulation += $nominal;
+                                                $accumulationfc += $nominalfc;
+                                            }
+                                            JournalDetail::create([
+                                                'journal_id'                    => $query->id,
+                                                'cost_distribution_detail_id'   => $rowcost->id,
+                                                'coa_id'                        => $coaAvailable[$key],
+                                                'place_id'                      => $rowcost->place_id ? $rowcost->place_id : ($place ? $place->id : NULL),
+                                                'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+                                                'machine_id'                    => $machine ? $machine->id : NULL,
+                                                'department_id'                 => $department ? $department->id : NULL,
+                                                'note'                          => $request->arr_multi_note_detail[$key],
+                                                'note2'                         => $request->arr_multi_note_detail2[$key],
+                                                'type'                          => '2',
+                                                'nominal'                       => $nominal,
+                                                'nominal_fc'					=> $nominalfc,
+                                                'account_id'                    => $account ? $account->id : NULL,
+                                                'project_id'                    => $project ? $project->id : NULL,
+                                            ]);
+                                        }
+                                    }else{
+                                        JournalDetail::create([
+                                            'journal_id'        => $query->id,
+                                            'coa_id'            => $coaAvailable[$key],
+                                            'account_id'        => $account ? $account->id : NULL,
+                                            'place_id'          => $place ? $place->id : NULL,
+                                            'machine_id'        => $machine ? $machine->id : NULL,
+                                            'project_id'        => $project ? $project->id : NULL,
+                                            'department_id'     => $department ? $department->id : NULL,
+                                            'type'              => '2',
+                                            'nominal'           => floatval(str_replace(',', '.', $request->arr_multi_kredit[$key])),
+                                            'nominal_fc'        => floatval(str_replace(',', '.', $request->arr_multi_kredit_fc[$key])),
+                                            'note'              => $request->arr_multi_note_detail[$key],
+                                            'note2'             => $request->arr_multi_note_detail2[$key],
+                                        ]);
+                                    }
                                 }
                             }
                         }

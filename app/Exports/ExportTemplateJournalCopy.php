@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Company;
+use App\Models\CostDistribution;
 use App\Models\Currency;
 use App\Models\User;
 use App\Models\Coa;
@@ -34,7 +35,7 @@ class ExportTemplateJournalCopy implements WithEvents
         $user = User::where('status','1')->get();
         $coa = Coa::where('status','1')->where('level','5')->orderBy('code', 'asc')->get();
         $place = Place::where('status','1')->get();
-        $line = Line::where('status','1')->get();
+        $dist = CostDistribution::where('status','1')->get();
         $machine = Machine::where('status','1')->get();
         $department = Division::where('status','1')->get();
         $project = Project::where('status','1')->get();
@@ -75,7 +76,7 @@ class ExportTemplateJournalCopy implements WithEvents
         }
 
         $startRow = 2;
-        foreach($line as $row){
+        foreach($dist as $row){
             $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
             $startRow++;

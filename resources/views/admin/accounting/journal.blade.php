@@ -309,7 +309,7 @@
                                                         <th class="center" style="width:75px;" rowspan="2">BP</th>
                                                         <th class="center" style="width:75px;" rowspan="2">Coa</th>
                                                         <th class="center" style="width:75px;" rowspan="2">{{ __('translations.plant') }}</th>
-                                                        <th class="center" style="width:75px;" rowspan="2">{{ __('translations.line') }}</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Dist.Biaya</th>
                                                         <th class="center" style="width:75px;" rowspan="2">{{ __('translations.engine') }}</th>
                                                         <th class="center" style="width:75px;" rowspan="2">Proyek</th>
                                                         <th class="center" style="width:75px;" rowspan="2">{{ __('translations.division') }}</th>

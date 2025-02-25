@@ -350,7 +350,6 @@ class ComplaintSalesController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
 
         $approved = false;
         $revised = false;
@@ -504,21 +503,12 @@ class ComplaintSalesController extends Controller
                             'note'=> $request->arr_note[$key],
                         ]);
                     }
-
-                    // $resetdata = ApprovalSource::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->get();
-                    // foreach($resetdata as $rowreset){
-                    //     foreach($rowreset->approvalMatrix as $detailmatrix){
-                    //         $detailmatrix->delete();
-                    //     }
-                    //     $rowreset->delete();
-                    // }
-                    $data = DB::table($query->getTable())->where('id',$query->id)->first();
                     $approvalTemplate = ApprovalTemplate::where('status','1')
                     ->whereHas('approvalTemplateMenu',function($querys) use($query){
                         $querys->where('table_name',$query->getTable());
                     })
-                    ->whereHas('approvalTemplateOriginator',function($query){
-                        $query->where('user_id',session('bo_id'));
+                    ->whereHas('approvalTemplateOriginator',function($querys){
+                        $querys->where('user_id',session('bo_id'));
                     })->get();
 
                     if($query->approval()){
@@ -608,10 +598,8 @@ class ComplaintSalesController extends Controller
                 }
             }
 
-            DB::commit();
         }catch(\Exception $e){
             info($e->getMessage());
-            DB::rollback();
         }
 
 		return response()->json($response);
@@ -619,6 +607,59 @@ class ComplaintSalesController extends Controller
 
     public function show(Request $request){
         $po = ComplaintSales::where('code',CustomHelper::decrypt($request->id))->first();
+        // $approvalTemplate = ApprovalTemplate::where('status','1')
+        // ->whereHas('approvalTemplateMenu',function($querys) use($po){
+        //     $querys->where('table_name',$po->getTable());
+        // })
+        // ->whereHas('approvalTemplateOriginator',function($querys) use($po){
+        //     $querys->where('user_id',$po->user_id);
+        // })->get();
+
+        // foreach($approvalTemplate as $row){
+
+        //     $source = ApprovalSource::create([
+        //         'code'			=> strtoupper(uniqid()),
+        //         'user_id'		=> $po->user_id,
+        //         'date_request'	=> date('Y-m-d H:i:s'),
+        //         'lookable_type'	=> $po->getTable(),
+        //         'lookable_id'	=> $po->id,
+        //         'note'			=> $po->note,
+        //     ]);
+
+        //     $passed = true;
+
+        //     if($passed == true){
+
+        //         $count = 0;
+
+        //         foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
+        //                 $status = $count == 0 ? '1': '0';
+        //                 $check = true;
+        //                 if($check){
+        //                     if($po->getPercentageComplaint() > 5){
+        //                         ApprovalMatrix::create([
+        //                             'code'							=> strtoupper(Str::random(30)),
+        //                             'approval_template_stage_id'	=> $rowTemplateStage->id,
+        //                             'approval_source_id'			=> $source->id,
+        //                             'user_id'						=> 354,
+        //                             'date_request'					=> date('Y-m-d H:i:s'),
+        //                             'status'						=> $status
+        //                         ]);
+        //                     }else{
+        //                         ApprovalMatrix::create([
+        //                             'code'							=> strtoupper(Str::random(30)),
+        //                             'approval_template_stage_id'	=> $rowTemplateStage->id,
+        //                             'approval_source_id'			=> $source->id,
+        //                             'user_id'						=> 746,
+        //                             'date_request'					=> date('Y-m-d H:i:s'),
+        //                             'status'						=> $status
+        //                         ]);
+        //                     }
+        //                 }
+        //             }
+
+        //         }
+        // }
         $po['account_name'] = $po->account->name;
         $po['post_date']=date('Y-m-d',strtotime($po->post_date));
         $po['complaint_date']=date('Y-m-d',strtotime($po->complaint_date));

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Accounting\AccountingGrpoLcController;
 use App\Http\Controllers\Finance\BalanceBsEmployeeController;
 use App\Http\Controllers\HR\AttendanceController;
 use App\Http\Controllers\HR\AttendanceLatenessReportController;
@@ -465,8 +466,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_stock_repack', [Select2Controller::class, 'itemStockRepack']);
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
+                Route::get('purchase_order_detail_grpo', [Select2Controller::class, 'purchaseOrderDetailGrpo']);
                 Route::get('purchase_order_detail_scale', [Select2Controller::class, 'purchaseOrderDetailScale']);
                 Route::get('good_scale', [Select2Controller::class, 'goodScale']);
+                Route::get('good_scale_grpo', [Select2Controller::class, 'goodScaleGrpo']);
                 Route::get('good_scale_item', [Select2Controller::class, 'goodScale']);
                 Route::get('shift', [Select2Controller::class, 'shift']);
                 Route::get('shift_production', [Select2Controller::class, 'shiftProduction']);
@@ -4143,6 +4146,10 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ProfitLossController::class, 'index']);
                         Route::post('process', [ProfitLossController::class, 'process']);
                         Route::post('export', [ProfitLossController::class, 'export']);
+                    });
+                    Route::prefix('report_good_receipt_lc')->middleware('operation.access:report_good_receipt_lc,view')->group(function () {
+                        Route::get('/', [AccountingGrpoLcController::class, 'index']);
+                        Route::post('export', [AccountingGrpoLcController::class, 'export']);
                     });
                 });
             });

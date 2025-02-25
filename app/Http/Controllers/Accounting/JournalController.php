@@ -457,8 +457,8 @@ class JournalController extends Controller
                                                 $nominal = $total - $accumulation;
                                                 $nominalfc = $totalfc - $accumulationfc;
                                             }else{
-                                                $nominal = round(($rowcost->percentage / 100) * $total);
-                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $nominal = round(($rowcost->percentage / 100) * $total,2);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc,2);
                                                 $accumulation += $nominal;
                                                 $accumulationfc += $nominalfc;
                                             }
@@ -518,8 +518,8 @@ class JournalController extends Controller
                                                 $nominal = $total - $accumulation;
                                                 $nominalfc = $totalfc - $accumulationfc;
                                             }else{
-                                                $nominal = round(($rowcost->percentage / 100) * $total);
-                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $nominal = round(($rowcost->percentage / 100) * $total,2);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc,2);
                                                 $accumulation += $nominal;
                                                 $accumulationfc += $nominalfc;
                                             }
@@ -838,8 +838,8 @@ class JournalController extends Controller
                                                 $nominal = $total - $accumulation;
                                                 $nominalfc = $totalfc - $accumulationfc;
                                             }else{
-                                                $nominal = round(($rowcost->percentage / 100) * $total);
-                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $nominal = round(($rowcost->percentage / 100) * $total,2);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc,2);
                                                 $accumulation += $nominal;
                                                 $accumulationfc += $nominalfc;
                                             }
@@ -890,8 +890,8 @@ class JournalController extends Controller
                                                 $nominal = $total - $accumulation;
                                                 $nominalfc = $totalfc - $accumulationfc;
                                             }else{
-                                                $nominal = round(($rowcost->percentage / 100) * $total);
-                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc);
+                                                $nominal = round(($rowcost->percentage / 100) * $total,2);
+                                                $nominalfc = round(($rowcost->percentage / 100) * $totalfc,2);
                                                 $accumulation += $nominal;
                                                 $accumulationfc += $nominalfc;
                                             }

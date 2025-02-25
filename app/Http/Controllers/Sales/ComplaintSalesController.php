@@ -550,7 +550,7 @@ class ComplaintSalesController extends Controller
                                         $status = $count == 0 ? '1': '0';
                                         $check = true;
                                         if($check){
-                                            if($percent > 5){
+                                            if($query->getPercentageComplaint() > 5){
                                                 ApprovalMatrix::create([
                                                     'code'							=> strtoupper(Str::random(30)),
                                                     'approval_template_stage_id'	=> $rowTemplateStage->id,

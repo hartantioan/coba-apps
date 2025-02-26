@@ -599,10 +599,10 @@ class MarketingOrderInvoiceController extends Controller
                     ]);
 
                     //cek apakah SO punya mitraMarketingOrder
-                    $query_syncdata = null;
-                    if(optional($query->marketingOrderDeliveryProcess->getSalesModelUnique()[0] ?? null)->mitraMarketingOrder){
+                    /* $query_syncdata = null;
+                    if(optional($query->marketingOrderDeliveryProcess->getSalesModelUnique()[0] ?? null)->mitraMarketingOrder){ */
                         //input header Invoice to API
-                        $payload=[
+                        /* $payload=[
                             "code"              => $query->code,
                             "invDate"           => $query->post_date,
                             "totalAmount"       => $query->grandtotal,
@@ -619,7 +619,7 @@ class MarketingOrderInvoiceController extends Controller
                             'status'    => '0',
                             'attempts'  => 0,
                         ]);
-                    }
+                    } */
                 }
 
                 if($query) {
@@ -700,7 +700,7 @@ class MarketingOrderInvoiceController extends Controller
                         }
                     }
 
-                    if($query_syncdata){
+                    /* if($query_syncdata){
                         $arrDetailItem = MarketingOrderInvoiceDetail::where('marketing_order_invoice_id', $query->id)->get();
                         $detailItem=[];
                         foreach($arrDetailItem as $row){
@@ -709,14 +709,14 @@ class MarketingOrderInvoiceController extends Controller
                                 "qty"      => round($row->qty, 2),
                                 "uom"      => $row->getItemReal()->unit->code,
                             ];
-                        }
+                        } */
                         // Log::info($detailItem);
-                        $sync_data             = MitraApiSyncData::find($query_syncdata->id);
+                        /* $sync_data             = MitraApiSyncData::find($query_syncdata->id);
                         $temp_payload          = json_decode($sync_data->payload);             //ambil data payload, didecode jadi array
                         $temp_payload->details = $detailItem;                                  //payload detail diisi didetail item
                         $sync_data->payload    = json_encode($temp_payload);                   //payload disimpan dan diencode kembali
                         $sync_data->save();
-                    }
+                    } */
 
                     SendApproval::dispatch($query->getTable(),$query->id,$query->note,session('bo_id'));
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));

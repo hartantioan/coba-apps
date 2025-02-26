@@ -59,6 +59,7 @@ class ExportStockInRupiah extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBind
                         $query->where('item_cogs.place_id',$this->plant);
                     }
                 })
+                ->whereNull('item_cogs.deleted_at')
                 ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')
                 ->leftJoin('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
                 ->leftJoin('items', 'items.id', '=', 'item_cogs.item_id')

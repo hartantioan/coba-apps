@@ -74,9 +74,10 @@ class StockMovementController extends Controller
             foreach($item as $row){
                 $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
+                        $query->where('place_id',$request->plant);
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->where('warehouse_id',$request->warehouse);
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
@@ -99,6 +100,12 @@ class StockMovementController extends Controller
                         <tbody id="table_body">';
             $total = 0;
             foreach($arr as $key => $rowdata){
+                if($request->warehouse != 'all'){
+                    $rowtotal = round($rowdata->qtyByWarehouseIncludeDate($request->finish_date),3);
+                }else{
+                    $rowtotal = round($rowdata->qty_final,3);
+                }
+                $total += $rowtotal;
                 $html .= '<tr>
                     <td>'.($key + 1).'</td>
                     <td>'.$rowdata->place->code.'</td>
@@ -106,9 +113,8 @@ class StockMovementController extends Controller
                     <td>'.$rowdata->item->code.'</td>
                     <td>'.$rowdata->item->name.'</td>
                     <td>'.$rowdata->item->uomUnit->code.'</td>
-                    <td class="right-align">'.number_format($rowdata->qty_final,3,',','.').'</td>
+                    <td class="right-align">'.number_format($rowtotal,3,',','.').'</td>
                 </tr>';
-                $total += round($rowdata->qty_final,2);
             }
 
             $end_time = microtime(true);

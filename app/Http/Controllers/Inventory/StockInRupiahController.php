@@ -80,17 +80,17 @@ class StockInRupiahController extends Controller
                 </thead>
                 <tbody id="table_body">';
 
-            $arr = [];
-            $total = 0;
+            $totalNominal = 0;
+            $totalQty = 0;
             foreach($item as $key => $row){
-                $data = DB::table('item_cogs')->select('item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
+                $data = DB::table('item_cogs')->select('item_cogs.id AS id','item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
                 ->where('item_cogs.date','<=',$request->finish_date)->where('item_cogs.item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->where('item_cogs.place_id',$request->plant);
                     }
-                    if($request->warehouse != 'all'){
+                    /* if($request->warehouse != 'all'){
                         $query->where('item_cogs.warehouse_id',$request->warehouse);
-                    }
+                    } */
                 })
                 ->whereNull('item_cogs.deleted_at')
                 ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')
@@ -101,6 +101,14 @@ class StockInRupiahController extends Controller
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 if($data){
+                    /* if($request->warehouse != 'all'){
+                        $cogs = ItemCogs::find($data->id);
+                        $totalQty += round($cogs->qtyByWarehouseIncludeDate($request->finish_date),3);
+                        $totalNominal += round($cogs->totalByWarehouseIncludeDate($request->finish_date),2);
+                    }else{ */
+                        $totalQty += round($data->qty_final,3);
+                        $totalNominal += round($data->total_final,2);
+                    //}
                     $html .= '<tr>
                         <td>'.($key + 1).'</td>
                         <td>'.$data->place_code.'</td>
@@ -108,10 +116,9 @@ class StockInRupiahController extends Controller
                         <td>'.$data->item_code.'</td>
                         <td>'.$data->item_name.'</td>
                         <td>'.$data->uom_unit.'</td>
-                        <td class="right-align">'.number_format($data->qty_final,3,',','.').'</td>
-                        <td class="right-align">'.number_format($data->total_final,2,',','.').'</td>
+                        <td class="right-align">'.number_format($totalQty,3,',','.').'</td>
+                        <td class="right-align">'.number_format($totalNominal,2,',','.').'</td>
                     </tr>';
-                    $total += round($data->total_final,2);
                 }
             }
 
@@ -123,7 +130,7 @@ class StockInRupiahController extends Controller
                     <tfoot>
                         <tr>
                             <td colspan="7" class="right-align">Total</td>
-                            <td class="right-align">'.number_format($total,2,',','.').'</td>
+                            <td class="right-align">'.number_format($totalNominal,2,',','.').'</td>
                         </tr>
                     </tfoot>
                     </table> Execution time : '.$execution_time;
@@ -179,9 +186,9 @@ class StockInRupiahController extends Controller
                     if($request->plant != 'all'){
                         $query->where('item_cogs.place_id',$request->plant);
                     }
-                    if($request->warehouse != 'all'){
+                    /* if($request->warehouse != 'all'){
                         $query->where('item_cogs.warehouse_id',$request->warehouse);
-                    }
+                    } */
                 })
                 ->whereNull('item_cogs.deleted_at')
                 ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')
@@ -192,14 +199,14 @@ class StockInRupiahController extends Controller
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 if($old_data){
-                    if($request->warehouse != 'all'){
+                    /* if($request->warehouse != 'all'){
                         $cogs = ItemCogs::find($old_data->id);
                         $totalQty += round($cogs->qtyByWarehouseBeforeDate($request->start_date),3);
-                        $totalNominal += round($cogs->totalByWarehouseBeforeDate($request->start_date),3);
-                    }else{
+                        $totalNominal += round($cogs->totalByWarehouseBeforeDate($request->start_date),2);
+                    }else{ */
                         $totalQty += round($old_data->qty_final,3);
                         $totalNominal += round($old_data->total_final,2);
-                    }
+                    //}
                     $html .= '<tr>
                         <td>'.($key + 1).'</td>
                         <td>-</td>
@@ -223,9 +230,9 @@ class StockInRupiahController extends Controller
                     if($request->plant != 'all'){
                         $query->where('place_id',$request->plant);
                     }
-                    if($request->warehouse != 'all'){
+                    /* if($request->warehouse != 'all'){
                         $query->where('warehouse_id',$request->warehouse);
-                    }
+                    } */
                 })->orderBy('date')->orderBy('id')->get();
 
                 foreach($data as $rowdata){

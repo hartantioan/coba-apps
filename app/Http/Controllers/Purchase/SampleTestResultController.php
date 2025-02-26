@@ -47,7 +47,6 @@ class SampleTestResultController extends Controller
             'wet_whiteness_value',
             'dry_whiteness_value',
             'document',
-            'item_name',
             'note',
             'status',
         ];
@@ -120,7 +119,6 @@ class SampleTestResultController extends Controller
                     $val->user->name,
                     $val->sampleTestInput->supplier,
                     $val->lab_name,
-                    $val->item_name,
                     $val->wet_whiteness_value,
                     $val->dry_whiteness_value,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
@@ -152,14 +150,12 @@ class SampleTestResultController extends Controller
         $rules =[
             'wet_whiteness_value'                      => 'required',
             'dry_whiteness_value'              => 'required',
-            'item_name'              => 'required',
 
         ];
 
         if ($request->has('with_test') && $request->with_test == '1') {
             $rules['wet_whiteness_value'] = 'required';
             $rules['dry_whiteness_value'] = 'required';
-            $rules['item_name'] = 'required';
         }
 
         $validation = Validator::make($request->all(), $rules,  [
@@ -167,7 +163,6 @@ class SampleTestResultController extends Controller
 
             'wet_whiteness_value.required' => 'Wet Whiteness Value tidak boleh kosong.',
             'dry_whiteness_value.required' => 'Dry Whiteness Value tidak boleh kosong.',
-            'item_name.required'     => 'Nama item tidak boleh kosong.',
         ]);
         if($validation->fails()) {
             $response = [
@@ -197,7 +192,6 @@ class SampleTestResultController extends Controller
                     $query->wet_whiteness_value = str_replace(',','.',str_replace('.','',$request->wet_whiteness_value));
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
-                    $query->item_name = $request->item_name;
                     $query->note = $request->note;
                     $query->save();
                     $sample_test = SampleTestInput::find($request->sample_test_input_id);
@@ -215,7 +209,7 @@ class SampleTestResultController extends Controller
                         'lab_name'                  => $request->lab_name,
                         'wet_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->wet_whiteness_value)),
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
-                        'item_name'                 => $request->item_name,
+
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/sample_test_input') : NULL,
                         'note'                      => $request->note,
                     ]);

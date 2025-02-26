@@ -23,7 +23,6 @@
             <th rowspan="2">NILAI WET WHITENESS</th>
             <th rowspan="2">NILAI DRY WHITENESS</th>
             <th rowspan="2">LINK FOTO HASIL UJI</th>
-            <th rowspan="2">NAMA ITEM PORCELAIN</th>
             <th rowspan="2">CATATAN HASIL UJI</th>
             <th rowspan="2">TANGGAL DATA CATATAN KUSUS</th>
             <th rowspan="2">PENGGUNA</th>
@@ -47,21 +46,24 @@
                 $nama_lab = '';
                 $wet_white_val = $row->sampleTestResultQc->wet_whiteness_value ?? ''; // ✅ Handle null
                 $dry_white_val = $row->sampleTestResultQc->dry_whiteness_value ?? '';
-                $item_name = $row->sampleTestResultQc->item_name ?? '';
                 $note = $row->sampleTestResultQc->note ?? '';
             }
             elseif($row->type == 2){ // ✅ Use elseif instead of if
                 $nama_lab = $row->sampleTestResultProc->lab_name ?? '';
                 $wet_white_val = $row->sampleTestResultProc->wet_whiteness_value ?? '';
                 $dry_white_val = $row->sampleTestResultProc->dry_whiteness_value ?? '';
-                $item_name = $row->sampleTestResultProc->item_name ?? '';
                 $note = $row->sampleTestResultProc->note ?? '';
+            }
+            elseif($row->type == 3){ // ✅ Use elseif instead of if
+                $nama_lab = '';
+                $wet_white_val = '';
+                $dry_white_val = $row->sampleTestResultQcPacking->dry_whiteness_value ?? '';
+                $note = $row->sampleTestResultQcPacking->note ?? '';
             }
             else {
                 $nama_lab = '';
                 $wet_white_val = '';
                 $dry_white_val = '';
-                $item_name = '';
                 $note = '';
             }
         @endphp
@@ -94,7 +96,6 @@
                 <td>{{ $wet_white_val}}</td>
                 <td>{{ $dry_white_val }}</td>
                 <td></td>
-                <td>{{ $item_name }}</td>
                 <td>{{ $note }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->created_at ?? '' }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->user->name ?? ''}}</td>

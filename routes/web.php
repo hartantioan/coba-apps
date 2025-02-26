@@ -157,6 +157,7 @@ use App\Http\Controllers\Purchase\PurchaseOrderController;
 use App\Http\Controllers\Purchase\SampleTestInputController;
 use App\Http\Controllers\Purchase\SampleTestResultController;
 use App\Http\Controllers\Purchase\SampleTestQcResultController;
+use App\Http\Controllers\Purchase\SampleTestResultQcPackingController;
 use App\Http\Controllers\Purchase\SpecialNotePICSampleController;
 use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
 use App\Http\Controllers\Purchase\LandedCostController;
@@ -547,6 +548,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_complaint', [Select2Controller::class, 'marketingOrderComplaint']);
                 Route::get('sample_test_input_proc', [Select2Controller::class, 'sampleTestInputProc']);
                 Route::get('sample_test_input_qc', [Select2Controller::class, 'sampleTestInputQc']);
+                Route::get('sample_test_input_qc_packing', [Select2Controller::class, 'sampleTestInputQcPacking']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -2095,6 +2097,31 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual_chi/{id}', [SampleTestQcResultController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [SampleTestQcResultController::class, 'voidStatus'])->middleware('operation.access:sample_test_qc_result,void');
                     Route::post('destroy', [SampleTestQcResultController::class, 'destroy'])->middleware('operation.access:sample_test_qc_result,delete');
+                });
+
+                Route::prefix('sample_test_qc_packing_result')->middleware(['operation.access:sample_test_qc_packing_result,view'])->group(function () {
+                    Route::get('/', [SampleTestResultQcPackingController::class, 'index']);
+                    Route::get('datatable', [SampleTestResultQcPackingController::class, 'datatable']);
+                    Route::get('row_detail', [SampleTestResultQcPackingController::class, 'rowDetail']);
+                    Route::post('show', [SampleTestResultQcPackingController::class, 'show']);
+                    Route::post('done', [SampleTestResultQcPackingController::class, 'done'])->middleware('operation.access:sample_test_qc_packing_result,update');
+                    Route::post('get_items', [SampleTestResultQcPackingController::class, 'getItems']);
+                    Route::post('get_code', [SampleTestResultQcPackingController::class, 'getCode']);
+                    Route::post('print', [SampleTestResultQcPackingController::class, 'print']);
+                    Route::post('print_by_range', [SampleTestResultQcPackingController::class, 'printByRange']);
+                    Route::get('export_from_page', [SampleTestResultQcPackingController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [SampleTestResultQcPackingController::class, 'viewStructureTree']);
+                    Route::get('simplestructuretree', [SampleTestResultQcPackingController::class, 'simpleStructrueTree']);
+                    Route::post('get_details', [SampleTestResultQcPackingController::class, 'getDetails']);
+                    Route::post('send_email', [SampleTestResultQcPackingController::class, 'sendEmail']);
+                    Route::post('remove_used_data', [SampleTestResultQcPackingController::class, 'removeUsedData']);
+                    Route::post('create', [SampleTestResultQcPackingController::class, 'create'])->middleware('operation.access:sample_test_qc_packing_result,update');
+                    Route::post('create_done', [SampleTestResultQcPackingController::class, 'createDone'])->middleware('operation.access:sample_test_qc_packing_result,update');
+                    Route::get('approval/{id}', [SampleTestResultQcPackingController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [SampleTestResultQcPackingController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}', [SampleTestResultQcPackingController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [SampleTestResultQcPackingController::class, 'voidStatus'])->middleware('operation.access:sample_test_qc_packing_result,void');
+                    Route::post('destroy', [SampleTestResultQcPackingController::class, 'destroy'])->middleware('operation.access:sample_test_qc_packing_result,delete');
                 });
 
                 Route::prefix('sample_test_input_pic_note')->middleware(['operation.access:sample_test_input,view', 'lockacc'])->group(function () {

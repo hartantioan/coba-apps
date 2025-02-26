@@ -113,27 +113,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>code</th>
-                                                        <th>Tipe Sampel</th>
+                                                        <th>Kode</th>
+                                                        <th>User</th>
                                                         <th>Supplier</th>
-                                                        <th>CP Supplier</th>
-                                                        <th>Provinsi</th>
-                                                        <th>Kota</th>
-                                                        <th>Kelurahan</th>
-                                                        <th>Telepon Supplier</th>
-                                                        <th>Tanggal Sampel</th>
-                                                        <th>Status</th>
-                                                        <th>Link Peta</th>
-                                                        <th>Jenis Izin</th>
-                                                        <th>Nama Izin</th>
-                                                        <th>Perizinan Komoditas</th>
-                                                        <th>Periode Izin</th>
-                                                        <th>Kapasitas yang Diterima</th>
-                                                        <th>Estimasi Harga Loco</th>
-                                                        <th>Estimasi Harga Franco</th>
-                                                        <th>Kode Sampel Supplier</th>
-                                                        <th>Kode Sampel Perusahaan</th>
-                                                        <th>Dokumen</th>
+                                                        <th>Nilai Dry Whiteness</th>
+                                                        <th>File</th>
                                                         <th>Catatan</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -164,128 +148,27 @@
                     <div class="col s12">
                         <div class="row">
                             <div class="col s12">
-                                <fieldset>
-                                    <div class="row">
-                                        <div class="col s12 m6">
-                                            <div class="switch mb-1">
-                                                <label for="with_test">Hasil Uji</label>
-                                            </div>
-                                        </div>
-                                        <div class="col s12 m6">
-                                        </div>
-                                    </div>
-                                    <div class="card-alert card red" style="display: none">
+                                <fieldset id="modal-fieldset">
+                                    <legend>Hasil Uji</legend>
 
-                                        <div class="card-content white-text">
-                                            <p></p>
-                                        </div>
-                                    </div>
-                                    <legend>1. {{ __('translations.main_info') }}</legend>
-                                    <div class="input-field col m2 s12 step1">
-                                        <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                        <label class="active" for="code">No. Dokumen</label>
-                                    </div>
-                                    <div class="input-field col m1 s12 step2">
-                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s12 m3">
-                                        <select class="select2 browser-default" id="sample_type_id" name="sample_type_id">
+                                    <div class="input-field col s12 m6">
+                                        <select class="select2 browser-default" id="sample_test_input_id" name="sample_test_input_id" onchange="applyTest()">
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
-                                        <label class="active" for="sample_type_id">Jenis Sampel</label>
+                                        <label class="active" for="sample_test_input_id">Kode Input Tes Sampel</label>
                                     </div>
                                     <div class="input-field col m3 s12 step12">
-                                        <select class="form-control" id="type" name="type">
-                                            <option value="1">QC Lab</option>
-                                            <option value="3">QC Packing</option>
-                                            <option value="2">Pihak ke-3</option>
-                                            <option value="">Belum Diuji</option>
-                                        </select>
-                                        <label class="active" for="type">Di Uji Oleh:</label>
-                                    </div>
-                                    <div class="input-field col s12 m3">
-                                        <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
-                                        <label class="active" for="province_id">{{ __('translations.province') }}</label>
-                                    </div>
-
-                                    <div class="input-field col s12 m12"></div>
-                                    <div class="input-field col s12 m3">
-                                        <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
-                                            <option value="">--{{ __('translations.select') }}--</option>
-                                        </select>
-                                        <label class="active" for="city_id">{{ __('translations.city') }}</label>
-                                    </div>
-                                    <div class="input-field col s12 m3">
-                                        <select class="select2 browser-default" id="district_id" name="district_id">
-                                            <option value="">--{{ __('translations.select') }}--</option>
-                                        </select>
-                                        <label class="active" for="district_id">{{ __('translations.district') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="village_name" name="village_name" type="text" placeholder="Desa / Kecamatan">
-                                        <label class="active" for="village_name">Desa / Kecamatan</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="link_map" name="link_map" type="text" placeholder="Link Map">
-                                        <label class="active" for="link_map">Link Map</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="sample_date" name="sample_date" type="date" placeholder="Nama Izin">
-                                        <label class="active" for="sample_date">Tanggal Sampel</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
-                                        <input id="supplier" name="supplier" type="text" placeholder="Supplier">
-                                        <label class="active" for="supplier"> Supplier</label>
+                                        <input  type="text" id="sample_type" name="sample_type" readonly placeholder=" "></input>
+                                        <label class="active" for="sample_type">Jenis Sampel</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step3">
-
-                                        <input id="supplier_name" name="supplier_name" type="text" placeholder="CP Supplier">
-                                        <label class="active" for="supplier_name">CP Supplier</label>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  type="text" id="company_code" name="company_code" readonly placeholder=" "></input>
+                                        <label class="active" for="company_code">Kode Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="supplier_phone" name="supplier_phone" type="text" placeholder="Telp CP Supplier">
-                                        <label class="active" for="supplier_phone">Telp CP Supplier</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="permission_type" name="permission_type" type="text" placeholder="Jenis Izin">
-                                        <label class="active" for="permission_type">Jenis Izin</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="permission_name" name="permission_name" type="text" placeholder="Nama Izin">
-                                        <label class="active" for="permission_name">Nama Izin</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="commodity_permits" name="commodity_permits" type="text" placeholder="Komoditas Izin">
-                                        <label class="active" for="commodity_permits">Komoditas Izin</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="permits_period" name="permits_period" type="text" placeholder="Masa Berlaku Izin">
-                                        <label class="active" for="permits_period">Masa Berlaku Izin</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step26">
-                                        <input id="receiveable_capacity" name="receiveable_capacity" type="text" value="0" onkeyup="formatRupiah(this)">
-                                        <label class="active" for="receiveable_capacity">Kapasitas yang bisa didapatkan(perbulan)</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step26">
-                                        <input id="price_estimation_loco" name="price_estimation_loco" type="text" value="0" onkeyup="formatRupiah(this)">
-                                        <label class="active" for="price_estimation_loco">Estimasi Harga Loco</label>
-                                    </div><div class="input-field col m3 s12 step26">
-                                        <input id="price_estimation_franco" name="price_estimation_franco" type="text" value="0" onkeyup="formatRupiah(this)">
-                                        <label class="active" for="price_estimation_franco">Estimasi Harga Franco</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="supplier_sample_code" name="supplier_sample_code" type="text" placeholder="Kode dari Supplier">
-                                        <label class="active" for="supplier_sample_code">Kode dari Supplier</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input id="company_sample_code" name="company_sample_code" type="text" placeholder="Kode dari Perusahaan">
-                                        <label class="active" for="company_sample_code">Kode dari Perusahaan ( No Duplicate )</label>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input  type="text" id="dry_whiteness_value" name="dry_whiteness_value" placeholder=" " value="0" onkeyup="formatRupiah(this)"></input>
+                                        <label class="active" for="dry_whiteness_value">Nilai dry whiteness.</label>
                                     </div>
                                     <div class="col m4 s12 step6">
                                         <label class="">Bukti Upload</label>
@@ -304,10 +187,12 @@
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
+                                    <div class="col s12 m12 l12"></div>
+
                                     <div class="input-field col m3 s12 step3">
 
-                                        <input id="note" name="note" type="text" placeholder="Catatan Sampel">
-                                        <label class="active" for="note"> Catatan Sampel</label>
+                                        <input id="note" name="note" type="text" placeholder=" ">
+                                        <label class="active" for="note"> Catatan hasil Uji </label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -505,21 +390,7 @@
 
 <script>
 
-    $(document).ready(function() {
-        toggleLabNameField($('#lab_type').val());
 
-        $('#lab_type').change(function() {
-            toggleLabNameField($(this).val());
-        });
-
-        function toggleLabNameField(value) {
-            if (value == "2") {
-                $('#lab_name_field').show();
-            } else {
-                $('#lab_name_field').hide();
-            }
-        }
-    });
     var mode = '';
 
     const dropZone = document.getElementById('dropZone');
@@ -533,15 +404,16 @@
         fileInput.click();
     });
 
-
     fileInput.addEventListener('change', (e) => {
         handleFile(e.target.files[0]);
     });
+
 
     function dragOverHandler(event) {
         event.preventDefault();
         dropZone.style.backgroundColor = '#f0f0f0';
     }
+
 
     function dropHandler(event) {
         event.preventDefault();
@@ -549,6 +421,7 @@
 
         handleFile(event.dataTransfer.files[0]);
     }
+
 
     function handleFile(file) {
         if (file) {
@@ -593,6 +466,7 @@
         fileInput.value = '';
         fileNameDiv.textContent = '';
     });
+
 
     document.addEventListener('paste', (event) => {
         const items = event.clipboardData.items;
@@ -733,6 +607,12 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                    $('#company_id').trigger('change');
+                }
+                /* $('#pr-show,#gi-show,#sj-show').show(); */
+                $('#inventory_type').formSelect().trigger('change');
             },
             onCloseEnd: function(modal, trigger){
                 $('input').css('border', 'none');
@@ -745,7 +625,7 @@
                 $('#province_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
-                $('#sample_type_id').empty();
+                $('#sample_test_input_id').empty();
                 $('#province_id').empty();
                 $('#city_id').empty();
                 window.onbeforeunload = function() {
@@ -822,8 +702,7 @@
             }
         });
 
-        select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
-        select2ServerSide('#sample_type_id', '{{ url("admin/select2/sample_type") }}');
+        select2ServerSide('#sample_test_input_id', '{{ url("admin/select2/sample_test_input_qc_packing") }}');
 
         $("#table-detail th").resizable({
             minWidth: 100,
@@ -948,27 +827,11 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
-                { name: 'sample_type', className: 'center-align' },
-                { name: 'supplier', className: '' },
                 { name: 'supplier_name', className: '' },
-                { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
                 { name: 'supplier_phone', className: '' },
-                { name: 'sample_date', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'link_map', className: '' },
-                { name: 'permission_type', className: '' },
-                { name: 'permission_name', className: '' },
-                { name: 'commodity_permits', className: '' },
-                { name: 'permits_period', className: '' },
-                { name: 'receiveable_capacity', className: 'right-align' },
-                { name: 'price_estimation', className: 'right-align' },
-                { name: 'supplier_sample_code', className: '' },
-                { name: 'company_sample_code', className: '' },
-                { name: 'document', className: '' },
-                { name: 'document', className: '' },
-                { name: 'note', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' }
             ],
         });
@@ -1164,40 +1027,16 @@
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                $('#sample_type_id').empty();
-                $('#sample_type_id').append(`
-                    <option value="` + response.sample_type_id + `">` + response.sample_type_name + `</option>
+                $('#sample_test_input_id').empty();
+                $('#sample_test_input_id').append(`
+                    <option value="` + response.sample_test_input_id + `">` + response.sample_test_input_code + `</option>
                 `);
 
-                $('#province_id').empty();
-                $('#province_id').append(`
-                    <option value="` + response.province_id + `">` + response.province_name + `</option>
-                `);
 
-                $('#city_id').empty();
-                $('#city_id').append(`
-                    <option value="` + response.city_id + `">` + response.city_name + `</option>
-                `);
-
-                $('#district_id').empty();
-                $('#district_id').append(`
-                    <option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>
-                `);
-                $('#link_map').val(response.link_map);
-                $('#supplier_phone').val(response.supplier_phone);
-                $('#village_name').val(response.village_name);
-                $('#sample_date').val(response.sample_date);
-                $('#supplier').val(response.supplier);
-                $('#supplier_name').val(response.supplier_name);
-                $('#permission_type').val(response.permission_type);
-                $('#permission_name').val(response.permission_name);
-                $('#commodity_permits').val(response.commodity_permits);
-                $('#permits_period').val(response.permits_period);
-                $('#price_estimation').val(response.price_estimation);
                 $('#receiveable_capacity').val(response.receiveable_capacity);
-                $('#supplier_sample_code').val(response.supplier_sample_code);
-                $('#company_sample_code').val(response.company_sample_code);
-                $('#type').val(response.type).formSelect();
+                $('#sample_type').val(response.sample_type);
+                $('#company_code').val(response.company_sample_code);
+                $('#dry_whiteness_value').val(response.dry_whiteness_value);
                 $('#note').val(response.note);
 
                 $('#note').focus();
@@ -1359,6 +1198,15 @@
         }else{
             city = [];
             district = [];
+        }
+    }
+
+    function applyTest(){
+        if($('#sample_test_input_id').val()){
+            var jenis_sampel = $('#sample_test_input_id').select2('data')[0].sample_type_name;
+            $('#sample_type').val(jenis_sampel);
+            var company_code = $('#sample_test_input_id').select2('data')[0].company_sample_code;
+            $('#company_code').val(company_code);
         }
     }
 

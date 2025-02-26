@@ -117,7 +117,6 @@
                                                         <th>User</th>
                                                         <th>Supplier</th>
                                                         <th>Laboratorium</th>
-                                                        <th>Item</th>
                                                         <th>Nilai Wet Whiteness</th>
                                                         <th>Nilai Dry Whiteness</th>
                                                         <th>File</th>
@@ -199,10 +198,6 @@
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
                                     <div class="col s12 m12 l12"></div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  id="item_name" type="text" name="item_name" placeholder=" "></input>
-                                        <label class="active" for="item_name">Nama Item</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step3">
 
                                         <input id="note" name="note" type="text" placeholder=" ">
@@ -354,41 +349,6 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <form class="row" id="form_done" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert_done" style="display:none;"></div>
-                    </div>
-                    <p class="mt-2 mb-2">
-                        <h4>Detail Penutupan Permintaan Pembelian per Item</h4>
-                        <input type="hidden" id="tempDone" name="tempDone">
-                        <table class="bordered" style="width:100%;">
-                            <thead>
-                                <tr>
-                                    <th class="center">Tutup</th>
-                                    <th class="center">{{ __('translations.item') }}</th>
-                                    <th class="center">{{ __('translations.unit') }}</th>
-                                    <th class="center">Qty Order</th>
-                                    <th class="center">Qty Diterima</th>
-                                    <th class="center">Qty Gantungan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-done"></tbody>
-                        </table>
-                    </p>
-                    <button class="btn waves-effect waves-light right submit" onclick="saveDone();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                </form>
-                <p>Info : Item yang tertutup akan dianggap sudah diterima / masuk gudang secara keseluruhan, sehingga tidak akan muncul di form Penerimaan PO / Goods Receipt.</p>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
-    </div>
-</div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
@@ -854,7 +814,6 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'sample_type', className: 'center-align' },
                 { name: 'sample_type', className: 'center-align' },
                 { name: 'supplier', className: '' },
                 { name: 'supplier_name', className: '' },

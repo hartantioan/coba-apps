@@ -116,7 +116,6 @@
                                                         <th>Kode</th>
                                                         <th>User</th>
                                                         <th>Supplier</th>
-                                                        <th>Item</th>
                                                         <th>Nilai Wet Whiteness</th>
                                                         <th>Nilai Dry Whiteness</th>
                                                         <th>File</th>
@@ -194,10 +193,7 @@
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
                                     </div>
                                     <div class="col s12 m12 l12"></div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  id="item_name" type="text" name="item_name" placeholder=" "></input>
-                                        <label class="active" for="item_name">Nama Item</label>
-                                    </div>
+
                                     <div class="input-field col m3 s12 step3">
 
                                         <input id="note" name="note" type="text" placeholder=" ">
@@ -836,7 +832,6 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
-                { name: 'sample_type', className: 'center-align' },
                 { name: 'supplier', className: '' },
                 { name: 'supplier_name', className: '' },
                 { name: 'city_name', className: '' },
@@ -1049,8 +1044,6 @@
                 $('#company_code').val(response.company_sample_code);
                 $('#wet_whiteness_value').val(response.wet_whiteness_value);
                 $('#dry_whiteness_value').val(response.dry_whiteness_value);
-                $('#item_name').val(response.item_name);
-
                 $('#note').val(response.note);
 
                 $('#note').focus();

@@ -8,13 +8,13 @@ use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\Place;
 use App\Models\SampleTestInput;
-use App\Models\SampleTestQcResult;
+use App\Models\SampleTestQcPackingResult;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class SampleTestQcResultController extends Controller
+class SampleTestResultQcPackingController extends Controller
 {
     public function index(Request $request)
     {
@@ -24,9 +24,9 @@ class SampleTestQcResultController extends Controller
 
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'         => 'Hasil Uji Qc Lab',
+            'title'         => 'Hasil Uji Qc Packing',
             'place'         => Place::where('status','1')->get(),
-            'content'       => 'admin.purchase.sample_test_result_qc',
+            'content'       => 'admin.purchase.sample_test_result_qc_packing',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
@@ -42,7 +42,6 @@ class SampleTestQcResultController extends Controller
         $column = [
             'sample_test_input_id',
             'user_id',
-            'wet_whiteness_value',
             'dry_whiteness_value',
             'document',
             'note',
@@ -55,9 +54,9 @@ class SampleTestQcResultController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = SampleTestQcResult::count();
+        $total_data = SampleTestQcPackingResult::count();
 
-        $query_data = SampleTestQcResult::where(function($query) use ($search, $request) {
+        $query_data = SampleTestQcPackingResult::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
@@ -83,7 +82,7 @@ class SampleTestQcResultController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = SampleTestQcResult::where(function($query) use ($search, $request) {
+        $total_filtered = SampleTestQcPackingResult::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
@@ -116,7 +115,6 @@ class SampleTestQcResultController extends Controller
                     $val->sampleTestInput->code,
                     $val->user->name,
                     $val->sampleTestInput->supplier,
-                    $val->wet_whiteness_value,
                     $val->dry_whiteness_value,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
@@ -145,20 +143,14 @@ class SampleTestQcResultController extends Controller
 
     public function create(Request $request){
         $rules =[
-            'wet_whiteness_value'                      => 'required',
             'dry_whiteness_value'              => 'required',
+            'note'                             => 'required',
 
         ];
-
-        if ($request->has('with_test') && $request->with_test == '1') {
-            $rules['wet_whiteness_value'] = 'required';
-            $rules['dry_whiteness_value'] = 'required';
-        }
 
         $validation = Validator::make($request->all(), $rules,  [
             'supplier.required'     => 'Supplier tidak boleh kosong.',
 
-            'wet_whiteness_value.required' => 'Wet Whiteness Value tidak boleh kosong.',
             'dry_whiteness_value.required' => 'Dry Whiteness Value tidak boleh kosong.',
 
         ]);
@@ -171,7 +163,7 @@ class SampleTestQcResultController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
 
-                    $query = SampleTestQcResult::find($request->temp);
+                    $query = SampleTestQcPackingResult::find($request->temp);
 
                     if($request->has('file')) {
                         if($query->document){
@@ -186,7 +178,6 @@ class SampleTestQcResultController extends Controller
 
                     $query->user_id = session('bo_id');
                     $query->sample_test_input_id = $request->sample_test_input_id;
-                    $query->wet_whiteness_value = str_replace(',','.',str_replace('.','',$request->wet_whiteness_value));
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
                     $query->note = $request->note;
@@ -200,10 +191,9 @@ class SampleTestQcResultController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = SampleTestQcResult::create([
+                    $query = SampleTestQcPackingResult::create([
                         'user_id'                   => session('bo_id'),
                         'sample_test_input_id'      => $request->sample_test_input_id,
-                        'wet_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->wet_whiteness_value)),
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
 
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/sample_test_input') : NULL,
@@ -224,7 +214,7 @@ class SampleTestQcResultController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new SampleTestQcResult())
+                    ->performedOn(new SampleTestQcPackingResult())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit hasil uji.');
@@ -245,7 +235,7 @@ class SampleTestQcResultController extends Controller
     }
 
     public function show(Request $request){
-        $unit = SampleTestQcResult::find($request->id);
+        $unit = SampleTestQcPackingResult::find($request->id);
 
         $unit['sample_test_input_code'] = $unit->sampleTestInput->code;
         $unit['company_sample_code'] = $unit->sampleTestInput->company_sample_code;
@@ -259,15 +249,15 @@ class SampleTestQcResultController extends Controller
     //     $end_date = $request->end_date ? $request->end_date : '';
     //     $status = $request->status ? $request->status : '';
     //     $search = $request->search ? $request->search : '';
-	// 	return Excel::download(new ExportFromTransactionPageSampleTestQcResult($post_date,$end_date,$status,$search), 'sample_test_input'.uniqid().'.xlsx');
+	// 	return Excel::download(new ExportFromTransactionPageSampleTestQcPackingResult($post_date,$end_date,$status,$search), 'sample_test_input'.uniqid().'.xlsx');
     // }
 
     public function destroy(Request $request){
-        $query = SampleTestQcResult::find($request->id);
+        $query = SampleTestQcPackingResult::find($request->id);
 
         if($query->delete()) {
             activity()
-                ->performedOn(new SampleTestQcResult())
+                ->performedOn(new SampleTestQcPackingResult())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the Sample Result data');

@@ -134,11 +134,15 @@ class SampleTestInput extends Model
     public function sampleTestResultQc(){
         return $this->hasOne('App\Models\SampleTestQcResult','sample_test_input_id','id');
     }
+    public function sampleTestResultQcPacking(){
+        return $this->hasOne('App\Models\SampleTestQcPackingResult','sample_test_input_id','id');
+    }
 
     public function type(){
         $status = match ($this->type) {
-            '1' => 'Pabrik',
-            '2' => 'Luar',
+            '1' => 'QC Lab',
+            '2' => 'Pihak ke-3',
+            '3' => 'QC Packing',
             default => '-',
         };
 

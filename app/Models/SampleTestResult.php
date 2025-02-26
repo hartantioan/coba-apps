@@ -21,7 +21,6 @@ class SampleTestResult extends Model
         'wet_whiteness_value',
         'dry_whiteness_value',
         'document',
-        'item_name',
         'note',
         'status',
     ];

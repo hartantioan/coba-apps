@@ -70,6 +70,17 @@ class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
                 $drawings[] = $drawing;
             }
 
+            if ($row_data->type == '3' && !empty($row_data->sampleTestResultQcPacking->document) &&
+                file_exists(storage_path('app/' . $row_data->sampleTestResultQcPacking->document))) {
+                $drawing = new Drawing();
+                $drawing->setName('QC Document');
+                $drawing->setDescription('QC Test Result');
+                $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQcPacking->document));
+                $drawing->setHeight(100);
+                $drawing->setCoordinates('AB' . ($index + 2));
+                $drawings[] = $drawing;
+            }
+
             if ($row_data->type == '1' && !empty($row_data->sampleTestResultProc->document) &&
                 file_exists(storage_path('app/' . $row_data->sampleTestResultProc->document))) {
                 $drawing = new Drawing();

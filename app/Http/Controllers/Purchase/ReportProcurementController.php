@@ -22,6 +22,7 @@ use App\Models\RuleBpScale;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 
 class ReportProcurementController extends Controller
@@ -659,6 +660,7 @@ class ReportProcurementController extends Controller
             if($query_data){
                 foreach ($limited_data as $k=>$row) {
                     $arr = [];
+                    $temp_pdf = [];
                     $no = 1;
                     $all_penerimaan = 0;
                     $all_bayar = 0;
@@ -847,21 +849,28 @@ class ReportProcurementController extends Controller
                         $randomString = Str::random(10);
                     }
 
-
-                    info('masuktod');
                     $filePath = 'public/pdf/' . $randomString . '.pdf';
 
                     Storage::put($filePath, $content);
-                    $randomStringss = Str::random(4);
 
                     $absoluteFilePath = storage_path('app/' . $filePath);
                     $document_po = asset(Storage::url($filePath));
-                    $pdfFileName = "Report_Procurement_Account_{$k}_{$randomStringss}.pdf";
-                    $contentArray[] = $content;
-                    $pdfFileNameArray[] = $pdfFileName;
+                    $temp_pdf[] = $content;
 
 
                 }
+                $merger = new Merger();
+                foreach ($temp_pdf as $pdfContent) {
+                    $merger->addRaw($pdfContent);
+                }
+
+
+                $result = $merger->merge();
+
+                $randomStringss = Str::random(4);
+                $pdfFileName = "Report_Procurement_Account_{$k}_{$randomStringss}.pdf";
+                $contentArray[]=$result;
+                $pdfFileNameArray[] = $pdfFileName;
 
             }else{
                 $error = $zip->getStatusString();

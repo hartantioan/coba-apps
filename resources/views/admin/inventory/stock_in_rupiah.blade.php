@@ -140,33 +140,6 @@
                     </div>
 
                 </div>
-                <div class="row" id="table_laporan">
-                    <table class="bordered" style="font-size:10px;">
-                        <thead id="t_head">
-                            <tr>
-                                <th class="center-align">{{ __('translations.no') }}.</th>
-                                <th class="center-align">{{ __('translations.date') }}</th>
-                                <th class="center-align">{{ __('translations.plant') }}</th>
-                                <th class="center-align">{{ __('translations.warehouse') }}</th>
-                                <th class="center-align">{{ __('translations.code') }}</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">{{ __('translations.unit') }}</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Batch Produksi</th>
-                                <th class="center-align">No. Dokumen</th>
-                                <th class="center-align">{{ __('translations.qty') }}</th>
-                                <th class="center-align">Harga </th>
-                                <th class="center-align">{{ __('translations.total') }}</th>
-                                <th class="center-align">Cumulative Qty.</th>
-                                <th class="center-align">Cumulative Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table_body">
-                        </tbody>
-                    </table>
-
-                </div>
                 <div class="row" id="result-final">
             
                 </div>
@@ -215,96 +188,7 @@
             success: function(response) {
                 loadingClose('#main');
                 if(response.status == 200) {
-                    $('#table_body').empty();
-
-                    if($('#type').val() == 'final'){
-                        $('#table_laporan').addClass('hide');
-                        $('#result-final').removeClass('hide');
-                        $('#result-final').html(response.html);
-                    }else{
-                        $('#table_laporan').removeClass('hide');
-                        $('#result-final').addClass('hide');
-                        if (response.message.length > 0) {
-                            var processedItems = [];
-                            $('#t_head').empty();
-                            $('#t_head').append(`
-                                <tr>
-                                    <th class="center-align">{{ __('translations.no') }}.</th>
-                                    <th class="center-align">{{ __('translations.date') }}</th>
-                                    <th class="center-align">{{ __('translations.plant') }}</th>
-                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
-                                    <th class="center-align">{{ __('translations.code') }}</th>
-                                    <th class="center-align">Nama Item</th>
-                                    <th class="center-align">{{ __('translations.unit') }}</th>
-                                    <th class="center-align">Area</th>
-                                    <th class="center-align">Shading</th>
-                                    <th class="center-align">Batch Produksi</th>
-                                    <th class="center-align">No. Dokumen</th>
-                                    <th class="center-align">{{ __('translations.qty') }}</th>
-                                    <th class="center-align">Harga </th>
-                                    <th class="center-align">{{ __('translations.total') }}</th>
-                                    <th class="center-align">Cumulative Qty.</th>
-                                    <th class="center-align">Cumulative Value</th>
-                                </tr>`);
-                                var itung = 0;
-                                $.each(response.message, function(i, val) {
-                                if(val.perlu == 1){
-                                    $('#table_body').append(`
-                                        <tr>
-                                            <td class="center-align">`+(itung+1)+`</td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align">` + val.kode + `</td>
-                                            <td class="">` + val.item + `</td>
-                                            <td class="center-align">` + val.satuan + `</td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align">Saldo Awal</td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="right-align">` + val.last_qty + `</td>
-                                            <td class="right-align">` + val.last_nominal + `</td>
-                                        </tr>`
-                                    );
-                                    itung++;
-                                }else{
-                                    $('#table_body').append(`
-                                        <tr>
-                                            <td class="center-align"></td>
-                                            <td >`+val.date+`</td>
-                                            <td >`+val.plant+`</td>
-                                            <td >`+val.warehouse+`</td>
-                                            <td >`+val.kode+`</td>
-                                            <td >`+val.item+`</td>
-                                            <td class="center-align">`+val.satuan+`</td>
-                                            <td class="center-align">`+val.area+`</td>
-                                            <td class="center-align">`+val.shading+`</td>
-                                            <td class="center-align">`+val.production_batch+`</td>
-                                            <td >`+val.document+`</td>
-                                            <td class="right-align">`+val.qty+`</td>
-                                            <td class="right-align">`+val.final+`</td>
-                                            <td class="right-align">`+val.total+`</td>
-                                            <td class="right-align">`+val.cum_qty+`</td>
-                                            <td class="right-align">`+val.cum_val+`</td>
-                                        </tr>
-                                    `);
-                                }
-
-                            });
-                            M.toast({
-                                html: 'filtered'
-                            });
-                        }else{
-                            $('#table_body').append(`
-                                <tr>
-                                    <td colspan="6" class="center-align">BELUM ADA STOCK</td>
-                                </tr>`);
-                        }
-                    }
-
+                    $('#result-final').html(response.html);
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);

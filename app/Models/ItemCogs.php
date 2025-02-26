@@ -202,6 +202,36 @@ class ItemCogs extends Model
         return $total;
     }
 
+    public function totalByWarehouseBeforeDate($date){
+
+        $batch = $this->production_batch_id ? "AND ic.production_batch_id = ".$this->production_batch_id : "";
+        $shading = $this->item_shading_id ? "AND ic.item_shading_id = ".$this->item_shading_id : "";
+
+        $data = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(ic.total_in,3)),0) AS total_in,
+                    IFNULL(SUM(ROUND(ic.total_out,3)),0) AS total_out
+                FROM item_cogs ic
+                WHERE 
+                    ic.date < :date 
+                    ".$batch."
+                    AND ic.item_id = :item_id
+                    AND ic.place_id = :place_id
+                    AND ic.warehouse_id = :warehouse_id
+                    ".$shading."
+                    AND ic.deleted_at IS NULL
+            ", array(
+                'date'                  => $date,
+                'item_id'               => $this->item_id,
+                'place_id'              => $this->place_id,
+                'warehouse_id'          => $this->warehouse_id,
+            ));
+
+        $total = round($data[0]->total_in,3) - round($data[0]->total_out,3);
+
+        return $total;
+    }
+
     public function totalNominalByBatchBeforeIncludeDate(){
 
         $data = DB::select("

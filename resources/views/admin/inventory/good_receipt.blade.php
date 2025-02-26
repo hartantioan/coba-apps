@@ -840,7 +840,7 @@
     });
 
     var arrpod = [];
-    
+
     $(function() {
         $("#table-detail th").resizable({
             minWidth: 100,
@@ -2181,7 +2181,9 @@
                                         </td>
                                     </tr>
                                 `);
+                                applyScale(count,0);
                             });
+
                         }
                         if(response.serials.length > 0){
                             $('#empty-item-serial').remove();

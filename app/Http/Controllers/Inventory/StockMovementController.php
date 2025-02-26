@@ -197,8 +197,7 @@ class StockMovementController extends Controller
                         <td>'.($old_data->area->name ?? '-').'</td>
                         <td>'.($old_data->itemShading->code ?? '-').'</td>
                         <td>'.($old_data->productionBatch->code ?? '-').'</td>
-                        <td>-</td>
-                        <td>-</td>
+                        <td colspan="2">Saldo Periode Sebelumnya</td>
                         <td class="right-align">'.number_format($total,3,',','.').'</td>
                     </tr>';
                 }

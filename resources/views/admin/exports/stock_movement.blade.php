@@ -23,45 +23,22 @@
                $x = 0;
             @endphp
             @foreach($data as $i => $row)
-                @if($row['perlu'] == 1)
-                    <tr>
-                        <td align="center">{{ $x + 1 }}</td>
-                        <td align="center"></td>
-                        <td align="center"></td>
-                        <td align="center"></td>
-                        <td align="center">{{ $row['kode'] }}</td>
-                        <td align="center">{{ $row['item'] }}</td>
-                        <td align="center">{{ $row['satuan'] }}</td>
-                        <td align="center">{{ $row['requester'] }}</td>
-                        <td align="center"></td>
-                        <td align="center"></td>
-                        <td align="center"></td>
-                        <td align="center"></td>
-                        <td align="center">Saldo Awal</td>
-                        <td align="right">{{ $row['last_qty'] }}</td>
-                    </tr>
-                    @php
-                        $x++;
-                    @endphp
-                @else
-                    <tr>
-                        <td align="center"></td>
-                        <td align="center">{{$row['date']}}</td>
-                        <td align="center">{{$row['plant']}}</td>
-                        <td align="center">{{$row['warehouse']}}</td>
-                        <td align="center">{{$row['kode']}}</td>
-                        <td align="center">{{$row['item']}}</td>
-                        <td align="center">{{$row['satuan']}}</td>
-                        <td align="center">{{ $row['requester'] }}</td>
-                        <td align="center">{{$row['area']}}</td>
-                        <td align="center">{{$row['shading']}}</td>
-                        <td align="center">{{$row['production_batch']}}</td>
-                        <td align="center">{{$row['document']}}</td>
-                        <td align="right">{{$row['qty']}}</td>
-                        <td align="right">{{$row['cum_qty']}}</td>
-                    </tr>
-
-                @endif
+                <tr>
+                    <td align="center"></td>
+                    <td align="center">{{$row['date']}}</td>
+                    <td align="center">{{$row['plant']}}</td>
+                    <td align="center">{{$row['warehouse']}}</td>
+                    <td align="center">{{$row['kode']}}</td>
+                    <td align="center">{{$row['item']}}</td>
+                    <td align="center">{{$row['satuan']}}</td>
+                    <td align="center">{{ $row['requester'] }}</td>
+                    <td align="center">{{$row['area']}}</td>
+                    <td align="center">{{$row['shading']}}</td>
+                    <td align="center">{{$row['production_batch']}}</td>
+                    <td align="center">{{$row['document']}}</td>
+                    <td align="right">{{$row['qty']}}</td>
+                    <td align="right">{{$row['cum_qty']}}</td>
+                </tr>
             @endforeach
 
             @if(count($data) == 0)

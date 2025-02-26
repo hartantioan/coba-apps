@@ -225,7 +225,7 @@ class StockMovementController extends Controller
                         <td>'.$rowdata->warehouse->name.   '</td>
                         <td>'.$rowdata->item->code.'</td>
                         <td>'.$rowdata->item->name.'</td>
-                        <td>'.$rowdata->uomUnit->code.'</td>
+                        <td>'.$rowdata->item->uomUnit->code.'</td>
                         <td>'.$rowdata->getRequester().'</td>
                         <td>'.($rowdata->area->name ?? '-').'</td>
                         <td>'.($rowdata->itemShading->code ?? '-').'</td>

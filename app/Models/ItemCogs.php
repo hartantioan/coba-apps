@@ -189,11 +189,11 @@ class ItemCogs extends Model
                     AND ic.deleted_at IS NULL
             ", array(
                 'date'                  => $date,
-                'production_batch_id'   => $this->production_batch_id,
+                'production_batch_id'   => $this->production_batch_id ?? NULL,
                 'item_id'               => $this->item_id,
                 'place_id'              => $this->place_id,
                 'warehouse_id'          => $this->warehouse_id,
-                'item_shading_id'       => $this->item_shading_id,
+                'item_shading_id'       => $this->item_shading_id ?? NULL,
             ));
 
         $total = round($data[0]->total_in,3) - round($data[0]->total_out,3);

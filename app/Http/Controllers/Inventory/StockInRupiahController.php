@@ -88,6 +88,9 @@ class StockInRupiahController extends Controller
                     if($request->plant != 'all'){
                         $query->where('item_cogs.place_id',$request->plant);
                     }
+                    if($request->warehouse != 'all'){
+                        $query->where('item_cogs.warehouse_id',$request->warehouse);
+                    }
                 })
                 ->whereNull('item_cogs.deleted_at')
                 ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')

@@ -2181,7 +2181,20 @@
                                         </td>
                                     </tr>
                                 `);
-                                applyScale(count,0);
+                                if($('#good_scale_id').val()){
+                                    $('#arr_water_content' + count).val($('#good_scale_id').select2('data')[0].water_content);
+                                    $('#arr_qty_sj' + count).val($('#good_scale_id').select2('data')[0].qty_sj);
+                                    $('#arr_viscosity' + count).val($('#good_scale_id').select2('data')[0].viscosity);
+                                    $('#arr_residue' + count).val($('#good_scale_id').select2('data')[0].residue);
+                                    $('#vehicle_no').val($('#good_scale_id').select2('data')[0].vehicle_no);
+                                    $('#delivery_no').val($('#good_scale_id').select2('data')[0].delivery_no);
+                                    $('#arr_percentage_modifier' + count).val($('#good_scale_id').select2('data')[0].percentage_modifier);
+                                    $('#arr_netto' + count).val($('#good_scale_id').select2('data')[0].netto);
+                                    $('#arr_percentage_limit_netto' + count).val($('#good_scale_id').select2('data')[0].percentage_limit_netto);
+                                    $('#arr_rule_id' + count).val($('#good_scale_id').select2('data')[0].rule_procurement_id);
+                                    $('#arr_note' + count).val($('#arr_note' + count).val() + ' - NOTE QC : ' + $('#good_scale_id').select2('data')[0].note_qc);
+                                    hitungSelisih(count);
+                                }
                             });
 
                         }

@@ -610,6 +610,7 @@ class ReportProcurementController extends Controller
         if (!is_dir(storage_path('app/public/temp'))) {
             mkdir(storage_path('app/public/temp'), 0777, true);
         }
+        $temp_pdf = [];
         foreach($array_item as $row_item){
             $type='';
             $item = Item::find($row_item);
@@ -659,8 +660,11 @@ class ReportProcurementController extends Controller
 
             if($query_data){
                 foreach ($limited_data as $k=>$row) {
+
+                    if(!isset($temp_pdf[$k])){
+                        $temp_pdf[$k] = [];
+                    }
                     $arr = [];
-                    $temp_pdf = [];
                     $no = 1;
                     $all_penerimaan = 0;
                     $all_bayar = 0;
@@ -855,22 +859,10 @@ class ReportProcurementController extends Controller
 
                     $absoluteFilePath = storage_path('app/' . $filePath);
                     $document_po = asset(Storage::url($filePath));
-                    $temp_pdf[] = $content;
-
+                    $temp_pdf[$k][] = $content;
 
                 }
-                $merger = new Merger();
-                foreach ($temp_pdf as $pdfContent) {
-                    $merger->addRaw($pdfContent);
-                }
 
-
-                $result = $merger->merge();
-
-                $randomStringss = Str::random(4);
-                $pdfFileName = "Report_Procurement_Account_{$k}_{$randomStringss}.pdf";
-                $contentArray[]=$result;
-                $pdfFileNameArray[] = $pdfFileName;
 
             }else{
                 $error = $zip->getStatusString();
@@ -878,10 +870,24 @@ class ReportProcurementController extends Controller
             }
 
         }
+        foreach($temp_pdf as $k=>$row_pdf){
+
+            $merger = new Merger();
+            foreach ($row_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+
+            $result = $merger->merge();
+
+            $randomStringss = Str::random(4);
+            $pdfFileName = "Report_Procurement_Account_{$k}_{$randomStringss}.pdf";
+            $contentArray[]=$result;
+            $pdfFileNameArray[] = $pdfFileName;
+        }
         if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
 
             foreach($contentArray as $index=>$row_content){
-                info($row_content);
                 $zip->addFromString($pdfFileNameArray[$index],$row_content);
                 if ($zip->addFromString($pdfFileNameArray[$index], $row_content) === false) {
                     dd("Failed to add PDF file to ZIP: " . $pdfFileNameArray[$index]);

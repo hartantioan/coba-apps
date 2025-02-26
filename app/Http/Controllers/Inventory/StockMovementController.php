@@ -190,13 +190,13 @@ class StockMovementController extends Controller
                         <td></td>
                         <td>'.$old_data->place->code.'</td>
                         <td>'.$old_data->warehouse->name.   '</td>
-                        <td>'.$row->code.'</td>
-                        <td>'.$row->name.'</td>
-                        <td>'.$row->uomUnit->code.'</td>
+                        <td>'.$old_data->item->code.'</td>
+                        <td>'.$old_data->item->name.'</td>
+                        <td>'.$old_data->item->uomUnit->code.'</td>
                         <td></td>
-                        <td>'.($row->area->name ?? '-').'</td>
-                        <td>'.($row->itemShading->code ?? '-').'</td>
-                        <td>'.($row->productionBatch->code ?? '-').'</td>
+                        <td>'.($old_data->area->name ?? '-').'</td>
+                        <td>'.($old_data->itemShading->code ?? '-').'</td>
+                        <td>'.($old_data->productionBatch->code ?? '-').'</td>
                         <td>-</td>
                         <td>-</td>
                         <td class="right-align">'.number_format($total,3,',','.').'</td>
@@ -223,8 +223,8 @@ class StockMovementController extends Controller
                         <td>'.date('d/m/Y',strtotime($rowdata->date)).'</td>
                         <td>'.$rowdata->place->code.'</td>
                         <td>'.$rowdata->warehouse->name.   '</td>
-                        <td>'.$row->code.'</td>
-                        <td>'.$row->name.'</td>
+                        <td>'.$rowdata->item->code.'</td>
+                        <td>'.$rowdata->item->name.'</td>
                         <td>'.$rowdata->uomUnit->code.'</td>
                         <td>'.$rowdata->getRequester().'</td>
                         <td>'.($rowdata->area->name ?? '-').'</td>

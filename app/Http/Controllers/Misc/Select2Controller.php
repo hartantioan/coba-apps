@@ -3134,6 +3134,45 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function purchaseOrderDetailGrpo(Request $request){
+        $response   = [];
+        $search     = $request->search;
+        $goodScale  = GoodScale::find($request->good_scale_id);
+        $item_id    = $goodScale->item_id ?? '';
+        $arrpod     = $request->arrpod ?? [];
+
+        $data = PurchaseOrderDetail::where(function($query) use($search,$request,$item_id){
+                    /* $query->where('item_id',$item_id) */
+                    $query->whereHas('purchaseOrder',function($query) use($search,$request){
+                        if($request->account_id){
+                            $query->where('account_id',$request->account_id);
+                        }
+                        $query->where('code','like',"%$search%")
+                            ->where('status','2')
+                            ->where('inventory_type','1');
+                    });
+                })
+                ->whereIn('place_id',$this->dataplaces)
+                ->whereIn('warehouse_id',$this->datawarehouses)
+                ->whereNotIn('id',$arrpod)
+                ->get();
+
+        foreach($data as $d) {
+            $balanceReceipt = $d->getBalanceReceipt();
+            if($balanceReceipt > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' - '.$d->item->name.' Qty. '.CustomHelper::formatConditionalQty($balanceReceipt).' '.$d->itemUnit->unit->code,
+                    'qty'               => CustomHelper::formatConditionalQty($balanceReceipt),
+                ];
+            }
+        }
+
+        return response()->json([
+            'items' => $response,
+        ]);
+    }
+
     public function purchaseOrderDetailScale(Request $request){
         $response   = [];
         $search     = $request->search;
@@ -3225,6 +3264,73 @@ class Select2Controller extends Controller {
         }
 
         return response()->json(['items' => $response]);
+    }
+
+    public function goodScaleGrpo(Request $request){
+        $response   = [];
+
+        $data = GoodScale::where(function($query) use($request){
+                    $query->where('code','like',"%$request->search%")
+                    ->orWhereHas('item',function($query) use($request){
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('name','like',"%$request->search%");
+                    });
+                })
+                ->whereIn('status',['2','3'])
+                ->where('qty_final','>',0)
+                ->where('type','1')
+                ->whereDoesntHave('used')
+                ->whereDoesntHave('goodReceipt')
+                ->get();
+
+        foreach($data as $d) {
+            $balancegrpo = round($d->balanceGoodReceipt(),3);
+            if($balancegrpo > 0){
+                $id_rules = null;
+                $rule_procurement_id = null;
+                $percentage_mod = 0;
+                $percentage_limit_netto = 0;
+                $getRules = RuleBPScale::where('account_id',$d->account_id)
+                ->whereDate('start_effective_date','<=',date('Y-m-d'))
+                ->whereDate('effective_date','>=',date('Y-m-d'))
+                ->where('item_id',$d->item_id)->first();
+    
+                if($getRules){
+                    $id_rules = $getRules->id;
+                    $percentage_mod = $getRules->percentage_level;
+                    $rule_procurement_id = $getRules->ruleProcurement->id;
+                    $percentage_limit_netto = $getRules->percentage_netto_limit??0;
+                }
+                $response[] = [
+                    'id'   			        => $d->id,
+                    'text' 			        => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code.' - Sisa GRPO : '.CustomHelper::formatConditionalQty($balancegrpo),
+                    'qty'                   => CustomHelper::formatConditionalQty($d->qty_final),
+                    'percentage_modifier'   => CustomHelper::formatConditionalQty($percentage_mod),
+                    'netto'                 => CustomHelper::formatConditionalQty($d->qty_balance),
+                    'qty_sj'                => CustomHelper::formatConditionalQty($d->qty_sj),
+                    'id_rules'              => $id_rules,
+                    'rule_procurement_id'   => $rule_procurement_id,
+                    'vehicle_no'            => $d->vehicle_no,
+                    'delivery_no'           => $d->delivery_no,
+                    'percentage_limit_netto'=> CustomHelper::formatConditionalQty($percentage_limit_netto),
+                    'water_content'         => CustomHelper::formatConditionalQty($d->water_content),
+                    'viscosity'             => CustomHelper::formatConditionalQty($d->viscosity),
+                    'residue'               => CustomHelper::formatConditionalQty($d->residue),
+                    'note_qc'               => $d->note_qc,
+                    'account_id'            => $d->purchaseOrderDetail->purchaseOrder->account_id,
+                    'account_name'          => $d->purchaseOrderDetail->purchaseOrder->account->employee_no.' - '.$d->purchaseOrderDetail->purchaseOrder->account->name,
+                    'qty_balance_grpo'      => CustomHelper::formatConditionalQty($balancegrpo),
+                    'qty_bruto'             => CustomHelper::formatConditionalQty($d->qty_in),
+                    'qty_tara'              => CustomHelper::formatConditionalQty($d->qty_out),
+                    'qty_qc'                => CustomHelper::formatConditionalQty($d->qty_qc),
+                    'qty_netto'             => CustomHelper::formatConditionalQty($d->qty_balance),
+                ];
+            }
+        }
+
+        return response()->json([
+            'items' => $response,
+        ]);
     }
 
     public function shift(Request $request)

@@ -33,6 +33,8 @@ use App\Models\ItemSerial;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\UsedData;
+use App\Models\GoodScale;
+
 class GoodReceiptPOController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -355,11 +357,20 @@ class GoodReceiptPOController extends Controller
     }
 
     public function getPurchaseOrder(Request $request){
-        $data = PurchaseOrder::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        $pod = NULL;
+        if($request->type == '1'){
+            $data = PurchaseOrder::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        }else{
+            $pod = PurchaseOrderDetail::where('id',$request->id)->whereHas('purchaseOrder',function($query){
+                $query->whereIn('status',['2','3']);
+            })->first();
+            $data = $pod->purchaseOrder;
+        }
+        
         $data['account_name'] = $data->supplier->employee_no.' - '.$data->supplier->name;
         $data['secret_po'] = $data->isSecretPo() ? '1' : '';
 
-        if($data->used()->exists()){
+        if($data->used()->exists() && $data->used->user_id !== session('bo_id')){
             $data['status'] = '500';
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
@@ -382,6 +393,7 @@ class GoodReceiptPOController extends Controller
                                 'item_id'                   => $row->item_id,
                                 'item_name'                 => $row->item->code.' - '.$row->item->name,
                                 'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
+                                'qty_balance'               => CustomHelper::formatConditionalQty($qtyBalance),
                                 'unit'                      => $row->itemUnit->unit->code,
                                 'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
                                 'unit_stock'                => $row->item->uomUnit->code,
@@ -399,6 +411,10 @@ class GoodReceiptPOController extends Controller
                                 'note2'                     => $row->note2 ? $row->note2 : '',
                                 'qty_conversion'            => $row->qty_conversion,
                                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                                'good_scale_id'             => '',
+                                'good_scale_code'           => $data->code,
+                                'good_scale_qty'            => '0,000',
+                                'qty_grpo_good_scale'       => '',
                             ];
                             if($row->item()->exists()){
                                 if($row->item->itemGroup->is_activa){
@@ -422,26 +438,26 @@ class GoodReceiptPOController extends Controller
                     $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
                 }
             }elseif($request->type == '2'){
+                $gs = GoodScale::find($request->good_scale_id);
                 if($data->hasBalanceRM()){
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                     $details = [];
                     $serials = [];
                     $maxcolumn = 0;
-                    foreach($data->purchaseOrderDetail as $row){
-                        if($request->type == '1'){
-                            $qtyBalance = $row->getBalanceReceipt();
-                        }elseif($request->type == '2'){
-                            $qtyBalance = $row->getBalanceReceiptRM();
-                        }
 
+                    if($pod){
+                        $row = $pod;
+                        $qtyBalance = $row->getBalanceReceiptRM();
+                        $qtyBalanceFilter = $qtyBalance > $gs->qty_final ? $gs->qty_final : $qtyBalance;
                         if($qtyBalance > 0){
                             $details[] = [
                                 'purchase_order_detail_id'  => $row->id,
                                 'item_id'                   => $row->item_id,
                                 'item_name'                 => $row->item->code.' - '.$row->item->name,
-                                'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
+                                'qty'                       => CustomHelper::formatConditionalQty($qtyBalanceFilter),
+                                'qty_balance'               => CustomHelper::formatConditionalQty($qtyBalance),
                                 'unit'                      => $row->itemUnit->unit->code,
-                                'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
+                                'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalanceFilter * $row->qty_conversion),
                                 'unit_stock'                => $row->item->uomUnit->code,
                                 'place_id'                  => $row->place_id,
                                 'place_name'                => $row->place->code,
@@ -457,6 +473,10 @@ class GoodReceiptPOController extends Controller
                                 'note2'                     => $row->note2 ? $row->note2 : '',
                                 'qty_conversion'            => $row->qty_conversion,
                                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                                'good_scale_id'             => $gs->id ?? '',
+                                'good_scale_code'           => ($gs->code ?? '').' - '.$data->code,
+                                'good_scale_qty'            => $gs ? CustomHelper::formatConditionalQty($gs->qty_sj) : '0,000',
+                                'qty_grpo_good_scale'       => $row->item->qty_good_scale ?? '',
                             ];
                             if($row->item()->exists()){
                                 if($row->item->itemGroup->is_activa){
@@ -469,12 +489,13 @@ class GoodReceiptPOController extends Controller
                                     $maxcolumn = $qtyBalance > $maxcolumn ? $qtyBalance : $maxcolumn;
                                 }
                             }
+
+                            $data['details'] = $details;
+                            $data['serials'] = $serials;
+                            $data['maxcolumn'] = $maxcolumn;
                         }
                     }
-
-                    $data['details'] = $details;
-                    $data['serials'] = $serials;
-                    $data['maxcolumn'] = $maxcolumn;
+                    
                 }else{
                     $data['status'] = '500';
                     $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
@@ -532,6 +553,7 @@ class GoodReceiptPOController extends Controller
 			'post_date'		            => 'required',
             'document_date'		        => 'required',
             'delivery_no'		        => 'required',
+            'good_scale_id'             => $request->type == '2' ? 'required' : '',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
@@ -543,6 +565,7 @@ class GoodReceiptPOController extends Controller
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'document_date.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
             'delivery_no.required' 			    => 'No surat jalan tidak boleh kosong.',
+            'good_scale_id.required' 			=> 'Dokumen timbangan tidak boleh kosong untuk tipe : Timbangan.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
@@ -574,6 +597,17 @@ class GoodReceiptPOController extends Controller
                         if($itemcek){
                             $passedSerial = false;
                             $arrErrorSerial[] = $itemcek->item->name.' - '.$rowserial;
+                        }
+                    }
+                }
+                if($request->good_scale_id){
+                    $gs = GoodScale::find($request->good_scale_id);
+                    if($gs){
+                        if($gs->goodReceipt()->exists()){
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Mohon maaf, data timbangan sudah memiliki 1 GRPO.',
+                            ]);
                         }
                     }
                 }
@@ -726,6 +760,7 @@ class GoodReceiptPOController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $account_id;
+                        $query->good_scale_id = $request->good_scale_id ?? NULL;
                         $query->company_id = $request->company_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
@@ -769,6 +804,7 @@ class GoodReceiptPOController extends Controller
                         'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $account_id,
+                        'good_scale_id'         => $request->good_scale_id ?? NULL,
                         'company_id'            => $request->company_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,
@@ -1018,12 +1054,18 @@ class GoodReceiptPOController extends Controller
         $grm = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         $grm['account_name'] = $grm->account->name;
         $grm['code_place_id'] = substr($grm->code,7,2);
+        $grm['good_scale_qty'] = $grm->goodScale()->exists() ? CustomHelper::formatConditionalQty($grm->goodScale->qty_final) : '0,000';
+        $grm['good_scale_qty_bruto'] = $grm->goodScale()->exists() ? CustomHelper::formatConditionalQty($grm->goodScale->qty_in) : '0,000';
+        $grm['good_scale_qty_netto'] = $grm->goodScale()->exists() ? CustomHelper::formatConditionalQty($grm->goodScale->qty_balance) : '0,000';
+        $grm['good_scale_qty_tara'] = $grm->goodScale()->exists() ? CustomHelper::formatConditionalQty($grm->goodScale->qty_out) : '0,000';
+        $grm['good_scale_qty_qc'] = $grm->goodScale()->exists() ? CustomHelper::formatConditionalQty($grm->goodScale->qty_qc) : '0,000';
+        $grm['good_scale_code'] = $grm->goodScale()->exists() ? $grm->goodScale->code.' '.$grm->goodScale->item->name.' '.CustomHelper::formatConditionalQty($grm->goodScale->qty_final).' '.$grm->goodScale->itemUnit->unit->code : '';
 
         $arr = [];
         $serials = [];
 
-        foreach($grm->goodReceiptDetail as $row){
-
+        foreach($grm->goodReceiptDetail()->orderBy('id')->get() as $key => $row){
+            
             $rule_procurement_id = null;
             $percentage_mod = 0;
             $percentage_limit_netto = 0;
@@ -1045,6 +1087,7 @@ class GoodReceiptPOController extends Controller
                 'rule_id'                   => $rule_procurement_id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
+                'good_scale_code'           => $row->goodScale()->exists() ? $row->goodScale->code.' - '.$row->purchaseOrderDetail->purchaseOrder->code : '',
                 'netto'                     => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($row->goodScale->qty_balance) : '',
                 'percentage_limit_netto'    => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($percentage_limit_netto) : '',
                 'percentage_mod'            => $row->goodScale()->exists() ? CustomHelper::formatConditionalQty($percentage_mod) : '',
@@ -1062,8 +1105,8 @@ class GoodReceiptPOController extends Controller
                 'water_content'             => CustomHelper::formatConditionalQty($row->water_content),
                 'viscosity'                 => CustomHelper::formatConditionalQty($row->viscosity),
                 'residue'                   => CustomHelper::formatConditionalQty($row->residue),
-                'percent_modifier'             => CustomHelper::formatConditionalQty($row->percent_modifier),
-                'qty_balance'                 => CustomHelper::formatConditionalQty($row->qty_balance),
+                'percent_modifier'          => CustomHelper::formatConditionalQty($row->percent_modifier),
+                'qty_balance'               => CustomHelper::formatConditionalQty($row->qty_balance),
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
                 'line_id'                   => $row->line_id ? $row->line_id : '',
@@ -1077,6 +1120,8 @@ class GoodReceiptPOController extends Controller
                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
                 'qty_conversion'            => $row->qty_conversion,
                 'secret_po'                 => $row->item->is_hide_supplier ?? '',
+                'qty_grpo_good_scale'       => $row->item->qty_good_scale ?? '',
+                'qty_balance_grpo'          => CustomHelper::formatConditionalQty($row->purchaseOrderDetail->getBalanceReceipt()),
             ];
         }
 

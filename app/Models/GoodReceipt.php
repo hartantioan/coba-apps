@@ -23,6 +23,7 @@ class GoodReceipt extends Model
         'company_id',
         'type',
         'account_id',
+        'good_scale_id',
         'receiver_name',
         'post_date',
         'due_date',
@@ -65,6 +66,11 @@ class GoodReceipt extends Model
     public function account()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+
+    public function goodScale()
+    {
+        return $this->belongsTo('App\Models\GoodScale', 'good_scale_id', 'id')->withTrashed();
     }
 
     public function goodReceiptDetail()

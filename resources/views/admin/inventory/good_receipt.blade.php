@@ -247,14 +247,22 @@
                                 <img src="" alt="Preview" id="imagePreview" style="display: none;">
                             </div>
                             <div class="col m12 s12 step11">
+                                <div class="input-field col m4 s12 mt-2 mb-2 hide good-scale-option">
+                                    <select class="browser-default" id="good_scale_id" name="good_scale_id" onchange="applyScaleQty();">&nbsp;</select>
+                                    <label class="active red-text" for="good_scale_id">Timbangan (Pilih Timbangan dulu. 1 Timbang untuk 1 GRPO.)</label>
+                                </div>
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
                                         <div class="row">
-                                            <div class="input-field col m6 s6">
+                                            <div class="input-field col m8 s12 hide good-scale-option">
+                                                <select class="browser-default" id="purchase_order_detail_id" name="purchase_order_detail_id" onchange="checkGoodScaleValue();">&nbsp;</select>
+                                                <label class="active" for="purchase_order_detail_id">Purchase Order</label>
+                                            </div>
+                                            <div class="input-field col m8 s12 purchase-order-option">
                                                 <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
                                                 <label class="active" for="purchase_order_id">Purchase Order</label>
                                             </div>
-                                            <div class="input-field col m6 s6 mt-4">
+                                            <div class="input-field col m4 s12 mt-4">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseOrder();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah PO
                                                 </a>
@@ -262,21 +270,43 @@
                                         </div>
                                     </p>
                                 </div>
+                                <div class="col m12 s12"></div>
                                 <div class="col m6 s6 pt-1">
                                     <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                </div>
+                                <div class="col m6 s6 pt-1 hide good-scale-option">
+                                    <div class="row">
+                                        <div class="col m6 s12">
+                                            BERAT BRUTO : <b id="goodScaleBruto">0,000</b>
+                                        </div>
+                                        <div class="col m6 s12">
+                                            BERAT TARA : <b id="goodScaleTara">0,000</b>
+                                        </div>
+                                        <div class="col m6 s12">
+                                            BERAT NETTO : <b id="goodScaleNetto">0,000</b>
+                                        </div>
+                                        <div class="col m6 s12">
+                                            BERAT POTONGAN (QC) : <b id="goodScaleQc">0,000</b>
+                                        </div>
+                                        <div class="col m6 s12">
+                                            BERAT FINAL (QC) : <b id="goodScaleQtyMax">0,000</b>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col m12 s12 step12">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Produk</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2500px !important;" id="table-detail">
+                                        <table class="bordered" style="min-width:3100px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">{{ __('translations.delete') }}</th>
-                                                    <th class="center">Timbangan & QC</th>
+                                                    <th class="center">Timbangan & PO</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
-                                                    <th class="center">Qty PO</th>
+                                                    <th class="center">Item Timbang</th>
+                                                    <th class="center">Qty PO/Terima</th>
+                                                    <th class="center">Qty OS</th>
                                                     <th class="center">Qty SJ</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center">Qty Stok</th>
@@ -298,11 +328,16 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="18" class="center">
+                                                    <td colspan="23" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
                                             </tbody>
+                                            <thead>
+                                                <th colspan="4">TOTAL</th>
+                                                <th class="right-align" id="total-received">0,000</th>
+                                                <th colspan="18"></th>
+                                            </thead>
                                         </table>
                                     </div>
                                 </p>
@@ -803,6 +838,9 @@
             activeSelect2.classList.remove('tab-active');
         }
     });
+
+    var arrpod = [];
+    
     $(function() {
         $("#table-detail th").resizable({
             minWidth: 100,
@@ -905,7 +943,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="18" class="center">
+                            <td colspan="23" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -920,7 +958,7 @@
                         </tr>
                     `);
                 }
-                $('#purchase_order_id').empty();
+                $('#purchase_order_id,#good_scale_id,#purchase_order_detail_id').empty();
                 $('#account_id').empty();
                 M.updateTextFields();
                 if($('.data-used').length > 0){
@@ -929,6 +967,8 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#goodScaleQtyMax,#goodScaleBruto,#goodScaleTara,#goodScaleNetto,#goodScaleQc,#total-received').text('0,000');
+                arrpod = [];
             }
         });
 
@@ -1022,6 +1062,57 @@
             }
         });
 
+        $('#purchase_order_detail_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_order_detail_grpo") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                        good_scale_id: $('#good_scale_id').val(),
+                        arrpod: arrpod,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#good_scale_id').select2({
+            placeholder: '-- Pilih ya --',
+            allowClear: true,
+            minimumInputLength: 1,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/good_scale_grpo") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             let id = $(this).data('detail');
@@ -1029,23 +1120,62 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="18" class="center">
+                        <td colspan="23" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
                 `);
                 $('#purchase_order_id').empty();
+                countAll();
+                fillInArray();
             }
         });
     });
 
+    function checkGoodScaleValue(){
+        if(!$('#good_scale_id').val()){
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih dokumen timbangan terlebih dahulu.',
+                icon: 'info'
+            });
+            $('#purchase_order_detail_id').empty();
+        }
+    }
+
+    function applyScaleQty(){
+        $('#goodScaleQtyMax,#goodScaleBruto,#goodScaleTara,#goodScaleNetto,#goodScaleQc').text('0,000');
+        if($('#good_scale_id').val()){
+            $('#goodScaleQtyMax').text($('#good_scale_id').select2('data')[0].qty_balance_grpo);
+            $('#goodScaleBruto').text($('#good_scale_id').select2('data')[0].qty_bruto);
+            $('#goodScaleNetto').text($('#good_scale_id').select2('data')[0].qty_netto);
+            $('#goodScaleQc').text($('#good_scale_id').select2('data')[0].qty_qc);
+            $('#goodScaleTara').text($('#good_scale_id').select2('data')[0].qty_tara);
+            $('#account_id').empty().append(`
+                <option value="` + $('#good_scale_id').select2('data')[0].account_id + `">` + $('#good_scale_id').select2('data')[0].account_name + `</option>
+            `);
+        }
+    }
+
+    function countAll(){
+        let total = 0;
+        $('input[name^="arr_qty[]"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-received').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
+    }
+
     function applyFilter(){
-        $('#purchase_order_id').empty();
+        $('#purchase_order_id,#purchase_order_detail_id,#good_scale_id').empty();
         $('#account_id').empty();
         if($('#type').val() == '2'){
             $('.div-account').addClass('hide');
+            $('.purchase-order-option').addClass('hide');
+            $('.good-scale-option').removeClass('hide');
         }else{
             $('.div-account').removeClass('hide');
+            $('.good-scale-option').addClass('hide');
+            $('.purchase-order-option').removeClass('hide');
         }
         resetDetails();
     }
@@ -1064,7 +1194,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="18" class="center">
+                            <td colspan="23" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1246,7 +1376,6 @@
                         });
                     }
                     $('#purchase_order_id').empty();
-                    $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
                 error: function() {
@@ -1269,7 +1398,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="18" class="center">
+                        <td colspan="23" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1650,6 +1779,27 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
+
+                if($('#type').val() == '2'){
+                    let totalScale = parseFloat($('#goodScaleQtyMax').text().replaceAll(".", "").replaceAll(",","."));
+                    let totalReceived = 0;
+
+                    $('.arr_qty_gs').each(function(index){
+                        if($(this).text() == 'YA'){
+                            totalReceived += parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                        }else{
+                            totalReceived += (totalScale - totalReceived);
+                        }
+                    });
+
+                    if(totalScale != totalReceived){
+                        M.toast({
+                            html: 'Mohon maaf untuk tipe Timbangan, nominal BERAT TIMBANG harus sama dengan total Qty Diterima. Qty Timbang : ' + totalScale + ', sedangkan Qty PO Diterima (item Timbang) : ' + totalReceived.toFixed(3)
+                        });
+                        return false;
+                    }
+                }
+
                 var formData = new FormData($('#form_data')[0]), passedSerial = true;
 
                 formData.delete("arr_department[]");
@@ -1670,7 +1820,7 @@
                     formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
                 });
 
-                $('select[name^="arr_scale"]').each(function(index){
+                $('input[name^="arr_scale"]').each(function(index){
                     formData.append('arr_scale[]',($(this).val() ? $(this).val() : ''));
                 });
 
@@ -1879,8 +2029,26 @@
         }
     }
 
+    function fillInArray(){
+        arrpod = [];
+        $('input[name^="arr_purchase[]"]').each(function(){
+            arrpod.push($(this).val());
+        });
+    }
+
     function getPurchaseOrder(){
-        let val = $('#purchase_order_id').val();
+
+        if(!$('#purchase_order_id').val() && !$('#purchase_order_detail_id').val()){
+            swal({
+                title: 'Ups! Hayo.',
+                text: 'Silahkan pilih Purchase Order.',
+                icon: 'warning'
+            });
+            return false;
+        }
+
+        let val = $('#type').val() == '1' ? $('#purchase_order_id').val() : $('#purchase_order_detail_id').val();
+        let good_scale_id = $('#type').val() == '1' ? '' : $('#good_scale_id').val();
 
         if(val){
             $.ajax({
@@ -1890,16 +2058,20 @@
                 data: {
                     id: val,
                     type: $('#type').val(),
+                    good_scale_id: good_scale_id,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#purchase_order_id').empty();
+                    loadingClose('#modal1');
+                    if($('#type').val() == '2'){
+                        arrpod.push($('#purchase_order_detail_id').val());
+                    }
+                    $('#purchase_order_id,#purchase_order_detail_id').empty();
                     if(response.status == 500){
                         swal({
                             title: 'Ups!',
@@ -1937,22 +2109,27 @@
                                         <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                         <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                        <input type="hidden" name="arr_scale[]" id="arr_scale` + count + `" value="` + val.good_scale_id + `">
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
-                                        <td class="center">
-                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `','` + val.qty + `');"></select>
+                                        <td>
+                                            ` + val.good_scale_code + `
                                         </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
+                                        <td class="arr_qty_gs">` + (val.qty_grpo_good_scale ? 'YA' : 'TIDAK') + `</td>
                                         <td>
-                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + ($('#type').val() == '2' ? `readonly` : ``) + `>
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);countAll();" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `">
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.qty_balance + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
+                                            <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.good_scale_qty + `" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -2004,36 +2181,6 @@
                                         </td>
                                     </tr>
                                 `);
-
-                                $('#arr_scale' + count).select2({
-                                    placeholder: '-- Pilih ya --',
-                                    minimumInputLength: 1,
-                                    allowClear: true,
-                                    cache: true,
-                                    width: 'resolve',
-                                    dropdownParent: $('body').parent(),
-                                    ajax: {
-                                        url: '{{ url("admin/select2/good_scale_item") }}',
-                                        type: 'GET',
-                                        dataType: 'JSON',
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                item: $('#arr_item' + count).val(),
-                                                place: $('#arr_place' + count).val(),
-                                                warehouse: $('#arr_warehouse' + count).val(),
-                                                pod: val.purchase_order_detail_id
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.items
-                                            }
-                                        }
-                                    }
-                                });
-
-
                             });
                         }
                         if(response.serials.length > 0){
@@ -2055,13 +2202,13 @@
                             });
                         }
                         $('#purchase_order_id').empty();
-                        $('.modal-content').scrollTop(0);
                         M.updateTextFields();
+                        countAll();
                     }
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',
@@ -2077,7 +2224,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="18" class="center">
+                        <td colspan="23" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -2218,7 +2365,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="18" class="center">
+                            <td colspan="23" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -2234,6 +2381,9 @@
                         </tr>
                     `);
                 }
+
+                countAll();
+                fillInArray();
             },
             error: function() {
                 swal({
@@ -2268,6 +2418,8 @@
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
+                $('#type').val(response.type).formSelect();
+                applyFilter();
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
@@ -2277,17 +2429,27 @@
                     $('.div-account').removeClass('hide');
                 }
                 $('#company_id').val(response.company_id).formSelect();
-                $('#type').val(response.type).formSelect();
+                if(response.good_scale_code){
+                    $('#good_scale_id').empty().append(`
+                        <option value="` + response.good_scale_id + `">` + response.good_scale_code + `</option>
+                    `);
+                }
                 $('#note').val(response.note);
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
                 $('#document_date').val(response.document_date);
                 $('#vehicle_no').val(response.vehicle_no);
                 $('#delivery_no').val(response.delivery_no);
+                $('#goodScaleQtyMax').text(response.good_scale_qty);
+                $('#goodScaleNetto').text(response.good_scale_qty_netto);
+                $('#goodScaleBruto').text(response.good_scale_qty_bruto);
+                $('#goodScaleTara').text(response.good_scale_qty_tara);
+                $('#goodScaleQc').text(response.good_scale_qty_qc);
 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        arrpod.push(val.purchase_order_detail_id);
                         $('#body-item').append(`
                             <tr class="row_item">
                                 <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.id + `">
@@ -2301,19 +2463,24 @@
                                 <input type="hidden" name="arr_netto[]" id="arr_netto` + count + `" value="0">
                                 <input type="hidden" name="arr_percentage_limit_netto[]" id="arr_percentage_limit_netto` + count + `" value="0">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_scale[]" id="arr_scale` + count + `" value="` + val.good_scale_id + `">
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `','` + val.qty + `');"></select>
+                                <td>
+                                    ` + val.good_scale_code + `
                                 </td>
                                 <td>
                                     ` + val.item_name + `
                                 </td>
+                                <td class="arr_qty_gs">` + (val.qty_grpo_good_scale ? 'YA' : 'TIDAK') + `</td>
                                 <td>
-                                    <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);countAll();" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `">
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_balance_grpo + `
                                 </td>
                                 <td>
                                     <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_sj + `" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
@@ -2368,42 +2535,11 @@
                                 </td>
                             </tr>
                         `);
-                        if(val.good_scale_id){
-                            $('#arr_scale' + count).append(`
-                                <option value="` + val.good_scale_id + `">` + val.good_scale_name + `</option>
-                            `);
-                        }
                         if(val.secret_po){
                             $('.div-account').addClass('hide');
                         }
-                        $('#arr_scale' + count).select2({
-                            placeholder: '-- Pilih ya --',
-                            minimumInputLength: 1,
-                            allowClear: true,
-                            cache: true,
-                            width: 'resolve',
-                            dropdownParent: $('body').parent(),
-                            ajax: {
-                                url: '{{ url("admin/select2/good_scale_item") }}',
-                                type: 'GET',
-                                dataType: 'JSON',
-                                data: function(params) {
-                                    return {
-                                        search: params.term,
-                                        item: $('#arr_item' + count).val(),
-                                        place: $('#arr_place' + count).val(),
-                                        warehouse: $('#arr_warehouse' + count).val(),
-                                        pod: val.purchase_order_detail_id,
-                                    };
-                                },
-                                processResults: function(data) {
-                                    return {
-                                        results: data.items
-                                    }
-                                }
-                            }
-                        });
                     });
+                    countAll();
                 }
 
                 if(response.document){

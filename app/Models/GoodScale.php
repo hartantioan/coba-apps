@@ -137,6 +137,13 @@ class GoodScale extends Model
         });
     }
 
+
+
+    public function balanceGoodReceipt(){
+        $qty = $this->qty_final - $this->goodReceiptDetail->sum('qty');
+        return $qty;
+    }
+
     public function goodReceiptDetailExcel(){
 
         $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
@@ -157,6 +164,10 @@ class GoodScale extends Model
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function goodReceipt(){
+        return $this->hasOne('App\Models\GoodReceipt')->whereIn('status',['1','2','3','9']);
     }
 
     public function company()

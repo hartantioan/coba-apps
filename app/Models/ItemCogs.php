@@ -174,6 +174,9 @@ class ItemCogs extends Model
 
     public function qtyByWarehouseBeforeDate($date){
 
+        $batch = $this->production_batch_id ? "AND ic.production_batch_id = ".$this->production_batch_id : "";
+        $shading = $this->item_shading_id ? "AND ic.item_shading_id = ".$this->item_shading_id : "";
+
         $data = DB::select("
                 SELECT 
                     IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_in,
@@ -181,19 +184,17 @@ class ItemCogs extends Model
                 FROM item_cogs ic
                 WHERE 
                     ic.date < :date 
-                    AND ic.production_batch_id = :production_batch_id
+                    ".$batch."
                     AND ic.item_id = :item_id
                     AND ic.place_id = :place_id
                     AND ic.warehouse_id = :warehouse_id
-                    AND ic.item_shading_id = :item_shading_id
+                    ".$shading."
                     AND ic.deleted_at IS NULL
             ", array(
                 'date'                  => $date,
-                'production_batch_id'   => $this->production_batch_id ?? NULL,
                 'item_id'               => $this->item_id,
                 'place_id'              => $this->place_id,
                 'warehouse_id'          => $this->warehouse_id,
-                'item_shading_id'       => $this->item_shading_id ?? NULL,
             ));
 
         $total = round($data[0]->total_in,3) - round($data[0]->total_out,3);

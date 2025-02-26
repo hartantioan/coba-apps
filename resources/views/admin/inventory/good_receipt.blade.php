@@ -2182,6 +2182,7 @@
                                     </tr>
                                 `);
                                 if($('#good_scale_id').val()){
+                                    console.log($('#good_scale_id').select2('data')[0].rule_procurement_id);
                                     $('#arr_water_content' + count).val($('#good_scale_id').select2('data')[0].water_content);
                                     $('#arr_qty_sj' + count).val($('#good_scale_id').select2('data')[0].qty_sj);
                                     $('#arr_viscosity' + count).val($('#good_scale_id').select2('data')[0].viscosity);

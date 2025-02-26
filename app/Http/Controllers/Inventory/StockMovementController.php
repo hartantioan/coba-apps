@@ -212,26 +212,26 @@ class StockMovementController extends Controller
                         $query->where('warehouse_id',$request->warehouse);
                     }
                 })->orderBy('date')->orderBy('id')->get();
-                foreach($data as $key => $row){
+                foreach($data as $key => $rowdata){
                     if($row->type == 'IN'){
-                        $total += round($row->qty_in,3);
+                        $total += round($rowdata->qty_in,3);
                     }else{
-                        $total -= round($row->qty_out,3);
+                        $total -= round($rowdata->qty_out,3);
                     }
                     $html .= '<tr>
                         <td>'.($key + 1).'</td>
-                        <td>'.date('d/m/Y',strtotime($row->date)).'</td>
-                        <td>'.$row->place->code.'</td>
-                        <td>'.$row->warehouse->name.   '</td>
+                        <td>'.date('d/m/Y',strtotime($rowdata->date)).'</td>
+                        <td>'.$rowdata->place->code.'</td>
+                        <td>'.$rowdata->warehouse->name.   '</td>
                         <td>'.$row->code.'</td>
                         <td>'.$row->name.'</td>
-                        <td>'.$row->uomUnit->code.'</td>
-                        <td>'.$row->getRequester().'</td>
-                        <td>'.($row->area->name ?? '-').'</td>
-                        <td>'.($row->itemShading->code ?? '-').'</td>
-                        <td>'.($row->productionBatch->code ?? '-').'</td>
-                        <td>'.$row->lookable->code.'</td>
-                        <td class="right-align">'.($row->type == 'IN' ? number_format($row->qty_in,3,',','.') : '-'.number_format($row->qty_out,3,',','.')).'</td>
+                        <td>'.$rowdata->uomUnit->code.'</td>
+                        <td>'.$rowdata->getRequester().'</td>
+                        <td>'.($rowdata->area->name ?? '-').'</td>
+                        <td>'.($rowdata->itemShading->code ?? '-').'</td>
+                        <td>'.($rowdata->productionBatch->code ?? '-').'</td>
+                        <td>'.$rowdata->lookable->code.'</td>
+                        <td class="right-align">'.($rowdata->type == 'IN' ? number_format($rowdata->qty_in,3,',','.') : '-'.number_format($rowdata->qty_out,3,',','.')).'</td>
                         <td class="right-align">'.number_format($total,3,',','.').'</td>
                     </tr>';
                 }

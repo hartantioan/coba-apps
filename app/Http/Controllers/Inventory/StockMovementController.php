@@ -181,9 +181,9 @@ class StockMovementController extends Controller
                 })->orderByDesc('date')->orderByDesc('id')->first();
                 if($old_data){
                     if($request->warehouse != 'all'){
-                        $total += round($old_data->qty_final,3);
-                    }else{
                         $total += round($old_data->qtyByWarehouseBeforeDate($request->start_date),3);
+                    }else{
+                        $total += round($old_data->qty_final,3);
                     }
                     $html .= '<tr>
                         <td></td>
@@ -213,7 +213,7 @@ class StockMovementController extends Controller
                     }
                 })->orderBy('date')->orderBy('id')->get();
                 foreach($data as $key => $rowdata){
-                    if($row->type == 'IN'){
+                    if($rowdata->type == 'IN'){
                         $total += round($rowdata->qty_in,3);
                     }else{
                         $total -= round($rowdata->qty_out,3);

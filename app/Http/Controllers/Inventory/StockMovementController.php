@@ -166,9 +166,9 @@ class StockMovementController extends Controller
                             </tr>
                         </thead>
                         <tbody id="movement_body">';
-
-            $total = 0; 
+            
             foreach($item as $row){
+                $total = 0;
                 $old_data = ItemCogs::where('date','<',$request->start_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
                         $query->whereHas('place',function($query) use($request){

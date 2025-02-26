@@ -156,30 +156,6 @@
                     </div>
 
                 </div>
-                <div class="row" id="table_laporan">
-                    <table class="bordered" style="font-size:10px;">
-                        <thead id="t_head">
-                            <tr>
-                                <th class="center-align">{{ __('translations.no') }}.</th>
-                                <th class="center-align">Tanggal.</th>
-                                <th class="center-align">Plant.</th>
-                                <th class="center-align">Gudang.</th>
-                                <th class="center-align">Kode Item</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">{{ __('translations.unit') }}</th>
-                                <th class="center-align">Requester</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Batch Produksi</th>
-                                <th class="center-align">No Dokumen</th>
-                                <th class="center-align">Mutasi</th>
-                                <th class="center-align">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody id="movement_body">
-                        </tbody>
-                    </table>
-                </div>
                 <div class="row" id="result-final">
                         
                 </div>
@@ -231,115 +207,7 @@
                 $('#export_button').show();
                 loadingClose('#main');
                 if (response.status == 200) {
-                    if($('#type').val() == 'final'){
-                        $('#table_laporan').addClass('hide');
-                        $('#result-final').removeClass('hide');
-                        $('#result-final').html(response.html);
-                    }else{
-                        $('#table_laporan').removeClass('hide');
-                        $('#result-final').addClass('hide');
-                        $('#movement_body').empty();
-                        $('.uomunit').empty();
-                        var gtall = 0;
-                        if ($('#type').val() == 'final') {
-                            $('#t_head').empty();
-                            $('#t_head').append(`
-                                <tr>
-                                    <th class="center-align">{{ __('translations.no') }}.</th>
-                                    <th class="center-align">{{ __('translations.plant') }}</th>
-                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
-                                    <th class="center-align">{{ __('translations.code') }}</th>
-                                    <th class="center-align">Nama Item</th>
-                                    <th class="center-align">{{ __('translations.unit') }}</th>
-                                    <th class="center-align">Requester</th>
-                                    <th class="center-align">Area</th>
-                                    <th class="center-align">Shading</th>
-                                    <th class="center-align">Batch Produksi</th>
-                                    <th class="center-align">Balance</th>
-                                </tr>`);
-                            $.each(response.message, function(i, val) {
-
-                                $('#movement_body').append(`
-                                    <tr>
-                                        <td class="center-align">` + (i + 1) + `</td>
-                                        <td >` + val.plant + `</td>
-                                        <td >` + val.warehouse + `</td>
-                                        <td >` + val.kode + `</td>
-                                        <td >` + val.item + `</td>
-                                        <td >` + val.satuan + `</td>
-                                        <td >` + val.requester + `</td>
-                                        <td >` + val.area + `</td>
-                                        <td >` + val.shading + `</td>
-                                        <td >` + val.production_batch + `</td>
-                                        <td class="right-align">` + val.cum_qty + `</td>
-                                    </tr>
-                                `);
-                            });
-                        } else {
-                            var processedItems = [];
-                            $('#t_head').empty();
-                            $('#t_head').append(`
-                                <tr>
-                                    <th class="center-align">{{ __('translations.no') }}.</th>
-                                    <th class="center-align">Tanggal.</th>
-                                    <th class="center-align">Plant.</th>
-                                    <th class="center-align">Gudang.</th>
-                                    <th class="center-align">Kode Item</th>
-                                    <th class="center-align">Nama Item</th>
-                                    <th class="center-align">{{ __('translations.unit') }}</th>
-                                    <th class="center-align">Requester</th>
-                                    <th class="center-align">Area</th>
-                                    <th class="center-align">Shading</th>
-                                    <th class="center-align">Batch Produksi</th>
-                                    <th class="center-align">No Dokumen</th>
-                                    <th class="center-align">Mutasi</th>
-                                    <th class="center-align">Balance</th>
-                                </tr>`);
-
-                            var itung = 0;
-                            $.each(response.message, function(i, val) {
-                                if (val.perlu == 1) {
-                                    $('#movement_body').append(`
-                                        <tr>
-                                            <td class="center-align">` + (itung + 1) + `</td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="">` + val.kode + `</td>
-                                            <td class="">` + val.item + `</td>
-                                            <td class="">` + val.satuan + `</td>
-                                            <td >` + val.requester + `</td>
-                                            <td ></td>
-                                            <td ></td>
-                                            <td ></td>
-                                            <td>Saldo Awal</td>
-                                            <td class="right-align"></td>
-                                            <td class="right-align">` + val.last_qty + `</td>
-                                        </tr>`);
-                                    itung++;
-                                } else {
-                                    $('#movement_body').append(`
-                                        <tr>
-                                            <td class="center-align"></td>
-                                            <td >` + val.date + `</td>
-                                            <td >` + val.plant + `</td>
-                                            <td >` + val.warehouse + `</td>
-                                            <td >` + val.kode + `</td>
-                                            <td >` + val.item + `</td>
-                                            <td >` + val.satuan + `</td>
-                                            <td >` + val.requester + `</td>
-                                            <td >` + val.area + `</td>
-                                            <td >` + val.shading + `</td>
-                                            <td >` + val.production_batch + `</td>
-                                            <td>` + val.document + `</td>
-                                            <td class="right-align">` + val.qty + `</td>
-                                            <td class="right-align">` + val.cum_qty + `</td>
-                                        </tr>
-                                    `);
-                                }
-                            });
-                        }
-                    }
+                    $('#result-final').html(response.html);
                 } else if (response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);

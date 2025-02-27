@@ -653,7 +653,7 @@ class GoodScaleController extends Controller
                         $document = null;
                     }
                     if($request->type == '3'){
-                        $account_id = null;
+                        $account_id = $request->account_id ?? NULL;
                     }else{
                         $account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
                     }

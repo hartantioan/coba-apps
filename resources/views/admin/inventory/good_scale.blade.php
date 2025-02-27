@@ -279,7 +279,7 @@
                                 <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>
                                 <label class="active" for="item_id">{{ __('translations.item') }}</label>
                             </div>
-                            <div class="input-field col m3 s12 manual-inputs" id="div-account">
+                            <div class="input-field col m3 s12" id="div-account">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Supplier/Ekspedisi</label>
@@ -353,11 +353,11 @@
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Pengiriman">
                                 <label class="active" for="delivery_no">Nomor Pengiriman / SJ</label>
                             </div>
-                            <div class="input-field col m3 s12 manual-inputs">
+                            <div class="input-field col m3 s12">
                                 <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Kendaraan">
                                 <label class="active" for="vehicle_no">Nomor Kendaraan</label>
                             </div>
-                            <div class="input-field col m3 s12 manual-inputs">
+                            <div class="input-field col m3 s12">
                                 <input id="driver" name="driver" type="text" placeholder="Nama Supir">
                                 <label class="active" for="driver">Nama Supir</label>
                             </div>

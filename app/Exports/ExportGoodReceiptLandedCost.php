@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
+use App\Models\LandedCostDetail;
 use App\Models\ProductionBatch;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -33,18 +34,41 @@ class ExportGoodReceiptLandedCost implements FromArray, WithTitle, ShouldAutoSiz
 
         $arr[] = [
             'No.',
-            'No.Dokumen',
+            'Tgl.LC',
+            'No.LC',
+            'Broker',
+            'Nilai LC (RP)',
+            'No.GRPO',
+            'Supplier',
             'Kode Item',
             'Nama Item',
-            'Jumlah',
-            'Satuan',
-            'Total',
-            'Based On',
-            'Nilai LC',
-            'Akumulasi',
+            'Qty',
+            'Total (RP)',
         ];
+
+        $datadetail = LandedCostDetail::whereHas('landedCost',function($query){
+            $query->whereIn('status',['2','3'])->where('post_date','>=',$this->start_date)->where('post_date','<=',$this->end_date);
+        })
+        ->whereDoesntHave('landedCostDetailSelfWithPending')->get();
+
+        foreach($datadetail as $key => $rowdetail){
+            $arr[] = [
+                $key + 1,
+                date('d/m/Y',strtotime($rowdetail->landedCost->post_date)),
+                $rowdetail->landedCost->code,
+                $rowdetail->landedCost->account->employee_no.' - '.$rowdetail->landedCost->account->name,
+                round($rowdetail->nominal * $rowdetail->landedCost->currency_rate,2),
+                $rowdetail->getGrpo(),
+                $rowdetail->landedCost->supplier->employee_no.' - '.$rowdetail->landedCost->supplier->name,
+                $rowdetail->item->code,
+                $rowdetail->item->name,
+                $rowdetail->qty,
+                $rowdetail->getGrpoValueRp(),
+                /* $total, */
+            ];
+        }
         
-        $datadetail = GoodReceiptDetail::whereHas('goodReceipt',function($query){
+        /* $datadetail = GoodReceiptDetail::whereHas('goodReceipt',function($query){
             $query->where('post_date','>=',$this->start_date)->where('post_date','<=',$this->end_date)->whereIn('status',['2','3','9']);
         })->get();
 
@@ -165,7 +189,7 @@ class ExportGoodReceiptLandedCost implements FromArray, WithTitle, ShouldAutoSiz
                     $total,
                 ];
             }
-        }
+        } */
 
         return $arr;
     }

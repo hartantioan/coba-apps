@@ -1317,6 +1317,7 @@
         if(val == '1'){
             $('.hide-inputs').removeClass('hide');
             $('.manual-inputs').removeClass('hide');
+            $('.hide-account').removeClass('hide');
             $('#is_quality_check').prop( "checked", true);
             $('#table-detail-mod').parent().addClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
@@ -1330,6 +1331,7 @@
         }else if(val == '3'){
             $('#is_quality_check').prop( "checked", false);
             $('.hide-inputs').addClass('hide');
+            $('.hide-account').removeClass('hide');
             $('.manual-inputs').addClass('hide');
             $('#table-detail-mod').parent().addClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/customer") }}');

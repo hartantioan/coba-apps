@@ -1524,6 +1524,19 @@ class UserController extends Controller
         $destinations = [];
         $documents    = [];
         foreach($user->userData as $row){
+            $code_provinsi = $row->province->code ?? null;
+
+            $code_city = $row->city->code ?? null;
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$code_provinsi%"]);
+            $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$code_city%"]);
 			$datas[] = [
                 'id'                => $row->id,
                 'title'             => $row->title,
@@ -1535,6 +1548,10 @@ class UserController extends Controller
                 'country_id'        => $row->country_id ? $row->country_id : '',
                 'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
                 'province_id'       => $row->province_id ? $row->province_id : '',
+                'province_code'     => $row->province_id ? $row->province->code : '',
+                'city_code'         => $row->city_id ? $row->city->code : '',
+                'cities'            => $cities,
+                'districts'         => $districts,
                 'city_id'           => $row->city_id ? $row->city_id : '',
                 'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
                 'district_id'       => $row->district_id ? $row->district_id : '',
@@ -1543,12 +1560,29 @@ class UserController extends Controller
             ];
 		}
         foreach($user->userDestination as $row){
+            $code_provinsi = $row->province->code ?? null;
+
+            $code_city = $row->city->code ?? null;
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$code_provinsi%"]);
+            $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$code_city%"]);
 			$destinations[] = [
                 'id'                => $row->id,
                 'address'           => $row->address,
                 'country_id'        => $row->country_id ? $row->country_id : '',
                 'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
                 'province_id'       => $row->province_id ? $row->province_id : '',
+                'province_code'     => $row->province_id ? $row->province->code : '',
+                'city_code'         => $row->city_id ? $row->city->code : '',
+                'cities'            => $cities,
+                'districts'         => $districts,
                 'city_id'           => $row->city_id ? $row->city_id : '',
                 'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
                 'district_id'       => $row->district_id ? $row->district_id : '',
@@ -1557,12 +1591,29 @@ class UserController extends Controller
             ];
 		}
         foreach($user->userDestinationDocument as $row){
+            $code_provinsi = $row->province->code ?? null;
+
+            $code_city = $row->city->code ?? null;
+            $cities = DB::select("
+                SELECT id, code, name
+                FROM regions
+                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
+            ", ["$code_provinsi%"]);
+            $districts = DB::select("
+                    SELECT id, code, name
+                    FROM regions
+                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
+                ", ["$code_city%"]);
 			$documents[] = [
                 'id'                => $row->id,
                 'address'           => $row->address,
                 'country_id'        => $row->country_id ? $row->country_id : '',
                 'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
                 'province_id'       => $row->province_id ? $row->province_id : '',
+                'province_code'     => $row->province_id ? $row->province->code : '',
+                'city_code'         => $row->city_id ? $row->city->code : '',
+                'cities'            => $cities,
+                'districts'         => $districts,
                 'city_id'           => $row->city_id ? $row->city_id : '',
                 'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
                 'district_id'       => $row->district_id ? $row->district_id : '',

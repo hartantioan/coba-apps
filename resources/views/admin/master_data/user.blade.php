@@ -1612,7 +1612,7 @@
                         `);
                     @endif
                     select2ServerSide('#arr_country' + count, '{{ url("admin/select2/country") }}');
-                    
+
                     $('#arr_province' + count).select2({
                         dropdownAutoWidth: true,
                         width: '100%',
@@ -1945,7 +1945,7 @@
                     });
                 @endforeach
             @endif
-            
+
 
             $('.modal-content').scrollTop(0);
             $('#note').focus();
@@ -3017,7 +3017,6 @@
                     $('#type_body').val(response.type_body).trigger('change').formSelect();
                 }
                 $('#province_id,#country_id').empty();
-
                 if(response.province_id){
                     $('#province_id').append(`
                         <option value="` + response.province_id + `">` + response.province_name + `</option>
@@ -3068,7 +3067,7 @@
                 if(response.type !== '1'){
                     $('#limit_credit').attr('readonly',true);
                 }
-                
+
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();
                     $('#position_id').val(response.position_id).formSelect();
@@ -3228,7 +3227,7 @@
                                 data: function(params) {
                                     return {
                                         search: params.term,
-                                        province: $('#arr_province' + count).select2().find(":selected").data("code"),
+                                        province: val.province_code,
                                     };
                                 },
                                 processResults: function(data) {
@@ -3265,7 +3264,7 @@
                                 data: function(params) {
                                     return {
                                         search: params.term,
-                                        city: $('#arr_city' + count).select2('data')[0].code,
+                                        city:  val.city_code,
                                     };
                                 },
                                 processResults: function(data) {

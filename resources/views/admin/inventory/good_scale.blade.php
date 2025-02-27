@@ -960,7 +960,7 @@
 
         const noteTextarea = document.getElementById('note');
         const charCountDiv = document.getElementById('charCount');
-        const maxChars = 50;
+        const maxChars = 500;
 
         noteTextarea.addEventListener('input', function() {
             const currentLength = noteTextarea.value.length;

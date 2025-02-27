@@ -13,6 +13,7 @@ use App\Models\Warehouse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class DeadStockController extends Controller
 {
@@ -49,10 +50,17 @@ class DeadStockController extends Controller
             if($request->filter_group){
                 $query->whereIn('item_group_id', $request->filter_group);
             }
+            if($request->warehouse != 'all'){
+                $query->whereHas('itemGroup',function($query)use($request){
+                    $query->whereHas('itemGroupWarehouse',function($query)use($request){
+                        $query->where('warehouse_id',$request->warehouse);
+                    });
+                });
+            }
         })->pluck('id');
         $arr = [];
         foreach($item as $row){
-            $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
+            /* $data = ItemCogs::where('date','<=',$request->date)->where('item_id',$row)->where(function($query)use($request){
                 if($request->plant != 'all'){
                     $query->whereHas('place',function($query) use($request){
                         $query->where('id',$request->plant);
@@ -63,21 +71,36 @@ class DeadStockController extends Controller
                         $query->where('id',$request->warehouse);
                     });
                 }
-            })->orderByDesc('date')->orderByDesc('id')->first();
+            })->orderByDesc('date')->orderByDesc('id')->first(); */
+            $data = DB::table('item_cogs')->select('item_cogs.id AS id','item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading','item_cogs.date AS date','production_batches.code AS batch_code')
+                ->where('item_cogs.date','<=',$request->date)->where('item_cogs.item_id',$row)->where(function($query)use($request){
+                    if($request->plant != 'all'){
+                        $query->where('item_cogs.place_id',$request->plant);
+                    }
+                })
+                ->whereNull('item_cogs.deleted_at')
+                ->leftJoin('places', 'places.id', '=', 'item_cogs.place_id')
+                ->leftJoin('warehouses', 'warehouses.id', '=', 'item_cogs.warehouse_id')
+                ->leftJoin('items', 'items.id', '=', 'item_cogs.item_id')
+                ->leftJoin('units', 'units.id', '=', 'items.uom_unit')
+                ->leftJoin('areas', 'areas.id', '=', 'item_cogs.area_id')
+                ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
+                ->leftJoin('production_batches', 'production_batches.id', '=', 'item_cogs.production_batch_id')
+                ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
             if($data){
                 if($data->qty_final > 0){
                     $date = Carbon::parse($data->date);
                     $dateDifference = $date->diffInDays($request->date);
                     $arr[]=[
-                        'plant'=>$data->place->code,
-                        'gudang'=>$data->warehouse->name,
-                        'kode'=>$data->item->code,
-                        'item'=>$data->item->name,
-                        'satuan' => $data->item->uomUnit->code,
-                        'area'         => $data->area->code ?? '-',
-                        'production_batch' => $data->productionBatch()->exists() ? $data->productionBatch->code : '-',
-                        'shading'      => $data->shading->code ?? '-',
-                        'keterangan'=>$data->lookable->code.'-'.$data->lookable->name,
+                        'plant'=>$data->place_code,
+                        'gudang'=>$data->warehouse_name,
+                        'kode'=>$data->item_code,
+                        'item'=>$data->item_name,
+                        'satuan' => $data->uom_unit,
+                        'area'         => $data->area_code,
+                        'production_batch' => $data->batch_code,
+                        'shading'      => $data->item_shading,
+                        'keterangan'=>'',
                         'date'=>$data->date,
                         'lamahari'=>$dateDifference,
                     ];

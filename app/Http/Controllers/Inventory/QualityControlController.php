@@ -227,7 +227,7 @@ class QualityControlController extends Controller
             $data['purchase_order']     = $data->purchaseOrderDetail->purchaseOrder->code;
             $data['item_name']          = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '-';
             $data['place_name']         = $data->place->code;
-            $data['warehouse_name']     = $data->warehouse->name;
+            $data['warehouse_name']     = $data->warehouse->name ?? '-';
             $data['note']               = $data->note;
             $data['is_hide_supplier']   = $data->item->is_hide_supplier ?? '';
             $data['water_content']      = CustomHelper::formatConditionalQty($data->water_content);

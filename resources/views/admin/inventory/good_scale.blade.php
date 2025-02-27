@@ -282,7 +282,7 @@
                             <div class="input-field col m3 s12" id="div-account">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Supplier/Ekspedisi</label>
+                                <label class="active" for="account_id">Supplier/Ekspedisi/Customer</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="place_id" name="place_id">

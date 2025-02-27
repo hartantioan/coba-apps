@@ -943,7 +943,7 @@ class GoodScaleController extends Controller
                 $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
                 $percent_balance = round(($balance / $gs->purchaseOrderDetail->qty) * 100,2);
                 if($percent_balance > $tolerance_gr){
-                    $overtolerance = true;
+                    //$overtolerance = true;
                 }
 
                 if($overtolerance && $gs->item->item_group_id == 2){

@@ -313,6 +313,7 @@
                                     <legend>2. Pajak</legend>
                                     <div class="input-field col m3 s12 step11">
                                         <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
+                                            <option value="040">040</option>
                                             <option value="010">010</option>
                                         </select>
                                         <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>

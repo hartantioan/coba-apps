@@ -63,8 +63,57 @@ class Menu extends Model
 
     public function hasTable(){
         if($this->table_name){
-            
+
         }
+    }
+
+    public function menuUserShow(){
+
+        $userId = session('bo_id');
+
+        if (!$userId) {
+            return false;
+        }
+
+        // Check if the user has direct access to this menu
+        $menu = MenuUser::where('user_id', $userId)
+            ->where('menu_id', $this->id)
+            ->where('type', 'view')
+            ->first();
+
+        // If it's the main menu or directly accessible, show it
+        if ($menu || $this->parent_id == null) {
+            return true;
+        }
+
+        // Recursively check if any parent has permission
+        if ($this->sub()->exists()) {
+            foreach ($this->sub as $submenu) {
+                if ($submenu->menuUserShow()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function menuUserParentShow(){
+        $show = false;
+        if($this->sub()->exists()){
+            foreach($this->sub as $row_sub_menu){
+                $yes=MenuUser::where('user_id',session('bo_id'))
+                ->where('menu_id',$row_sub_menu->id)
+                ->where('type','view')
+                ->first();
+                if($yes||$row_sub_menu->parent_id == null){
+                    $show = true;
+                    break;
+                }
+            }
+        }else{
+            $show = true;
+        }
+        return $show;
     }
 
     public function fullName(){

@@ -107,6 +107,66 @@ class LandedCostDetail extends Model
         return $document;
     }
 
+    public function getItemUnit(){
+        $document = '-';
+        if($this->lookable_type == 'good_receipt_details'){
+            $document = $this->lookable?->itemUnit->unit->code ?? '-';
+        }elseif($this->lookable_type == 'landed_cost_details'){
+            if($this->lookable->lookable_type == 'good_receipt_details'){
+                $document = $this->lookable?->lookable?->itemUnit->unit->code?? '-';
+            }elseif($this->lookable->lookable_type == 'landed_cost_details'){
+                if($this->lookable->lookable->lookable_type == 'good_receipt_details'){
+                    $document = $this->lookable?->lookable?->lookable?->itemUnit->unit->code?? '-';
+                }elseif($this->lookable->lookable->lookable_type == 'landed_cost_details'){
+                    if($this->lookable->lookable->lookable->lookable_type == 'good_receipt_details'){
+                        $document = $this->lookable?->lookable?->lookable?->itemUnit->unit->code?? '-';
+                    }
+                }
+            }
+        }
+        return $document;
+    }
+
+    public function getGrpo(){
+        $document = '-';
+        if($this->lookable_type == 'good_receipt_details'){
+            $document = $this->lookable?->goodReceipt->code ?? '-';
+        }elseif($this->lookable_type == 'landed_cost_details'){
+            if($this->lookable->lookable_type == 'good_receipt_details'){
+                $document = $this->lookable?->lookable?->goodReceipt->code?? '-';
+            }elseif($this->lookable->lookable_type == 'landed_cost_details'){
+                if($this->lookable->lookable->lookable_type == 'good_receipt_details'){
+                    $document = $this->lookable?->lookable?->lookable?->goodReceipt->code?? '-';
+                }elseif($this->lookable->lookable->lookable_type == 'landed_cost_details'){
+                    if($this->lookable->lookable->lookable->lookable_type == 'good_receipt_details'){
+                        $document = $this->lookable?->lookable?->lookable?->goodReceipt->code?? '-';
+                    }
+                }
+            }
+        }
+        return $document;
+    }
+
+    public function getGrpoValueRp(){
+        $total = 0;
+        if($this->lookable_type == 'good_receipt_details'){
+            $total = $this->lookable->total * $this->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+        }elseif($this->lookable_type == 'landed_cost_details'){
+            if($this->lookable->lookable_type == 'good_receipt_details'){
+                $total = $this->lookable->lookable->total * $this->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+            }elseif($this->lookable->lookable_type == 'landed_cost_details'){
+                if($this->lookable->lookable->lookable_type == 'good_receipt_details'){
+                    $total = $this->lookable->lookable->lookable->total * $this->lookable->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+                }elseif($this->lookable->lookable->lookable_type == 'landed_cost_details'){
+                    if($this->lookable->lookable->lookable->lookable_type == 'good_receipt_details'){
+                        $total = $this->lookable->lookable->lookable->lookable->total * $this->lookable->lookable->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+                    }
+                }
+            }
+        }
+        return $total;
+    }
+
     public function inventoryTransferOutDetail()
     {
         if($this->lookable_type == 'inventory_transfer_out_details'){
@@ -129,6 +189,13 @@ class LandedCostDetail extends Model
     {
         return $this->hasMany('App\Models\LandedCostDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('landedCost',function($query){
             $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function landedCostDetailSelfWithPending()
+    {
+        return $this->hasMany('App\Models\LandedCostDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('landedCost',function($query){
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

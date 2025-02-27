@@ -225,7 +225,7 @@ class QualityControlController extends Controller
             $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
 
             $data['purchase_order']     = $data->purchaseOrderDetail->purchaseOrder->code;
-            $data['item_name']          = $data->item->code.' - '.$data->item->name;
+            $data['item_name']          = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '-';
             $data['place_name']         = $data->place->code;
             $data['warehouse_name']     = $data->warehouse->name;
             $data['note']               = $data->note;

@@ -938,7 +938,7 @@ class GoodScaleController extends Controller
             $qty_in = 0;
             if($gs->type == '1'){
                 $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
-                $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
+                $tolerance_gr = $gs->item()->exists() ? ($gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0) : 0;
                 $balancegrpo = $gs->purchaseOrderDetail->qtyGR();
                 $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
                 $percent_balance = round(($balance / $gs->purchaseOrderDetail->qty) * 100,2);
@@ -946,11 +946,13 @@ class GoodScaleController extends Controller
                     //$overtolerance = true;
                 }
 
-                if($overtolerance && $gs->item->item_group_id == 2){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
-                    ]);
+                if($gs->item()->exists()){
+                    if($overtolerance && $gs->item->item_group_id == 2){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                        ]);
+                    }
                 }
 
                 $qty_qc = 0;

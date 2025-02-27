@@ -1318,7 +1318,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);hitungSelisih('`+count+`');" style="text-align:right;width:100px;">
                                         </td>
                                         <td>
                                             <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">
@@ -2309,28 +2309,34 @@
 
             return formatted;
         }
+        let total = 0;
+        $('input[name^="arr_qty[]"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
 
         var water_content = parseNumber($('#arr_water_content' + count).val());
         var percent_mod = parseNumber($('#arr_percentage_modifier' + count).val());
         var qty_balance = parseNumber($('#arr_netto' + count).val());
         var percentage_limit_netto = parseNumber($('#arr_percentage_limit_netto' + count).val());
+        var qty_po_diterima = parseNumber($('#arr_qty' + count).val());
         if($('#arr_scale' + count).val()){
             if(percent_mod > 0){
                 var kadar_air = 0;
                 var finance_kg = 0;
-                var total_bayar = qty_balance;
+                var total_bayar = qty_po_diterima/total * qty_balance;
                 if(percent_mod < water_content){
                     kadar_air = water_content-percent_mod;
                 }
                 if(kadar_air > 0){
-                    finance_kg = ((kadar_air/100)*(percentage_limit_netto/100)*qty_balance);
+                    finance_kg = ((kadar_air/100)*(percentage_limit_netto/100)*(qty_po_diterima/total * qty_balance));
                     total_bayar = total_bayar-finance_kg;
                 }
 
                 $('#arr_qty_balance' + count).val(formatNumber(total_bayar));
             }else{
 
-                $('#arr_qty_balance' + count).val(formatNumber(qty_balance));
+                var total_bayar = qty_po_diterima/total * qty_balance;
+                $('#arr_qty_balance' + count).val(formatNumber(total_bayar));
             }
         }
 

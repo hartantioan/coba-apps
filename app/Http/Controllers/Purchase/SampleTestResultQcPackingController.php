@@ -58,7 +58,7 @@ class SampleTestResultQcPackingController extends Controller
 
         $query_data = SampleTestQcPackingResult::where(function($query) use ($search, $request) {
                 if($search) {
-                    $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
+                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
                         ->orWhere('note','like',"%$search%")
                         ->orWhere('supplier','like',"%$search%")
@@ -84,7 +84,7 @@ class SampleTestResultQcPackingController extends Controller
 
         $total_filtered = SampleTestQcPackingResult::where(function($query) use ($search, $request) {
                 if($search) {
-                    $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
+                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
                         ->orWhere('note','like',"%$search%")
                         ->orWhere('supplier','like',"%$search%")

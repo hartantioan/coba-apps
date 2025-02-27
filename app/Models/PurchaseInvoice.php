@@ -590,7 +590,7 @@ class PurchaseInvoice extends Model
     public function updateRootDocumentStatusProcess(){
         foreach($this->purchaseInvoiceDetail as $row){
             if($row->purchaseOrderDetail()){
-                $row->lookable->purchaseOrder->update([
+                $row->purchaseOrderDetailNew->purchaseOrder->update([
                     'status'    => '2'
                 ]);
             }
@@ -618,8 +618,8 @@ class PurchaseInvoice extends Model
     public function updateRootDocumentStatusDone(){
         foreach($this->purchaseInvoiceDetail as $row){
             if($row->purchaseOrderDetail()){
-                if(!$row->lookable->purchaseOrder->hasBalanceInvoice()){
-                    $row->lookable->purchaseOrder->update([
+                if(!$row->purchaseOrderDetailNew->purchaseOrder->hasBalanceInvoice()){
+                    $row->purchaseOrderDetailNew->purchaseOrder->update([
                         'status'    => '3'
                     ]);
                 }

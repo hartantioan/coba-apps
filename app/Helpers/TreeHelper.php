@@ -627,7 +627,7 @@ class TreeHelper {
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
                         if($row->purchaseOrderDetail()){
 
-                            $row_po=$row->lookable->purchaseOrder;
+                            $row_po=$row->purchaseOrderDetailNew->purchaseOrder;
                             if($row_po->isSecretPo()){
                                 $name = null;
                             }else{
@@ -4938,7 +4938,7 @@ class TreeHelper {
                             if($index < 2 || $urutan <=8){
                                 if($row->purchaseOrderDetail()){
 
-                                    $row_po=$row->lookable->purchaseOrder;
+                                    $row_po=$row->purchaseOrderDetailNew->purchaseOrder;
                                     if($row_po->isSecretPo()){
                                         $name = null;
                                     }else{
@@ -9193,7 +9193,7 @@ class TreeHelper {
                         foreach($query_invoice->purchaseInvoiceDetail as $row){
                             if($row->purchaseOrderDetail()){
 
-                                $row_po=$row->lookable->purchaseOrder;
+                                $row_po=$row->purchaseOrderDetailNew->purchaseOrder;
                                 if($row_po->isSecretPo()){
                                     $name = null;
                                 }else{

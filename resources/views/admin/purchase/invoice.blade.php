@@ -2132,6 +2132,7 @@
                                                     <tr class="row_detail">
                                                         <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
                                                         <input type="hidden" name="arr_frd_id[]" value="` + val.id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_pod_id[]" value="0" data-id="` + count + `">
                                                         <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
                                                         <input type="hidden" name="arr_total[]" value="0" data-id="` + count + `">
                                                         <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">
@@ -2324,7 +2325,8 @@
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">
                                                         <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
-                                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_pod_id[]" value="` + val.id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
                                                         <input type="hidden" name="arr_price[]" value="` + val.raw_price + `" data-id="` + count + `">
                                                         <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                                         <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
@@ -2344,7 +2346,7 @@
                                                             </a>
                                                         </td>
                                                         <td class="center">
-                                                            ` + val.rawcode + `
+                                                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                                         </td>
                                                         <td>
                                                             <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
@@ -2446,6 +2448,12 @@
                                                         </td>
                                                     </tr>
                                                 `);
+                                                if(val.coa_id){
+                                                    $('#arr_coa' + count).append(`
+                                                        <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                                                    `);
+                                                }
+                                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
                                                 if(val.cost_distribution_id){
                                                     $('#arr_cost_distribution' + count).append(`
                                                         <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
@@ -2479,6 +2487,7 @@
                                             else{
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">
+                                                        <input type="hidden" name="arr_pod_id[]" value="0" data-id="` + count + `">
                                                         <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
                                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                                         <input type="hidden" name="arr_price[]" value="` + val.raw_price + `" data-id="` + count + `">
@@ -3851,11 +3860,12 @@
                         $('.row_detail').remove();
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            if(val.type == 'coas'){
+                            if(val.type == 'coas' && val.pod_id == '0'){
                                 $('#last-row-detail').before(`
                                     <tr class="row_detail">
                                         <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
                                         <input type="hidden" name="arr_frd_id[]" value="` + val.frd_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_pod_id[]" value="` + val.pod_id + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
@@ -4018,10 +4028,11 @@
                                 }
                                 select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
 
-                            }else if(val.type == 'fund_request_details' || val.type == 'purchase_order_details'){
+                            }else if(val.type == 'fund_request_details' || val.pod_id !== '0'){
                                 $('#last-row-detail').before(`
                                     <tr class="row_detail">
-                                        <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
+                                        <input type="hidden" name="arr_frd_id[]" value="` + val.frd_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_pod_id[]" value="` + val.pod_id + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
@@ -4042,7 +4053,7 @@
                                             </a>
                                         </td>
                                         <td class="center">
-                                            ` + val.rawcode + `
+                                            ` + (val.type == 'fund_request_details' ? val.rawcode : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>`) + `
                                         </td>
                                         <td>
                                             <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
@@ -4144,6 +4155,12 @@
                                         </td>
                                     </tr>
                                 `);
+                                if(val.pod_id !== '0' && val.type == 'coas'){
+                                    $('#arr_coa' + count).append(`
+                                        <option value="` + val.id + `">` + val.name + `</option>
+                                    `);
+                                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
+                                }
                                 if(val.cost_distribution_id){
                                     $('#arr_cost_distribution' + count).append(`
                                         <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>

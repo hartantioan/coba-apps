@@ -21,6 +21,7 @@ class PurchaseInvoiceDetail extends Model
         'lookable_type',
         'lookable_id',
         'fund_request_detail_id',
+        'purchase_order_detail_id',
         'qty',
         'price',
         'total',
@@ -139,7 +140,7 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function purchaseOrderDetail(){
-        if($this->lookable_type == 'purchase_order_details'){
+        if($this->purchaseOrderDetailNew()->exists()){
             return true;
         }else{
             return false;
@@ -148,6 +149,10 @@ class PurchaseInvoiceDetail extends Model
 
     public function fundRequestDetail(){
         return $this->belongsTo('App\Models\FundRequestDetail', 'fund_request_detail_id', 'id')->withTrashed();
+    }
+
+    public function purchaseOrderDetailNew(){
+        return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
     }
 
     public function getCode(){
@@ -191,15 +196,19 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getHeaderCode(){
-        $fund_code = null;
+        $fund_code = '';
         if($this->fundRequestDetail()->exists()){
             $fund_code = $this->fundRequestDetail->fundRequest->code;
+        }
+        $po_code = '';
+        if($this->purchaseOrderDetail()){
+            $po_code = $this->purchaseOrderDetailNew->purchaseOrder->code;
         }
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
             'landed_cost_fee_details'   => $this->lookable->landedCost?->code ?? '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->code,
-            'coas'                      => $fund_code ?? $this->lookable->code . ' - ' . $this->lookable->name,
+            'coas'                      => $fund_code ?? ($po_code ?? $this->lookable->code . ' - ' . $this->lookable->name),
             default                     => '-',
         };
 
@@ -207,11 +216,15 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getNote(){
+        $po_note = '';
+        if($this->purchaseOrderDetail()){
+            $po_note = $this->purchaseOrderDetailNew->note.($this->purchaseOrderDetailNew->note2 ? '<br>'.$this->purchaseOrderDetailNew->note2 : '');
+        }
         $note = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->note,
             'landed_cost_fee_details'   => $this->lookable->note,
             'purchase_order_details'    => $this->lookable->note.($this->lookable->note2 ? '<br>'.$this->lookable->note2 : ''),
-            'coas'                      => $this->note,
+            'coas'                      => $po_note ?? $this->note,
             default                     => '-',
         };
 
@@ -219,11 +232,15 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getTop(){
+        $po_term = '';
+        if($this->purchaseOrderDetail()){
+            $po_term = $this->purchaseOrderDetailNew->purchaseOrder->payment_term;
+        }
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
             'landed_cost_fee_details'   => '0',
             'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
-            default                     => '-',
+            default                     => $po_term ?? '-',
         };
 
         return $code;
@@ -240,32 +257,44 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getPostDate(){
+        $po_date = '';
+        if($this->purchaseOrderDetail()){
+            $po_date = date('d/m/Y',strtotime($this->purchaseOrderDetailNew->purchaseOrder->post_date));
+        }
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => date('d/m/Y',strtotime($this->lookable->goodReceipt->post_date)),
             'landed_cost_fee_details'   => date('d/m/Y',strtotime($this->lookable?->landedCost?->post_date)),
             'purchase_order_details'    => date('d/m/Y',strtotime($this->lookable->purchaseOrder->post_date)),
-            default                     => '-',
+            default                     => $po_date ?? '-',
         };
 
         return $date;
     }
 
     public function getDueDate(){
+        $po_duedate = '';
+        if($this->purchaseOrderDetail()){
+            $po_duedate = date('d/m/Y',strtotime($this->purchaseOrderDetailNew->purchaseOrder->due_date));
+        }
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/Y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/Y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
-            default                     => '-',
+            default                     => $po_duedate ?? '-',
         };
 
         return $date;
     }
 
     public function getPurchaseCode(){
+        $code = '';
+        if($this->purchaseOrderDetail()){
+            $code = $this->purchaseOrderDetailNew->purchaseOrder->code;
+        }
         $code = match ($this->lookable_type) {
             'good_receipt_details' => $this->lookable?->purchaseOrderDetail?->purchaseOrder?->code ?? '-',
             'landed_cost_fee_details' => $this->lookable?->landedCost ? ($this->lookable->landedCost->getGoodReceiptNo() ?? '-') : '-',
             'purchase_order_details' => $this->lookable?->purchaseOrder?->code.' - '.$this->lookable?->purchaseOrder?->code ?? '-',
-            'coas' => '-',
+            'coas' => $code ?? '-',
             default => '-',
         };
 

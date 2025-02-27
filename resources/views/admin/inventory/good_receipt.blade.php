@@ -1318,7 +1318,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);hitungSelisih('`+count+`');" style="text-align:right;width:100px;">
                                         </td>
                                         <td>
                                             <input name="arr_qty_sj[]" id="arr_qty_sj` + count + `" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);hitungRule('`+count+`');" style="text-align:right;width:100px;">

@@ -3178,8 +3178,7 @@ class Select2Controller extends Controller {
         $search     = $request->search;
 
         $data = PurchaseOrderDetail::where(function($query) use($search,$request){
-                    $query->where('item_id',$request->item_id)
-                    ->whereHas('purchaseOrder',function($query) use($search,$request){
+                    $query->whereHas('purchaseOrder',function($query) use($search,$request){
                         if($request->account_id){
                             $query->where('account_id',$request->account_id);
                         }
@@ -3187,6 +3186,9 @@ class Select2Controller extends Controller {
                             ->where('status','2')
                             ->where('inventory_type','1');
                     });
+                    if($request->item_id){
+                        $query->where('item_id',$request->item_id);
+                    }
                 })
                 ->whereIn('place_id',$this->dataplaces)
                 ->whereIn('warehouse_id',$this->datawarehouses)

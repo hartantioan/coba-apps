@@ -59,7 +59,7 @@ class SampleTestQcResultController extends Controller
 
         $query_data = SampleTestQcResult::where(function($query) use ($search, $request) {
                 if($search) {
-                    $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
+                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
                         ->orWhere('note','like',"%$search%")
                         ->orWhere('supplier','like',"%$search%")
@@ -85,7 +85,7 @@ class SampleTestQcResultController extends Controller
 
         $total_filtered = SampleTestQcResult::where(function($query) use ($search, $request) {
                 if($search) {
-                    $query->orWhereHas('sampleTypeInput',function($query) use ($search, $request){
+                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
                         $query->where('code','like',"%$search%")
                         ->orWhere('note','like',"%$search%")
                         ->orWhere('supplier','like',"%$search%")

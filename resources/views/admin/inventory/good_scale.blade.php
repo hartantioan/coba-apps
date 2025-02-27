@@ -279,7 +279,7 @@
                                 <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>
                                 <label class="active" for="item_id">{{ __('translations.item') }}</label>
                             </div>
-                            <div class="input-field col m3 s12" id="div-account">
+                            <div class="input-field col m3 s12 hide-account" id="div-account">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Supplier/Ekspedisi</label>
@@ -1323,6 +1323,7 @@
         }else if(val == '2'){
             $('#is_quality_check').prop( "checked", false);
             $('.hide-inputs').addClass('hide');
+            $('.hide-account').addClass('hide');
             $('.manual-inputs').removeClass('hide');
             $('#table-detail-mod').parent().removeClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
@@ -1331,7 +1332,7 @@
             $('.hide-inputs').addClass('hide');
             $('.manual-inputs').addClass('hide');
             $('#table-detail-mod').parent().addClass('hide');
-            select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
+            select2ServerSide('#account_id', '{{ url("admin/select2/customer") }}');
         }
     }
 

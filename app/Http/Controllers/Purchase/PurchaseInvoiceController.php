@@ -1179,7 +1179,7 @@ class PurchaseInvoiceController extends Controller
 
             $grandtotal += $rounding;
 
-            $balance = $grandtotal - $downpayment;
+            $balance = round($grandtotal,2) - round($downpayment,2);
             if($balance < 0){
                 return response()->json([
                     'status'  => 500,

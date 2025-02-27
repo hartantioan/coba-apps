@@ -132,6 +132,9 @@ class GoodReceiptPOController extends Controller
                                     });
                                 });
                             })
+                            ->orWhereHas('goodScale',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%");
+                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -207,6 +210,9 @@ class GoodReceiptPOController extends Controller
                                         $query->where('code', 'like', "%$search%");
                                     });
                                 });
+                            })
+                            ->orWhereHas('goodScale',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%");
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -307,6 +313,7 @@ class GoodReceiptPOController extends Controller
                     $val->vehicle_no,
                     $val->isMultipleLC(),
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->goodScale->code ?? '-',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :

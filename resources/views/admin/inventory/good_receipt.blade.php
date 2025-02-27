@@ -141,6 +141,7 @@
                                                         <th rowspan="2">Plat Nomor</th>
                                                         <th rowspan="2">Status LC</th>
                                                         <th rowspan="2">Dokumen</th>
+                                                        <th rowspan="2">Link Timbangan</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">Operasi</th>
@@ -1703,7 +1704,8 @@
                 { name: 'vehicle_no', className: 'center-align' },
                 { name: 'is_multiple_lc', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'good_scale_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

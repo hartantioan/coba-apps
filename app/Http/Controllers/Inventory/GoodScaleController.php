@@ -946,7 +946,7 @@ class GoodScaleController extends Controller
                     $overtolerance = true;
                 }
 
-                if($overtolerance){
+                if($overtolerance && $gs->item->item_group_id == 2){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'

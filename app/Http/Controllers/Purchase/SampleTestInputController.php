@@ -274,6 +274,7 @@ class SampleTestInputController extends Controller
                     $query->province_id = $request->province_id;
                     $query->city_id = $request->city_id;
                     $query->subdistrict_id = $request->district_id;
+                    $query->account_id = $request->account_id;
                     $query->village_name = $request->village_name;
                     $query->supplier = $request->supplier;
                     $query->supplier_name = $request->supplier_name;
@@ -313,6 +314,7 @@ class SampleTestInputController extends Controller
                         'user_id'             => session('bo_id'),
                         'sample_type_id'      => $request->sample_type_id,
                         'province_id'         => $request->province_id,
+                        'account_id'         => $request->account_id,
                         'city_id'             => $request->city_id,
                         'subdistrict_id'      => $request->district_id,
                         'village_name'        => $request->village_name,

@@ -4176,6 +4176,7 @@
                             else{
                                 $('#last-row-detail').before(`
                                     <tr class="row_detail">
+                                        <input type="hidden" name="arr_pod_id[]" value="` + val.pod_id + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_frd_id[]" value="0" data-id="` + count + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">

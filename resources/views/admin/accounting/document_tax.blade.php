@@ -718,7 +718,7 @@
 
     function saveNoFaktur(){
 
-        var formData = new FormData($('#form_data')[0]);
+        var formData = new FormData($('#form_data_no_pajak')[0]);
 
         $.ajax({
             url: '{{ Request::url() }}/save_no_faktur',

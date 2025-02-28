@@ -303,7 +303,7 @@ class DocumentTaxController extends Controller
             DB::beginTransaction();
             try {
                 if($request->temp_add_no_faktur){
-                    $barcode = $request->no_factor;
+                    $barcode = $request->no_factor_pajak;
                     $kdJenisTransaksi = substr($barcode, 0, 2);
                     $fgPengganti = substr($barcode, 2, 1);
                     $nomorFaktur = substr($barcode, 3);

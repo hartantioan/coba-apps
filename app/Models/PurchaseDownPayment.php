@@ -421,7 +421,7 @@ class PurchaseDownPayment extends Model
         })->where('id','<>',$prd)->get() as $rowpayment){
             $total -= round($rowpayment->nominal,2);
         }
-        return $total;
+        return round($total,2);
     }
 
     public function status(){

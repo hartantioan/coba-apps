@@ -1034,6 +1034,7 @@ class SendJournal implements ShouldQueue
 					}elseif($row->lookable_type == 'purchase_down_payments'){
 						$mustpay = $row->lookable->balancePaidExcept($row->id);
 						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2);
+						info($balanceReal);
 						if($row->lookable->getTotalPaid() <= 0){
 							$row->lookable->update([
 								'status'	=> '3'
@@ -1088,7 +1089,6 @@ class SendJournal implements ShouldQueue
 							]);
 						}
 					}else{
-						info($balanceReal);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,

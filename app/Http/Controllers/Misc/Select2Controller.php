@@ -3305,7 +3305,7 @@ class Select2Controller extends Controller {
                 }
                 $response[] = [
                     'id'   			        => $d->id,
-                    'text' 			        => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code.' - Sisa GRPO : '.CustomHelper::formatConditionalQty($balancegrpo),
+                    'text' 			        => $d->code.' '.$d->purchaseOrderDetail->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->purchaseOrderDetail->itemUnit->unit->code.' - Sisa GRPO : '.CustomHelper::formatConditionalQty($balancegrpo),
                     'qty'                   => CustomHelper::formatConditionalQty($d->qty_final),
                     'percentage_modifier'   => CustomHelper::formatConditionalQty($percentage_mod),
                     'netto'                 => CustomHelper::formatConditionalQty($d->qty_balance),

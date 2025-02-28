@@ -516,8 +516,8 @@ class ApprovalController extends Controller
                                                 $row->update([
                                                     'status'    => '1'
                                                 ]);
-                                                if($row->user->phone == '085729547103'){
-                                                    WaBlas::kirim_wa('085729547103','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                if(in_array($row->user->phone,['085729547103','087788809205'])){
+                                                    WaBlas::kirim_wa($row->user->phone,'Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                                     WaBlas::kirim_wa('081330074432','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                                 }
                                             }
@@ -721,9 +721,9 @@ class ApprovalController extends Controller
                                                 $rowdetail->update([
                                                     'status'    => '1'
                                                 ]);
-                                                if($rowdetail->user->phone == '085729547103'){
-                                                    WaBlas::kirim_wa('085729547103','Dokumen '.$rowdetail->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
-                                                    WaBlas::kirim_wa('081330074432','Dokumen '.$rowdetail->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                if(in_array($row->user->phone,['085729547103','087788809205'])){
+                                                    WaBlas::kirim_wa($row->user->phone,'Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                    WaBlas::kirim_wa('081330074432','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                                 }
                                             }
                                         }

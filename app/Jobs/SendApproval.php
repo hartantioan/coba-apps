@@ -358,8 +358,8 @@ class SendApproval implements ShouldQueue
 									'date_request'					=> date('Y-m-d H:i:s'),
 									'status'						=> $status
 								]);
-								if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
-									WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+								if(in_array($rowStageDetail->user->phone,['085729547103','087788809205']) && $status == '1'){
+									WaBlas::kirim_wa($rowStageDetail->user->phone,'Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
 									WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
 								}
 							}

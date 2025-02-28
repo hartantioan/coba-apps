@@ -1032,10 +1032,8 @@ class SendJournal implements ShouldQueue
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
 					}elseif($row->lookable_type == 'purchase_down_payments'){
-						/* $mustpay = $row->lookable->balancePaidExcept($row->id);
-						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2); */
-						$mustpay = $row->nominal;
-						$balanceReal = round($mustpay * $row->lookable->currency_rate,2);
+						$mustpay = $row->lookable->balancePaidExcept($row->id);
+						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2);
 						if($row->lookable->getTotalPaid() <= 0){
 							$row->lookable->update([
 								'status'	=> '3'
@@ -1100,7 +1098,7 @@ class SendJournal implements ShouldQueue
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> floatval(round($balanceReal,2)),
+							'nominal'		=> floatval($balanceReal),
 							'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($mustpay * $op->currency_rate,2)) : floatval(round($mustpay,2)),
 							'lookable_type'	=> $table_name,
 							'lookable_id'	=> $table_id,
@@ -1110,7 +1108,7 @@ class SendJournal implements ShouldQueue
 							'note2'			=> $row->lookable_type == 'fund_requests' ? $row->lookable->code : '',
 						]);
 						if($row->lookable_type == 'marketing_order_memos'){
-							CustomHelper::addCountLimitCredit($op->account_id,round($balanceReal,2));
+							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
 						}
 					}
 				}else{

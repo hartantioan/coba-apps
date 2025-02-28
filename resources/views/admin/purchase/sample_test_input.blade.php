@@ -113,7 +113,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>code</th>
+                                                        <th>Code</th>
+                                                        <th>PIC Sampel</th>
                                                         <th>Tipe Sampel</th>
                                                         <th>Supplier</th>
                                                         <th>CP Supplier</th>
@@ -819,6 +820,7 @@
                 { name: 'sample_type', className: 'center-align' },
                 { name: 'sample_type', className: 'center-align' },
                 { name: 'supplier', className: '' },
+                { name: 'supplier_name', className: '' },
                 { name: 'supplier_name', className: '' },
                 { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },

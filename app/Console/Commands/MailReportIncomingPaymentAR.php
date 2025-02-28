@@ -31,7 +31,7 @@ class MailReportIncomingPaymentAR extends Command
     public function handle()
     {
         $recipient = ['andrew@superior.co.id', 'henrianto@superior.co.id', 'haidong@superiorporcelain.co.id', 'annabela@superior.co.id', 'yorghi@superior.co.id', 'marisa@superiorporcelain.co.id'];
-       // $recipient = ['edp@superior.co.id'];
+        //$recipient = ['edp@superior.co.id'];
 
         $data = [];
         $date = date('d');

@@ -217,6 +217,34 @@
     </div>
 </div>
 
+<div id="modal_add_no_faktur" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Tambah Manual</h4>
+                <form class="row" id="form_data_no_pajak" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field col s12">
+                            <input type="hidden" id="temp_add_no_faktur" name="temp_add_no_faktur">
+                            <input id="no_factor_pajak" name="no_factor_pajak" type="text" placeholder="No Faktur">
+                            <label class="active" for="no_factor_pajak">Kode Faktur / Dokumen</label>
+                        </div>
+                        <div class="col s12 mt-3">
+                            <button class="btn waves-effect waves-light right submit" onclick="saveNoFaktur();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -266,6 +294,25 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                $('#temp').val('');
+                M.updateTextFields();
+            }
+        });
+
+        $('#modal_add_no_faktur').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data_no_pajak')[0].reset();
                 $('input').css('border', 'none');
                 $('input').css('border-bottom', '0.5px solid black');
                 $('#temp').val('');
@@ -504,6 +551,7 @@
     function success(){
         loadDataTable();
         $('#modal_manual').modal('close');
+        $('#modal_add_no_faktur').modal('close');
     }
 
     function rowDetail(data) {
@@ -587,9 +635,9 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal_manual').modal('open');
+                $('#modal_add_no_faktur').modal('open');
                 console.log(response);
-                $('#temp').val(response.id);
+                $('#temp_add_no_faktur').val(response.id);
                 M.updateTextFields();
             },
             error: function() {
@@ -665,6 +713,81 @@
                 w.document.open();
                 w.document.write(data);
                 w.document.close();
+            }
+        });
+    }
+
+    function saveNoFaktur(){
+
+        var formData = new FormData($('#form_data_no_pajak')[0]);
+
+        $.ajax({
+            url: '{{ Request::url() }}/save_no_faktur',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    $.each(response.error, function(field, errorMessage) {
+                        $('#' + field).addClass('error-input');
+                        $('#' + field).css('border', '1px solid red');
+
+                    });
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
         });
     }

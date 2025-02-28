@@ -410,16 +410,16 @@ class PurchaseDownPayment extends Model
     }
 
     public function balancePaidExcept($prd){
-        $total = $this->grandtotal;
+        $total = round($this->grandtotal,2);
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
         })->where('id','<>',$prd)->get() as $rowpayment){
-            $total -= $rowpayment->nominal;
+            $total -= round($rowpayment->nominal,2);
         }
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
         })->where('id','<>',$prd)->get() as $rowpayment){
-            $total -= $rowpayment->nominal;
+            $total -= round($rowpayment->nominal,2);
         }
         return $total;
     }

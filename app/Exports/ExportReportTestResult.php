@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 
 
-class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
+class ExportReportTestResult implements FromView, ShouldAutoSize
 {
     protected $start_date, $end_date, $data; // ✅ Store data
 
@@ -44,56 +44,56 @@ class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
         ]);
     }
 
-    public function drawings()
-    {
-        $drawings = [];
+    // public function drawings()
+    // {
+    //     $drawings = [];
 
-        foreach ($this->data as $index => $row_data) { // ✅ Use stored data
-            if (!empty($row_data->document) && file_exists(storage_path('app/' . $row_data->document))) {
-                $drawing = new Drawing();
-                $drawing->setName('Document Image');
-                $drawing->setDescription('Sample Document');
-                $drawing->setPath(storage_path('app/' . $row_data->document));
-                $drawing->setHeight(100);
-                $drawing->setCoordinates('U' . ($index + 2));
-                $drawings[] = $drawing;
-            }
+    //     foreach ($this->data as $index => $row_data) { // ✅ Use stored data
+    //         if (!empty($row_data->document) && file_exists(storage_path('app/' . $row_data->document))) {
+    //             $drawing = new Drawing();
+    //             $drawing->setName('Document Image');
+    //             $drawing->setDescription('Sample Document');
+    //             $drawing->setPath(storage_path('app/' . $row_data->document));
+    //             $drawing->setHeight(100);
+    //             $drawing->setCoordinates('U' . ($index + 2));
+    //             $drawings[] = $drawing;
+    //         }
 
-            if ($row_data->type == '2' && !empty($row_data->sampleTestResultQc->document) &&
-                file_exists(storage_path('app/' . $row_data->sampleTestResultQc->document))) {
-                $drawing = new Drawing();
-                $drawing->setName('QC Document');
-                $drawing->setDescription('QC Test Result');
-                $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQc->document));
-                $drawing->setHeight(100);
-                $drawing->setCoordinates('AB' . ($index + 2));
-                $drawings[] = $drawing;
-            }
+    //         if ($row_data->type == '2' && !empty($row_data->sampleTestResultQc->document) &&
+    //             file_exists(storage_path('app/' . $row_data->sampleTestResultQc->document))) {
+    //             $drawing = new Drawing();
+    //             $drawing->setName('QC Document');
+    //             $drawing->setDescription('QC Test Result');
+    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQc->document));
+    //             $drawing->setHeight(100);
+    //             $drawing->setCoordinates('AB' . ($index + 2));
+    //             $drawings[] = $drawing;
+    //         }
 
-            if ($row_data->type == '3' && !empty($row_data->sampleTestResultQcPacking->document) &&
-                file_exists(storage_path('app/' . $row_data->sampleTestResultQcPacking->document))) {
-                $drawing = new Drawing();
-                $drawing->setName('QC Document');
-                $drawing->setDescription('QC Test Result');
-                $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQcPacking->document));
-                $drawing->setHeight(100);
-                $drawing->setCoordinates('AB' . ($index + 2));
-                $drawings[] = $drawing;
-            }
+    //         if ($row_data->type == '3' && !empty($row_data->sampleTestResultQcPacking->document) &&
+    //             file_exists(storage_path('app/' . $row_data->sampleTestResultQcPacking->document))) {
+    //             $drawing = new Drawing();
+    //             $drawing->setName('QC Document');
+    //             $drawing->setDescription('QC Test Result');
+    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQcPacking->document));
+    //             $drawing->setHeight(100);
+    //             $drawing->setCoordinates('AB' . ($index + 2));
+    //             $drawings[] = $drawing;
+    //         }
 
-            if ($row_data->type == '1' && !empty($row_data->sampleTestResultProc->document) &&
-                file_exists(storage_path('app/' . $row_data->sampleTestResultProc->document))) {
-                $drawing = new Drawing();
-                $drawing->setName('Proc Document');
-                $drawing->setDescription('Proc Test Result');
-                $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultProc->document));
-                $drawing->setHeight(100);
-                $drawing->setCoordinates('AB' . ($index + 2));
-                $drawings[] = $drawing;
-            }
-        }
+    //         if ($row_data->type == '1' && !empty($row_data->sampleTestResultProc->document) &&
+    //             file_exists(storage_path('app/' . $row_data->sampleTestResultProc->document))) {
+    //             $drawing = new Drawing();
+    //             $drawing->setName('Proc Document');
+    //             $drawing->setDescription('Proc Test Result');
+    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultProc->document));
+    //             $drawing->setHeight(100);
+    //             $drawing->setCoordinates('AB' . ($index + 2));
+    //             $drawings[] = $drawing;
+    //         }
+    //     }
 
-        return $drawings;
-    }
+    //     return $drawings;
+    // }
 }
 

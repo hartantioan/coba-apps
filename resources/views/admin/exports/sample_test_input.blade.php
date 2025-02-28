@@ -15,14 +15,12 @@
             <th rowspan="2">HARGA</th>
             <th rowspan="2">KODE SAMPEL Supplier</th>
             <th rowspan="2">KODE SAMPEL PORCELAIN</th>
-            <th rowspan="2">LINK FOTO SAMPEL</th>
             <th rowspan="2">CATATAN SAMPEL</th>
             <th rowspan="2">TGL UPDATE</th>
             <th rowspan="2">TIPE LABORATORIUM</th>
             <th rowspan="2">NAMA LAB</th>
             <th rowspan="2">NILAI WET WHITENESS</th>
             <th rowspan="2">NILAI DRY WHITENESS</th>
-            <th rowspan="2">LINK FOTO HASIL UJI</th>
             <th rowspan="2">CATATAN HASIL UJI</th>
             <th rowspan="2">TANGGAL DATA CATATAN KUSUS</th>
             <th rowspan="2">PENGGUNA</th>
@@ -88,14 +86,12 @@
                 <td>{{ $row->price_estimation }}</td>
                 <td>{{ $row->supplier_sample_code }}</td>
                 <td>{{ $row->company_sample_code }}</td>
-                <td></td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->update_at }}</td>
                 <td>{{ $row->type() }}</td>
                 <td>{{ $nama_lab}}</td>
                 <td>{{ $wet_white_val}}</td>
                 <td>{{ $dry_white_val }}</td>
-                <td></td>
                 <td>{{ $note }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->created_at ?? '' }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->user->name ?? ''}}</td>

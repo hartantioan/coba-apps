@@ -505,7 +505,6 @@
     $(document).ready(function() {
         toggleLabNameField($('#lab_type').val());
 
-        select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
         $('#lab_type').change(function() {
             toggleLabNameField($(this).val());
         });
@@ -554,6 +553,7 @@
             width: '100%',
         });
 
+        select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
         $('#with_test').change(function() {
             if ($(this).is(':checked')) {
                 $('#modal-fieldset').show();

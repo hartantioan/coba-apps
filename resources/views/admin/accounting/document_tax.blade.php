@@ -551,6 +551,7 @@
     function success(){
         loadDataTable();
         $('#modal_manual').modal('close');
+        $('#modal_add_no_faktur').modal('close');
     }
 
     function rowDetail(data) {

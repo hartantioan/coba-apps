@@ -1088,6 +1088,7 @@ class SendJournal implements ShouldQueue
 							]);
 						}
 					}else{
+						info($balanceReal);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -1098,7 +1099,7 @@ class SendJournal implements ShouldQueue
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> round($balanceReal,2),
+							'nominal'		=> floatval(round($balanceReal,2)),
 							'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($mustpay * $op->currency_rate,2)) : floatval(round($mustpay,2)),
 							'lookable_type'	=> $table_name,
 							'lookable_id'	=> $table_id,

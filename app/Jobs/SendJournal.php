@@ -1098,7 +1098,7 @@ class SendJournal implements ShouldQueue
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> floatval($balanceReal),
+							'nominal'		=> floatval(round($balanceReal,2)),
 							'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($mustpay * $op->currency_rate,2)) : floatval(round($mustpay,2)),
 							'lookable_type'	=> $table_name,
 							'lookable_id'	=> $table_id,
@@ -1108,7 +1108,7 @@ class SendJournal implements ShouldQueue
 							'note2'			=> $row->lookable_type == 'fund_requests' ? $row->lookable->code : '',
 						]);
 						if($row->lookable_type == 'marketing_order_memos'){
-							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
+							CustomHelper::addCountLimitCredit($op->account_id,round($balanceReal,2));
 						}
 					}
 				}else{

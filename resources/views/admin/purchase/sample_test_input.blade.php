@@ -156,7 +156,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <h4> {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -290,7 +290,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step3">
                                         <input id="company_sample_code" name="company_sample_code" type="text" placeholder="Kode dari Perusahaan">
-                                        <label class="active" for="company_sample_code">Kode dari Perusahaan ( No Duplicate )</label>
+                                        <label class="active" for="company_sample_code">Kode Sampel ( No Duplicate )</label>
                                     </div>
                                     <div class="file-field input-field col m12 s12 step18">
                                         <div class="btn">

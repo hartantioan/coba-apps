@@ -229,8 +229,8 @@
                     <div class="col s12">
                         <div class="input-field col s12">
                             <input type="hidden" id="temp_add_no_faktur" name="temp_add_no_faktur">
-                            <input id="no_factor" name="no_factor" type="text" placeholder="No Faktur">
-                            <label class="active" for="no_factor">Kode Faktur / Dokumen</label>
+                            <input id="no_factor_pajak" name="no_factor_pajak" type="text" placeholder="No Faktur">
+                            <label class="active" for="no_factor_pajak">Kode Faktur / Dokumen</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="saveNoFaktur();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>

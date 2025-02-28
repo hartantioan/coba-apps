@@ -289,9 +289,9 @@ class DocumentTaxController extends Controller
 
     public function saveNoFaktur(Request $request){
         $validation = Validator::make($request->all(), [
-            'no_factor'               => 'required',
+            'no_factor_pajak'               => 'required',
         ], [
-            'no_factor.required'      => 'No Faktur Pajak',
+            'no_factor_pajak.required'      => 'No Faktur Pajak',
         ]);
 
         if($validation->fails()) {
@@ -302,7 +302,7 @@ class DocumentTaxController extends Controller
         } else {
             DB::beginTransaction();
             try {
-                if($request->temp){
+                if($request->temp_add_no_faktur){
                     $barcode = $request->no_factor;
                     $kdJenisTransaksi = substr($barcode, 0, 2);
                     $fgPengganti = substr($barcode, 2, 1);

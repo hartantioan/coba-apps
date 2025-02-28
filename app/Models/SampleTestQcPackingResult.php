@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class SampleTestQcPackingResult extends Model
 {
@@ -23,9 +24,23 @@ class SampleTestQcPackingResult extends Model
 
     protected $dates = ['deleted_at'];
 
-    /**
-     * Relationships
-     */
+    public function attachment()
+    {
+        if($this->document){
+            $arr = explode(',',$this->document);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document_po = implode(' ',$arrDoc);
+        }else{
+            $document_po = 'Tidak ada';
+        }
+
+        return $document_po;
+    }
     public function sampleTestInput()
     {
         return $this->belongsTo(SampleTestInput::class);

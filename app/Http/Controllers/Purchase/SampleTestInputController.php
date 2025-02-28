@@ -28,7 +28,7 @@ class SampleTestInputController extends Controller
 
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title' => 'Hasil Uji & Input Sampel',
+            'title' => 'Input Sampel',
             'place'         => Place::where('status','1')->get(),
             'content' => 'admin.purchase.sample_test_input',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -151,7 +151,7 @@ class SampleTestInputController extends Controller
                     $val->supplier_phone,
                     $val->sample_date,
                     $val->status(),
-                    '<a  target="_blank" href="'.$val->link_map.'"><i class="material-icons dp48" style="font-size: 40px;">location_on</i></a>',
+                    $val->link_map ? '<a  target="_blank" href="'.$val->link_map.'"><i class="material-icons dp48" style="font-size: 40px;">location_on</i></a>' : '-' ,
                     $val->permission_type,
                     $val->permission_name,
                     $val->commodity_permits,
@@ -162,7 +162,7 @@ class SampleTestInputController extends Controller
                     number_format($val->price_estimation_franco,2,',','.'),
                     $val->supplier_sample_code,
                     $val->company_sample_code,
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->document ? $val->attachment() : 'file tidak ditemukan',
                     $val->note,
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -190,11 +190,21 @@ class SampleTestInputController extends Controller
     public function create(Request $request){
         $rules =[
             'supplier'              => 'required',
+            'province_id'              => 'required',
+            'city_id'              => 'required',
+            'account_id'              => 'required',
+            'district_id'              => 'required',
             'sample_type_id'              => 'required',
+            'sample_date'              => 'required',
+            'supplier_name'              => 'required',
             'supplier_phone'              => 'required',
             'permission_type'              => 'required',
             'permission_name'              => 'required',
             'commodity_permits'              => 'required',
+            'receiveable_capacity'              => 'required',
+            'price_estimation_loco'              => 'required',
+            'price_estimation_franco'              => 'required',
+            'supplier_sample_code'              => 'required',
             'permits_period'              => 'required',
             'company_sample_code' => $request->company_sample_code
             ? ['required', 'string', Rule::unique('sample_test_inputs', 'company_sample_code')->ignore($request->temp)]
@@ -202,24 +212,24 @@ class SampleTestInputController extends Controller
 
         ];
 
-        if ($request->has('with_test') && $request->with_test == '1') {
-            $rules['wet_whiteness_value'] = 'required';
-            $rules['dry_whiteness_value'] = 'required';
-            $rules['item_name'] = 'required';
-        }
-
         $validation = Validator::make($request->all(), $rules,  [
-            'supplier.required'     => 'Supplier tidak boleh kosong.',
-            'sample_type_id.required' => 'Jenis sampel tidak boleh kosong.',
-            'supplier_phone.required' => 'Nomor telepon supplier tidak boleh kosong.',
-
-            'permission_type.required' => 'Tipe izin tidak boleh kosong.',
-            'permission_name.required' => 'Nama izin tidak boleh kosong.',
-            'commodity_permits.required' => 'Izin komoditas tidak boleh kosong.',
-            'permits_period.required' => 'Periode izin tidak boleh kosong.',
-            'wet_whiteness_value.required' => 'Wet Whiteness Value tidak boleh kosong.',
-            'dry_whiteness_value.required' => 'Dry Whiteness Value tidak boleh kosong.',
-            'item_name.required'     => 'Nama item tidak boleh kosong.',
+            'supplier.required'             => 'Supplier tidak boleh kosong.',
+            'province_id.required'          => 'Provinsi tidak boleh kosong.',
+            'account_id.required'              => 'PIC SAMPLE tidak boleh kosong',
+            'city_id.required'              => 'Kota tidak boleh kosong.',
+            'district_id.required'          => 'Kecamatan tidak boleh kosong.',
+            'sample_type_id.required'       => 'Jenis sampel tidak boleh kosong.',
+            'sample_date.required'          => 'Tanggal sampel tidak boleh kosong.',
+            'supplier_name.required'        => 'Nama supplier tidak boleh kosong.',
+            'supplier_phone.required'       => 'Nomor telepon supplier tidak boleh kosong.',
+            'permission_type.required'      => 'Tipe izin tidak boleh kosong.',
+            'permission_name.required'      => 'Nama izin tidak boleh kosong.',
+            'commodity_permits.required'    => 'Izin komoditas tidak boleh kosong.',
+            'receiveable_capacity.required' => 'Kapasitas yang dapat diterima tidak boleh kosong.',
+            'price_estimation_loco.required'=> 'Estimasi harga loco tidak boleh kosong.',
+            'price_estimation_franco.required' => 'Estimasi harga franco tidak boleh kosong.',
+            'supplier_sample_code.required' => 'Kode sampel supplier tidak boleh kosong.',
+            'permits_period.required'       => 'Periode izin tidak boleh kosong.',
         ]);
         if($validation->fails()) {
             $response = [
@@ -237,12 +247,24 @@ class SampleTestInputController extends Controller
                     $query = SampleTestInput::find($request->temp);
 
                     if($request->has('file')) {
+
                         if($query->document){
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            $arrFile = explode(',',$query->document);
+                            foreach($arrFile as $row){
+                                if(Storage::exists($row)){
+                                    Storage::delete($row);
+                                }
                             }
                         }
-                        $document = $request->file('file')->store('public/sample_test_input');
+
+                        $arrFile = [];
+
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/sample_test_input');
+                        }
+
+                        $document = implode(',',$arrFile);
                     } else {
                         $document = $query->document;
                     }
@@ -276,6 +298,16 @@ class SampleTestInputController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $fileUpload = '';
+
+                    if($request->file('file')){
+                        $arrFile = [];
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/purchase_orders');
+                        }
+                        $fileUpload = implode(',',$arrFile);
+                    }
                     $query = SampleTestInput::create([
                         'code'                => $newCode,
                         'user_id'             => session('bo_id'),
@@ -300,7 +332,7 @@ class SampleTestInputController extends Controller
                         'type'                => $request->type,
                         'supplier_sample_code'=> $request->supplier_sample_code,
                         'company_sample_code' => $request->company_sample_code,
-                        'document'            => $request->file('file') ? $request->file('file')->store('public/sample_test_input') : NULL,
+                        'document'            => $fileUpload ? $fileUpload : NULL,
                         'note'                => $request->note,
                         'status'              => 1,
                     ]);
@@ -337,6 +369,7 @@ class SampleTestInputController extends Controller
     public function show(Request $request){
         $unit = SampleTestInput::find($request->id);
 
+        $unit['account_name'] = $unit->account->name ?? '-';
         $unit['sample_type_name'] = $unit->sampleType->name;
         $unit['province_name'] =$unit->province->name ;
         $unit['city_name'] = $unit->city->name;

@@ -40,13 +40,16 @@ class SampleTestQcResultController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'sample_test_input_id',
             'user_id',
-            'wet_whiteness_value',
-            'dry_whiteness_value',
-            'document',
-            'note',
-            'status',
+            'sample_type_id',
+            'province_id',
+            'city_id',
+            'subdistrict_id',
+            'village_name',
+            'sample_date',
+            'supplier',
+            'supplier_name',
+            'supplier_phone',
         ];
 
         $start  = $request->start;
@@ -55,51 +58,55 @@ class SampleTestQcResultController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = SampleTestQcResult::count();
+        $total_data = SampleTestInput::where('type','1')->count();
 
-        $query_data = SampleTestQcResult::where(function($query) use ($search, $request) {
+        $query_data = SampleTestInput::where(function($query) use ($search, $request) {
+            if($search) {
+                $query->where(function($query) use ($search, $request) {
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('sampleType',function($query) use ($search, $request){
+                        $query->where('name','like',"%$search%");
+                    })->orWhereHas('city',function($query) use ($search, $request){
+                        $query->where('name','like',"%$search%");
+                    })->orWhereHas('province',function($query) use ($search, $request){
+                        $query->where('name','like',"%$search%");
+                    })->orWhereHas('subdistrict',function($query) use ($search, $request){
+                        $query->where('name','like',"%$search%");
+                    })
+                    ->orWhere('note','like',"%$search%")
+                    ->orWhere('supplier_name','like',"%$search%");
+
+                });
+            }
+            $query->where('type','1');
+            if($request->status){
+                $query->where('status', $request->status);
+            }
+        })
+        ->offset($start)
+        ->limit($length)
+        ->orderBy($order, $dir)
+        ->get();
+
+        $total_filtered = SampleTestInput::where(function($query) use ($search, $request) {
                 if($search) {
-                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
-                        $query->where('code','like',"%$search%")
-                        ->orWhere('note','like',"%$search%")
-                        ->orWhere('supplier','like',"%$search%")
-                        ->orWhere('supplier_name','like',"%$search%")
-                        ->orWhereHas('city',function($query) use ($search, $request){
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                        ->orWhereHas('sampleType',function($query) use ($search, $request){
+                            $query->where('name','like',"%$search%");
+                        })->orWhereHas('city',function($query) use ($search, $request){
                             $query->where('name','like',"%$search%");
                         })->orWhereHas('province',function($query) use ($search, $request){
                             $query->where('name','like',"%$search%");
                         })->orWhereHas('subdistrict',function($query) use ($search, $request){
                             $query->where('name','like',"%$search%");
-                        });
-                    });
-                }
-
-                if($request->status){
-                    $query->where('status', $request->status);
-                }
-            })
-            ->offset($start)
-            ->limit($length)
-            ->orderBy($order, $dir)
-            ->get();
-
-        $total_filtered = SampleTestQcResult::where(function($query) use ($search, $request) {
-                if($search) {
-                    $query->orWhereHas('sampleTestInput',function($query) use ($search, $request){
-                        $query->where('code','like',"%$search%")
+                        })
                         ->orWhere('note','like',"%$search%")
-                        ->orWhere('supplier','like',"%$search%")
-                        ->orWhere('supplier_name','like',"%$search%")
-                        ->orWhereHas('city',function($query) use ($search, $request){
-                            $query->where('name','like',"%$search%");
-                        })->orWhereHas('province',function($query) use ($search, $request){
-                            $query->where('name','like',"%$search%");
-                        })->orWhereHas('subdistrict',function($query) use ($search, $request){
-                            $query->where('name','like',"%$search%");
-                        });
+                        ->orWhere('supplier_name','like',"%$search%");
+
                     });
                 }
-
+                $query->where('type','1');
                 if($request->status){
                     $query->where('status', $request->status);
                 }
@@ -113,13 +120,15 @@ class SampleTestQcResultController extends Controller
 
                 $response['data'][] = [
                     $nomor,
-                    $val->sampleTestInput->code,
-                    $val->user->name,
-                    $val->sampleTestInput->supplier,
-                    $val->wet_whiteness_value,
-                    $val->dry_whiteness_value,
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
-                    $val->note,
+                    $val->code,
+                    $val->supplier,
+                    $val->sampleType->name,
+                    $val->sampleTestResultQc?->user->name ?? '-',
+                    $val->sampleTestResultQc?->wet_whiteness_value ?? '-',
+                    $val->sampleTestResultQc?->dry_whiteness_value ?? '-',
+                    $val->sampleTestResultQc?->document ? $val->sampleTestResultQc->attachment()  : 'file tidak ditemukan',
+                    $val->sampleTestResultQc?->note?? '-',
+                    $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -168,30 +177,41 @@ class SampleTestQcResultController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-			if($request->temp){
+			if($request->temp_test){
                 DB::beginTransaction();
-
-                    $query = SampleTestQcResult::find($request->temp);
+                    $query = SampleTestQcResult::find($request->temp_test);
 
                     if($request->has('file')) {
+
                         if($query->document){
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            $arrFile = explode(',',$query->document);
+                            foreach($arrFile as $row){
+                                if(Storage::exists($row)){
+                                    Storage::delete($row);
+                                }
                             }
                         }
-                        $document = $request->file('file')->store('public/sample_test_input');
+
+                        $arrFile = [];
+
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/sample_test_input');
+                        }
+
+                        $document = implode(',',$arrFile);
                     } else {
                         $document = $query->document;
                     }
 
                     $query->user_id = session('bo_id');
-                    $query->sample_test_input_id = $request->sample_test_input_id;
+                    $query->sample_test_input_id = $request->temp_test;
                     $query->wet_whiteness_value = str_replace(',','.',str_replace('.','',$request->wet_whiteness_value));
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
                     $query->note = $request->note;
                     $query->save();
-                    $sample_test = SampleTestInput::find($request->sample_test_input_id);
+                    $sample_test = SampleTestInput::find($request->temp);
                     $sample_test->update([
                         'status'=>2
                     ]);
@@ -200,17 +220,27 @@ class SampleTestQcResultController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $fileUpload = '';
+
+                    if($request->file('file')){
+                        $arrFile = [];
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/purchase_orders');
+                        }
+                        $fileUpload = implode(',',$arrFile);
+                    }
                     $query = SampleTestQcResult::create([
                         'user_id'                   => session('bo_id'),
-                        'sample_test_input_id'      => $request->sample_test_input_id,
+                        'sample_test_input_id'      => $request->temp_test,
                         'wet_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->wet_whiteness_value)),
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
 
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/sample_test_input') : NULL,
+                        'document'                  => $fileUpload ? $fileUpload : NULL,
                         'note'                      => $request->note,
                     ]);
 
-                    $sample_test = SampleTestInput::find($request->sample_test_input_id);
+                    $sample_test = SampleTestInput::find($request->temp);
                     $sample_test->update([
                         'status'=>2
                     ]);
@@ -245,11 +275,26 @@ class SampleTestQcResultController extends Controller
     }
 
     public function show(Request $request){
-        $unit = SampleTestQcResult::find($request->id);
+        $unit = SampleTestInput::find($request->id);
+        $unit['sample_test_input_code'] = $unit->code;
+        $unit['company_sample_code'] = $unit->company_sample_code;
+        $unit['sample_type'] = $unit->sampleType->name;
 
-        $unit['sample_test_input_code'] = $unit->sampleTestInput->code;
-        $unit['company_sample_code'] = $unit->sampleTestInput->company_sample_code;
-        $unit['sample_type'] = $unit->sampleTestInput->sampleType->name;
+        $dry_whiteness_value = '';
+        $wet_whiteness_value = '';
+        $note = '';
+        $id = '';
+        if($unit->sampleTestResultQc()->exists()){
+            $wet_whiteness_value = $unit->sampleTestResultQc->wet_whiteness_value;
+            $dry_whiteness_value = $unit->sampleTestResultQc->dry_whiteness_value;
+            $note = $unit->sampleTestResultQc->note;
+            $id = $unit->sampleTestResultQc->id;
+        }
+        $unit['id_test'] = $id;
+        $unit['wet_whiteness_value'] = $wet_whiteness_value;
+        $unit['dry_whiteness_value'] = $dry_whiteness_value;
+        $unit['note'] = $note;
+
 		return response()->json($unit);
     }
 
@@ -263,25 +308,35 @@ class SampleTestQcResultController extends Controller
     // }
 
     public function destroy(Request $request){
-        $query = SampleTestQcResult::find($request->id);
+        $query = SampleTestInput::find($request->id);
+        if($query->sampleTestResultQc()->exists()){
+            if($query->sampleTestResultQc->delete()) {
+                $query->update([
+                    'status'=>1
+                ]);
+                activity()
+                    ->performedOn(new SampleTestQcResult())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Delete the Sample Result data');
 
-        if($query->delete()) {
-            activity()
-                ->performedOn(new SampleTestQcResult())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Delete the Sample Result data');
-
-            $response = [
-                'status'  => 200,
-                'message' => 'Data deleted successfully.'
-            ];
-        } else {
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data deleted successfully.'
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to delete.'
+                ];
+            }
+        }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Data failed to delete.'
+                'message' => 'Data belum memiliki data hasil uji.'
             ];
         }
+
 
         return response()->json($response);
     }

@@ -43,12 +43,19 @@ class SampleTestQcResult extends Model
 
     public function attachment()
     {
-        if($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
-        } else {
-            $document = asset('website/empty.png');
+        if($this->document){
+            $arr = explode(',',$this->document);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document_po = implode(' ',$arrDoc);
+        }else{
+            $document_po = 'Tidak ada';
         }
 
-        return $document;
+        return $document_po;
     }
 }

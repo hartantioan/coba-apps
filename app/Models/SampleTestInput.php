@@ -41,13 +41,14 @@ class SampleTestInput extends Model
         'status',
         'price_estimation_franco',
         'type',
+        'account_id',
 
     ];
 
     public function status(){
         switch($this->status) {
             case '1':
-                $status = '<span class="gradient-45deg-yellow-teal medium-small white-text padding-3">Belum Diuji</span>';
+                $status = '<span class="gradient-45deg-yellow-teal medium-small white-text padding-3">Belum Ada Hasil Uji</span>';
                 break;
             case '2':
                 $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Done</span>';
@@ -100,13 +101,24 @@ class SampleTestInput extends Model
 
     public function attachment()
     {
-        if($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
-        } else {
-            $document = asset('website/empty.png');
+        if($this->document){
+            $arr = explode(',',$this->document);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document_po = implode(' ',$arrDoc);
+        }else{
+            $document_po = 'Tidak ada';
         }
 
-        return $document;
+        return $document_po;
+    }
+
+    public function account(){
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
     public function attachmentResult()

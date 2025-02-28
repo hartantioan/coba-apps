@@ -114,11 +114,12 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>User</th>
                                                         <th>Supplier</th>
-                                                        <th>Nilai Dry Whiteness</th>
+                                                        <th>Jenis Sampel</th>
+                                                        <th>User</th>
                                                         <th>File</th>
                                                         <th>Catatan</th>
+                                                        <th>Status</th>
                                                         <th>Aksi</th>
                                                     </tr>
                                                 </thead>
@@ -140,7 +141,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <h4> {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -151,41 +152,29 @@
                                 <fieldset id="modal-fieldset">
                                     <legend>Hasil Uji</legend>
 
-                                    <div class="input-field col s12 m6">
-                                        <select class="select2 browser-default" id="sample_test_input_id" name="sample_test_input_id" onchange="applyTest()">
-                                            <option value="">--{{ __('translations.select') }}--</option>
-                                        </select>
-                                        <label class="active" for="sample_test_input_id">Kode Input Tes Sampel</label>
-                                    </div>
+
                                     <div class="input-field col m3 s12 step12">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input  type="text" id="sample_test_input_code" name="sample_test_input_code" readonly placeholder=" "></input>
+                                        <label class="active" for="sample_test_input_code">Sample Test Input</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <input type="hidden" id="temp_test" name="temp_test">
                                         <input  type="text" id="sample_type" name="sample_type" readonly placeholder=" "></input>
                                         <label class="active" for="sample_type">Jenis Sampel</label>
                                     </div>
                                     <div class="input-field col m3 s12 step12">
                                         <input  type="text" id="company_code" name="company_code" readonly placeholder=" "></input>
-                                        <label class="active" for="company_code">Kode Perusahaan</label>
+                                        <label class="active" for="company_code">Kode Sampel</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  type="text" id="dry_whiteness_value" name="dry_whiteness_value" placeholder=" " value="0" onkeyup="formatRupiah(this)"></input>
-                                        <label class="active" for="dry_whiteness_value">Nilai dry whiteness.</label>
-                                    </div>
-                                    <div class="col m4 s12 step6">
-                                        <label class="">Bukti Upload</label>
-                                        <br>
-                                        <input type="file" name="file" id="fileInput" style="display: none;">
-                                        <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                            Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
-                                            <br>
-
+                                    <div class="file-field input-field col m12 s12 step18">
+                                        <div class="btn">
+                                            <span>Bukti Upload</span>
+                                            <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
                                         </div>
-                                        <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
-                                           Clear
-                                        </a>
-                                    </div>
-                                    <div class="col m4 s12">
-                                        <div id="fileName"></div>
-                                        <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
                                     </div>
                                     <div class="col s12 m12 l12"></div>
 
@@ -249,96 +238,6 @@
     </div>
 </div>
 
-<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
-    <div class="modal-header ml-6 mt-2">
-        <h6>Range Printing</h6>
-    </div>
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <form class="row" id="form_data_print_multi" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert_multi" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <ul class="tabs">
-                            <li class="tab">
-                                <a href="#range-tabs" class="" id="part-tabs-btn">
-                                <span>By No</span>
-                                </a>
-                            </li>
-                            <li class="tab">
-                                <a href="#date-tabs" class="">
-                                <span>By Date</span>
-                                </a>
-                            </li>
-                            <li class="indicator" style="left: 0px; right: 0px;"></li>
-                        </ul>
-                        <div id="range-tabs" style="display: block;" class="">
-                            <div class="row ml-2 mt-2">
-                                <div class="row">
-                                    <div class="input-field col m2 s12">
-                                        <p>{{ $menucode }}</p>
-                                    </div>
-                                    <div class="input-field col m2 s12">
-                                        <select class="form-control" id="code_place_range" name="code_place_range">
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="code_place_range">Plant / Place</label>
-                                    </div>
-                                    <div class="input-field col m2 s12">
-                                        <input id="year_range" name="year_range" min="0" type="number" placeholder="23">
-                                        <label class="active" for="year_range">Tahun</label>
-                                    </div>
-                                    <div class="input-field col m1 s12">
-                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
-                                        <label class="" for="range_end">No Awal</label>
-                                    </div>
-
-                                    <div class="input-field col m1 s12">
-                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
-                                        <label class="active" for="range_end">No akhir</label>
-                                    </div>
-                                    <div class="input-field col m2 s12">
-                                        <label>
-                                            <input name="type_date" type="radio" checked value="1"/>
-                                            <span>Dengan range biasa</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                <div class="input-field col m8 s12">
-                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
-                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
-                                </div>
-
-                                <div class="input-field col m1 s12">
-                                    <label>
-                                        <input name="type_date" type="radio" value="2"/>
-                                        <span>Dengan Range koma</span>
-                                    </label>
-                                </div>
-                                </div>
-                                <div class="col s12 mt-3">
-                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="date-tabs" style="display: none;" class="">
-
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
-    </div>
-</div>
 
 <div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
@@ -376,11 +275,11 @@
     </div>
 </div>
 
-<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
-</div>
+</div> --}}
 
 <div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
@@ -393,138 +292,6 @@
 
     var mode = '';
 
-    const dropZone = document.getElementById('dropZone');
-    const uploadLink = document.getElementById('uploadLink');
-    const fileInput = document.getElementById('fileInput');
-    const imagePreview = document.getElementById('imagePreview');
-    const clearButton = document.getElementById('clearButton');
-    const fileNameDiv = document.getElementById('fileName');
-
-    dropZone.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        handleFile(e.target.files[0]);
-    });
-
-
-    function dragOverHandler(event) {
-        event.preventDefault();
-        dropZone.style.backgroundColor = '#f0f0f0';
-    }
-
-
-    function dropHandler(event) {
-        event.preventDefault();
-        dropZone.style.backgroundColor = '#fff';
-
-        handleFile(event.dataTransfer.files[0]);
-    }
-
-
-    function handleFile(file) {
-        if (file) {
-        const reader = new FileReader();
-        const fileType = file.type.split('/')[0];
-        const maxSize = 10 * 1024 * 1024;
-        if (file.size > maxSize) {
-            alert('File size exceeds the maximum limit of 10 MB.');
-            return;
-        }
-
-        reader.onload = () => {
-
-            fileNameDiv.textContent = 'File uploaded: ' + file.name;
-
-            if (fileType === 'image') {
-
-                imagePreview.src = reader.result;
-                imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block';
-            } else {
-
-                imagePreview.style.display = 'none';
-
-            }
-        };
-
-        reader.readAsDataURL(file);
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-
-
-        fileInput.files = dataTransfer.files;
-
-        }
-    }
-
-
-    clearButton.addEventListener('click', () => {
-        imagePreview.src = '';
-        imagePreview.style.display = 'none';
-        fileInput.value = '';
-        fileNameDiv.textContent = '';
-    });
-
-
-    document.addEventListener('paste', (event) => {
-        const items = event.clipboardData.items;
-        if (items) {
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
-                    const file = items[i].getAsFile();
-                    handleFile(file);
-                    break;
-                }
-            }
-        }
-    });
-
-    function displayFile(fileLink) {
-        const fileType = getFileType(fileLink);
-
-        fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
-
-        if (fileType === 'image') {
-
-            imagePreview.src = fileLink;
-            imagePreview.style.display = 'inline-block';
-
-        } else {
-
-            imagePreview.style.display = 'none';
-
-
-            const fileExtension = getFileExtension(fileLink);
-            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-
-                const downloadLink = document.createElement('a');
-                downloadLink.href = fileLink;
-                downloadLink.download = getFileName(fileLink);
-                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
-                fileNameDiv.appendChild(downloadLink);
-            }
-        }
-    }
-
-    function getFileType(fileLink) {
-        const fileExtension = getFileExtension(fileLink);
-        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
-            return 'image';
-        } else {
-            return 'other';
-        }
-    }
-
-
-    function getFileExtension(fileLink) {
-        return fileLink.split('.').pop().toLowerCase();
-    }
-
-    function getFileName(fileLink) {
-        return fileLink.split('/').pop();
-    }
 
 
 
@@ -625,7 +392,6 @@
                 $('#province_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
-                $('#sample_test_input_id').empty();
                 $('#province_id').empty();
                 $('#city_id').empty();
                 window.onbeforeunload = function() {
@@ -827,6 +593,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
+                { name: 'supplier', className: '' },
                 { name: 'supplier_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
@@ -1023,18 +790,13 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                console.log(response);
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#sample_test_input_id').empty();
-                $('#sample_test_input_id').append(`
-                    <option value="` + response.sample_test_input_id + `">` + response.sample_test_input_code + `</option>
-                `);
-
-
+                $('#temp_test').val(response.id_test);
                 $('#receiveable_capacity').val(response.receiveable_capacity);
-                $('#sample_type').val(response.sample_type);
+                $('#sample_type').val(response.sample_type_name);
+                $('#sample_test_input_code').val(response.sample_test_input_code);
                 $('#company_code').val(response.company_sample_code);
                 $('#dry_whiteness_value').val(response.dry_whiteness_value);
                 $('#note').val(response.note);
@@ -1201,14 +963,6 @@
         }
     }
 
-    function applyTest(){
-        if($('#sample_test_input_id').val()){
-            var jenis_sampel = $('#sample_test_input_id').select2('data')[0].sample_type_name;
-            $('#sample_type').val(jenis_sampel);
-            var company_code = $('#sample_test_input_id').select2('data')[0].company_sample_code;
-            $('#company_code').val(company_code);
-        }
-    }
 
     function getDistrict(){
         $('#district_id').empty().append(`

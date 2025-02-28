@@ -1032,9 +1032,10 @@ class SendJournal implements ShouldQueue
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
 					}elseif($row->lookable_type == 'purchase_down_payments'){
-						$mustpay = $row->lookable->balancePaidExcept($row->id);
-						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2);
-						info($balanceReal);
+						/* $mustpay = $row->lookable->balancePaidExcept($row->id);
+						$balanceReal = round($row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate,2); */
+						$mustpay = $row->nominal;
+						$balanceReal = round($mustpay * $row->lookable->currency_rate,2);
 						if($row->lookable->getTotalPaid() <= 0){
 							$row->lookable->update([
 								'status'	=> '3'

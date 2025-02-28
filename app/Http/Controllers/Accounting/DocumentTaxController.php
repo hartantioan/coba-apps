@@ -321,7 +321,7 @@ class DocumentTaxController extends Controller
                         ];
                         return response()->json($response);
                     }else{
-                        $query = DocumentTax::find($request->temp);
+                        $query = DocumentTax::find($request->temp_add_no_faktur);
                         $query->user_id         = session('bo_id');
                         $query->transaction_code        = $kdJenisTransaksi;
                         $query->replace        = $fgPengganti;

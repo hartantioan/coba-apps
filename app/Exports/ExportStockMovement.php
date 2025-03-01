@@ -144,9 +144,9 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                             $query->where('id',$this->plant);
                         });
                     }
-                    /* if($this->warehouse != 'all'){
+                    if($this->warehouse != 'all'){
                         $query->where('warehouse_id',$this->warehouse);
-                    } */
+                    }
                 })->orderBy('date')->orderBy('id')->get();
                 foreach($data as $key => $row){
                     if($row->type == 'IN'){

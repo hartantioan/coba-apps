@@ -25,7 +25,11 @@
             @endphp
             @foreach($data as $i => $row)
                 @php
-                    $no = $tempNo !== $row['kode'] ? 1 : $no++;
+                    if($tempNo != $row['kode']){
+                        $no = 1;
+                    }else{
+                        $no++;
+                    }
                 @endphp
                 <tr>
                     <td align="center">{{ $no }}</td>

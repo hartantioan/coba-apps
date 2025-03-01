@@ -207,8 +207,9 @@ class StockInRupiahController extends Controller
                         $totalQty += round($old_data->qty_final,3);
                         $totalNominal += round($old_data->total_final,2);
                     //}
+                    $no = 1;
                     $html .= '<tr>
-                        <td>'.($key + 1).'</td>
+                        <td>'.$no.'</td>
                         <td>-</td>
                         <td>'.$old_data->place_code.'</td>
                         <td>'.$old_data->warehouse_name.'</td>
@@ -236,6 +237,7 @@ class StockInRupiahController extends Controller
                 })->orderBy('date')->orderBy('id')->get();
 
                 foreach($data as $key1 => $rowdata){
+                    $no++;
                     if($rowdata->type == 'IN'){
                         $price = $rowdata->qty_in > 0 ? round($rowdata->total_in / $rowdata->qty_in,2) : 0;
                         $totalQty += round($rowdata->qty_in,3);
@@ -246,7 +248,7 @@ class StockInRupiahController extends Controller
                         $totalNominal -= round($rowdata->total_out,2);
                     }
                     $html .= '<tr>
-                        <td>'.($key1 + 1).'</td>
+                        <td>'.$no.'</td>
                         <td>'.date('d/m/Y',strtotime($rowdata->date)).'</td>
                         <td>'.$rowdata->place->code.'</td>
                         <td>'.$rowdata->warehouse->name.'</td>

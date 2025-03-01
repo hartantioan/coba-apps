@@ -417,7 +417,7 @@ class GoodIssueController extends Controller
             foreach($request->arr_coa as $key => $row){
                 if ( $row == 105) {
                     if (!isset($request->arr_project[$key]) || $request->arr_project[$key] === null) {
-                        $kambing["kambing"][]="Project Belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant.';
+                        $kambing["kambing"][]="Anda memilih coa / biaya proyek dalam pelaksanaan dan project belum terisi di detail di ". $key+1 . ' mohon diisi proyek plant yang mana.';
                         $response = [
                             'status' => 422,
                             'error'  => $kambing

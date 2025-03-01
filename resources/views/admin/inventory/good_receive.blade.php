@@ -258,7 +258,7 @@
                                                     <th class="center">Coa</th>
                                                     <th class="center">Dist.Biaya</th>
                                                     <th class="center" width="150px">{{ __('translations.plant') }}</th>
-                                                    <th class="center" width="150px">{{ __('translations.line') }}</th>
+                                                    {{-- <th class="center" width="150px">{{ __('translations.line') }}</th> --}}
                                                     <th class="center" width="150px">{{ __('translations.engine') }}</th>
                                                     <th class="center" width="150px">{{ __('translations.division') }}</th>
                                                     <th class="center" width="150px">{{ __('translations.area') }}</th>
@@ -270,7 +270,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="21">
+                                                    <td colspan="20">
 
                                                     </td>
                                                 </tr>
@@ -1180,15 +1180,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                        <option value="">--{{ __('translations.empty') }}--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1245,24 +1237,6 @@
         if($('#arr_coa' + code).val() && passed == true){
             $('#inventory_coa' + code).css('pointer-events','none');
             $('#arr_inventory_coa' + code).empty();
-        }
-    }
-
-    function changePlace(element){
-        $(element).parent().next().find('select[name="arr_machine[]"] option').show();
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
-            $(element).parent().next().find('select[name="arr_machine[]"] option[data-line!="' + $(element).val() + '"]').hide();
-        }else{
-            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
-        }
-    }
-
-    function changeLine(element){
-        if($(element).val()){
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
-        }else{
-            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
         }
     }
 
@@ -1327,7 +1301,6 @@
                 formData.delete("arr_area[]");
                 formData.delete("arr_shading[]");
                 formData.delete("arr_batch_no[]");
-                formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_project[]");
                 formData.delete("arr_coa[]");
@@ -1382,7 +1355,6 @@
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_shading[]',($('#arr_shading' + $(this).data('id')).length > 0 ? ($('#arr_shading' + $(this).data('id')).val() ? $('#arr_shading' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_batch_no[]',($('#arr_batch_no' + $(this).data('id')).length > 0 ? ($('#arr_batch_no' + $(this).data('id')).val() ? $('#arr_batch_no' + $(this).data('id')).val() : '' )  : ''));
-                    formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '' ));
                     formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
                     formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
                     formData.append('arr_coa[]',($('#arr_coa' + $(this).data('id')).val() ? $('#arr_coa' + $(this).data('id')).val() : '' ));
@@ -1579,15 +1551,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                        <option value="">--{{ __('translations.empty') }}--</option>
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1659,7 +1623,6 @@
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place_cost' + count).val(val.place_cost_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();
-                        $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
                         if(val.area_id){
                             $('#arr_area' + count).append(`

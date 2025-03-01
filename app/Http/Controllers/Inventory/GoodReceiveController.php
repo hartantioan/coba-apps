@@ -564,7 +564,7 @@ class GoodReceiveController extends Controller
                             'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                             'place_cost_id'         => $request->arr_place_cost[$key] ? $request->arr_place_cost[$key] : NULL,
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            /* 'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL, */
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
                             'area_id'               => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,

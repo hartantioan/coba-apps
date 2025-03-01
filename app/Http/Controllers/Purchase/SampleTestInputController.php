@@ -157,7 +157,6 @@ class SampleTestInputController extends Controller
                     $val->permission_name,
                     $val->commodity_permits,
                     $val->permits_period,
-
                     number_format($val->receiveable_capacity,2,',','.'),
                     number_format($val->price_estimation_loco,2,',','.'),
                     number_format($val->price_estimation_franco,2,',','.'),

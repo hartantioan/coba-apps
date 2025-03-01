@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class SampleTestInputPICNote extends Model
 {
@@ -19,6 +20,7 @@ class SampleTestInputPICNote extends Model
         'sample_test_input_id',
         'status',
         'note',
+        'document',
     ];
 
     protected $dates = ['deleted_at'];
@@ -26,6 +28,23 @@ class SampleTestInputPICNote extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function attachment()
+    {
+        if($this->document){
+            $arr = explode(',',$this->document);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document_po = implode(' ',$arrDoc);
+        }else{
+            $document_po = 'Tidak ada';
+        }
+
+        return $document_po;
     }
 
     public function sampleTestInput()

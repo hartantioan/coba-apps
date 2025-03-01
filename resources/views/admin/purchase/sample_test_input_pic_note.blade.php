@@ -116,6 +116,7 @@
                                                         <th>code</th>
                                                         <th>Pengguna</th>
                                                         <th>Catatan</th>
+                                                        <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -160,6 +161,15 @@
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
                                         <label class="active" for="sample_test_input_id">Kode Sample Test Input</label>
+                                    </div>
+                                    <div class="file-field input-field col m12 s12 step18">
+                                        <div class="btn">
+                                            <span>Bukti Upload</span>
+                                            <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
                                     </div>
                                     <div class="input-field col s12 m12 l12"></div>
                                     <div class="input-field col m4 s12 step4">
@@ -263,15 +273,6 @@
                                     <div class="input-field col m3 s12 step3">
                                         <input id="company_sample_code" name="company_sample_code" type="text" placeholder="Kode dari Perusahaan">
                                         <label class="active" for="company_sample_code">Kode Sampel ( No Duplicate )</label>
-                                    </div>
-                                    <div class="file-field input-field col m12 s12 step18">
-                                        <div class="btn">
-                                            <span>Bukti Upload</span>
-                                            <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
-                                        </div>
-                                        <div class="file-path-wrapper">
-                                            <input class="file-path validate" type="text">
-                                        </div>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
 
@@ -825,6 +826,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
                 { name: 'sample_type', className: 'center-align' },
+                { name: 'supplier', className: '' },
                 { name: 'supplier', className: '' },
                 { name: 'note', className: '' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' }

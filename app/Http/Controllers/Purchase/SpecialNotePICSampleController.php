@@ -13,6 +13,7 @@ use App\Helpers\CustomHelper;
 use App\Models\SampleTestInput;
 use App\Models\SampleTestInputPICNote;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -121,6 +122,7 @@ class SpecialNotePICSampleController extends Controller
                     $val->sampleTestInput->code,
                     $val->user->name,
                     $val->note,
+                    $val->document ? $val->attachment() : 'file tidak ditemukan',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->sampleTestInput->id . ')"><i class="material-icons dp48">create</i></button>
@@ -168,12 +170,34 @@ class SpecialNotePICSampleController extends Controller
 
 			if($request->temp){
                 DB::beginTransaction();
-                info($request);
-                    $query = SampleTestInputPICNote::find($request->temp);
 
+                    $query = SampleTestInputPICNote::find($request->temp);
+                    if($request->has('file')) {
+
+                        if($query->document){
+                            $arrFile = explode(',',$query->document);
+                            foreach($arrFile as $row){
+                                if(Storage::exists($row)){
+                                    Storage::delete($row);
+                                }
+                            }
+                        }
+
+                        $arrFile = [];
+
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/sample_test_input');
+                        }
+
+                        $document = implode(',',$arrFile);
+                    } else {
+                        $document = $query->document;
+                    }
                     $query->user_id = session('bo_id');
                     $query->sample_test_input_id = $request->sample_test_input_id;
                     $query->note = $request->note_pic;
+                    $query->document = $document;
                     $query->status = '1';
                     $query->save();
                     DB::commit();
@@ -181,11 +205,21 @@ class SpecialNotePICSampleController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $fileUpload = '';
+                    if($request->file('file')){
+                        $arrFile = [];
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/purchase_orders');
+                        }
+                        $fileUpload = implode(',',$arrFile);
+                    }
                     $query = SampleTestInputPICNote::create([
 
                         'user_id'             => session('bo_id'),
                         'sample_test_input_id'=> $request->sample_test_input_id,
                         'note'                => $request->note_pic,
+                        'document'            => $fileUpload ? $fileUpload : NULL,
                         'status'              => '1'
                     ]);
 

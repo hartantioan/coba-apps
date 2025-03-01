@@ -168,6 +168,7 @@ class ReportProcurementController extends Controller
                             $percentage_netto_limit = 0;
                             $finance_kadar_air = 0;
                             $finance_kg = 0;
+                            $real_balance=0;
                             if($take_item_rule_percent){
                                 $percentage_level = round($take_item_rule_percent->percentage_level,2);
                                 $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
@@ -188,6 +189,8 @@ class ReportProcurementController extends Controller
                                     $all_netto += $real_balance;
                                     $finance_price = $price*$total_bayar;
                                 }else{
+
+                                    $real_balance=$detail_gs->qty_balance;
                                     if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
@@ -205,6 +208,7 @@ class ReportProcurementController extends Controller
                                 }
                             }else{
                                 if($detail_gs->goodScale()->exists()){
+                                    $real_balance=$detail_gs->goodScale->qty_balance;
                                     if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
@@ -221,6 +225,7 @@ class ReportProcurementController extends Controller
 
                                     $finance_price = $price*$total_bayar;
                                 }else{
+                                    $real_balance=$detail_gs->qty_balance;
                                     if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
@@ -254,7 +259,7 @@ class ReportProcurementController extends Controller
                                 'NAMA ITEM'=> $detail_gs->item->name,
                                 'NO SJ'=> $detail_gs->goodReceipt->delivery_no,
                                 'TGL MASUK'=> date('d/m/Y',strtotime($detail_gs->goodScale->post_date?? $detail_gs->goodReceipt->post_date)),
-                                'NO. KENDARAAN' =>$detail_gs->goodScale->vehicle_no ?? $detail_gs->goodReceipt->vehicle_no,
+                                'NO. KENDARAAN' =>$real_balance ?? $detail_gs->goodReceipt->vehicle_no,
                                 'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->goodScale->qty_balance ?? $detail_gs->qty_balance,2,',','.'),
                                 'HASIL QC' =>number_format($detail_gs->water_content,2,',','.'),
                                 'STD POTONGAN QC' =>number_format($percentage_level,2,',','.'),

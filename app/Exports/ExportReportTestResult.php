@@ -4,13 +4,14 @@ namespace App\Exports;
 
 use App\Models\SampleTestInput;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 
 
-class ExportReportTestResult implements FromView, ShouldAutoSize
+class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
 {
     protected $start_date, $end_date, $data; // ✅ Store data
 
@@ -44,56 +45,58 @@ class ExportReportTestResult implements FromView, ShouldAutoSize
         ]);
     }
 
-    // public function drawings()
-    // {
-    //     $drawings = [];
+    public function drawings()
+    {
+        $drawings = [];
 
-    //     foreach ($this->data as $index => $row_data) { // ✅ Use stored data
-    //         if (!empty($row_data->document) && file_exists(storage_path('app/' . $row_data->document))) {
-    //             $drawing = new Drawing();
-    //             $drawing->setName('Document Image');
-    //             $drawing->setDescription('Sample Document');
-    //             $drawing->setPath(storage_path('app/' . $row_data->document));
-    //             $drawing->setHeight(100);
-    //             $drawing->setCoordinates('U' . ($index + 2));
-    //             $drawings[] = $drawing;
-    //         }
+        foreach ($this->data as $index => $row_data) {
+            // General document(s)
+            $this->addDrawingsFromString($drawings, $row_data->document, 'Document Image', 'Sample Document', 'U' . ($index + 2));
 
-    //         if ($row_data->type == '2' && !empty($row_data->sampleTestResultQc->document) &&
-    //             file_exists(storage_path('app/' . $row_data->sampleTestResultQc->document))) {
-    //             $drawing = new Drawing();
-    //             $drawing->setName('QC Document');
-    //             $drawing->setDescription('QC Test Result');
-    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQc->document));
-    //             $drawing->setHeight(100);
-    //             $drawing->setCoordinates('AB' . ($index + 2));
-    //             $drawings[] = $drawing;
-    //         }
+            // Conditional QC and Proc documents
+            if ($row_data->type == '2') {
+                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQc)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
+            } elseif ($row_data->type == '3') {
+                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQcPacking)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
+            } elseif ($row_data->type == '1') {
+                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultProc)->document, 'Proc Document', 'Proc Test Result', 'AB' . ($index + 2));
+            }
+        }
 
-    //         if ($row_data->type == '3' && !empty($row_data->sampleTestResultQcPacking->document) &&
-    //             file_exists(storage_path('app/' . $row_data->sampleTestResultQcPacking->document))) {
-    //             $drawing = new Drawing();
-    //             $drawing->setName('QC Document');
-    //             $drawing->setDescription('QC Test Result');
-    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultQcPacking->document));
-    //             $drawing->setHeight(100);
-    //             $drawing->setCoordinates('AB' . ($index + 2));
-    //             $drawings[] = $drawing;
-    //         }
+        return $drawings;
+    }
 
-    //         if ($row_data->type == '1' && !empty($row_data->sampleTestResultProc->document) &&
-    //             file_exists(storage_path('app/' . $row_data->sampleTestResultProc->document))) {
-    //             $drawing = new Drawing();
-    //             $drawing->setName('Proc Document');
-    //             $drawing->setDescription('Proc Test Result');
-    //             $drawing->setPath(storage_path('app/' . $row_data->sampleTestResultProc->document));
-    //             $drawing->setHeight(100);
-    //             $drawing->setCoordinates('AB' . ($index + 2));
-    //             $drawings[] = $drawing;
-    //         }
-    //     }
+    // Helper function to process multiple documents
+    private function addDrawingsFromString(&$drawings, $documents, $name, $description, $coordinates)
+    {
+        if (empty($documents)) return;
 
-    //     return $drawings;
-    // }
+        $files = explode(',', $documents);
+
+        foreach ($files as $file) {
+            $file = trim($file); // Remove spaces
+
+            if (Storage::exists($file) && $this->isImage($file)) {
+                $drawing = new Drawing();
+                $drawing->setName($name);
+                $drawing->setDescription($description);
+                $drawing->setPath(storage_path('app/' . $file));
+                $drawing->setHeight(100);
+                $drawing->setCoordinates($coordinates);
+                $drawings[] = $drawing;
+            }
+        }
+    }
+
+    // Function to check if a file is an image
+    private function isImage($file)
+    {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+        return in_array(strtolower($extension), $allowedExtensions);
+    }
+
+
 }
 

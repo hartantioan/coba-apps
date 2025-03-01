@@ -142,6 +142,7 @@ class SampleTestInputController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
+                    $val->account?->name ?? '-',
                     $val->sampleType->name,
                     $val->supplier,
                     $val->supplier_name,

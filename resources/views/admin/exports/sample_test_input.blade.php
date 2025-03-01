@@ -3,6 +3,7 @@
         <tr>
             <th rowspan="2">Tgl Input</th>
             <th rowspan="2">Pengguna</th>
+            <th rowspan="2">PIC Sampel</th>
             <th rowspan="2">Tgl Sampel</th>
             <th rowspan="2">Jenis Sampel</th>
             <th colspan="4">Lokasi Sampel</th>
@@ -15,16 +16,18 @@
             <th rowspan="2">HARGA</th>
             <th rowspan="2">KODE SAMPEL Supplier</th>
             <th rowspan="2">KODE SAMPEL PORCELAIN</th>
+            <th rowspan="2">FOTO SAMPEL</th>
             <th rowspan="2">CATATAN SAMPEL</th>
             <th rowspan="2">TGL UPDATE</th>
             <th rowspan="2">TIPE LABORATORIUM</th>
             <th rowspan="2">NAMA LAB</th>
             <th rowspan="2">NILAI WET WHITENESS</th>
             <th rowspan="2">NILAI DRY WHITENESS</th>
+            <th rowspan="2">DOKUMENTASI HASIL UJI</th>
             <th rowspan="2">CATATAN HASIL UJI</th>
-            <th rowspan="2">TANGGAL DATA CATATAN KUSUS</th>
+            <th rowspan="2">TANGGAL CATATAN KHUSUS</th>
             <th rowspan="2">PENGGUNA</th>
-            <th rowspan="2">CATATAN KUSUS</th>
+            <th rowspan="2">CATATAN KHUSUS</th>
         </tr>
         <tr>
             <th>PROVINSI</th>
@@ -68,6 +71,7 @@
             <tr>
                 <td>{{ $row->post_date }}</td>
                 <td>{{ $row->user->name }}</td>
+                <td>{{ $row->account->name ?? '-' }}</td>
                 <td>{{ $row->sample_date }}</td>
                 <td>{{ $row->sampleType->name }}</td>
                 <td>{{ $row->province->name }}</td>
@@ -86,12 +90,14 @@
                 <td>{{ $row->price_estimation }}</td>
                 <td>{{ $row->supplier_sample_code }}</td>
                 <td>{{ $row->company_sample_code }}</td>
+                <td></td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->update_at }}</td>
                 <td>{{ $row->type() }}</td>
                 <td>{{ $nama_lab}}</td>
                 <td>{{ $wet_white_val}}</td>
                 <td>{{ $dry_white_val }}</td>
+                <td></td>
                 <td>{{ $note }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->created_at ?? '' }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->user->name ?? ''}}</td>

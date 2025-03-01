@@ -21,10 +21,14 @@
         <tbody>
             @php
                $x = 0;
+               $tempNo = '';
             @endphp
             @foreach($data as $i => $row)
+                @php
+                    $no = $tempNo !== $row['kode'] ? 1 : $no++;
+                @endphp
                 <tr>
-                    <td align="center"></td>
+                    <td align="center">{{ $no }}</td>
                     <td align="center">{{$row['date']}}</td>
                     <td align="center">{{$row['plant']}}</td>
                     <td align="center">{{$row['warehouse']}}</td>

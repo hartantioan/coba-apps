@@ -256,7 +256,7 @@
                                                     <th class="center" width="150px">{{ __('translations.note') }}</th>
                                                     <th class="center">Tipe Penerimaan</th>
                                                     <th class="center">Coa</th>
-                                                    <th class="center">Dist.Biaya</th>
+                                                    <th class="center">Line</th>
                                                     <th class="center" width="150px">{{ __('translations.plant') }}</th>
                                                     {{-- <th class="center" width="150px">{{ __('translations.line') }}</th> --}}
                                                     <th class="center" width="150px">{{ __('translations.engine') }}</th>

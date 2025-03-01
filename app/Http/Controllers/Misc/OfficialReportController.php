@@ -49,7 +49,7 @@ class OfficialReportController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $data = [
             'title'     => 'Berita Acara',
             'content'   => 'admin.misc.official_report',
@@ -62,14 +62,14 @@ class OfficialReportController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
         ];
-        
+
         return view('admin.layouts.index', ['data' => $data]);
 
     }
 
     public function getCode(Request $request){
         $code = OfficialReport::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -101,7 +101,7 @@ class OfficialReportController extends Controller
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
-        
+
         $query_data = OfficialReport::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -163,7 +163,7 @@ class OfficialReportController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
@@ -332,7 +332,7 @@ class OfficialReportController extends Controller
 
                 $lastSegment = $request->lastsegment;
                 $menu = Menu::where('url', $lastSegment)->first();
-                
+
                 if($request->temp){
                     $query = OfficialReport::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -370,10 +370,10 @@ class OfficialReportController extends Controller
                         $query->place_id = $request->place_id;
                         $query->source_document = $request->source_document; */
                         $query->target_document = $request->target_document;
-                        /* $query->chronology = $request->chronology;
+                        //$query->chronology = $request->chronology;
                         $query->action = $request->action;
-                        $query->note = $request->note;
-                        $query->status = '1'; */
+                        // $query->note = $request->note;
+                        // $query->status = '1';
 
                         $query->save();
 
@@ -411,7 +411,7 @@ class OfficialReportController extends Controller
                         'status'                    => '1',
                     ]);
                 }
-                
+
                 if($query) {
 
                     if(!$request->temp){
@@ -421,7 +421,7 @@ class OfficialReportController extends Controller
                                 $arrFile[] = $file->store('public/official_reports');
                             }
                         }
-    
+
                         if(count($arrFile) > 0){
                             foreach($arrFile as $row){
                                 OfficialReportDetail::create([
@@ -430,7 +430,7 @@ class OfficialReportController extends Controller
                                 ]);
                             }
                         }
-    
+
                         if($request->arr_user){
                             $tempArrayStage = [];
                             $countApprover = 0;
@@ -518,7 +518,7 @@ class OfficialReportController extends Controller
                                     'table_name'                => $menu->table_name,
                                 ]);
                             }
-    
+
                             $source = ApprovalSource::create([
                                 'code'			=> strtoupper(uniqid()),
                                 'user_id'		=> session('bo_id'),
@@ -527,7 +527,7 @@ class OfficialReportController extends Controller
                                 'lookable_id'	=> $query->id,
                                 'note'			=> 'Approval Berita Acara '.$query->code,
                             ]);
-    
+
                             foreach($approvalTemplate->approvalTemplateStage as $rowTemplateStage){
                                 foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
                                     ApprovalMatrix::create([
@@ -545,9 +545,9 @@ class OfficialReportController extends Controller
                                 }
                             }
                         }
-    
+
                         CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Berita Acara No. '.$query->code,$query->note,session('bo_id'));
-    
+
                         activity()
                             ->performedOn(new OfficialReport())
                             ->causedBy(session('bo_id'))
@@ -596,7 +596,7 @@ class OfficialReportController extends Controller
         }
 
         $or['approver'] = $approver;
-			
+
 		return response()->json($or);
     }
 
@@ -631,17 +631,17 @@ class OfficialReportController extends Controller
                     $row->deleteFile();
                     $row->delete();
                 }
-    
+
                 $query->officialReportApprover()->delete();
-    
+
                 CustomHelper::removeApproval($query->getTable(),$query->id);
-    
+
                 activity()
                     ->performedOn(new OfficialReport())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Delete the berita acara official report');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data deleted successfully.'

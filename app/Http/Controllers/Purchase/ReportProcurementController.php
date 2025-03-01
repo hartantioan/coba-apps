@@ -183,7 +183,7 @@ class ReportProcurementController extends Controller
                                     }
                                     $total_bayar = $detail_gs->qty_balance;
 
-                                    $total_penerimaan = $real_balance * (1 - ($detail_gs->water_content/100));
+                                    $total_penerimaan = $real_balance * $detail_gs->water_content/100;
                                     $price = $detail_gs->goodScale->purchaseOrderDetail->price;
                                     $all_netto += $real_balance;
                                     $finance_price = $price*$total_bayar;

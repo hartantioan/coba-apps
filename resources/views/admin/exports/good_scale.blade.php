@@ -101,7 +101,7 @@
                 <td>{{ $row->viscosity }}</td>
                 <td>{{ $row->residue }}</td>
                 <td>{{ $row->water_content }}</td>
-                <td>{{ $row->referencePO() }}</td>
+                <td>{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : $row->referencePO() }}</td>
                 <td>{{ $row->referenceGRPODO() }}</td>
 
 

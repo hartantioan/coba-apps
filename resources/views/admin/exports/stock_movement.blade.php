@@ -43,6 +43,9 @@
                     <td align="right">{{$row['qty']}}</td>
                     <td align="right">{{$row['cum_qty']}}</td>
                 </tr>
+                @php
+                    $tempNo = $row['kode'];
+                @endphp
             @endforeach
 
             @if(count($data) == 0)

@@ -74,36 +74,12 @@ class GoodIssueDetail extends Model
     }
 
     public function getMachine(){
-        $machine = '';
-        if($this->costDistribution()->exists()){
-            $arrtext = [];
-            foreach($this->costDistribution->costDistributionDetail as $row){
-                if($row->machine()->exists()){
-                    $arrtext[] = $row->machine->code;
-                }
-            }
-            $machine = implode(',',$arrtext);
-        }else{
-            $machine = $this->machine()->exists() ? $this->machine->code : '-';
-        }
-
+        $machine = $this->machine()->exists() ? $this->machine->code : '-';
         return $machine;
     }
 
     public function getDepartment(){
-        $department = '';
-        if($this->costDistribution()->exists()){
-            $arrtext = [];
-            foreach($this->costDistribution->costDistributionDetail as $row){
-                if($row->department()->exists()){
-                    $arrtext[] = $row->department->code;
-                }
-            }
-            $department = implode(',',$arrtext);
-        }else{
-            $department = $this->department()->exists() ? $this->department->code : '-';
-        }
-
+        $department = $this->department()->exists() ? $this->department->code : '-';
         return $department;
     }
 

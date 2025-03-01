@@ -299,7 +299,6 @@ class SampleTestInputController extends Controller
 
 			}else{
                 DB::beginTransaction();
-                try {
                     $fileUpload = '';
 
                     if($request->file('file')){
@@ -341,9 +340,7 @@ class SampleTestInputController extends Controller
                     ]);
 
                     DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
+
 			}
 
 			if($query) {

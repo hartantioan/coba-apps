@@ -180,7 +180,7 @@ class ReportProcurementController extends Controller
                                     }
                                     $real_balance = (($detail_gs->qty/$detail_gs->goodReceipt->getTotalQty())*$detail_gs->goodScale->qty_balance);
                                     if($finance_kadar_air > 0){
-                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$detail_gs->qty_balance;
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
                                     }
                                     $total_bayar = $detail_gs->qty_balance;
 

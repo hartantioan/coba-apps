@@ -179,7 +179,7 @@ class ReportProcurementController extends Controller
                                     }
                                     $real_balance = (($detail_gs->qty/$detail_gs->goodReceipt->getTotalQty())/$detail_gs->goodScale->qty_balance);
                                     if($finance_kadar_air > 0){
-                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$detail_gs->qty_balance;
                                     }
                                     $total_bayar = $detail_gs->qty_balance;
 
@@ -733,6 +733,7 @@ class ReportProcurementController extends Controller
                             $percentage_netto_limit = 0;
                             $finance_kadar_air = 0;
                             $finance_kg = 0;
+                            $real_balance=0;
                             if($take_item_rule_percent){
                                 $percentage_level = round($take_item_rule_percent->percentage_level,2);
                                 $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
@@ -753,23 +754,25 @@ class ReportProcurementController extends Controller
                                     $all_netto += $real_balance;
                                     $finance_price = $price*$total_bayar;
                                 }else{
+                                    $real_balance=$detail_gs->qty;
                                     if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
                                     if($finance_kadar_air > 0){
                                         $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
                                     }
-                                    $total_bayar = $detail_gs->qty_balance;
+                                    $total_bayar = $real_balance;
                                     if($finance_kadar_air > 0){
                                         $total_bayar = $total_bayar-$finance_kg;
                                     }
-                                    $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $total_penerimaan = $real_balance * (1 - ($detail_gs->water_content/100));
                                     $price = $detail_gs->purchaseOrderDetail->price;
                                     $finance_price = $price*$total_bayar;
                                     $all_netto += $detail_gs->qty;
                                 }
                             }else{
                                 if($detail_gs->goodScale()->exists()){
+                                    $real_balance = $detail_gs->goodScale->qty_balance;
                                     if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
@@ -786,6 +789,7 @@ class ReportProcurementController extends Controller
                                     $finance_price = $price*$total_bayar;
 
                                 }else{
+                                    $real_balance = $detail_gs->qty;
                                     if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
                                         $finance_kadar_air = $detail_gs->water_content - $percentage_level;
                                     }
@@ -818,7 +822,7 @@ class ReportProcurementController extends Controller
                                 'NO SJ'=> $detail_gs->goodReceipt->delivery_no,
                                 'TGL MASUK'=> date('d/m/Y',strtotime($detail_gs->goodScale->post_date?? $detail_gs->goodReceipt->post_date)),
                                 'NO. KENDARAAN' =>$detail_gs->goodScale->vehicle_no ?? $detail_gs->goodReceipt->vehicle_no,
-                                'NETTO JEMBATAN TIMBANG' =>number_format($detail_gs->goodScale->qty_balance ?? $detail_gs->qty,2,',','.'),
+                                'NETTO JEMBATAN TIMBANG' =>number_format($real_balance ?? $detail_gs->qty,2,',','.'),
                                 'HASIL QC' =>number_format($detail_gs->water_content,2,',','.'),
                                 'STD POTONGAN QC' =>number_format($percentage_level,2,',','.'),
                                 'FINANCE Kadar air' =>number_format($finance_kadar_air,2,',','.'),

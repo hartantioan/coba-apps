@@ -189,7 +189,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     ->whereDate('effective_date','>=',$row->goodReceipt->post_date)
                     ->where('account_id',$row->goodReceipt->account_id)->first();
                 }
-
+                $real_balance = 0;
                 $percentage_level = 0;
                 $percentage_netto_limit = 0;
                 $finance_kadar_air = 0;
@@ -205,14 +205,15 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                         }
                         $real_balance = (($row->qty/$row->goodReceipt->getTotalQty())/$row->goodScale->qty_balance);
                         if($finance_kadar_air > 0){
-                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
+                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$row->qty_balance;
                         }
                         $total_bayar = $row->qty_balance;
 
-                        $total_penerimaan = $real_balance * (1 - ($row->water_content/100));
+                        $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
                         $price = $row->goodScale->purchaseOrderDetail->price;
                         $finance_price = $price*$total_bayar;
                     }else{
+                        $real_balance = $row->qty_balance;
                         if($row->water_content > $percentage_level && $percentage_level != 0){
                             $finance_kadar_air = $row->water_content - $percentage_level;
                         }
@@ -229,6 +230,8 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     }
                 }else{
                     if($row->goodScale()->exists()){
+
+                        $real_balance = $row->goodScale->qty_balance;
                         if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
                             $finance_kadar_air = $row->water_content - $percentage_level;
                         }
@@ -243,6 +246,8 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                         $price = $row->goodScale->purchaseOrderDetail->price;
                         $finance_price = $price*$total_bayar;
                     }else{
+
+                        $real_balance = $row->qty_balance;
                         if($row->water_content > $percentage_level && $percentage_level != 0){
                             $finance_kadar_air = $row->water_content - $percentage_level;
                         }
@@ -272,7 +277,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     'NO SJ'=> $row->goodReceipt->delivery_no,
                     'TGL MASUK'=> date('d/m/Y',strtotime($row?->goodScale->post_date ?? $row->goodReceipt->post_date)),
                     'NO. KENDARAAN' =>$row->goodScale->vehicle_no ?? $row->goodReceipt->vehicle_no,
-                    'NETTO JEMBATAN TIMBANG' =>$row->goodScale->qty_balance ?? $row->qty_balance,
+                    'NETTO JEMBATAN TIMBANG' =>$real_balance ?? $row->qty_balance,
                     'HASIL QC' =>$row->water_content,
                     'STD POTONGAN QC' =>$percentage_level,
                     'FINANCE Kadar air' =>$finance_kadar_air,

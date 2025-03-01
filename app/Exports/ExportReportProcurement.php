@@ -203,7 +203,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                         if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
                             $finance_kadar_air = $row->water_content - $percentage_level;
                         }
-                        $real_balance = (($row->qty/$row->goodReceipt->getTotalQty())/$row->goodScale->qty_balance);
+                        $real_balance = (($row->qty/$row->goodReceipt->getTotalQty())*$row->goodScale->qty_balance);
                         if($finance_kadar_air > 0){
                             $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$row->qty_balance;
                         }

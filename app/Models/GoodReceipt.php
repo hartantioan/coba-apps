@@ -525,4 +525,14 @@ class GoodReceipt extends Model
     public function cancelDocument(){
         return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function getTotalQty(){
+        $total = 0;
+
+        foreach($this->goodReceiptDetail as $row){
+            $total += $row->qty;
+        }
+
+        return $total;
+    }
 }

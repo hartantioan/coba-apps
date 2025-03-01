@@ -8,6 +8,7 @@ use App\Models\GoodScaleDetail;
 use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDetail;
 use App\Models\RuleBpScale;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -197,34 +198,65 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                     $percentage_level = round($take_item_rule_percent->percentage_level,2);
                     $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
                 }
-                if($row->goodScale()->exists()){
-                    if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
-                        $finance_kadar_air = $row->water_content - $percentage_level;
+                if (Carbon::parse($this->start_date)->greaterThan(Carbon::create(2025, 1, 1))) {
+                    if($row->goodScale()->exists()){
+                        if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                            $finance_kadar_air = $row->water_content - $percentage_level;
+                        }
+                        $real_balance = (($row->qty/$row->goodReceipt->getTotalQty())/$row->goodScale->qty_balance);
+                        if($finance_kadar_air > 0){
+                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
+                        }
+                        $total_bayar = $row->qty_balance;
+
+                        $total_penerimaan = $real_balance * (1 - ($row->water_content/100));
+                        $price = $row->goodScale->purchaseOrderDetail->price;
+                        $finance_price = $price*$total_bayar;
+                    }else{
+                        if($row->water_content > $percentage_level && $percentage_level != 0){
+                            $finance_kadar_air = $row->water_content - $percentage_level;
+                        }
+                        if($finance_kadar_air > 0){
+                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->qty);
+                        }
+                        $total_bayar = $row->qty_balance;
+                        if($finance_kadar_air > 0){
+                            $total_bayar = $total_bayar-$finance_kg;
+                        }
+                        $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
+                        $price = $row->purchaseOrderDetail->price;
+                        $finance_price = $price*$total_bayar;
                     }
-                    if($finance_kadar_air > 0){
-                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->goodScale->qty_balance);
-                    }
-                    $total_bayar = $row->goodScale->qty_balance;
-                    if($finance_kadar_air > 0){
-                        $total_bayar = $total_bayar-$finance_kg;
-                    }
-                    $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->water_content/100));
-                    $price = $row->goodScale->purchaseOrderDetail->price;
-                    $finance_price = $price*$total_bayar;
                 }else{
-                    if($row->water_content > $percentage_level && $percentage_level != 0){
-                        $finance_kadar_air = $row->water_content - $percentage_level;
+                    if($row->goodScale()->exists()){
+                        if($row->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                            $finance_kadar_air = $row->water_content - $percentage_level;
+                        }
+                        if($finance_kadar_air > 0){
+                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->goodScale->qty_balance);
+                        }
+                        $total_bayar = $row->goodScale->qty_balance;
+                        if($finance_kadar_air > 0){
+                            $total_bayar = $total_bayar-$finance_kg;
+                        }
+                        $total_penerimaan = $row->goodScale->qty_balance * (1 - ($row->water_content/100));
+                        $price = $row->goodScale->purchaseOrderDetail->price;
+                        $finance_price = $price*$total_bayar;
+                    }else{
+                        if($row->water_content > $percentage_level && $percentage_level != 0){
+                            $finance_kadar_air = $row->water_content - $percentage_level;
+                        }
+                        if($finance_kadar_air > 0){
+                            $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->qty);
+                        }
+                        $total_bayar = $row->qty_balance;
+                        if($finance_kadar_air > 0){
+                            $total_bayar = $total_bayar-$finance_kg;
+                        }
+                        $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
+                        $price = $row->purchaseOrderDetail->price;
+                        $finance_price = $price*$total_bayar;
                     }
-                    if($finance_kadar_air > 0){
-                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$row->qty);
-                    }
-                    $total_bayar = $row->qty_balance;
-                    if($finance_kadar_air > 0){
-                        $total_bayar = $total_bayar-$finance_kg;
-                    }
-                    $total_penerimaan = $row->qty_balance * (1 - ($row->water_content/100));
-                    $price = $row->purchaseOrderDetail->price;
-                    $finance_price = $price*$total_bayar;
                 }
 
 
@@ -235,7 +267,7 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
                 $arr[] = [
                     'no'                => $no,
                     'PLANT'=> $row->place->name,
-                    'NO PO'=> $row->goodScale->purchaseOrderDetail->purchaseOrder->code??$row->purchaseOrderDetail->purchaseOrder->code,
+                    'NO PO'=> $row->purchaseOrderDetail->purchaseOrder->code,
                     'NAMA ITEM'=> $row->item->name,
                     'NO SJ'=> $row->goodReceipt->delivery_no,
                     'TGL MASUK'=> date('d/m/Y',strtotime($row?->goodScale->post_date ?? $row->goodReceipt->post_date)),

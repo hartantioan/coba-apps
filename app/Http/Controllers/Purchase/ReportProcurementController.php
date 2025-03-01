@@ -22,6 +22,7 @@ use App\Models\RuleBpScale;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 
@@ -171,38 +172,74 @@ class ReportProcurementController extends Controller
                                 $percentage_level = round($take_item_rule_percent->percentage_level,2);
                                 $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
                             }
-                            if($detail_gs->goodScale()->exists()){
-                                if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
-                                    $finance_kadar_air = $detail_gs->water_content - $percentage_level;
-                                }
-                                if($finance_kadar_air > 0){
-                                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->goodScale->qty_balance);
-                                }
-                                $total_bayar = $detail_gs->goodScale->qty_balance;
-                                if($finance_kadar_air > 0){
-                                    $total_bayar = $total_bayar-$finance_kg;
-                                }
-                                $total_penerimaan = $detail_gs->goodScale->qty_balance * (1 - ($detail_gs->water_content/100));
-                                $price = $detail_gs->goodScale->purchaseOrderDetail->price;
-                                $all_netto += $detail_gs->goodScale->qty_balance;
-                            }else{
-                                if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
-                                    $finance_kadar_air = $detail_gs->water_content - $percentage_level;
-                                }
-                                if($finance_kadar_air > 0){
-                                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
-                                }
-                                $total_bayar = $detail_gs->qty_balance;
-                                if($finance_kadar_air > 0){
-                                    $total_bayar = $total_bayar-$finance_kg;
-                                }
-                                $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
-                                $price = $detail_gs->purchaseOrderDetail->price;
-                                $finance_price = $price*$total_bayar;
-                                $all_netto += $detail_gs->qty;
-                            }
-                            $finance_price = $price*$total_bayar;
+                            if (Carbon::parse($request->start_date)->greaterThan(Carbon::create(2025, 1, 1))) {
+                                if($detail_gs->goodScale()->exists()){
+                                    if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    $real_balance = (($detail_gs->qty/$detail_gs->goodReceipt->getTotalQty())/$detail_gs->goodScale->qty_balance);
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
+                                    }
+                                    $total_bayar = $detail_gs->qty_balance;
 
+                                    $total_penerimaan = $real_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->goodScale->purchaseOrderDetail->price;
+                                    $all_netto += $real_balance;
+                                    $finance_price = $price*$total_bayar;
+                                }else{
+                                    if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
+                                    }
+                                    $total_bayar = $detail_gs->qty_balance;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->purchaseOrderDetail->price;
+                                    $finance_price = $price*$total_bayar;
+                                    $all_netto += $detail_gs->qty;
+                                }
+                            }else{
+                                if($detail_gs->goodScale()->exists()){
+                                    if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->goodScale->qty_balance);
+                                    }
+                                    $total_bayar = $detail_gs->goodScale->qty_balance;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->goodScale->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->goodScale->purchaseOrderDetail->price;
+                                    $all_netto += $detail_gs->goodScale->qty_balance;
+
+                                    $finance_price = $price*$total_bayar;
+                                }else{
+                                    if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
+                                    }
+                                    $total_bayar = $detail_gs->qty_balance;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->purchaseOrderDetail->price;
+                                    $finance_price = $price*$total_bayar;
+                                    $all_netto += $detail_gs->qty;
+                                }
+
+
+
+                            }
 
                             $all_penerimaan += $total_penerimaan;
                             $all_finance_price += $finance_price;
@@ -213,7 +250,7 @@ class ReportProcurementController extends Controller
                             $arr[] = [
                                 'no'                => $no,
                                 'PLANT'=> $detail_gs->place->code,
-                                'NO PO'=> $detail_gs->goodScale->purchaseOrderDetail->purchaseOrder->code??$detail_gs->purchaseOrderDetail->purchaseOrder->code,
+                                'NO PO'=> $detail_gs->purchaseOrderDetail->purchaseOrder->code,
                                 'NAMA ITEM'=> $detail_gs->item->name,
                                 'NO SJ'=> $detail_gs->goodReceipt->delivery_no,
                                 'TGL MASUK'=> date('d/m/Y',strtotime($detail_gs->goodScale->post_date?? $detail_gs->goodReceipt->post_date)),
@@ -700,37 +737,71 @@ class ReportProcurementController extends Controller
                                 $percentage_level = round($take_item_rule_percent->percentage_level,2);
                                 $percentage_netto_limit = round($take_item_rule_percent->percentage_netto_limit,2);
                             }
-                            if($detail_gs->goodScale()->exists()){
-                                if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
-                                    $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                            if (Carbon::parse($request->start_date)->greaterThan(Carbon::create(2025, 1, 1))) {
+                                if($detail_gs->goodScale()->exists()){
+                                    if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    $real_balance = (($detail_gs->qty/$detail_gs->goodReceipt->getTotalQty())/$detail_gs->goodScale->qty_balance);
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 )*$real_balance;
+                                    }
+                                    $total_bayar = $detail_gs->qty_balance;
+
+                                    $total_penerimaan = $real_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->goodScale->purchaseOrderDetail->price;
+                                    $all_netto += $real_balance;
+                                    $finance_price = $price*$total_bayar;
+                                }else{
+                                    if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
+                                    }
+                                    $total_bayar = $detail_gs->qty_balance;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->purchaseOrderDetail->price;
+                                    $finance_price = $price*$total_bayar;
+                                    $all_netto += $detail_gs->qty;
                                 }
-                                if($finance_kadar_air > 0){
-                                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->goodScale->qty_balance);
-                                }
-                                $total_bayar = $detail_gs->goodScale->qty_balance;
-                                if($finance_kadar_air > 0){
-                                    $total_bayar = $total_bayar-$finance_kg;
-                                }
-                                $total_penerimaan = $detail_gs->goodScale->qty_balance * (1 - ($detail_gs->water_content/100));
-                                $price = $detail_gs->goodScale->purchaseOrderDetail->price;
-                                $all_netto += $detail_gs->goodScale->qty_balance;
                             }else{
-                                if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
-                                    $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                if($detail_gs->goodScale()->exists()){
+                                    if($detail_gs->goodScale->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->goodScale->qty_balance);
+                                    }
+                                    $total_bayar = $detail_gs->goodScale->qty_balance;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->goodScale->qty_balance * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->goodScale->purchaseOrderDetail->price;
+                                    $all_netto += $detail_gs->goodScale->qty_balance;
+                                    $finance_price = $price*$total_bayar;
+
+                                }else{
+                                    if($detail_gs->water_content > $percentage_level && $percentage_level != 0){
+                                        $finance_kadar_air = $detail_gs->water_content - $percentage_level;
+                                    }
+                                    if($finance_kadar_air > 0){
+                                        $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
+                                    }
+                                    $total_bayar = $detail_gs->qty;
+                                    if($finance_kadar_air > 0){
+                                        $total_bayar = $total_bayar-$finance_kg;
+                                    }
+                                    $total_penerimaan = $detail_gs->qty * (1 - ($detail_gs->water_content/100));
+                                    $price = $detail_gs->purchaseOrderDetail->price;
+                                    $finance_price = $price*$total_bayar;
+                                    $all_netto += $detail_gs->qty;
                                 }
-                                if($finance_kadar_air > 0){
-                                    $finance_kg = ($finance_kadar_air/100 *$percentage_netto_limit/100 *$detail_gs->qty);
-                                }
-                                $total_bayar = $detail_gs->qty;
-                                if($finance_kadar_air > 0){
-                                    $total_bayar = $total_bayar-$finance_kg;
-                                }
-                                $total_penerimaan = $detail_gs->qty * (1 - ($detail_gs->water_content/100));
-                                $price = $detail_gs->purchaseOrderDetail->price;
-                                $finance_price = $price*$total_bayar;
-                                $all_netto += $detail_gs->qty;
                             }
-                            $finance_price = $price*$total_bayar;
 
 
                             $all_penerimaan += $total_penerimaan;

@@ -116,8 +116,8 @@ class StockInRupiahController extends Controller
                         <td>'.$data->item_code.'</td>
                         <td>'.$data->item_name.'</td>
                         <td>'.$data->uom_unit.'</td>
-                        <td class="right-align">'.number_format($totalQty,3,',','.').'</td>
-                        <td class="right-align">'.number_format($totalNominal,2,',','.').'</td>
+                        <td class="right-align">'.number_format($data->qty_final,3,',','.').'</td>
+                        <td class="right-align">'.number_format($data->total_final,2,',','.').'</td>
                     </tr>';
                 }
             }

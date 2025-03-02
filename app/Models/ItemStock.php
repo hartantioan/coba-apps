@@ -38,6 +38,32 @@ class ItemStock extends Model
                 $total -= round($row->total_out,2);
             }
         }
+
+        /* $data = DB::select("
+            SELECT 
+                IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS qty_in,
+                IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS qty_out,
+                IFNULL(SUM(ROUND(ic.total_in,2)),0) AS total_in,
+                IFNULL(SUM(ROUND(ic.total_out,2)),0) AS total_out
+            FROM item_cogs ic
+            WHERE 
+                ic.date <= :date 
+                AND ic.item_id = :item_id
+                AND ic.place_id = :place_id
+                AND ic.warehouse_id = :warehouse_id
+                AND ic.item_shading_id ".($this->item_shading_id ? "= ".$this->item_shading_id : "IS NULL")."
+                AND ic.production_batch_id ".($this->production_batch_id ? "= ".$this->production_batch_id : "IS NULL")."
+                AND ic.deleted_at IS NULL
+        ", array(
+            'date'              => $date,
+            'item_id'           => $this->item_id,
+            'place_id'          => $this->place_id,
+            'warehouse_id'      => $this->warehouse_id,
+        ));
+        
+        $qty = $data[0]->qty_in - $data[0]->qty_out;
+        $total = $data[0]->total_in - $data[0]->total_out; */
+
         $pricenow = $qty > 0 ? $total / $qty : 0;
         return $pricenow;
     }

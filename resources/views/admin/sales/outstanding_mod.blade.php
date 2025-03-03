@@ -170,10 +170,10 @@
         });
     }
 
-    // function exportExcel2() {
-    //     var date = $('#date').val();
-    //     window.location = "{{ Request::url() }}/export2?date=" + date;
-    // }
+     function exportExcel2() {
+         var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export2?date=" + date;
+     }
 
     function filter() {
 
@@ -229,7 +229,7 @@
     }
 
     function filterWithStock() {
-
+      
      let urlgas = '';
 
      urlgas = '{{ Request::url() }}/filterWithStock';

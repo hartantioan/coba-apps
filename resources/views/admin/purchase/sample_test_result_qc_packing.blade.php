@@ -110,6 +110,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
+                                                        <th>Kode Sampel Perusahaan</th>
                                                         <th>User</th>
                                                         <th>File</th>
                                                         <th>Catatan</th>
@@ -582,6 +583,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
+                { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
                 { name: 'supplier_phone', className: '' },

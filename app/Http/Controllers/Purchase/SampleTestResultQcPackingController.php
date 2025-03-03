@@ -121,6 +121,7 @@ class SampleTestResultQcPackingController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
+                    $val->company_sample_code,
                     $val->sampleTestResultQcPacking?->user->name ?? '-',
                     $val->sampleTestResultQcPacking?->document ? $val->sampleTestResultQcPacking->attachment()  : 'file tidak ditemukan',
                     $val->sampleTestResultQcPacking?->note?? '-',

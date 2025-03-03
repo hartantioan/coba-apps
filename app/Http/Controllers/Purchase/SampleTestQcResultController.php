@@ -117,6 +117,7 @@ class SampleTestQcResultController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
+                    $val->company_sample_code,
                     $val->sampleTestResultQc?->user->name ?? '-',
                     $val->sampleTestResultQc?->wet_whiteness_value ?? '-',
                     $val->sampleTestResultQc?->dry_whiteness_value ?? '-',

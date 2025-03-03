@@ -240,7 +240,7 @@ class PurchaseInvoiceDetail extends Model
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
             'landed_cost_fee_details'   => '0',
             'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
-            default                     => $po_term ?? '-',
+            default                     => $po_term ? $po_term : '-',
         };
 
         return $code;
@@ -265,7 +265,7 @@ class PurchaseInvoiceDetail extends Model
             'good_receipt_details'      => date('d/m/Y',strtotime($this->lookable->goodReceipt->post_date)),
             'landed_cost_fee_details'   => date('d/m/Y',strtotime($this->lookable?->landedCost?->post_date)),
             'purchase_order_details'    => date('d/m/Y',strtotime($this->lookable->purchaseOrder->post_date)),
-            default                     => $po_date ?? '-',
+            default                     => $po_date ? $po_date : '-',
         };
 
         return $date;
@@ -279,7 +279,7 @@ class PurchaseInvoiceDetail extends Model
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/Y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/Y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
-            default                     => $po_duedate ?? '-',
+            default                     => $po_duedate ? $po_duedate : '-',
         };
 
         return $date;
@@ -294,7 +294,7 @@ class PurchaseInvoiceDetail extends Model
             'good_receipt_details' => $this->lookable?->purchaseOrderDetail?->purchaseOrder?->code ?? '-',
             'landed_cost_fee_details' => $this->lookable?->landedCost ? ($this->lookable->landedCost->getGoodReceiptNo() ?? '-') : '-',
             'purchase_order_details' => $this->lookable?->purchaseOrder?->code.' - '.$this->lookable?->purchaseOrder?->code ?? '-',
-            'coas' => $code ?? '-',
+            'coas' => $code ? $code : '-',
             default => '-',
         };
 

@@ -71,7 +71,6 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
-                                                        <th>Kategori Series</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -104,15 +103,11 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode (Akan jadi Komponen Kode Item)</label>
+                            <label class="active" for="code">Kode Series</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
-                        </div>
-                        <div class="input-field col s12 m3">
-                            <select class="browser-default" id="variety_category_id" name="variety_category_id" ></select>
-                            <label class="active" for="variety_category_id">Kategori Seri</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -173,7 +168,7 @@
     });
     $(function() {
         loadDataTable();
-        select2ServerSide('#variety_category_id', '{{ url("admin/select2/variety_category") }}');
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -188,7 +183,6 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#variety_category_id').empty();
                 M.updateTextFields();
             }
         });
@@ -231,7 +225,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'category', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

@@ -3,23 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Variety extends Model
+class VarietyCategory extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes;
 
-    protected $table = 'varieties';
-    protected $primaryKey = 'id';
-    protected $dates = ['deleted_at'];
+    protected $table = 'variety_categories';
+
     protected $fillable = [
+        'user_id',
         'code',
         'name',
         'status',
-        'variety_category_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function variety()
+    {
+        return $this->hasMany('App\Models\Variety','variety_category_id','id');
+    }
 
     public function status(){
         switch($this->status) {
@@ -35,10 +43,5 @@ class Variety extends Model
         }
 
         return $status;
-    }
-
-    public function varietyCategory()
-    {
-        return $this->belongsTo('App\Models\VarietyCategory', 'variety_category_id', 'id')->withTrashed();
     }
 }

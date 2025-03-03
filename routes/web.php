@@ -133,6 +133,7 @@ use App\Http\Controllers\MasterData\OutletPriceController;
 use App\Http\Controllers\MasterData\TypeController;
 use App\Http\Controllers\MasterData\SizeController;
 use App\Http\Controllers\MasterData\VarietyController;
+use App\Http\Controllers\MasterData\VarietyCategoryController;
 use App\Http\Controllers\MasterData\PatternController;
 use App\Http\Controllers\MasterData\ColorController;
 use App\Http\Controllers\MasterData\GradeController;
@@ -549,6 +550,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('sample_test_input_proc', [Select2Controller::class, 'sampleTestInputProc']);
                 Route::get('sample_test_input_qc', [Select2Controller::class, 'sampleTestInputQc']);
                 Route::get('sample_test_input_qc_packing', [Select2Controller::class, 'sampleTestInputQcPacking']);
+                Route::get('variety_category', [Select2Controller::class, 'varietyCategory']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -852,6 +854,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [VarietyController::class, 'show']);
                         Route::post('create', [VarietyController::class, 'create'])->middleware('operation.access:variety,update');
                         Route::post('destroy', [VarietyController::class, 'destroy'])->middleware('operation.access:variety,delete');
+                    });
+
+                    Route::prefix('variety_category')->middleware('operation.access:variety_category,view')->group(function () {
+                        Route::get('/', [VarietyCategoryController::class, 'index']);
+                        Route::get('datatable', [VarietyCategoryController::class, 'datatable']);
+                        Route::post('show', [VarietyCategoryController::class, 'show']);
+                        Route::post('create', [VarietyCategoryController::class, 'create'])->middleware('operation.access:variety_category,update');
+                        Route::post('destroy', [VarietyCategoryController::class, 'destroy'])->middleware('operation.access:variety_category,delete');
                     });
 
                     Route::prefix('pattern')->middleware('operation.access:pattern,view')->group(function () {

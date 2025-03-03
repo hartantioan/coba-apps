@@ -5,14 +5,13 @@ namespace App\Models;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class GoodReceipt extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'good_receipts';
     protected $primaryKey = 'id';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\VarietyCategory;
 use App\Models\SampleType;
 use App\Models\SampleTestInput;
 use App\Models\TruckQueue;
@@ -6407,5 +6408,25 @@ class Select2Controller extends Controller {
                 'more' => $data->hasMorePages()
             ]
         ]);
+    }
+
+    public function varietyCategory(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = VarietyCategory::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('code', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
     }
 }

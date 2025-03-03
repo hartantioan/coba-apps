@@ -1,20 +1,21 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Variety;
-use Illuminate\Support\Facades\DB;
 
-class VarietyController extends Controller
+use App\Http\Controllers\Controller;
+use App\Models\VarietyCategory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
+class VarietyCategoryController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'     => 'Jenis',
-            'content'   => 'admin.master_data.variety',
+            'title'     => 'Kategori Jenis ',
+            'content'   => 'admin.master_data.variety_category',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -25,7 +26,6 @@ class VarietyController extends Controller
             'id',
             'code',
             'name',
-            'variety_category_id',
         ];
 
         $start  = $request->start;
@@ -34,9 +34,9 @@ class VarietyController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Variety::count();
+        $total_data = VarietyCategory::count();
 
-        $query_data = Variety::where(function($query) use ($search, $request) {
+        $query_data = VarietyCategory::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -53,7 +53,7 @@ class VarietyController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Variety::where(function($query) use ($search, $request) {
+        $total_filtered = VarietyCategory::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -76,7 +76,6 @@ class VarietyController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
-                    $val->varietyCategory?->name ?? '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -105,12 +104,10 @@ class VarietyController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('varieties', 'code')->ignore($request->temp)] : 'required|unique:varieties,code',
             'name'              => 'required',
-            'variety_category_id.required'         => 'kategori variasi tidak boleh kosong.',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
-            'variety_category_id.required'         => 'kategori variasi tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -122,10 +119,10 @@ class VarietyController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Variety::find($request->temp);
+                    $query = VarietyCategory::find($request->temp);
+                    $query->user_id         = session('bo_id');
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->variety_category_id	= $request->variety_category_id;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -135,10 +132,10 @@ class VarietyController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = Variety::create([
+                    $query = VarietyCategory::create([
+                        'user_id'                       => session('bo_id'),
                         'code'                          => $request->code,
                         'name'			                => $request->name,
-                        'variety_category_id'			=> $request->variety_category_id,
                         'status'                        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -150,10 +147,10 @@ class VarietyController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new Variety())
+                    ->performedOn(new VarietyCategory())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit variety.');
+                    ->log('Add / edit VarietyCategory.');
 
 				$response = [
 					'status'  => 200,
@@ -171,20 +168,20 @@ class VarietyController extends Controller
     }
 
     public function show(Request $request){
-        $variety = Variety::find($request->id);
+        $VarietyCategory = VarietyCategory::find($request->id);
 
-		return response()->json($variety);
+		return response()->json($VarietyCategory);
     }
 
     public function destroy(Request $request){
-        $query = Variety::find($request->id);
+        $query = VarietyCategory::find($request->id);
 
         if($query->delete()) {
             activity()
-                ->performedOn(new Variety())
+                ->performedOn(new VarietyCategory())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the variety data');
+                ->log('Delete the VarietyCategory data');
 
             $response = [
                 'status'  => 200,

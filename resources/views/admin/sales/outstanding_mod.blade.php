@@ -44,21 +44,21 @@
                                                         <span class="hide-on-small-onl">Excel</span>
                                                         <i class="material-icons right">view_list</i>
                                                     </a>
-                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filter();">
+                                                    <{{-- a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filter();">
                                                         <i class="material-icons hide-on-med-and-up">view_list</i>
                                                         <span class="hide-on-small-onl">View</span>
                                                         <i class="material-icons right">view_list</i>
-                                                    </a>
+                                                    </a> --}}
                                                     <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel2();">
                                                         <i class="material-icons hide-on-med-and-up">view_list</i>
                                                         <span class="hide-on-small-onl">Excel (Compare With Stock)</span>
                                                         <i class="material-icons right">view_list</i>
                                                     </a>
-                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterWithStock();">
+                                                    {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterWithStock();">
                                                         <i class="material-icons hide-on-med-and-up">view_list</i>
                                                         <span class="hide-on-small-onl">View (Compare With Stock)</span>
                                                         <i class="material-icons right">view_list</i>
-                                                    </a>
+                                                    </a> --}}
                                                 </div>
                                             </div>
                                         </form>
@@ -108,18 +108,75 @@
 </div>
 
 <script>
-    function exportExcel() {
-        var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export?date=" + date;
+    function exportExcel(){
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
-    function exportExcel2() {
-        var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export2?date=" + date;
+    function exportExcel2(){
+        $.ajax({
+            url: '{{ Request::url() }}/export2?date=" + date',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
+
+    // function exportExcel2() {
+    //     var date = $('#date').val();
+    //     window.location = "{{ Request::url() }}/export2?date=" + date;
+    // }
 
     function filter() {
-     
+
         let urlgas = '';
 
         urlgas = '{{ Request::url() }}/filter';
@@ -172,7 +229,7 @@
     }
 
     function filterWithStock() {
-     
+
      let urlgas = '';
 
      urlgas = '{{ Request::url() }}/filterWithStock';

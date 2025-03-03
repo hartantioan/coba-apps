@@ -110,8 +110,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>Supplier</th>
-                                                        <th>Jenis Sampel</th>
+                                                        <th>Kode Sampel Perusahaan</th>
                                                         <th>User</th>
                                                         <th>Nilai Wet Whiteness</th>
                                                         <th>Nilai Dry Whiteness</th>
@@ -155,10 +154,6 @@
                                         <input type="hidden" id="temp_test" name="temp_test">
                                         <input  type="text" id="sample_test_input_code" name="sample_test_input_code" readonly placeholder=" "></input>
                                         <label class="active" for="sample_test_input_code">Sample Test Input</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  type="text" id="sample_type" name="sample_type" readonly placeholder=" "></input>
-                                        <label class="active" for="sample_type">Jenis Sampel</label>
                                     </div>
                                     <div class="input-field col m3 s12 step12">
                                         <input  type="text" id="company_code" name="company_code" readonly placeholder=" "></input>
@@ -688,8 +683,8 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
-                { name: 'supplier', className: '' },
-                { name: 'supplier_name', className: '' },
+
+                { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
@@ -896,7 +891,6 @@
 
                 $('#sample_test_input_code').val(response.sample_test_input_code);
                 $('#receiveable_capacity').val(response.receiveable_capacity);
-                $('#sample_type').val(response.sample_type.name);
                 $('#company_code').val(response.company_sample_code);
                 $('#wet_whiteness_value').val(response.wet_whiteness_value);
                 $('#dry_whiteness_value').val(response.dry_whiteness_value);

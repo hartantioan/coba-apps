@@ -121,8 +121,7 @@ class SampleTestResultQcPackingController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->supplier,
-                    $val->sampleType->name,
+                    $val->company_sample_code,
                     $val->sampleTestResultQcPacking?->user->name ?? '-',
                     $val->sampleTestResultQcPacking?->document ? $val->sampleTestResultQcPacking->attachment()  : 'file tidak ditemukan',
                     $val->sampleTestResultQcPacking?->note?? '-',
@@ -267,7 +266,6 @@ class SampleTestResultQcPackingController extends Controller
         $unit = SampleTestInput::find($request->id);
         $unit['sample_test_input_code'] = $unit->code;
         $unit['company_sample_code'] = $unit->company_sample_code;
-        $unit['sample_type_name'] = $unit->sampleType->name;
 
         $dry_whiteness_value = '';
         $note = '';

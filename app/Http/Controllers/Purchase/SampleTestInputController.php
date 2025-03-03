@@ -94,6 +94,8 @@ class SampleTestInputController extends Controller
                             $query->where('name','like',"%$search%");
                         })
                         ->orWhere('note','like',"%$search%")
+                        ->orWhere('company_sample_code','like',"%$search%")
+                        ->orWhere('supplier','like',"%$search%")
                         ->orWhere('supplier_name','like',"%$search%");
 
                     });
@@ -122,6 +124,7 @@ class SampleTestInputController extends Controller
                             $query->where('name','like',"%$search%");
                         })
                         ->orWhere('note','like',"%$search%")
+                        ->orWhere('company_sample_code','like',"%$search%")
                         ->orWhere('supplier','like',"%$search%")
                         ->orWhere('supplier_name','like',"%$search%");
 

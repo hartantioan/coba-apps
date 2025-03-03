@@ -122,8 +122,7 @@ class SampleTestResultController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->supplier,
-                    $val->sampleType->name,
+                    $val->company_sample_code,
                     $val->sampleTestResultProc?->user->name ?? '-',
                     $val->sampleTestResultProc?->lab_name ?? '-',
                     $val->sampleTestResultProc?->wet_whiteness_value ?? '-',
@@ -167,7 +166,6 @@ class SampleTestResultController extends Controller
         }
 
         $validation = Validator::make($request->all(), $rules,  [
-            'supplier.required'     => 'Supplier tidak boleh kosong.',
 
             'wet_whiteness_value.required' => 'Wet Whiteness Value tidak boleh kosong.',
             'dry_whiteness_value.required' => 'Dry Whiteness Value tidak boleh kosong.',
@@ -282,7 +280,6 @@ class SampleTestResultController extends Controller
         $unit = SampleTestInput::find($request->id);
         $unit['sample_test_input_code'] = $unit->code;
         $unit['company_sample_code'] = $unit->company_sample_code;
-        $unit['sample_type'] = $unit->sampleType->name;
 
         $dry_whiteness_value = '';
         $wet_whiteness_value = '';

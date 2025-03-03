@@ -3604,8 +3604,8 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('outstanding_mod')->middleware('operation.access:outstanding_mod,view')->group(function () {
                         Route::get('/', [MarketingOrderOutstandingMODController::class, 'index']);
-                        Route::get('export', [MarketingOrderOutstandingMODController::class, 'export']);
-                        Route::get('export2', [MarketingOrderOutstandingMODController::class, 'export2']);
+                        Route::post('export', [MarketingOrderOutstandingMODController::class, 'export']);
+                        Route::post('export2', [MarketingOrderOutstandingMODController::class, 'export2']);
                         Route::post('filter', [MarketingOrderOutstandingMODController::class, 'filter']);
                         Route::post('filterWithStock', [MarketingOrderOutstandingMODController::class, 'filterWithStock']);
                     });

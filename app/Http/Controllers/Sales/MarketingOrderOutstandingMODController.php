@@ -200,7 +200,7 @@ class MarketingOrderOutstandingMODController extends Controller
             FROM marketing_order_deliveries a
             LEFT JOIN marketing_order_delivery_details b ON b.marketing_order_delivery_id=a.id AND b.deleted_at IS null
             LEFT JOIN marketing_order_delivery_detail_stocks c ON b.id=c.marketing_order_delivery_detail_id AND c.deleted_at IS NULL
-            LEFT JOIN (SELECT b.marketing_order_delivery_detail_id FROM marketing_order_delivery_processes a
+            LEFT JOIN (SELECT distinct b.marketing_order_delivery_detail_id FROM marketing_order_delivery_processes a
                 LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id AND b.deleted_at IS null
                 WHERE a.void_date IS NULL AND a.deleted_at IS NULL
             )d ON d.marketing_order_delivery_detail_id = b.id

@@ -61,12 +61,8 @@
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
-                                                        <option value="1">Menunggu</option>
-                                                        <option value="2">Dalam Proses</option>
-                                                        <option value="3">Selesai</option>
-                                                        <option value="4">Ditolak</option>
-                                                        <option value="5">Ditutup</option>
-                                                        <option value="6">Direvisi</option>
+                                                        <option value="1">Belum Ada Hasil Uji</option>
+                                                        <option value="2">Done</option>
                                                     </select>
                                                 </div>
                                             </div>

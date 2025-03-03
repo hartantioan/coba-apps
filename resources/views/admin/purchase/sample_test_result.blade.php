@@ -110,8 +110,6 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>Supplier</th>
-                                                        <th>Jenis Sampel</th>
                                                         <th>User</th>
                                                         <th>Laboratorium</th>
                                                         <th>Nilai Wet Whiteness</th>
@@ -140,7 +138,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <h4>{{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -156,10 +154,6 @@
                                         <input type="hidden" id="temp_test" name="temp_test">
                                         <input  type="text" id="sample_test_input_code" name="sample_test_input_code" readonly placeholder=" "></input>
                                         <label class="active" for="sample_test_input_code">Sample Test Input</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <input  type="text" id="sample_type" name="sample_type" readonly placeholder=" "></input>
-                                        <label class="active" for="sample_type">Jenis Sampel</label>
                                     </div>
                                     <div class="input-field col m3 s12 step12">
                                         <input  type="text" id="company_code" name="company_code" readonly placeholder=" "></input>
@@ -668,8 +662,6 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'sample_type', className: 'center-align' },
-                { name: 'supplier', className: '' },
-                { name: 'supplier_name', className: '' },
                 { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
@@ -877,7 +869,7 @@
 
                 $('#temp_test').val(response.id_test);
                 $('#receiveable_capacity').val(response.receiveable_capacity);
-                $('#sample_type').val(response.sample_type.name);
+
                 $('#company_code').val(response.company_sample_code);
                 $('#lab_name').val(response.lab_name);
                 $('#wet_whiteness_value').val(response.wet_whiteness_value);

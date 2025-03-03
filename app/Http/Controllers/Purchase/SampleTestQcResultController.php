@@ -47,8 +47,6 @@ class SampleTestQcResultController extends Controller
             'subdistrict_id',
             'village_name',
             'sample_date',
-            'supplier',
-            'supplier_name',
             'supplier_phone',
         ];
 
@@ -73,8 +71,7 @@ class SampleTestQcResultController extends Controller
                     })->orWhereHas('subdistrict',function($query) use ($search, $request){
                         $query->where('name','like',"%$search%");
                     })
-                    ->orWhere('note','like',"%$search%")
-                    ->orWhere('supplier_name','like',"%$search%");
+                    ->orWhere('note','like',"%$search%");
 
                 });
             }
@@ -101,8 +98,7 @@ class SampleTestQcResultController extends Controller
                         })->orWhereHas('subdistrict',function($query) use ($search, $request){
                             $query->where('name','like',"%$search%");
                         })
-                        ->orWhere('note','like',"%$search%")
-                        ->orWhere('supplier_name','like',"%$search%");
+                        ->orWhere('note','like',"%$search%");
 
                     });
                 }
@@ -121,8 +117,6 @@ class SampleTestQcResultController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->supplier,
-                    $val->sampleType->name,
                     $val->sampleTestResultQc?->user->name ?? '-',
                     $val->sampleTestResultQc?->wet_whiteness_value ?? '-',
                     $val->sampleTestResultQc?->dry_whiteness_value ?? '-',

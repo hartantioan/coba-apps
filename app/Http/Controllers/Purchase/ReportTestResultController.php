@@ -30,7 +30,7 @@ class ReportTestResultController extends Controller
         $parentSegment = request()->segment(2);
 
         $data = [
-            'title'     => 'Report Hasil Uji',
+            'title'     => 'Report Data Sampel',
             'content'   => 'admin.purchase.report_test_result',
             'shading'      => ItemShading::get(),
             'item'      => Item::where('status','1')

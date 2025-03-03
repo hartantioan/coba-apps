@@ -208,7 +208,7 @@ class PurchaseInvoiceDetail extends Model
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
             'landed_cost_fee_details'   => $this->lookable->landedCost?->code ?? '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->code,
-            'coas'                      => $fund_code ?? ($po_code ?? $this->lookable->code . ' - ' . $this->lookable->name),
+            'coas'                      => $fund_code ? $fund_code : ($po_code ? $po_code : $this->lookable->code . ' - ' . $this->lookable->name),
             default                     => '-',
         };
 

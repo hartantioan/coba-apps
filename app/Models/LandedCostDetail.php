@@ -130,16 +130,16 @@ class LandedCostDetail extends Model
     public function getGrpo(){
         $document = '-';
         if($this->lookable_type == 'good_receipt_details'){
-            $document = $this->lookable?->goodReceipt->code ?? '-';
+            $document = $this->lookable->goodReceipt->code ?? '-';
         }elseif($this->lookable_type == 'landed_cost_details'){
             if($this->lookable->lookable_type == 'good_receipt_details'){
-                $document = $this->lookable?->lookable?->goodReceipt->code?? '-';
+                $document = $this->lookable->lookable->goodReceipt->code ?? '-';
             }elseif($this->lookable->lookable_type == 'landed_cost_details'){
                 if($this->lookable->lookable->lookable_type == 'good_receipt_details'){
-                    $document = $this->lookable?->lookable?->lookable?->goodReceipt->code?? '-';
+                    $document = $this->lookable->lookable->lookable->goodReceipt->code ?? '-';
                 }elseif($this->lookable->lookable->lookable_type == 'landed_cost_details'){
                     if($this->lookable->lookable->lookable->lookable_type == 'good_receipt_details'){
-                        $document = $this->lookable?->lookable?->lookable?->goodReceipt->code?? '-';
+                        $document = $this->lookable->lookable->lookable->lookable->goodReceipt->code ?? '-';
                     }
                 }
             }

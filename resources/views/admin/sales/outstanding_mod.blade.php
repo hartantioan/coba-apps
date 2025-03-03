@@ -44,7 +44,7 @@
                                                         <span class="hide-on-small-onl">Excel</span>
                                                         <i class="material-icons right">view_list</i>
                                                     </a>
-                                                    <{{-- a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filter();">
+                                                    {{--<a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filter();">
                                                         <i class="material-icons hide-on-med-and-up">view_list</i>
                                                         <span class="hide-on-small-onl">View</span>
                                                         <i class="material-icons right">view_list</i>

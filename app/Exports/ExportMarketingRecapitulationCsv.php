@@ -71,7 +71,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $year = date('Y', strtotime($row->post_date));
             $newdate = date('d/n/Y', strtotime($row->post_date));
             $arr[] = [
-                '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->account->userDataDefault()->title . ';' . $row->account->userDataDefault()->address . ';' . floor($row->total * (11/12), 0) . ';' . round($row->tax, 0) . ';0;;1;' . floor($row->total * (11/12)) . ';' . floor($row->tax) . ';0;' . $row->code . ';;'
+                '1'     => 'FK;' . $transactionCode . ';' . $revCode . ';' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->account->userDataDefault()->title . ';' . $row->account->userDataDefault()->address . ';' . floor($row->total * (11/12)) . ';' . round($row->tax, 0) . ';0;;1;' . floor($row->total * (11/12)) . ';' . floor($row->tax) . ';0;' . $row->code . ';;'
             ];
             $arr[] = [
                 '1'     => 'OF;1;' . $row->note . ';' . round($row->total, 2) . ';1.00;' . round($row->total, 2) . ';0;' . round($row->total * (11/12), 2) . ';' . round($row->tax, 2) . ';0;0;;;;;;;;;;',

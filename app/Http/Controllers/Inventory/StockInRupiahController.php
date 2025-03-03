@@ -261,7 +261,7 @@ class StockInRupiahController extends Controller
                         <td>'.$rowdata->lookable->code.'</td>
                         <td class="right-align">'.($rowdata->type == 'IN' ? number_format($rowdata->qty_in,3,',','.') : number_format(-1 * $rowdata->qty_out,3,',','.')).'</td>
                         <td class="right-align">'.number_format($price,3,',','.').'</td>
-                        <td class="right-align">'.($rowdata->type == 'IN' ? number_format($rowdata->total_in,3,',','.') : number_format(-1 * $rowdata->total_out,3,',','.')).'</td>
+                        <td class="right-align">'.($rowdata->type == 'IN' ? number_format($rowdata->total_in,2,',','.') : number_format(-1 * $rowdata->total_out,2,',','.')).'</td>
                         <td class="right-align">'.number_format($totalQty,3,',','.').'</td>
                         <td class="right-align">'.number_format($totalNominal,2,',','.').'</td>
                     </tr>';

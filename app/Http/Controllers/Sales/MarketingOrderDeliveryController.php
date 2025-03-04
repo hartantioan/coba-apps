@@ -784,15 +784,6 @@ class MarketingOrderDeliveryController extends Controller
                 }
             }
 
-            if($request->detail_modd){
-                foreach($request->detail_id as $key => $row){
-                    $modd = MarketingOrderDeliveryDetail::find($row);
-                    if($modd){
-                        $modd->marketingOrderDeliveryDetailStock()->delete();
-                    }
-                }
-            }
-
             if(!$passedQty){
                 return response()->json([
                     'status'  => 500,
@@ -833,6 +824,15 @@ class MarketingOrderDeliveryController extends Controller
                         'status'  => 500,
                         'message' => implode(', ',$arrItemError),
                     ]);
+                }
+            }
+
+            if($request->detail_modd){
+                foreach($request->detail_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($row);
+                    if($modd){
+                        $modd->marketingOrderDeliveryDetailStock()->delete();
+                    }
                 }
             }
 

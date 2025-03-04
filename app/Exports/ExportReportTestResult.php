@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 
 
-class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
+class ExportReportTestResult implements FromView, ShouldAutoSize
 {
     protected $start_date, $end_date, $data; // ✅ Store data
 
@@ -45,57 +45,57 @@ class ExportReportTestResult implements FromView, ShouldAutoSize, WithDrawings
         ]);
     }
 
-    public function drawings()
-    {
-        $drawings = [];
+    // public function drawings()
+    // {
+    //     $drawings = [];
 
-        foreach ($this->data as $index => $row_data) {
-            // General document(s)
-            $this->addDrawingsFromString($drawings, $row_data->document, 'Document Image', 'Sample Document', 'U' . ($index + 2));
+    //     foreach ($this->data as $index => $row_data) {
+    //         // General document(s)
+    //         $this->addDrawingsFromString($drawings, $row_data->document, 'Document Image', 'Sample Document', 'U' . ($index + 2));
 
-            // Conditional QC and Proc documents
-            if ($row_data->type == '2') {
-                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQc)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
-            } elseif ($row_data->type == '3') {
-                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQcPacking)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
-            } elseif ($row_data->type == '1') {
-                $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultProc)->document, 'Proc Document', 'Proc Test Result', 'AB' . ($index + 2));
-            }
-        }
+    //         // Conditional QC and Proc documents
+    //         if ($row_data->type == '2') {
+    //             $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQc)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
+    //         } elseif ($row_data->type == '3') {
+    //             $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultQcPacking)->document, 'QC Document', 'QC Test Result', 'AB' . ($index + 2));
+    //         } elseif ($row_data->type == '1') {
+    //             $this->addDrawingsFromString($drawings, optional($row_data->sampleTestResultProc)->document, 'Proc Document', 'Proc Test Result', 'AB' . ($index + 2));
+    //         }
+    //     }
 
-        return $drawings;
-    }
+    //     return $drawings;
+    // }
 
-    // Helper function to process multiple documents
-    private function addDrawingsFromString(&$drawings, $documents, $name, $description, $coordinates)
-    {
-        if (empty($documents)) return;
+    // // // Helper function to process multiple documents
+    // // private function addDrawingsFromString(&$drawings, $documents, $name, $description, $coordinates)
+    // // {
+    // //     if (empty($documents)) return;
 
-        $files = explode(',', $documents);
+    // //     $files = explode(',', $documents);
 
-        foreach ($files as $file) {
-            $file = trim($file); // Remove spaces
+    // //     foreach ($files as $file) {
+    // //         $file = trim($file); // Remove spaces
 
-            if (Storage::exists($file) && $this->isImage($file)) {
-                $drawing = new Drawing();
-                $drawing->setName($name);
-                $drawing->setDescription($description);
-                $drawing->setPath(storage_path('app/' . $file));
-                $drawing->setHeight(100);
-                $drawing->setCoordinates($coordinates);
-                $drawings[] = $drawing;
-            }
-        }
-    }
+    // //         if (Storage::exists($file) && $this->isImage($file)) {
+    // //             $drawing = new Drawing();
+    // //             $drawing->setName($name);
+    // //             $drawing->setDescription($description);
+    // //             $drawing->setPath(storage_path('app/' . $file));
+    // //             $drawing->setHeight(100);
+    // //             $drawing->setCoordinates($coordinates);
+    // //             $drawings[] = $drawing;
+    // //         }
+    // //     }
+    // // }
 
-    // Function to check if a file is an image
-    private function isImage($file)
-    {
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
+    // // // Function to check if a file is an image
+    // // private function isImage($file)
+    // // {
+    // //     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+    // //     $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        return in_array(strtolower($extension), $allowedExtensions);
-    }
+    // //     return in_array(strtolower($extension), $allowedExtensions);
+    // // }
 
 
 }

@@ -236,13 +236,15 @@ class AnnouncementController extends Controller
             $announcements = Announcement::where('status', 1)
                 ->whereDate('start_date', '<=', $today)
                 ->whereDate('end_date', '>=', $today)
-                ->whereRaw("FIND_IN_SET(?, menu_id)", [$menuId])
                 ->orderByDesc('id')
                 ->limit(5)
                 ->get()
                 ->sortBy('id');
             foreach($announcements as $row){
-                $arrnotif[] = $row;
+                $arr = explode(',',$row->menu_id);
+                if(in_array(strval($menuId),$arr)){
+                    $arrnotif[] = $row;
+                }
             }
         }
 

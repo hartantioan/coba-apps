@@ -3902,15 +3902,15 @@ class Select2Controller extends Controller {
                 $disc3 = number_format($row->marketingOrderDetail->discount_3,2,',','.');
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
-                /* if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
 
-                }else{ */
+                }else{
                     if($row->marketingOrderDetail->tax_id > 0){
                         if($row->marketingOrderDetail->is_include_tax == '1'){
                             $total = round($total / (1 + ($row->marketingOrderDetail->percent_tax / 100)),2);
                         }
                     }
-                //}
+                }
                 $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                 $grandtotal = $total + $tax;
                 $arrDetail[] = [

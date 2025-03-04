@@ -317,15 +317,20 @@ class ReportProcurementController extends Controller
                             if($netto_sj > 0){
                                 $selisih = $row_2->qty - $netto_sj;
                             }
-                            if($take_item_rule_percent->rule_procurement_id == 3){
-                                if($row_2->qty<$row_2->qty_sj){
-                                    $total_bayar = $row_2->qty;
+                            if($take_item_rule_percent){
+                                if($take_item_rule_percent->rule_procurement_id == 3){
+                                    if($row_2->qty<$row_2->qty_sj){
+                                        $total_bayar = $row_2->qty;
+                                    }else{
+                                        $total_bayar = $row_2->qty_sj;
+                                    }
                                 }else{
-                                    $total_bayar = $row_2->qty_sj;
+                                    $total_bayar = $row_2->qty_balance;
                                 }
                             }else{
                                 $total_bayar = $row_2->qty_balance;
                             }
+
                             $price = $row_2->purchaseOrderDetail->price;
                             $finance_price = $price*$total_bayar;
 

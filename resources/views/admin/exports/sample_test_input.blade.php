@@ -28,6 +28,7 @@
             <th rowspan="2">TANGGAL CATATAN KHUSUS</th>
             <th rowspan="2">PENGGUNA</th>
             <th rowspan="2">CATATAN KHUSUS</th>
+            <th rowspan="2">DOKUMEN CATATAN KHUSUS</th>
         </tr>
         <tr>
             <th>PROVINSI</th>
@@ -48,24 +49,28 @@
                 $wet_white_val = $row->sampleTestResultQc->wet_whiteness_value ?? ''; // ✅ Handle null
                 $dry_white_val = $row->sampleTestResultQc->dry_whiteness_value ?? '';
                 $note = $row->sampleTestResultQc->note ?? '';
+                $link = asset(Storage::url($row->sampleTestResultQc?->document)) ?? '';
             }
             elseif($row->type == 2){ // ✅ Use elseif instead of if
                 $nama_lab = $row->sampleTestResultProc->lab_name ?? '';
                 $wet_white_val = $row->sampleTestResultProc->wet_whiteness_value ?? '';
                 $dry_white_val = $row->sampleTestResultProc->dry_whiteness_value ?? '';
                 $note = $row->sampleTestResultProc->note ?? '';
+                $link = asset(Storage::url($row->sampleTestResultProc?->document)) ?? '';
             }
             elseif($row->type == 3){ // ✅ Use elseif instead of if
                 $nama_lab = '';
                 $wet_white_val = '';
                 $dry_white_val = $row->sampleTestResultQcPacking->dry_whiteness_value ?? '';
                 $note = $row->sampleTestResultQcPacking->note ?? '';
+                $link = asset(Storage::url($row->sampleTestResultQcPacking?->document)) ?? '';
             }
             else {
                 $nama_lab = '';
                 $wet_white_val = '';
                 $dry_white_val = '';
                 $note = '';
+                $link = '';
             }
         @endphp
             <tr>
@@ -90,18 +95,19 @@
                 <td>{{ $row->price_estimation }}</td>
                 <td>{{ $row->supplier_sample_code }}</td>
                 <td>{{ $row->company_sample_code }}</td>
-                <td></td>
+                <td>{{ asset(Storage::url($row->document ?? '')) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->update_at }}</td>
                 <td>{{ $row->type() }}</td>
                 <td>{{ $nama_lab}}</td>
                 <td>{{ $wet_white_val}}</td>
                 <td>{{ $dry_white_val }}</td>
-                <td></td>
+                <td>{{ $link }}</td>
                 <td>{{ $note }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->created_at ?? '' }}</td>
                 <td>{{ $row->sampleTestInputPICNote?->user->name ?? ''}}</td>
                 <td>{{ $row->sampleTestInputPICNote?->note ?? ''}}</td>
+                <td>{{ asset(Storage::url($row->sampleTestInputPICNote?->document ?? '')) }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

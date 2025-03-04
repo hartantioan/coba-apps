@@ -73,8 +73,8 @@ class ItemStock extends Model
         
         $data_in = DB::select("
                 SELECT 
-                    IFNULL(SUM(ROUND(ic.qty_in,3)),0) AS total_qty_in,
-                    IFNULL(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out
+                    COALESCE(SUM(ROUND(ic.qty_in,3)),0) AS total_qty_in,
+                    COALESCE(SUM(ROUND(ic.qty_out,3)),0) AS total_qty_out
                 FROM item_cogs ic
                 WHERE 
                     ic.date <= :date 

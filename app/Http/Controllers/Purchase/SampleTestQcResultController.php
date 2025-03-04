@@ -123,6 +123,7 @@ class SampleTestQcResultController extends Controller
                     $val->sampleTestResultQc?->dry_whiteness_value ?? '-',
                     $val->sampleTestResultQc?->document ? $val->sampleTestResultQc->attachment()  : 'file tidak ditemukan',
                     $val->sampleTestResultQc?->note?? '-',
+                    $val->sampleTestResultQc?->decision() ?? '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -201,6 +202,7 @@ class SampleTestQcResultController extends Controller
 
                     $query->user_id = session('bo_id');
                     $query->sample_test_input_id = $request->temp_test;
+                    $query->decision = $request->decision;
                     $query->wet_whiteness_value = str_replace(',','.',str_replace('.','',$request->wet_whiteness_value));
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
@@ -231,6 +233,7 @@ class SampleTestQcResultController extends Controller
                         'wet_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->wet_whiteness_value)),
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
 
+                        'decision'                  => $request->decision,
                         'document'                  => $fileUpload ? $fileUpload : NULL,
                         'note'                      => $request->note,
                     ]);
@@ -275,16 +278,19 @@ class SampleTestQcResultController extends Controller
         $unit['company_sample_code'] = $unit->company_sample_code;
         $unit['sample_type'] = $unit->sampleType->name;
 
+        $decision = '';
         $dry_whiteness_value = '';
         $wet_whiteness_value = '';
         $note = '';
         $id = '';
         if($unit->sampleTestResultQc()->exists()){
+            $decision = $unit->sampleTestResultQc->decision;
             $wet_whiteness_value = $unit->sampleTestResultQc->wet_whiteness_value;
             $dry_whiteness_value = $unit->sampleTestResultQc->dry_whiteness_value;
             $note = $unit->sampleTestResultQc->note;
             $id = $unit->sampleTestResultQc->id;
         }
+        $unit['decision'] = $decision;
         $unit['id_test'] = $id;
         $unit['wet_whiteness_value'] = $wet_whiteness_value;
         $unit['dry_whiteness_value'] = $dry_whiteness_value;

@@ -114,6 +114,7 @@
                                                         <th>User</th>
                                                         <th>File</th>
                                                         <th>Catatan</th>
+                                                        <th>Keputusan Hasil Uji</th>
                                                         <th>Status</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -150,6 +151,7 @@
 
                                     <div class="input-field col m3 s12 step12">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="temp_test" name="temp_test">
                                         <input  type="text" id="sample_test_input_code" name="sample_test_input_code" readonly placeholder=" "></input>
                                         <label class="active" for="sample_test_input_code">Sample Test Input</label>
                                     </div>
@@ -168,11 +170,26 @@
                                     </div>
                                     <div class="col s12 m12 l12"></div>
 
-                                    <div class="input-field col m3 s12 step3">
-
+                                    <div class="input-field col m5 s12">
                                         <input id="note" name="note" type="text" placeholder=" ">
                                         <label class="active" for="note"> Catatan hasil Uji </label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <label class="active">Keputusan Hasil Uji</label>
+                                        <p>
+                                            <label>
+                                                <input name="decision" type="radio" value="1" />
+                                                <span>Ok</span>
+                                            </label>
+                                        </p>
+                                        <p>
+                                            <label>
+                                                <input name="decision" type="radio" value="2" />
+                                                <span>Not Ok</span>
+                                            </label>
+                                        </p>
+                                    </div>
+
                                 </fieldset>
                             </div>
                         </div>
@@ -586,6 +603,7 @@
                 { name: 'province_name', className: '' },
                 { name: 'city_name', className: '' },
                 { name: 'subdistrict_name', className: '' },
+                { name: 'subdistrict_name', className: '' },
                 { name: 'supplier_phone', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' }
@@ -787,10 +805,12 @@
 
                 $('#sample_test_input_code').val(response.sample_test_input_code);
                 $('#company_code').val(response.company_sample_code);
-                $('#dry_whiteness_value').val(response.dry_whiteness_value);
                 $('#note').val(response.note);
 
                 $('#note').focus();
+                if (response.decision) {
+                    $(`input[name="decision"][value="${response.decision}"]`).prop("checked", true);
+                }
                 M.updateTextFields();
             },
             error: function() {

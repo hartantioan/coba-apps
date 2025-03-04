@@ -20,6 +20,7 @@ class SampleTestQcPackingResult extends Model
         'document',
         'note',
         'status',
+        'decision',
     ];
 
     protected $dates = ['deleted_at'];
@@ -49,5 +50,20 @@ class SampleTestQcPackingResult extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function decision(){
+        switch($this->decision) {
+            case '1':
+                $decision = 'OK';
+                break;
+            case '2':
+                $decision = 'NOT OK';
+                break;
+            default:
+                $decision = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
+                break;
+        }
+
+        return $decision;
     }
 }

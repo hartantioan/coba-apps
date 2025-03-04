@@ -125,6 +125,7 @@ class SampleTestResultQcPackingController extends Controller
                     $val->sampleTestResultQcPacking?->user->name ?? '-',
                     $val->sampleTestResultQcPacking?->document ? $val->sampleTestResultQcPacking->attachment()  : 'file tidak ditemukan',
                     $val->sampleTestResultQcPacking?->note?? '-',
+                    $val->sampleTestResultQcPacking?->decision() ?? '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -198,6 +199,7 @@ class SampleTestResultQcPackingController extends Controller
                     $query->sample_test_input_id = $request->temp;
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
+                    $query->decision = $request->decision;
                     $query->note = $request->note;
                     $query->save();
                     $sample_test = SampleTestInput::find($request->temp);
@@ -224,6 +226,7 @@ class SampleTestResultQcPackingController extends Controller
                         'sample_test_input_id'      => $request->temp,
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
 
+                        'decision'                  => $request->decision,
                         'document'                  => $fileUpload ? $fileUpload : NULL,
                         'note'                      => $request->note,
                     ]);
@@ -267,16 +270,16 @@ class SampleTestResultQcPackingController extends Controller
         $unit['sample_test_input_code'] = $unit->code;
         $unit['company_sample_code'] = $unit->company_sample_code;
 
-        $dry_whiteness_value = '';
+        $decision = '';
         $note = '';
         $id = '';
         if($unit->sampleTestResultQcPacking()->exists()){
-            $dry_whiteness_value = $unit->sampleTestResultQcPacking->dry_whiteness_value;
+            $decision = $unit->sampleTestResultQcPacking->decision;
             $note = $unit->sampleTestResultQcPacking->note;
             $id = $unit->sampleTestResultQcPacking->id;
         }
         $unit['id_test'] = $id;
-        $unit['dry_whiteness_value'] = $dry_whiteness_value;
+        $unit['decision'] = $decision;
         $unit['note'] = $note;
 
 		return response()->json($unit);

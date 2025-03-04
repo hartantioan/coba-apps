@@ -117,6 +117,7 @@
                                                         <th>Nilai Dry Whiteness</th>
                                                         <th>File</th>
                                                         <th>Catatan</th>
+                                                        <th>Keputusan Hasil Uji</th>
                                                         <th>Status</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -182,10 +183,24 @@
                                         </div>
                                     </div>
                                     <div class="col s12 m12 l12"></div>
-                                    <div class="input-field col m3 s12 step3">
-
+                                    <div class="input-field col m5 s12">
                                         <input id="note" name="note" type="text" placeholder=" ">
                                         <label class="active" for="note"> Catatan hasil Uji </label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <label class="active">Keputusan Hasil Uji</label>
+                                        <p>
+                                            <label>
+                                                <input name="decision" type="radio" value="1" />
+                                                <span>Ok</span>
+                                            </label>
+                                        </p>
+                                        <p>
+                                            <label>
+                                                <input name="decision" type="radio" value="2" />
+                                                <span>Not Ok</span>
+                                            </label>
+                                        </p>
                                     </div>
                                 </fieldset>
                             </div>
@@ -669,6 +684,7 @@
                 { name: 'subdistrict_name', className: '' },
                 { name: 'supplier_phone', className: '' },
                 { name: 'subdistrict_name', className: '' },
+                { name: 'subdistrict_name', className: '' },
                 { name: 'supplier_phone', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' }
@@ -879,7 +895,9 @@
                 $('#item_name').val(response.item_name);
 
                 $('#note').val(response.note);
-
+                if (response.decision) {
+                    $(`input[name="decision"][value="${response.decision}"]`).prop("checked", true);
+                }
                 $('#note').focus();
                 M.updateTextFields();
             },

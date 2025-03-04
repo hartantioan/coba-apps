@@ -21,6 +21,7 @@ class SampleTestQcResult extends Model
         'document',
         'note',
         'status',
+        'decision',
     ];
 
     protected $dates = ['deleted_at']; // Enable soft delete timestamp
@@ -57,5 +58,21 @@ class SampleTestQcResult extends Model
         }
 
         return $document_po;
+    }
+
+    public function decision(){
+        switch($this->decision) {
+            case '1':
+                $decision = 'OK';
+                break;
+            case '2':
+                $decision = 'NOT OK';
+                break;
+            default:
+                $decision = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
+                break;
+        }
+
+        return $decision;
     }
 }

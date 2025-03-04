@@ -129,6 +129,7 @@ class SampleTestResultController extends Controller
                     $val->sampleTestResultProc?->dry_whiteness_value ?? '-',
                     $val->sampleTestResultProc?->document ? $val->sampleTestResultProc->attachment()   : 'file tidak ditemukan',
                     $val->sampleTestResultProc?->note?? '-',
+                    $val->sampleTestResultProc?->decision() ?? '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -176,10 +177,11 @@ class SampleTestResultController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            info($request);
 			if($request->temp_test){
                 DB::beginTransaction();
 
-                    $query = SampleTestResult::find($request->temp);
+                    $query = SampleTestResult::find($request->temp_test);
 
                     if($request->has('file')) {
 
@@ -205,11 +207,12 @@ class SampleTestResultController extends Controller
                     }
 
                     $query->user_id = session('bo_id');
-                    $query->sample_test_input_id = $request->temp_test;
+                    $query->sample_test_input_id = $request->temp;
                     $query->lab_name = $request->lab_name;
                     $query->wet_whiteness_value = str_replace(',','.',str_replace('.','',$request->wet_whiteness_value));
                     $query->dry_whiteness_value = str_replace(',','.',str_replace('.','',$request->dry_whiteness_value));
                     $query->document = $document;
+                    $query->decision = $request->decision;
                     $query->note = $request->note;
                     $query->save();
                     $sample_test = SampleTestInput::find($request->temp);
@@ -233,11 +236,12 @@ class SampleTestResultController extends Controller
                     }
                     $query = SampleTestResult::create([
                         'user_id'                   => session('bo_id'),
-                        'sample_test_input_id'      => $request->temp_test,
+                        'sample_test_input_id'      => $request->temp,
                         'lab_name'                  => $request->lab_name,
                         'wet_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->wet_whiteness_value)),
                         'dry_whiteness_value'       => str_replace(',','.',str_replace('.','',$request->dry_whiteness_value)),
 
+                        'decision'                  => $request->decision,
                         'document'                  => $fileUpload ? $fileUpload : NULL,
                         'note'                      => $request->note,
                     ]);
@@ -284,16 +288,18 @@ class SampleTestResultController extends Controller
         $dry_whiteness_value = '';
         $wet_whiteness_value = '';
         $note = '';
-        $id = '';$lab_name='';
+        $id = '';$lab_name='';$decision='';
         if($unit->sampleTestResultProc()->exists()){
             $wet_whiteness_value = $unit->sampleTestResultProc->wet_whiteness_value;
             $dry_whiteness_value = $unit->sampleTestResultProc->dry_whiteness_value;
+            $decision = $unit->sampleTestResultProc->decision;
             $note = $unit->sampleTestResultProc->note;
             $id = $unit->sampleTestResultProc->id;
             $lab_name = $unit->sampleTestResultProc->lab_name;
         }
         $unit['id_test'] = $id;
         $unit['lab_name'] = $lab_name;
+        $unit['decision'] = $decision;
         $unit['wet_whiteness_value'] = $wet_whiteness_value;
         $unit['dry_whiteness_value'] = $dry_whiteness_value;
         $unit['note'] = $note;

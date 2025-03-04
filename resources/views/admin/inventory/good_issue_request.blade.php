@@ -210,7 +210,7 @@
                                                 <th class="center">Keterangan 2</th>
                                                 <th class="center">Tgl.Dipakai</th>
                                                 <th class="center">{{ __('translations.plant') }}</th>
-                                                <th class="center">Dist. Biaya</th>
+                                                <th class="center">Line</th>
                                                 <th class="center">{{ __('translations.warehouse') }}</th>
                                                 <th class="center">{{ __('translations.engine') }}</th>
                                                 <th class="center">{{ __('translations.division') }}</th>

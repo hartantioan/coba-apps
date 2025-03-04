@@ -1230,6 +1230,42 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function salesItemShadingBox(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ItemShading::where(function($query) use($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhereHas('item',function($query) use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name', 'like', "%$search%");
+                        });
+                })
+                ->whereHas('item',function($query) use($search){
+                    $query->where('status','1')
+                    ->whereNotNull('is_sales_item')
+                    ->whereHas('pallet',function($query){
+                        $query->where('box_conversion','=',1);
+                    })
+                    ->whereHas('parentFg');
+                })
+                ->paginate(10);
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => 'Shading : '.$d->code.' - '.$d->item->code.' - '.$d->item->name,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
     public function asset(Request $request)
     {
         $response = [];
@@ -2967,6 +3003,48 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemStockByShadingPlace(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $data = ItemStock::where(function($query) use($search,$request){
+                        $query->whereHas('item',function($query) use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name','like',"%$search%")
+                                ->orWhereHas('productionBatch',function($query)use($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                        })->where('item_shading_id',$request->item_shading_id);
+                        if($request->place_id){
+                            $query->where('place_id',$request->place_id);
+                        }else{
+                            $query->whereIn('place_id',$this->dataplaces);
+                        }
+                        if($request->arr_shading){
+                            $query->whereNotIn('id',$request->arr_shading);
+                        }
+                    })
+                    ->whereIn('warehouse_id',$this->datawarehouses)
+                    ->where('qty','>','0')
+                    ->paginate(10);
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text' 	=> $d->place->code.' - '.$d->warehouse->name.' - '.($d->area->name ?? '').' - '.($d->itemShading->code ?? '').' - '.($d->productionBatch->code ?? '').' Item '.$d->item->name.' Qty. '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code,
+                'qty'   => round($d->qty,3),
+                'unit'  => $d->item->uomUnit->code,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
     public function itemStockRepack(Request $request)
     {
         $response   = [];
@@ -3824,15 +3902,15 @@ class Select2Controller extends Controller {
                 $disc3 = number_format($row->marketingOrderDetail->discount_3,2,',','.');
                 $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
                 $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
-                if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
+                /* if(date('Y-m-d',strtotime($row->marketingOrderDetail->created_at)) >= '2024-12-24'){
 
-                }else{
+                }else{ */
                     if($row->marketingOrderDetail->tax_id > 0){
                         if($row->marketingOrderDetail->is_include_tax == '1'){
-                            $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
+                            $total = round($total / (1 + ($row->marketingOrderDetail->percent_tax / 100)),2);
                         }
                     }
-                }
+                //}
                 $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                 $grandtotal = $total + $tax;
                 $arrDetail[] = [

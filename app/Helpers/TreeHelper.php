@@ -9338,16 +9338,19 @@ class TreeHelper {
                                         'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->lookable->goodReceipt->code),
                                     ];
                                     if( $putaran==0 || $urutan <= 8){
-                                        $data_go_chart[]=$data_good_receipt;
-                                        $data_link[]=[
-                                            'from'=>$data_good_receipt["key"],
-                                            'to'=>$query_invoice->code,
-                                            'string_link'=>$data_good_receipt["key"].$query_invoice->code,
-                                        ];
-                                        if(!in_array($row->lookable->goodReceipt->id, $data_id_gr)){
-                                            $data_id_gr[] = $row->lookable->goodReceipt->id;
-                                            $added = true;
+                                        if($urutan == 8){
+                                            $data_go_chart[]=$data_good_receipt;
+                                            $data_link[]=[
+                                                'from'=>$data_good_receipt["key"],
+                                                'to'=>$query_invoice->code,
+                                                'string_link'=>$data_good_receipt["key"].$query_invoice->code,
+                                            ];
+                                            if(!in_array($row->lookable->goodReceipt->id, $data_id_gr)){
+                                                $data_id_gr[] = $row->lookable->goodReceipt->id;
+                                                $added = true;
+                                            }
                                         }
+
                                     }
                                 }
                                 /* melihat apakah ada hubungan lc */
@@ -9423,15 +9426,17 @@ class TreeHelper {
                                         'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                                     ];
                                     if( $putaran==0 || $urutan <= 8){
-                                        $data_go_chart[]=$fr;
-                                        $data_link[]=[
-                                            'from'=>$row->fundRequestDetail->fundRequest->code,
-                                            'to'=>$query_invoice->code,
-                                            'string_link'=>$row->fundRequestDetail->fundRequest->code.$query_invoice->code,
-                                        ];
-                                        if(!in_array($row->fundRequestDetail->fundRequest->id, $data_id_frs)){
-                                            $data_id_frs[] = $row->fundRequestDetail->fundRequest->id;
-                                            $added = true;
+                                        if($urutan ==8 ){
+                                            $data_go_chart[]=$fr;
+                                            $data_link[]=[
+                                                'from'=>$row->fundRequestDetail->fundRequest->code,
+                                                'to'=>$query_invoice->code,
+                                                'string_link'=>$row->fundRequestDetail->fundRequest->code.$query_invoice->code,
+                                            ];
+                                            if(!in_array($row->fundRequestDetail->fundRequest->id, $data_id_frs)){
+                                                $data_id_frs[] = $row->fundRequestDetail->fundRequest->id;
+                                                $added = true;
+                                            }
                                         }
                                     }
                                 }
@@ -9457,12 +9462,14 @@ class TreeHelper {
                                         'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                                     ];
                                     if( $putaran==0 || $urutan <= 8){
-                                        $data_go_chart[]=$data_down_payment;
-                                        $data_link[]=[
-                                            'from'=>$row_pi->purchaseDownPayment->code,
-                                            'to'=>$query_invoice->code,
-                                            'string_link'=>$row_pi->purchaseDownPayment->code.$query_invoice->code,
-                                        ];
+                                        if($urutan ==8 ){
+                                            $data_go_chart[]=$data_down_payment;
+                                            $data_link[]=[
+                                                'from'=>$row_pi->purchaseDownPayment->code,
+                                                'to'=>$query_invoice->code,
+                                                'string_link'=>$row_pi->purchaseDownPayment->code.$query_invoice->code,
+                                            ];
+                                        }
                                     }
 
                                     if($row_pi->purchaseDownPayment->hasPaymentRequestDetail()->exists()){

@@ -269,7 +269,7 @@
                                                         <th class="center">Tipe Pengeluaran</th>
                                                         <th class="center">Coa</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
-                                                        <th class="center">Dist.Biaya</th>
+                                                        <th class="center">Line</th>
                                                         <th class="center">{{ __('translations.engine') }}</th>
                                                         <th class="center">{{ __('translations.division') }}</th>
                                                         <th class="center">Proyek</th>

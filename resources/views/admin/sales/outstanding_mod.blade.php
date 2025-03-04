@@ -141,7 +141,7 @@
 
     function exportExcel2(){
         $.ajax({
-            url: '{{ Request::url() }}/export2?date=" + date',
+            url: '{{ Request::url() }}/export2',
             type: 'POST',
             dataType: 'JSON',
             data: {
@@ -170,10 +170,10 @@
         });
     }
 
-     function exportExcel2() {
+     /* function exportExcel2() {
          var date = $('#date').val();
         window.location = "{{ Request::url() }}/export2?date=" + date;
-     }
+     } */
 
     function filter() {
 

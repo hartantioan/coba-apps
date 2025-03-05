@@ -29,4 +29,10 @@ class PurchaseInvoiceDp extends Model
     {
         return $this->belongsTo('App\Models\PurchaseDownPayment', 'purchase_down_payment_id', 'id')->withTrashed();
     }
+
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
 }

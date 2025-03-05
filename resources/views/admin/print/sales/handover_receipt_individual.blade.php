@@ -144,7 +144,19 @@
                 page-break-after: always;
             }
 
-            @page { margin: 2em 2em 5em 2em; }
+            @page {
+                margin: 2em 2em 5em 2em;
+            }
+
+            @page :first {
+                margin-top: 2em;
+            }
+
+            @page {
+                @bottom-right {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
 
         </style>
     </head>

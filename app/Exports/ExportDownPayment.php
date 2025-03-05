@@ -174,6 +174,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     pdp.post_date <= :date11
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7','8')
+                    AND pdp.post_date < '2025-02-01'
                     AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd

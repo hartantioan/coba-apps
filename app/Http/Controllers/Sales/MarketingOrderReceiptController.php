@@ -49,11 +49,11 @@ class MarketingOrderReceiptController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Kwitansi',
@@ -73,7 +73,7 @@ class MarketingOrderReceiptController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderReceipt::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -138,7 +138,7 @@ class MarketingOrderReceiptController extends Controller
         $search = $request->input('search.value');
 
         $total_data = MarketingOrderReceipt::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = MarketingOrderReceipt::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -237,7 +237,7 @@ class MarketingOrderReceiptController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
@@ -271,7 +271,7 @@ class MarketingOrderReceiptController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Kwitansi & Tanda Terima" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -295,7 +295,7 @@ class MarketingOrderReceiptController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
@@ -338,7 +338,7 @@ class MarketingOrderReceiptController extends Controller
                     $grandtotal += $moi->grandtotal;
                     $arr_id[] = $moi->id;
                 }
-                
+
                 if($request->temp){
                     $query = MarketingOrderReceipt::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -390,7 +390,7 @@ class MarketingOrderReceiptController extends Controller
                         $query->grandtotal = $grandtotal;
 
                         $query->save();
-                        
+
                         foreach($query->marketingOrderReceiptDetail as $row){
                             $row->delete();
                         }
@@ -404,7 +404,7 @@ class MarketingOrderReceiptController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderReceipt::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MarketingOrderReceipt::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -417,9 +417,9 @@ class MarketingOrderReceiptController extends Controller
                         'grandtotal'                => $grandtotal,
                     ]);
                 }
-                
+
                 if($query) {
-                        
+
                     foreach($arr_id as $key => $row){
                         MarketingOrderReceiptDetail::create([
                             'marketing_order_receipt_id'            => $query->id,
@@ -463,7 +463,7 @@ class MarketingOrderReceiptController extends Controller
         $po['account_name'] = $po->account->name;
 
         $arr = [];
-        
+
         foreach($po->marketingOrderReceiptDetail as $row){
             $arr[] = [
                 'code'              => $row->lookable->code,
@@ -484,7 +484,7 @@ class MarketingOrderReceiptController extends Controller
         }
 
         $po['details'] = $arr;
-        				
+
 		return response()->json($po);
     }
 
@@ -566,7 +566,7 @@ class MarketingOrderReceiptController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpay, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalmemo, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalbalancepayment, 2, ',', '.') . '</td>
-            </tr>  
+            </tr>
         ';
         $string .= '</tbody></table></div>';
 
@@ -583,7 +583,7 @@ class MarketingOrderReceiptController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -591,7 +591,7 @@ class MarketingOrderReceiptController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -603,7 +603,7 @@ class MarketingOrderReceiptController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -626,14 +626,14 @@ class MarketingOrderReceiptController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $mod = MarketingOrderReceipt::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($mod){
             $data = [
                 'title'     => 'Kwitansi',
@@ -648,13 +648,13 @@ class MarketingOrderReceiptController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MarketingOrderReceipt::where('code',CustomHelper::decrypt($id))->first();
         $formattedDate = date('d/m/Y H:i:s');
-        
+
         if($pr){
             $data = [
                 'title'     => 'Kwitansi',
@@ -673,16 +673,19 @@ class MarketingOrderReceiptController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-             
+
             $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
             $pdf = PrintHelper::print($pr,'Kwitansi','a4','portrait','admin.print.sales.order_receipt_individual');
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
             $pdf2->render();
             $content2 = $pdf2->download()->getOriginalContent();
             $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
+            $font = $pdf3->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf3->render();
             $content3 = $pdf3->download()->getOriginalContent();
 
@@ -695,7 +698,7 @@ class MarketingOrderReceiptController extends Controller
             $result = $merger->merge();
 
               $document_po = PrintHelper::savePrint($result);
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -708,7 +711,7 @@ class MarketingOrderReceiptController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -720,7 +723,7 @@ class MarketingOrderReceiptController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = MarketingOrderReceipt::where('code',$row)->first();
-                
+
                 if($pr){
                     $data = [
                         'title'     => 'Kwitansi',
@@ -763,8 +766,8 @@ class MarketingOrderReceiptController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -792,7 +795,7 @@ class MarketingOrderReceiptController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -800,19 +803,19 @@ class MarketingOrderReceiptController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderReceipt::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
@@ -829,12 +832,14 @@ class MarketingOrderReceiptController extends Controller
                             $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                             $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
                             $pdf2->render();
                             $font2 = $pdf2->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf2->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                             $content2 = $pdf2->download()->getOriginalContent();
 
                             $temp_pdf[]=$content2;
@@ -848,21 +853,21 @@ class MarketingOrderReceiptController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -871,7 +876,7 @@ class MarketingOrderReceiptController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -907,18 +912,18 @@ class MarketingOrderReceiptController extends Controller
                             $content2 = $pdf2->download()->getOriginalContent();
 
                             $temp_pdf[]=$content2;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -931,7 +936,7 @@ class MarketingOrderReceiptController extends Controller
 
     public function voidStatus(Request $request){
         $query = MarketingOrderReceipt::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
             if(in_array($query->status,['4','5'])){
                 $response = [
@@ -950,13 +955,13 @@ class MarketingOrderReceiptController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-    
+
                 activity()
                     ->performedOn(new MarketingOrderReceipt())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the marketing order handover invoice data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Kwitansi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
@@ -1008,7 +1013,7 @@ class MarketingOrderReceiptController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1048,7 +1053,7 @@ class MarketingOrderReceiptController extends Controller
                 return "Rp.";
             }
         }
-        
+
         $query = MarketingOrderReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
@@ -1061,7 +1066,7 @@ class MarketingOrderReceiptController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_mo_delivery;
@@ -1069,23 +1074,23 @@ class MarketingOrderReceiptController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;   
+            $data_link = $array2;
 
-           
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1116,13 +1121,13 @@ class MarketingOrderReceiptController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MarketingOrderReceipt())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Marketing Order Receipt data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1145,7 +1150,7 @@ class MarketingOrderReceiptController extends Controller
         $company = $request->company ? $request->company : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportTransactionPageMarketingOrderReceipt($search,$status,$account_id,$company,$end_date,$start_date), 'marketing_order_delivery_process_'.uniqid().'.xlsx');
     }
 }

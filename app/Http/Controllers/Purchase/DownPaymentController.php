@@ -202,13 +202,13 @@ class DownPaymentController extends Controller
                                 SELECT 
                                     1 
                                     FROM outgoing_payments op
-                                    LEFT JOIN payment_request_details prd ON prd.payment_request_id = pr.id AND prd.deleted_at IS NULL
-                                    LEFT JOIN payment_requests pr ON pr.id = op.payment_request_id AND pr.deleted_at IS NULL
+                                        JOIN payment_requests pr ON pr.id = op.payment_request_id AND pr.deleted_at IS NULL
+                                        JOIN payment_request_details prd ON prd.payment_request_id = pr.id AND prd.deleted_at IS NULL
                                     WHERE op.status = '3'
-                                    AND op.post_date <= :date13
-                                    AND pr.status = '3'
-                                    AND prd.lookable_id = pdp.id
-                                    AND prd.lookable_type = 'purchase_down_payments'
+                                        AND op.post_date <= :date13
+                                        AND pr.status = '3'
+                                        AND prd.lookable_id = pdp.id
+                                        AND prd.lookable_type = 'purchase_down_payments'
                             ),0) > 0
                         END
                     )

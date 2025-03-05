@@ -219,8 +219,9 @@
                                 </table>
                             </div>
                         </div>
+
                         @if(!$loop->last)
-                            <div class="page-break" style="page-break-before: always;"></div>
+                            <div class="page-break"></div>
                         @endif
                     @endforeach
                     <div class="invoice-subtotal break-row" style="margin-top:30px;">

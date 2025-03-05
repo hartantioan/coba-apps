@@ -258,14 +258,14 @@
                                                 <tr>
                                                     <td>Grand Total Unsent Mod Credit</td>
                                                     <td id="grandtotalUnsentModCredit"></td>
-                                                    <td>Grand Total Unsent Mod DP</td>
+                                                    <td>Total Unsent Mod DP</td>
                                                     <td id="grandtotalUnsentModDp"></td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Grand Total Unsent Do Credit</td>
                                                     <td id="grandtotalUnsentDoCredit"></td>
-                                                    <td>Grand Total Unsent Do DP</td>
+                                                    <td>Total Unsent Do DP</td>
                                                     <td id="grandtotalUnsentDoDp"></td>
                                                 </tr>
 

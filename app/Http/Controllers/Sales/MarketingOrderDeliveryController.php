@@ -794,6 +794,7 @@ class MarketingOrderDeliveryController extends Controller
             if($request->detail_shading){
                 $arrShadingItem = [];
                 $arrShadingQty = [];
+                $arrShadingOld = [];
                 $arrConversion = [];
                 $passedQtyShading = true;
                 $arrItemError = [];
@@ -801,6 +802,7 @@ class MarketingOrderDeliveryController extends Controller
                     if(!in_array($row,$arrShadingItem)){
                         $arrShadingItem[] = $row;
                         $arrShadingQty[] = round(str_replace(',', '.', str_replace('.', '', $request->detail_qty[$key])),3);
+                        $arrShadingOld[] = round(str_replace(',', '.', str_replace('.', '', $request->detail_old[$key])),3);
                         $arrConversion[] = round(str_replace(',', '.', str_replace('.', '', $request->detail_conversion[$key])),3);
                     }else{
                         $index = array_search($row,$arrShadingItem);
@@ -811,7 +813,8 @@ class MarketingOrderDeliveryController extends Controller
                     $itemShading = ItemShading::find($row);
                     if($itemShading){
                         /* $stock = round($itemShading->stockAvailable()/$arrConversion[$key],3); */
-                        $stock = round($itemShading->stockAvailable()/$arrConversion[$key],3) + round($arrShadingQty[$key],3);
+                        $minusstock = round($itemShading->stockAvailable()/$arrConversion[$key],3);
+                        $stock = $minusstock + round($arrShadingOld[$key],3);
                         if($stock < round($arrShadingQty[$key],3)){
                             $arrItemError[] = $itemShading->item->name.' Shading '.$itemShading->code.' Kebutuhan '.CustomHelper::formatConditionalQty(round($arrShadingQty[$key],3)).' Stok : '.CustomHelper::formatConditionalQty($stock);
                             $passedQtyShading = false;
@@ -828,7 +831,7 @@ class MarketingOrderDeliveryController extends Controller
                 }
             }
 
-            if($request->detail_modd){
+            /* if($request->detail_modd){
                 foreach($request->detail_id as $key => $row){
                     $modd = MarketingOrderDeliveryDetail::find($row);
                     if($modd){
@@ -882,7 +885,7 @@ class MarketingOrderDeliveryController extends Controller
             $response = [
                 'status'  => 200,
                 'message' => 'Data berhasil diupdate.'
-            ];
+            ]; */
 
 
         }else{

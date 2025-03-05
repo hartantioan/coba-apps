@@ -17,7 +17,7 @@
                 margin-left:-5px;
                 margin-right:-5px;
             }
-            
+
             .column1 {
                 float: left;
                 width: 50%;
@@ -39,42 +39,42 @@
 
             td {
                 vertical-align:top !important;
-            }            
+            }
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
                     font-size:13px !important;
                 }
-        
+
                 table > thead > tr > th {
-                    
+
                     font-size:11px !important;
                     font-weight: 800 !important;
                 }
 
                 td{
                     font-size:1em !important;
-              
+
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:11px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:13px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -82,33 +82,33 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-        
+
                 .invoice-info {
                     font-size:12px !important;
                 }
-        
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -119,22 +119,22 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 border:1px solid black;
                 min-height: auto;
@@ -182,7 +182,30 @@
                         </thead>
                         <tbody>
                             @foreach($data->marketingOrderReceiptDetail as $key => $row)
-                                <tr class="{{ $key % 35 == 0 && $key > 0 ? 'page-break' : '' }}">
+                                @if($key % 15 == 0 && $key > 0)
+                                    <tr class="page-break"></tr>
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="invoice-subtotal break-row" style="margin-top:30px;">
+                                                <table border="0" width="100%">
+                                                    <tr>
+                                                        <td width="50%" align="center">
+                                                            Dibuat Oleh
+                                                            <br><br><br><br><br>
+                                                            (.........................)
+                                                        </td>
+                                                        <td width="50%" align="center">
+                                                            Penerima
+                                                            <br><br><br><br><br>
+                                                            (.........................)
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                                <tr class="{{ $key % 15 == 0 && $key > 0 ? 'page-break' : '' }}">
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
                                     <td>{{ $row->lookable->tax_no ?? '-' }}</td>
@@ -191,8 +214,8 @@
                                     <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->lookable->balancePaymentIncoming(),2,',','.') }}</td>
                                     <td>
-                                    {{ 
-                                        $row->lookable->marketingOrderDeliveryProcess()->exists() ? $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) : '-' 
+                                    {{
+                                        $row->lookable->marketingOrderDeliveryProcess()->exists() ? $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) : '-'
                                     }}
                                     </td>
                                 </tr>
@@ -206,7 +229,7 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <div class="invoice-subtotal break-row" style="margin-top:30px;">
+                    {{-- <div class="invoice-subtotal break-row" style="margin-top:30px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="50%" align="center">
@@ -221,7 +244,7 @@
                                 </td>
                             </tr>
                         </table>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </main>

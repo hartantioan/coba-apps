@@ -677,12 +677,18 @@ class MarketingOrderReceiptController extends Controller
             $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
             $pdf = PrintHelper::print($pr,'Kwitansi','a4','portrait','admin.print.sales.order_receipt_individual');
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $content = $pdf->download()->getOriginalContent();
 
             $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
+            $font = $pdf2->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf2->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf2->render();
             $content2 = $pdf2->download()->getOriginalContent();
             $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
+            $font = $pdf3->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf3->render();
             $content3 = $pdf3->download()->getOriginalContent();
 

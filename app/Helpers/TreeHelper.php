@@ -5281,131 +5281,131 @@ class TreeHelper {
                                     }
                                 }
                             }
-                            if($query_invoice->realPaymentRequestDetail()->exists()){
+                        }
 
-                                foreach($query_invoice->realPaymentRequestDetail as $index=>$row_pyr_detail){
-                                    if($index < 2 || $urutan <=8){
-                                        $properties = [
-                                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                        if($query_invoice->realPaymentRequestDetail()->exists()){
+
+                            foreach($query_invoice->realPaymentRequestDetail as $index=>$row_pyr_detail){
+                                if($index < 2 || $urutan <=8){
+                                    $properties = [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                                    ];
+
+                                    if (!$hide_nominal) {
+                                        $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                        ;
+                                    }
+                                    $data_pyr_tempura=[
+                                        'properties'=>$properties,
+                                        "key" => $row_pyr_detail->paymentRequest->code,
+                                        "name" => $row_pyr_detail->paymentRequest->code,
+                                        'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                                    ];
+                                    if( $putaran==0 || $urutan <= 8){
+                                        $data_go_chart[]=$data_pyr_tempura;
+                                        $data_link[]=[
+                                            'from'=>$query_invoice->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                            'string_link'=>$query_invoice->code.$row_pyr_detail->paymentRequest->code,
+                                        ];
+                                        // $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;
+                                        if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
+                                            $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+                                            $added = true;
+
+                                        }
+                                    }
+
+                                    if($row_pyr_detail->fundRequest()){
+                                        $properties =  [
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                            ['name'=> "User :".$row_pyr_detail->lookable->account->name],
                                         ];
 
                                         if (!$hide_nominal) {
-                                            $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                            $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                             ;
                                         }
-                                        $data_pyr_tempura=[
+                                        $data_fund_tempura=[
                                             'properties'=>$properties,
-                                            "key" => $row_pyr_detail->paymentRequest->code,
-                                            "name" => $row_pyr_detail->paymentRequest->code,
-                                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
+                                        ];
+
+                                        if( $putaran==0 || $urutan <= 8){
+                                            $data_go_chart[]=$data_fund_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pyr_detail->lookable->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code
+                                            ];
+                                            if(!in_array($row_pyr_detail->lookable->id, $data_id_frs)){
+                                                $data_id_frs[] = $row_pyr_detail->lookable->id;
+                                                $added = true;
+                                            }
+                                        }
+
+                                    }
+                                    if($row_pyr_detail->purchaseDownPayment()){
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                        ];
+
+                                        if (!$hide_nominal) {
+                                            $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ;
+                                        }
+                                        $data_downp_tempura = [
+                                            'properties'=> $properties,
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
                                         ];
                                         if( $putaran==0 || $urutan <= 8){
-                                            $data_go_chart[]=$data_pyr_tempura;
+                                            $data_go_chart[]=$data_downp_tempura;
                                             $data_link[]=[
-                                                'from'=>$query_invoice->code,
+                                                'from'=>$row_pyr_detail->lookable->code,
                                                 'to'=>$row_pyr_detail->paymentRequest->code,
-                                                'string_link'=>$query_invoice->code.$row_pyr_detail->paymentRequest->code,
+                                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
                                             ];
-                                            // $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;
-                                            if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
-                                                $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+                                            $data_id_dp[]= $row_pyr_detail->lookable->id;
+                                        }
+
+                                    }
+                                    if($row_pyr_detail->purchaseInvoice()){
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                            ];
+
+                                        if (!$hide_nominal) {
+                                            $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ;
+                                        }
+                                        $data_invoices_tempura = [
+                                            'properties'=> $properties,
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
+                                        ];
+
+                                        if( $putaran==0 || $urutan <= 8){
+                                            $data_go_chart[]=$data_invoices_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pyr_detail->lookable->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                            ];
+
+                                            if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
+                                                $data_id_invoice[] = $row_pyr_detail->lookable->id;
                                                 $added = true;
-
-                                            }
-                                        }
-
-                                        if($row_pyr_detail->fundRequest()){
-                                            $properties =  [
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                                ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                            ];
-
-                                            if (!$hide_nominal) {
-                                                $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                                ;
-                                            }
-                                            $data_fund_tempura=[
-                                                'properties'=>$properties,
-                                                "key" => $row_pyr_detail->lookable->code,
-                                                "name" => $row_pyr_detail->lookable->code,
-                                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
-                                            ];
-
-                                            if( $putaran==0 || $urutan <= 8){
-                                                $data_go_chart[]=$data_fund_tempura;
-                                                $data_link[]=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code
-                                                ];
-                                                if(!in_array($row_pyr_detail->lookable->id, $data_id_frs)){
-                                                    $data_id_frs[] = $row_pyr_detail->lookable->id;
-                                                    $added = true;
-                                                }
-                                            }
-
-                                        }
-                                        if($row_pyr_detail->purchaseDownPayment()){
-                                            $properties =[
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                            ];
-
-                                            if (!$hide_nominal) {
-                                                $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                                ;
-                                            }
-                                            $data_downp_tempura = [
-                                                'properties'=> $properties,
-                                                "key" => $row_pyr_detail->lookable->code,
-                                                "name" => $row_pyr_detail->lookable->code,
-                                                'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
-                                            ];
-                                            if( $putaran==0 || $urutan <= 8){
-                                                $data_go_chart[]=$data_downp_tempura;
-                                                $data_link[]=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
-                                                ];
-                                                $data_id_dp[]= $row_pyr_detail->lookable->id;
-                                            }
-
-                                        }
-                                        if($row_pyr_detail->purchaseInvoice()){
-                                            $properties =[
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                                ];
-
-                                            if (!$hide_nominal) {
-                                                $properties[] = ['name'=> "Nominal :".formatNominalSimple($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                                ;
-                                            }
-                                            $data_invoices_tempura = [
-                                                'properties'=> $properties,
-                                                "key" => $row_pyr_detail->lookable->code,
-                                                "name" => $row_pyr_detail->lookable->code,
-                                                'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),
-                                            ];
-
-                                            if( $putaran==0 || $urutan <= 8){
-                                                $data_go_chart[]=$data_invoices_tempura;
-                                                $data_link[]=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
-                                                ];
-
-                                                if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
-                                                    $data_id_invoice[] = $row_pyr_detail->lookable->id;
-                                                    $added = true;
-                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-
                     }
                 }
             }

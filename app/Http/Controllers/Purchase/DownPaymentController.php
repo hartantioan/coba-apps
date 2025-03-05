@@ -195,7 +195,23 @@ class DownPaymentController extends Controller
                     pdp.post_date <= :date11
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7','8')
-                    AND pdp.post_date < '2025-02-01'
+                    AND (
+                        CASE 
+                            WHEN pdp.post_date < '2025-02-01' THEN pdp.post_date < '2025-02-01'
+                            WHEN pdp.post_date >= '2025-02-01' THEN IFNULL((
+                                SELECT 
+                                    1 
+                                    FROM outgoing_payments op
+                                    LEFT JOIN payment_request_details prd ON prd.payment_request_id = pr.id AND prd.deleted_at IS NULL
+                                    LEFT JOIN payment_requests pr ON pr.id = op.payment_request_id AND pr.deleted_at IS NULL
+                                    WHERE op.status = '3'
+                                    AND op.post_date <= :date13
+                                    AND pr.status = '3'
+                                    AND prd.lookable_id = pdp.id
+                                    AND prd.lookable_type = 'purchase_down_payments'
+                            ),0) > 0
+                        END
+                    )
                     AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
@@ -218,6 +234,7 @@ class DownPaymentController extends Controller
                 'date10' => $date,
                 'date11' => $date,
                 'date12' => $date,
+                'date13' => $date,
             ));
 
         $results = [];

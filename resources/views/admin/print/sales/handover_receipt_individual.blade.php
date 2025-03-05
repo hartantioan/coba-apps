@@ -220,7 +220,7 @@
                             </div>
                         </div>
                         @if(!$loop->last)
-                            <br style="page-break-before: always;">
+                            <div class="page-break" style="page-break-before: always;"></div>
                         @endif
                     @endforeach
                     <div class="invoice-subtotal break-row" style="margin-top:30px;">

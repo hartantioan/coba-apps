@@ -144,25 +144,7 @@
                 page-break-after: always;
             }
 
-            @page {
-                margin: 2em 2em 5em 2em;
-            }
-
-            @page {
-                /* This will add the page number in the footer */
-                @bottom-center {
-                    content: "Page " counter(page) " of " counter(pages);
-                }
-            }
-
-            /* If the above doesn't work, use this absolute positioning */
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                font-size: 12px;
-            }
+            @page { margin: 2em 2em 5em 2em; }
 
         </style>
     </head>
@@ -257,9 +239,6 @@
                                 </td>
                             </tr>
                         </table>
-                    </div>
-                    <div class="footer">
-                        Page {PAGE_NUM} of {PAGE_COUNT}
                     </div>
                 </div>
             </div>

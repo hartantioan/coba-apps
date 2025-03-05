@@ -168,6 +168,7 @@
                 <div class="card-content invoice-print-area">
                     @php
                         $chunks = $data->marketingOrderReceiptDetail->chunk(15);
+                        $rowNumber = 1; // Start row number from 1
                     @endphp
 
                     @foreach($chunks as $chunk)
@@ -187,9 +188,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($chunk as $key => $row)
+                                        @foreach($chunk as $row)
                                             <tr>
-                                                <td align="center">{{ ($loop->parent->index * 15) + ($key + 1) }}</td>
+                                                <td align="center">{{ $rowNumber }}</td>
                                                 <td>{{ $row->lookable->code }}</td>
                                                 <td>{{ $row->lookable->tax_no ?? '-' }}</td>
                                                 <td align="center">{{ date('d/m/Y', strtotime($row->lookable->post_date)) }}</td>
@@ -204,6 +205,7 @@
                                                     }}
                                                 </td>
                                             </tr>
+                                            @php $rowNumber++; @endphp <!-- Increment row number manually -->
                                         @endforeach
                                     </tbody>
                                     @if ($loop->last)

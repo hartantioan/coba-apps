@@ -646,68 +646,67 @@ class MarketingOrderReceiptController extends Controller
         }
     }
 
-    public function printIndividual(Request $request,$id){
-        $lastSegment = request()->segment(count(request()->segments())-2);
+    public function printIndividual(Request $request, $id) {
+        $lastSegment = request()->segment(count(request()->segments()) - 2);
 
         $menu = Menu::where('url', $lastSegment)->first();
-        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+        $menuUser = MenuUser::where('menu_id', $menu->id)
+                            ->where('user_id', session('bo_id'))
+                            ->where('type', 'view')
+                            ->first();
 
-        $pr = MarketingOrderReceipt::where('code',CustomHelper::decrypt($id))->first();
-        $formattedDate = date('d/m/Y H:i:s');
+        $pr = MarketingOrderReceipt::where('code', CustomHelper::decrypt($id))->first();
 
-        if($pr){
-            $data = [
-                'title'     => 'Kwitansi',
-                'data'      => $pr
-            ];
-            $opciones_ssl=array(
-                "ssl"=>array(
-                "verify_peer"=>false,
-                "verify_peer_name"=>false,
-                ),
-            );
-            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-            $img_path = 'website/logo_web_fix.png';
-            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
-            $img_base_64 = base64_encode($image_temp);
-            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-            $data["image"]=$path_img;
-
-            $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)
-                    ->setPaper('a4', 'portrait');
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $content = $pdf->stream(); // Change from download() to stream()
-
-            // Generate second PDF
-            $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
-                    ->setPaper('a4', 'portrait');
-            $font = $pdf2->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf2->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $content2 = $pdf2->stream();
-
-            // Generate third PDF
-            $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
-                    ->setPaper('a4', 'portrait');
-            $font = $pdf3->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $content3 = $pdf3->stream();
-
-            $merger = new Merger();
-
-            $merger->addRaw($content);
-            $merger->addRaw($content2);
-            $merger->addRaw($content3);
-
-            $result = $merger->merge();
-
-              $document_po = PrintHelper::savePrint($result);
-
-            return $document_po;
-        }else{
+        if (!$pr) {
             abort(404);
         }
+
+        $formattedDate = date('d/m/Y H:i:s');
+
+        $data = [
+            'title' => 'Kwitansi',
+            'data'  => $pr
+        ];
+
+        // Load and encode image
+        $opciones_ssl = [
+            "ssl" => [
+                "verify_peer"      => false,
+                "verify_peer_name" => false,
+            ],
+        ];
+        $img_path = 'website/logo_web_fix.png';
+        $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+        $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+        $img_base_64 = base64_encode($image_temp);
+        $data["image"] = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+
+        // Generate PDFs
+        $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)
+                  ->setPaper('a4', 'portrait');
+        $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", "helvetica", 10, array(0,0,0));
+        $content = $pdf->output(); // Use output() instead of stream()
+
+        $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
+                   ->setPaper('a4', 'portrait');
+        $pdf2->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", "helvetica", 10, array(0,0,0));
+        $content2 = $pdf2->output();
+
+        $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
+                   ->setPaper('a4', 'portrait');
+        $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", "helvetica", 10, array(0,0,0));
+        $content3 = $pdf3->output();
+
+        // Merge PDFs
+        $merger = new Merger();
+        $merger->addRaw($content);
+        $merger->addRaw($content2);
+        $merger->addRaw($content3);
+        $result = $merger->merge();
+
+        // Save and return final document
+        $document_po = PrintHelper::savePrint($result);
+        return $document_po;
     }
 
     public function print(Request $request){

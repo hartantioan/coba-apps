@@ -831,7 +831,7 @@ class MarketingOrderDeliveryController extends Controller
                 }
             }
 
-            /* if($request->detail_modd){
+            if($request->detail_modd){
                 foreach($request->detail_id as $key => $row){
                     $modd = MarketingOrderDeliveryDetail::find($row);
                     if($modd){
@@ -885,7 +885,7 @@ class MarketingOrderDeliveryController extends Controller
             $response = [
                 'status'  => 200,
                 'message' => 'Data berhasil diupdate.'
-            ]; */
+            ];
 
 
         }else{

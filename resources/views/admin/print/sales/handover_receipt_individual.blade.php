@@ -252,8 +252,19 @@
                             </tr>
                         </table>
                     </div>
+                    <div style="position: fixed; bottom: 10px; right: 10px;">
+                        Page <span class="pagenum"></span> of <span class="total-pages"></span>
+                    </div>
+
                 </div>
             </div>
         </main>
     </body>
 </html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".pagenum").innerText = counter(page);
+        document.querySelector(".total-pages").innerText = counter(pages);
+    });
+</script>

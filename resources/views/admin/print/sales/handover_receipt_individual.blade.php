@@ -148,14 +148,20 @@
                 margin: 2em 2em 5em 2em;
             }
 
-            @page :first {
-                margin-top: 2em;
-            }
-
             @page {
-                @bottom-right {
+                /* This will add the page number in the footer */
+                @bottom-center {
                     content: "Page " counter(page) " of " counter(pages);
                 }
+            }
+
+            /* If the above doesn't work, use this absolute positioning */
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
             }
 
         </style>
@@ -252,19 +258,11 @@
                             </tr>
                         </table>
                     </div>
-                    <div style="position: fixed; bottom: 10px; right: 10px;">
-                        Page <span class="pagenum"></span> of <span class="total-pages"></span>
+                    <div class="footer">
+                        Page {PAGE_NUM} of {PAGE_COUNT}
                     </div>
-
                 </div>
             </div>
         </main>
     </body>
 </html>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelector(".pagenum").innerText = counter(page);
-        document.querySelector(".total-pages").innerText = counter(pages);
-    });
-</script>

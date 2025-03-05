@@ -166,83 +166,62 @@
         <main>
             <div class="card break-row">
                 <div class="card-content invoice-print-area">
-                    @php
-                        $chunks = $data->marketingOrderReceiptDetail->chunk(15);
-                        $rowNumber = 1; // Start row number from 1
-                    @endphp
-
-                    @foreach($chunks as $chunk)
-                        <div class="card break-row">
-                            <div class="card-content invoice-print-area">
-                                <table border="1" width="100%" style="border-collapse: collapse;">
-                                    <thead>
-                                        <tr>
-                                            <th>{{ __('translations.no') }}</th>
-                                            <th>No.Invoice</th>
-                                            <th>No.Faktur Pajak</th>
-                                            <th>{{ __('translations.date') }}</th>
-                                            <th>{{ __('translations.grandtotal') }}</th>
-                                            <th>Dibayar</th>
-                                            <th>Sisa</th>
-                                            <th>Surat Jalan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($chunk as $row)
-                                            <tr>
-                                                <td align="center">{{ $rowNumber }}</td>
-                                                <td>{{ $row->lookable->code }}</td>
-                                                <td>{{ $row->lookable->tax_no ?? '-' }}</td>
-                                                <td align="center">{{ date('d/m/Y', strtotime($row->lookable->post_date)) }}</td>
-                                                <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
-                                                <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>
-                                                <td align="right">{{ number_format($row->lookable->balancePaymentIncoming(),2,',','.') }}</td>
-                                                <td>
-                                                    {{
-                                                        $row->lookable->marketingOrderDeliveryProcess()->exists()
-                                                        ? $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date))
-                                                        : '-'
-                                                    }}
-                                                </td>
-                                            </tr>
-                                            @php $rowNumber++; @endphp <!-- Increment row number manually -->
-                                        @endforeach
-                                    </tbody>
-                                    @if ($loop->last)
-                                        <tfoot>
-                                            <tr>
-                                                <td align="right" colspan="6"><b>Total</b></td>
-                                                <td align="right"><b>{{ number_format($data->grandtotal,2,',','.') }}</b></td>
-                                                <td>-</td>
-                                            </tr>
-                                        </tfoot>
-                                    @endif
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="invoice-subtotal break-row" style="margin-top:30px;">
-                            <table border="0" width="100%">
-                                <tr>
-                                    <td width="50%" align="center">
-                                        Dibuat Oleh
-                                        <br><br><br><br><br>
-                                        (.........................)
-                                    </td>
-                                    <td width="50%" align="center">
-                                        Penerima
-                                        <br><br><br><br><br>
-                                        (.........................)
+                    <!-- header section -->
+                    <table border="1" width="100%" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>{{ __('translations.no') }}</th>
+                                <th>No.Invoice</th>
+                                <th>No.Faktur Pajak</th>
+                                <th>{{ __('translations.date') }}</th>
+                                <th>{{ __('translations.grandtotal') }}</th>
+                                <th>Dibayar</th>
+                                <th>Sisa</th>
+                                <th>Surat Jalan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data->marketingOrderReceiptDetail as $key => $row)
+                                <tr class="{{ $key % 15 == 0 && $key > 0 ? 'page-break' : '' }}">
+                                    <td align="center">{{ ($key + 1)  }}</td>
+                                    <td>{{ $row->lookable->code }}</td>
+                                    <td>{{ $row->lookable->tax_no ?? '-' }}</td>
+                                    <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
+                                    <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->balancePaymentIncoming(),2,',','.') }}</td>
+                                    <td>
+                                    {{
+                                        $row->lookable->marketingOrderDeliveryProcess()->exists() ? $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) : '-'
+                                    }}
                                     </td>
                                 </tr>
-                            </table>
-                        </div>
-
-                        @if(!$loop->last)
-                            <div class="page-break"></div>
-                        @endif
-                    @endforeach
-
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td align="right" colspan="6"><b>Total</b></td>
+                                <td align="right"><b>{{ number_format($data->grandtotal,2,',','.') }}</b></td>
+                                <td>-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="invoice-subtotal break-row" style="margin-top:30px;">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td width="50%" align="center">
+                                    Dibuat Oleh
+                                    <br><br><br><br><br>
+                                    (.........................)
+                                </td>
+                                <td width="50%" align="center">
+                                    Penerima
+                                    <br><br><br><br><br>
+                                    (.........................)
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>

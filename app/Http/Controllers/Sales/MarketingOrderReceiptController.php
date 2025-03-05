@@ -674,23 +674,25 @@ class MarketingOrderReceiptController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
 
-            $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)->setPaper('a4', 'portrait');
-            $pdf->render();
-            $pdf = PrintHelper::print($pr,'Kwitansi','a4','portrait','admin.print.sales.order_receipt_individual');
+            $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)
+                    ->setPaper('a4', 'portrait');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $content = $pdf->download()->getOriginalContent();
+            $content = $pdf->stream(); // Change from download() to stream()
 
-            $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
+            // Generate second PDF
+            $pdf2 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
+                    ->setPaper('a4', 'portrait');
             $font = $pdf2->getFontMetrics()->get_font("helvetica", "bold");
             $pdf2->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf2->render();
-            $content2 = $pdf2->download()->getOriginalContent();
-            $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
+            $content2 = $pdf2->stream();
+
+            // Generate third PDF
+            $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)
+                    ->setPaper('a4', 'portrait');
             $font = $pdf3->getFontMetrics()->get_font("helvetica", "bold");
             $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf3->render();
-            $content3 = $pdf3->download()->getOriginalContent();
+            $content3 = $pdf3->stream();
 
             $merger = new Merger();
 

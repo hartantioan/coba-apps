@@ -684,7 +684,11 @@ class MarketingOrderReceiptController extends Controller
             $pdf2->render();
             $content2 = $pdf2->download()->getOriginalContent();
             $pdf3 = Pdf::loadView('admin.print.sales.handover_receipt_individual', $data)->setPaper('a4', 'portrait');
-            $pdf3->render();
+            $pdf3->output();
+            $pdf3->getDomPDF();
+            $font = $pdf3->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf3->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+
             $content3 = $pdf3->download()->getOriginalContent();
 
             $merger = new Merger();

@@ -177,8 +177,8 @@ class StockInRupiahController extends Controller
                             </tr>
                         </thead>
                         <tbody id="table_body">';
-            $no = 1;
             foreach($item as $key => $row){
+                $no = 1;
                 $totalQty = 0;
                 $totalNominal = 0;
                 $old_data = DB::table('item_cogs')->select('item_cogs.id AS id','item_cogs.qty_final AS qty_final','item_cogs.total_final AS total_final','places.code AS place_code','warehouses.name AS warehouse_name','items.code AS item_code','items.name AS item_name','units.code AS uom_unit','areas.code AS area_code','item_shadings.code AS item_shading')
@@ -236,7 +236,6 @@ class StockInRupiahController extends Controller
                 })->orderBy('date')->orderBy('id')->get();
 
                 foreach($data as $key1 => $rowdata){
-                    $no++;
                     if($rowdata->type == 'IN'){
                         $price = $rowdata->qty_in > 0 ? round($rowdata->total_in / $rowdata->qty_in,2) : 0;
                         $totalQty += round($rowdata->qty_in,3);
@@ -264,6 +263,7 @@ class StockInRupiahController extends Controller
                         <td class="right-align">'.number_format($totalQty,3,',','.').'</td>
                         <td class="right-align">'.number_format($totalNominal,2,',','.').'</td>
                     </tr>';
+                    $no++;
                 }
             }
 

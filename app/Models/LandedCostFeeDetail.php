@@ -124,6 +124,14 @@ class LandedCostFeeDetail extends Model
             $total -= round($rowinvoice->total,2);
         }
 
+        foreach($this->purchaseInvoiceRealDetail()->whereHas('purchaseInvoice',function($query)use($date){
+            $query->whereHas('cancelDocument',function($query)use($date){
+                $query->where('post_date','<=',$date);
+            });
+        })->get() as $rowinvoice){
+            $total += round($rowinvoice->total,2);
+        }
+
         return $total;
     }
 

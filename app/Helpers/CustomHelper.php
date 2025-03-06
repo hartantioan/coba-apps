@@ -92,6 +92,7 @@ use App\Models\PurchaseRequest;
 use App\Models\UsedData;
 use App\Models\IssueGlaze;
 use App\Models\ReceiveGlaze;
+use App\Models\MergeStock;
 use App\Models\CostDistribution;
 use App\Models\UserBrand;
 use Illuminate\Support\Carbon;
@@ -6751,6 +6752,92 @@ class CustomHelper {
 				'status'	=> '3'
 			]);
 
+		}elseif($table_name == 'merge_stocks'){
+
+			$pr = MergeStock::find($table_id);
+
+			$pr->update([
+				'status'	=> '3'
+			]);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pr->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note ?? '',
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			if($query){
+				#jurnal barang masuk
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $pr->item->itemGroup->coa_id,
+					'place_id'		=> $pr->to_place_id,
+					'item_id'		=> $pr->item_id,
+					'warehouse_id'	=> $pr->to_warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $pr->grandtotal,
+					'nominal_fc'	=> 0,
+					'note'			=> $pr->code,
+					'note2'			=> $pr->item->code.' - '.$pr->item->name,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+
+				foreach($pr->mergeStockDetail as $row){
+					#jurnal barang keluar
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+						'place_id'		=> $row->itemStock->place_id,
+						'item_id'		=> $row->item_id,
+						'warehouse_id'	=> $row->itemStock->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $row->total,
+						'nominal_fc'	=> 0,
+						'note'			=> $pr->code,
+						'note2'			=> $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+					]);
+	
+					CustomHelper::sendCogsForProduction($table_name,
+						$pr->id,
+						$pr->company_id,
+						$row->itemStock->place_id,
+						$row->itemStock->warehouse_id,
+						$row->item_id,
+						$row->qty,
+						$row->total,
+						'OUT',
+						$pr->post_date,
+						$row->itemStock->area_id,
+						$row->itemStock->item_shading_id,
+						$row->itemStock->production_batch_id,
+						$row->getTable(),
+						$row->id,
+					);
+	
+					CustomHelper::sendStock(
+						$row->itemStock->place_id,
+						$row->itemStock->warehouse_id,
+						$row->itemStock->item_id,
+						$row->qty,
+						'OUT',
+						$row->itemStock->area_id,
+						$row->itemStock->item_shading_id,
+						$row->itemStock->production_batch_id,
+					);
+				}
+			}
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 
@@ -7606,14 +7693,14 @@ class CustomHelper {
 						'coa_id'		=> $rowcoa->id,
 						'account_id'	=> $rowcoa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->lookable->total * $currency_rate_invoice,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate_invoice : $row->lookable->total,
+						'nominal'		=> $row->lookable->total * $row->lookable->landedCost->currency_rate,
+						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $row->lookable->landedCost->currency_rate : $row->lookable->total,
 						'note'			=> 'VOID CANCEL '.$row->lookable->landedCostFee->name,
 					]);
 
-					$grandtotal += $row->grandtotal * $currency_rate_invoice;
-					$tax += $row->tax * $currency_rate_invoice;
-					$wtax += $row->wtax * $currency_rate_invoice;
+					$grandtotal += $row->grandtotal * $row->lookable->landedCost->currency_rate;
+					$tax += $row->tax * $row->lookable->landedCost->currency_rate;
+					$wtax += $row->wtax * $row->lookable->landedCost->currency_rate;
 
 					if($row->tax_id){
 						JournalDetail::create([
@@ -7621,8 +7708,8 @@ class CustomHelper {
 							'coa_id'		=> $row->taxMaster->coa_purchase_id,
 							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> $row->tax * $currency_rate_invoice,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $currency_rate_invoice : $row->tax,
+							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $row->lookable->landedCost->currency_rate : $row->tax,
 							'note'			=> 'VOID CANCEL '.$row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
@@ -7634,8 +7721,8 @@ class CustomHelper {
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> $row->wtax * $currency_rate_invoice,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $currency_rate_invoice : $row->wtax,
+							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $row->lookable->landedCost->currency_rate : $row->wtax,
 							'note'			=> 'VOID CANCEL '.$row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
 						]);
@@ -7646,8 +7733,8 @@ class CustomHelper {
 						'coa_id'		=> $coahutangusaha->id,
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->grandtotal * $currency_rate_invoice,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate_invoice : $row->grandtotal,
+						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
+						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $row->lookable->landedCost->currency_rate : $row->grandtotal,
 						'note'			=> 'VOID CANCEL '.$row->note,
 						'note2'			=> 'VOID CANCEL '.$row->note2,
 					]);

@@ -1488,14 +1488,29 @@ class MarketingOrderDeliveryProcessController extends Controller
 
         foreach($modd as $rowmod){
             $moddd = MarketingOrderDeliveryDetail::find($rowmod);
+            $string='';
+            if($moddd->marketingOrderDeliveryDetailStock()->exists()){
+                $count = $moddd->marketingOrderDeliveryDetailStock->count();
+                $index = 0;
+
+                foreach ($moddd->marketingOrderDeliveryDetailStock as $row_detail) {
+                    $string .= $row_detail->itemShading->code . ': ' . CustomHelper::formatConditionalQty($row_detail->stock);
+
+                    if (++$index < $count) {
+                        $string .= ', ';
+                    }
+                }
+            }
             $moddd['item_name'] = $moddd->item->code.' - '.$moddd->item->name;
             $moddd['sales_order'] = $moddd->marketingOrderDetail->marketingOrder->code;
             $moddd['qty'] = CustomHelper::formatConditionalQty($moddd->qty);
             $moddd['unit'] = $moddd->marketingOrderDetail->itemUnit->unit->code;
             $moddd['place_id'] = $moddd->place_id;
             $moddd['conversion'] = $moddd->marketingOrderDetail->qty_conversion;
+            $moddd['shadingdetail'] = $string;
             $details = [];
             foreach($po->marketingOrderDeliveryProcessDetail()->where('marketing_order_delivery_detail_id',$rowmod)->get() as $row){
+
                 $details[] = [
                     'id'            => $row->id,
                     'item_stock_id' => $row->item_stock_id,

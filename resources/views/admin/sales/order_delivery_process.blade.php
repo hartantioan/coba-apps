@@ -2598,9 +2598,12 @@ document.addEventListener('focusin', function (event) {
                                     <td>
                                         ` + val.note + `
                                     </td>
+                                    <td>
+                                        ` + val.shadingdetail + `
+                                    </td>
                                 </tr>
                                 <tr class="row_item" data-id="` + response.id + `">
-                                    <td colspan="5">
+                                    <td colspan="6">
                                         <table class="bordered" id="table-detail-` + count + `">
                                             <thead>
                                                 <tr>

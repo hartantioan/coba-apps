@@ -315,11 +315,12 @@
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
+                                                        <th class="center">List Shading</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="6">
+                                                        <td colspan="7">
                                                             Silahkan pilih Jadwal Kirim...
                                                         </td>
                                                     </tr>
@@ -913,7 +914,7 @@ document.addEventListener('focusin', function (event) {
                 $('#driver_name,#driver_hp').prop("readonly", false);
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="6">
+                        <td colspan="7">
                             Silahkan pilih Jadwal Kirim...
                         </td>
                     </tr>
@@ -1202,7 +1203,7 @@ document.addEventListener('focusin', function (event) {
         $('#temp,#tempSwitch,#has_void_do').val('');
         $('#body-item').empty().append(`
             <tr id="last-row-item">
-                <td colspan="6">
+                <td colspan="7">
                     Silahkan pilih Jadwal Kirim...
                 </td>
             </tr>
@@ -1290,9 +1291,12 @@ document.addEventListener('focusin', function (event) {
                                         <td>
                                             ` + val.note + `
                                         </td>
+                                        <td>
+                                            ` + val.shadingdetail + `
+                                        </td>
                                     </tr>
                                     <tr class="row_item" data-id="` + response.id + `">
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <table class="bordered" id="table-detail-` + count + `">
                                                 <thead>
                                                     <tr>
@@ -2145,7 +2149,7 @@ document.addEventListener('focusin', function (event) {
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="6">
+                            <td colspan="7">
                                 Silahkan pilih Jadwal Kirim...
                             </td>
                         </tr>

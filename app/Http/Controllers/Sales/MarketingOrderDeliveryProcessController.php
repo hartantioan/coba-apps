@@ -408,6 +408,19 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $drivers = [];
 
                 foreach($data->marketingOrderDeliveryDetail as $row){
+                    $string='';
+                    if($row->marketingOrderDeliveryDetailStock()->exists()){
+                        $count = $row->marketingOrderDeliveryDetailStock->count();
+                        $index = 0;
+
+                        foreach ($row->marketingOrderDeliveryDetailStock as $row) {
+                            $string .= $row->itemShading->code . ': ' . CustomHelper::formatConditionalQty($row->stock);
+
+                            if (++$index < $count) {
+                                $string .= ', ';
+                            }
+                        }
+                    }
                     $details[] = [
                         'modd_id'       => $row->id,
                         'sales_order'   => $row->marketingOrderDetail->marketingOrder->code,
@@ -416,6 +429,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                         'note'          => $row->note,
+                        'shadingdetail'          => $string,
                         'place_id'      => $row->marketingOrderDetail->place_id,
                         'conversion'    => $row->marketingOrderDetail->qty_conversion,
                     ];
@@ -828,7 +842,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 "details"        => $detailItem,
                             ];
                             // Log::info($payload);
-                            
+
                             $query_syncdata = $query->mitraApiSyncDatas()->create([
                                 'mitra_id'  => $query->marketingOrderDelivery->customer->mitraCustomer->mitra_id,
                                 'operation' => 'store',

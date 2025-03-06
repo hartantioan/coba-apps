@@ -40,6 +40,15 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         AND pi.post_date <= :date1
                         AND pi.status IN ('2','3','7','8')
                         AND pid.deleted_at IS NULL
+                        AND IFNULL((SELECT
+                            1
+                            FROM cancel_documents cd
+                            WHERE 
+                                cd.post_date <= :date14
+                                AND cd.lookable_type = 'purchase_invoices'
+                                AND cd.lookable_id = pi.id
+                                AND cd.deleted_at IS NULL
+                        ),0) = 0
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
@@ -214,6 +223,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     'date11' => $this->date,
                     'date12' => $this->date,
                     'date13' => $this->date,
+                    'date14' => $this->date,
                 ));
 
             foreach($query_data as $row_invoice){

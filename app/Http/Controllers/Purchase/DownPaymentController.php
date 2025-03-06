@@ -61,6 +61,15 @@ class DownPaymentController extends Controller
                         AND pi.post_date <= :date1
                         AND pi.status IN ('2','3','7','8')
                         AND pid.deleted_at IS NULL
+                        AND IFNULL((SELECT
+                            1
+                            FROM cancel_documents cd
+                            WHERE 
+                                cd.post_date <= :date14
+                                AND cd.lookable_type = 'purchase_invoices'
+                                AND cd.lookable_id = pi.id
+                                AND cd.deleted_at IS NULL
+                        ),0) = 0
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
@@ -235,6 +244,7 @@ class DownPaymentController extends Controller
                 'date11' => $date,
                 'date12' => $date,
                 'date13' => $date,
+                'date14' => $date,
             ));
 
         $results = [];

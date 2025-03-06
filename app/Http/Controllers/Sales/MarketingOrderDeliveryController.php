@@ -648,7 +648,12 @@ class MarketingOrderDeliveryController extends Controller
                         $query->stage_status = '2';
                         $query->save();
 
-
+                        $modUpdate = MarketingOrderDelivery::find($query->id);
+                        if($modUpdate->goodScaleDetail()->exists()){
+                            $modUpdate->goodScaleDetail->goodScale->update([
+                                'account_id'    => $request->account_id,
+                            ]);
+                        }
                     }else{
                         return response()->json([
                             'status'  => 500,

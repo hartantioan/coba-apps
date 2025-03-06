@@ -413,8 +413,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $count = $row->marketingOrderDeliveryDetailStock->count();
                         $index = 0;
 
-                        foreach ($row->marketingOrderDeliveryDetailStock as $row) {
-                            $string .= $row->itemShading->code . ': ' . CustomHelper::formatConditionalQty($row->stock);
+                        foreach ($row->marketingOrderDeliveryDetailStock as $row_detail) {
+                            $string .= $row_detail->itemShading->code . ': ' . CustomHelper::formatConditionalQty($row_detail->stock);
 
                             if (++$index < $count) {
                                 $string .= ', ';

@@ -423,7 +423,7 @@ class MarketingOrderInvoiceDetail extends Model
     public function getHPP()
     {
         if ($this->lookable_type == 'marketing_order_delivery_process_details') {
-            return  $this->lookable_type->total;
+            return  $this->lookable->total;
         } else if ($this->lookable_type == 'marketing_order_delivery_details') {
             return $this->lookable->marketingOrderDeliveryProcessDetail()->sum('total');
         } else {

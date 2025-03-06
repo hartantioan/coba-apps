@@ -303,6 +303,7 @@ use App\Http\Controllers\Production\ProductionRecapitulationController;
 use App\Http\Controllers\Production\ProductionRepackController;
 use App\Http\Controllers\Production\ReportProductionResultController;
 use App\Http\Controllers\Sales\ReportSalesGoodScaleController;
+use App\Http\Controllers\Production\MergeStockController;
 
 use App\Http\Controllers\Tax\ReportRecapTaxController;
 
@@ -400,6 +401,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('sales_item_parent', [Select2Controller::class, 'salesItemParent']);
                 Route::get('sales_item_child', [Select2Controller::class, 'salesItemChild']);
+                Route::get('sales_item_shading_box', [Select2Controller::class, 'salesItemShadingBox']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
@@ -462,6 +464,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('item_stock_by_shading_place', [Select2Controller::class, 'itemStockByShadingPlace']);
                 Route::get('item_stock_by_place_item', [Select2Controller::class, 'itemStockByPlaceItem']);
                 Route::get('item_only_stock', [Select2Controller::class, 'itemOnlyStock']);
                 Route::get('item_stock_material_request', [Select2Controller::class, 'itemStockMaterialRequest']);
@@ -3046,6 +3049,28 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [ProductionRepackController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionRepackController::class, 'voidStatus'])->middleware('operation.access:production_repack,void');
                     Route::post('destroy', [ProductionRepackController::class, 'destroy'])->middleware('operation.access:production_repack,delete');
+                });
+
+                Route::prefix('merge_stock')->middleware(['operation.access:merge_stock,view', 'lockacc'])->group(function () {
+                    Route::get('/', [MergeStockController::class, 'index']);
+                    Route::get('datatable', [MergeStockController::class, 'datatable']);
+                    Route::get('row_detail', [MergeStockController::class, 'rowDetail']);
+                    Route::post('show', [MergeStockController::class, 'show']);
+                    Route::post('get_code', [MergeStockController::class, 'getCode']);
+                    Route::post('get_item_data', [MergeStockController::class, 'getItemData']);
+                    Route::post('print', [MergeStockController::class, 'print']);
+                    Route::post('done', [MergeStockController::class, 'done'])->middleware('operation.access:merge_stock,update');
+                    Route::post('print_by_range', [MergeStockController::class, 'printByRange']);
+                    Route::get('export', [MergeStockController::class, 'export']);
+                    Route::get('export_from_page', [MergeStockController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree', [MergeStockController::class, 'viewStructureTree']);
+                    Route::get('print_barcode/{id}', [MergeStockController::class, 'printBarcode']);
+                    Route::get('view_journal/{id}', [MergeStockController::class, 'viewJournal'])->middleware('operation.access:merge_stock,journal');
+                    Route::post('create', [MergeStockController::class, 'create'])->middleware('operation.access:merge_stock,update');
+                    Route::get('approval/{id}', [MergeStockController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}', [MergeStockController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MergeStockController::class, 'voidStatus'])->middleware('operation.access:merge_stock,void');
+                    Route::post('destroy', [MergeStockController::class, 'destroy'])->middleware('operation.access:merge_stock,delete');
                 });
 
                 Route::prefix('production_report')->middleware('direct.access')->group(function () {

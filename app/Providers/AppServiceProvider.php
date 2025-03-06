@@ -135,6 +135,7 @@ class AppServiceProvider extends ServiceProvider
             'mitra_sales_areas'                     => 'App\Models\MitraSalesArea',
             'complaint_sales'                       => 'App\Models\ComplaintSales',
             'personal_visits'                       => 'App\Models\PersonalVisit',
+            'merge_stocks'                          => 'App\Models\MergeStock',
         ]);
     }
 }

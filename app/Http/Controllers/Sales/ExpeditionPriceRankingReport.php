@@ -125,6 +125,7 @@ class ExpeditionPriceRankingReport extends Controller
             if($request->status){
                 $query->where('status', $request->status);
             }
+            $query->where('tonnage','>',0);
         })
         ->offset($start)
         ->limit($length)
@@ -198,6 +199,8 @@ class ExpeditionPriceRankingReport extends Controller
             if($request->status){
                 $query->where('status', $request->status);
             }
+
+            $query->where('tonnage','>',0);
         })
         ->count();
 

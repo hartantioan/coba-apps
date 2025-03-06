@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Models\IncomingPaymentDetail;
+use App\Models\IncomingPayment;
 use App\Helpers\CustomHelper;
 
 class ExportIncomingPaymentAR implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell, ShouldAutoSize
@@ -16,13 +17,12 @@ class ExportIncomingPaymentAR implements FromCollection, WithTitle, WithHeadings
      * @return \Illuminate\Support\Collection
      */
 
-    protected $tanggal1,$tanggal2;
+    protected $tanggal1, $tanggal2;
 
     public function __construct(string $tanggal1, string $tanggal2)
     {
         $this->tanggal1 = $tanggal1 ? $tanggal1 : '';
         $this->tanggal2 = $tanggal2 ? $tanggal2 : '';
-      
     }
 
     private $headings = [
@@ -56,34 +56,21 @@ class ExportIncomingPaymentAR implements FromCollection, WithTitle, WithHeadings
     public function collection()
     {
 
-        $data = IncomingPaymentDetail::whereHas('IncomingPayment', function ($query) {
-            $query->whereIn('status', ['2', '3'])->whereNotNull('account_id')->where('post_date', '>=', $this->tanggal1)->where('post_date', '<=', $this->tanggal2);
-        })->get();
+        $data = IncomingPayment::where(function ($query) {
+            $query->where('post_date', '>=', $this->tanggal1)
+                ->where('post_date', '<=', $this->tanggal2)->where('account_id', '!=', 'null');
+        })
+            ->get();
         $array = [];
         foreach ($data as $row) {
-            if ($row->lookable_type == "marketing_order_invoices") {
+            foreach ($row->incomingPaymentDetail as $rowDetail) {
                 $array[] = [
-                    'tanggal' => date('d/m/Y', strtotime($row->IncomingPayment->post_date)),
-                    'code' => $row->IncomingPayment->code,
-                    'bank' => $row->IncomingPayment->coa->name,
-                    'customer' => $row->IncomingPayment->account->name,
-                    'no' => $row->marketingOrderInvoice->code,
-                    'tanggaldok' => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
-                    'usia' => CustomHelper::countDays($row->marketingOrderInvoice->post_date, $row->IncomingPayment->post_date),
-                    'nominal' => $row->subtotal,
-                    'note' => $row->note,
-                ];
-            }
-            if ($row->lookable_type == "marketing_order_down_payments") {
-                $array[] = [
-                    'tanggal' => date('d/m/Y', strtotime($row->IncomingPayment->post_date)),
-                    'code' => $row->IncomingPayment->code,
-                    'bank' => $row->IncomingPayment->coa->name,
-                    'customer' => $row->IncomingPayment->account->name,
-                    'no' => $row->marketingOrderDownPayment->code,
-                    'tanggaldok' => date('d/m/Y', strtotime($row->marketingOrderDownPayment->post_date)),
-                    'usia' => CustomHelper::countDays($row->marketingOrderDownPayment->post_date, $row->IncomingPayment->post_date),
-                    'nominal' => $row->subtotal,
+                    'tanggal' => date('d/m/Y', strtotime($row->post_date)),
+                    'code' => $row->code,
+                    'bank' => $row->coa->name,
+                    'customer' => $row->account->name,
+                    'no' => $rowDetail->getCode(),
+                    'nominal' => $rowDetail->subtotal,
                     'note' => $row->note,
                 ];
             }

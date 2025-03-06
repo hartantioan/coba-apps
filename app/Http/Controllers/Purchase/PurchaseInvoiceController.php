@@ -1817,6 +1817,7 @@ class PurchaseInvoiceController extends Controller
         $downpayments = [];
 
         foreach($pi->purchaseInvoiceDp as $row){
+            $balance = round($row->purchaseDownPayment->balanceInvoice(),2) + round($row->nominal,2);
             $downpayments[] = [
                 'rawcode'       => $row->purchaseDownPayment->code,
                 'pyr_code'      => $row->purchaseDownPayment->listPaymentRequest(),
@@ -1824,6 +1825,7 @@ class PurchaseInvoiceController extends Controller
                 'post_date'     => date('d/m/Y',strtotime($row->purchaseDownPayment->post_date)),
                 'nominal'       => number_format($row->nominal,2,',','.'),
                 'grandtotal'    => number_format($row->purchaseDownPayment->grandtotal,2,',','.'),
+                'balance'       => number_format($balance,2,',','.')
             ];
         }
 

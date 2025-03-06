@@ -1082,6 +1082,13 @@
                 $('#type_detail').trigger('change').formSelect();
                 $('.row_multi').remove();
                 countAllMulti();
+                $('#body-detail-dp').append(`
+                    <tr id="empty-detail-dp">
+                        <td colspan="7" class="center">
+                            Pilih supplier/vendor untuk memulai...
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -2649,6 +2656,7 @@
 
                                 if(type == 'dp'){
                                     /* $('#body-detail-dp').empty(); */
+                                    $('#empty-detail-dp').remove();
                                     if(response.downpayments.length > 0){
                                         $.each(response.downpayments, function(i, val) {
                                             var count = makeid(10);
@@ -2676,7 +2684,7 @@
                                                         ` + val.balance + `
                                                     </td>
                                                     <td class="center">
-                                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();blockDownPayment('` + count + `');" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`" data-max="` + val.balance + `">
                                                     </td>
                                                 </tr>
                                             `);
@@ -2743,6 +2751,14 @@
         });
 
         M.updateTextFields();
+    }
+
+    function blockDownPayment(code){
+        let qty = parseFloat($('#rowNominal' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let max = parseFloat($('#rowNominal' + code).data('max').toString().replaceAll(".", "").replaceAll(",","."));
+        if(qty > max){
+            $('#rowNominal' + code).val($('#rowNominal' + code).data('max'));
+        }
     }
 
     function countStock(element){
@@ -4335,15 +4351,13 @@
                                         ` + val.nominal + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();blockDownPayment('` + count + `');" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`" data-max="` + val.balance + `">
                                     </td>
                                 </tr>
                             `);
                         });
                     }
                 }
-
-
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

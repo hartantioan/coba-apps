@@ -205,20 +205,20 @@ class ExpeditionPriceRankingReport extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                if($val->tonnage > 0){
-                    $response['data'][] = [
-                        $nomor,
-                        $val->code,
-                        $val->name,
-                        $val->transportation->name ?? '',
-                        $val->toCity->name,
-                        $val->toSubdistrict->name,
-                        number_format($val->qty_tonnage,3,',','.'),
-                        number_format($val->tonnage,2,',','.'),
-                        $val->status(),
-                    ];
-                    $nomor++;
-                }
+
+                $response['data'][] = [
+                    $nomor,
+                    $val->code,
+                    $val->name,
+                    $val->transportation->name ?? '',
+                    $val->toCity->name,
+                    $val->toSubdistrict->name,
+                    number_format($val->qty_tonnage,3,',','.'),
+                    number_format($val->tonnage,2,',','.'),
+                    $val->status(),
+                ];
+
+                $nomor++;
             }
         }
 

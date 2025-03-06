@@ -198,6 +198,7 @@ class StockInRupiahController extends Controller
                 ->leftJoin('areas', 'areas.id', '=', 'item_cogs.area_id')
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
+                $no = 1;
                 if($old_data){
                     /* if($request->warehouse != 'all'){
                         $cogs = ItemCogs::find($old_data->id);
@@ -207,7 +208,6 @@ class StockInRupiahController extends Controller
                         $totalQty += round($old_data->qty_final,3);
                         $totalNominal += round($old_data->total_final,2);
                     //}
-                    $no = 1;
                     $html .= '<tr>
                         <td>'.$no.'</td>
                         <td>-</td>

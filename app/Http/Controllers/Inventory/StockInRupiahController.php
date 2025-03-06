@@ -177,7 +177,7 @@ class StockInRupiahController extends Controller
                             </tr>
                         </thead>
                         <tbody id="table_body">';
-
+            $no = 1;
             foreach($item as $key => $row){
                 $totalQty = 0;
                 $totalNominal = 0;
@@ -198,9 +198,7 @@ class StockInRupiahController extends Controller
                 ->leftJoin('areas', 'areas.id', '=', 'item_cogs.area_id')
                 ->leftJoin('item_shadings', 'item_shadings.id', '=', 'item_cogs.item_shading_id')
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
-                $no = 1;
                 if($old_data){
-                    $no = 1;
                     /* if($request->warehouse != 'all'){
                         $cogs = ItemCogs::find($old_data->id);
                         $totalQty += round($cogs->qtyByWarehouseBeforeDate($request->start_date),3);

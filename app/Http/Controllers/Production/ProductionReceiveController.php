@@ -191,6 +191,10 @@ class ProductionReceiveController extends Controller
                                 $query->whereHas('productionOrder',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
                                 });
+                            })->orWhereHas('productionReceiveIssue',function($query) use ($search, $request){
+                                $query->whereHas('productionIssue',function($query) use ($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
                             });
                     });
                 }
@@ -229,6 +233,10 @@ class ProductionReceiveController extends Controller
                                     ->orWhere('employee_no','like',"%$search%");
                             })->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
                                 $query->whereHas('productionOrder',function($query) use ($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                            })->orWhereHas('productionReceiveIssue',function($query) use ($search, $request){
+                                $query->whereHas('productionIssue',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
                                 });
                             });

@@ -37,7 +37,8 @@
             $no = 1;
         @endphp
         @foreach($data as $row)
-            @foreach($row->goodIssueRequestDetail()->withTrashed()->get() as $key => $rowdetail)
+            {{-- @foreach($row->goodIssueRequestDetail()->withTrashed()->get() as $key => $rowdetail) --}}
+            @foreach($row->goodIssueRequestDetail()->orderBy('id')->get() as $key => $rowdetail)
                 <tr align="center">
                     <td>{{ $no }}</td>
                     <td>{{ $rowdetail->goodIssueRequest->code }}</td>

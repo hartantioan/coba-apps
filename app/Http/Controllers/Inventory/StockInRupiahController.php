@@ -200,6 +200,7 @@ class StockInRupiahController extends Controller
                 ->orderByDesc('item_cogs.date')->orderByDesc('item_cogs.id')->first();
                 $no = 1;
                 if($old_data){
+                    $no = 1;
                     /* if($request->warehouse != 'all'){
                         $cogs = ItemCogs::find($old_data->id);
                         $totalQty += round($cogs->qtyByWarehouseBeforeDate($request->start_date),3);

@@ -585,10 +585,10 @@ class MarketingOrderDeliveryController extends Controller
                     }
 
                     if($grandtotaldp < 0){
-                        /* return response()->json([
+                        return response()->json([
                             'status'  => 500,
                             'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa deposit '.number_format($totalLimitDp,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotaldp,2,',','.'),
-                        ]); */
+                        ]);
                     }
 
                     if(!$passedCreditLimit){

@@ -483,6 +483,24 @@ class GoodScale extends Model
         return $has;
     }
 
+    public function sjHasReceivedDocument(){
+        $has = false;
+        if($this->goodScaleDetail()->exists()){
+            $has = true;
+            foreach($this->goodScaleDetail as $row){
+                if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                    if($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->exists()){
+                        $data = $row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->where('status','3')->count();
+                        if($data == 0){
+                            $has = false;
+                        }
+                    }
+                }
+            }
+        }
+        return $has;
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }

@@ -4677,7 +4677,7 @@ class CustomHelper {
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->note,
 				'status'		=> '3'
 			]);
 
@@ -7533,7 +7533,7 @@ class CustomHelper {
 			$type = '';
 
 			foreach($pi->purchaseInvoiceDetail as $row){
-                
+
 				if($row->lookable_type == 'coas'){
 
 					JournalDetail::create([

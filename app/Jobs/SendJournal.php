@@ -2776,7 +2776,7 @@ class SendJournal implements ShouldQueue
 					]);
 
 					$coaAyatSilangPembelianAset = Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first();
-					
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coaAyatSilangPembelianAset->id,
@@ -3866,7 +3866,7 @@ class SendJournal implements ShouldQueue
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->note,
 				'status'		=> '3'
 			]);
 

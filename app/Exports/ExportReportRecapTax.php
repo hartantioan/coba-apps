@@ -104,11 +104,11 @@ class ExportReportRecapTax implements FromCollection, WithTitle, WithHeadings, S
                         }
                         if (date('Y-m-d', strtotime($row->created_at)) >= '2024-12-03') {
                             if ($row_detail->lookable->isPallet() || $row_detail->lookable->isBox()) {
-                                $boxQty = ' ( ' . CustomHelper::formatConditionalQty($row_detail->qty * $row_detail->lookable->item->pallet?->box_conversion??1) . ' BOX )';
+                                $boxQty = ' ( ' . CustomHelper::formatConditionalQty($row_detail->qty * $row_detail->lookable?->item?->pallet?->box_conversion??1) . ' BOX )';
                             }
                         }else{
                             if ($row_detail->lookable->isPallet()) {
-                                $boxQty = ' ( ' . CustomHelper::formatConditionalQty($row_detail->qty * $row_detail->lookable->item->pallet?->box_conversion??1) . ' BOX )';
+                                $boxQty = ' ( ' . CustomHelper::formatConditionalQty($row_detail->qty * $row_detail->lookable?->item?->pallet?->box_conversion??1) . ' BOX )';
                             }
                         }
 

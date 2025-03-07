@@ -169,14 +169,14 @@ class ExportReportProcurement implements FromCollection, WithTitle, WithHeadings
             ]);
 
             if($this->type == 2){
-                if($row->percent_modifier){
-                    $take_item_rule_percent = $row->percent_modifier;
-                }else{
-                    $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
-                    ->whereDate('start_effective_date','<=',$row->goodScale->post_date)
-                    ->whereDate('effective_date','>=',$row->goodScale->post_date)
-                    ->where('account_id',$row->goodScale->account_id)->first();
-                }
+                // if($row->percent_modifier){
+                //     $take_item_rule_percent = $row->percent_modifier;
+                // }else{
+                //     $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)
+                //     ->whereDate('start_effective_date','<=',$row->goodScale->post_date)
+                //     ->whereDate('effective_date','>=',$row->goodScale->post_date)
+                //     ->where('account_id',$row->goodScale->account_id)->first();
+                // }
                 //sementara pake ini
                 if($row->goodScale()->exists()){
                     $take_item_rule_percent = RuleBpScale::where('item_id',$this->item_id)

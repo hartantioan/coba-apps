@@ -1325,7 +1325,7 @@ class PurchaseOrderController extends Controller
                 'item_id'                           => $row->item_id,
                 'coa_id'                            => $row->coa_id,
                 'item_name'                         => $row->item_id ? $row->item->code.' - '.$row->item->name : '',
-                'coa_name'                          => $row->coa_id ? $row->coa->name : '',
+                'coa_name'                          => $row->coa_id ? ($row->coa->prefix ? $row->coa->prefix.' ' : '').''.$row->coa->code.' - '.$row->coa->name : '',
                 'qty'                               => CustomHelper::formatConditionalQty($row->qty),
                 'qty_limit'                         => $row->purchaseRequestDetail()->exists() ? CustomHelper::formatConditionalQty($row->purchaseRequestDetail->qtyBalance() + $row->qty) : CustomHelper::formatConditionalQty($row->qty),
                 'qty_stock'                         => $row->item_id ? CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion) : '-',

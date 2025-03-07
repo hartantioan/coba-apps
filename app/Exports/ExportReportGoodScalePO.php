@@ -86,6 +86,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
         })
         ->get();
         $arr = [];
+        $nomor = 0;
         foreach($query_data as $key=>$row){
             $po_total = 0;
             if($row->goodScale->type == '1' || $row->goodScale->type =='3'){
@@ -130,7 +131,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
             }
             if($row->lookable->type_delivery != 1){
                 $arr[] = [
-                    'no'                     => ($key+1),
+                    'no'                     => ($nomor+1),
                     'no_document'            => $row->goodScale->code,
                     'status'                 => $row->goodScale->statusRaw(),
                     'voider'                 => $row->goodScale->voidUser()->exists() ? $row->goodScale->voidUser->name : '',
@@ -158,6 +159,7 @@ class ExportReportGoodScalePO implements FromCollection, WithTitle, WithHeadings
                     'No. APIN'             => $list,
 
                 ];
+                $nomor++;
             }
 
         }

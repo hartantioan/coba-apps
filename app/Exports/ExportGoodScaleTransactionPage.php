@@ -35,6 +35,14 @@ class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
                     ->orWhereHas('user',function($query){
                         $query->where('name','like',"%$this->search%")
                             ->orWhere('employee_no','like',"%$this->search%");
+                    })
+                    ->orWhereHas('account',function($query){
+                        $query->where('name','like',"%$this->search%")
+                            ->orWhere('employee_no','like',"%$this->search%");
+                    })
+                    ->orWhereHas('item',function($query){
+                        $query->where('code','like',"%$this->search%")
+                            ->orWhere('name','like',"%$this->search%");
                     });
             });
         }

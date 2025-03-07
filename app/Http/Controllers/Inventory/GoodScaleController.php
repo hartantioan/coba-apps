@@ -86,6 +86,7 @@ class GoodScaleController extends Controller
             'code',
             'ref_po',
             'user_id',
+            'account_id',
             'company_id',
             'post_date',
             'type',
@@ -113,6 +114,10 @@ class GoodScaleController extends Controller
                             ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
@@ -167,6 +172,10 @@ class GoodScaleController extends Controller
                             ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
@@ -246,6 +255,7 @@ class GoodScaleController extends Controller
                     $val->code,
                     $val->referencePO(),
                     $val->user->name,
+                    $val->item()->exists() ? ($val->item->is_hide_supplier ? '-' : $val->account->employee_no.' - '.$val->account->name ) : $val->account->employee_no.' - '.$val->account->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),

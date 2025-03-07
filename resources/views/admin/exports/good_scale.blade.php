@@ -13,6 +13,7 @@
 
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
+            <th>Supplier/Customer/Ekspedisi</th>
             <th>Tgl Terima</th>
             <th>Tipe Timbangan</th>
             <th>No SJ</th>
@@ -62,6 +63,7 @@
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
+                <td>{{ $row->item()->exists() ? ($row->item->is_hide_supplier ? '-' : $row->account->employee_no.' - '.$row->account->name ) : $row->account->employee_no.' - '.$row->account->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->type() }}</td>
                 <td>

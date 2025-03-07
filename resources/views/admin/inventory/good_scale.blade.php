@@ -179,6 +179,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Ref.PO/MOD</th>
                                                         <th>{{ __('translations.user') }}</th>
+                                                        <th>Supplier/Customer/Ekspedisi</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>{{ __('translations.date') }}</th>
                                                         <th>Tipe</th>
@@ -1481,15 +1482,16 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
-                { name: 'other', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'company_id', className: 'center-align' },
+                { name: 'code', className: '' },
+                { name: 'other', searchable: false, orderable: false, className: '' },
+                { name: 'name', className: '' },
+                { name: 'account', className: '' },
+                { name: 'company_id', className: '' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'delivery_no', className: 'center-align' },
-                { name: 'vehicle_no', className: 'center-align' },
-                { name: 'driver', className: 'center-align' },
+                { name: 'type', className: '' },
+                { name: 'delivery_no', className: '' },
+                { name: 'vehicle_no', className: '' },
+                { name: 'driver', className: '' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
@@ -1506,7 +1508,7 @@
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'item_id', searchable: false, orderable: false, className: '' },
                 { name: 'qty_sj', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_po', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_in', searchable: false, orderable: false, className: 'center-align' },

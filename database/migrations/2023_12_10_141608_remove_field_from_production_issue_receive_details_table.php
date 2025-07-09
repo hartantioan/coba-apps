@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('production_issue_receive_details', function (Blueprint $table) {
-            $table->dropColumn('batch_no');
-        });
+
     }
 
     /**

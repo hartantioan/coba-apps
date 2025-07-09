@@ -24,8 +24,11 @@ return new class extends Migration
             $table->double('percentage')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+$table->index(
+    ['user_id', 'menu_id', 'coa_id', 'currency_id'],
+    'idx_user_menu_coa_curr'
+);
 
-            $table->index(['user_id','menu_id','coa_id','currency_id']);
         });
     }
 

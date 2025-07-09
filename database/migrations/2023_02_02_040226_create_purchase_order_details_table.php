@@ -33,7 +33,6 @@ return new class extends Migration
             $table->char('is_include_tax',1)->nullable();
             $table->double('percent_tax')->nullable();
             $table->char('is_wtax',1)->nullable();
-            $table->double('percent_tax')->nullable();
             $table->bigInteger('tax_id')->nullable();
             $table->bigInteger('wtax_id')->nullable();
             $table->bigInteger('place_id')->nullable();

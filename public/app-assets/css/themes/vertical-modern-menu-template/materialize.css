@@ -6666,14 +6666,14 @@ small
     letter-spacing: .5px;
 
     color: #fff;
-    background-color: #ff4081;
+    background-color: #0c0052;
 }
 
 .btn:hover,
 .btn-large:hover,
 .btn-small:hover
 {
-    background-color: #ff5a92;
+    background-color: #4c38bd;
 }
 
 .btn-floating
@@ -6697,7 +6697,7 @@ small
 
     color: #fff;
     border-radius: 50%;
-    background-color: #ff4081;
+    background-color: #4c5fdd;
 }
 
 .btn-floating:hover

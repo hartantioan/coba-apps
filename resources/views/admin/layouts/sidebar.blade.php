@@ -17,10 +17,7 @@
         <div class="brand-sidebar">
             <h1 class="logo-wrapper">
                 <a class="brand-logo darken-1" href="{{ url('admin/dashboard') }}">
-                    <img class="hide-on-med-and-down " src="{{ url('website/logo_web_small.png') }}" alt="materialize logo" style="height: 25px;" />
-                    <img class="show-on-medium-and-down hide-on-med-and-up" src="{{ url('website/logo_porselain_putih.png') }}" alt="materialize logo" style="margin-left:35px;"/>
-                    <span class="logo-text hide-on-med-and-down" style="top:-10px !important;position: relative;">SUPERIOR</span>
-                    <br><span class="logo-text hide-on-med-and-down" style="margin-top:-5px !important;font-size:10px;margin-left:35px;letter-spacing: 1.3px;">PORCELAIN SUKSES</span>
+                    <img class="hide-on-med-and-down " src="{{ url('website/logo_web_small1.png') }}" alt="materialize logo" style="height: 25px;" />
                 </a>
                 <a class="navbar-toggler" href="javascript:void(0);">
                     <i class="material-icons">radio_button_checked</i>

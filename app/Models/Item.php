@@ -53,10 +53,15 @@ class Item extends Model
         'bom_calculator_id',
         'print_name',
         'qty_good_scale',
+        'supplier_id',
     ];
 
     public function itemGroup(){
         return $this->belongsTo('App\Models\ItemGroup', 'item_group_id', 'id')->withTrashed();
+    }
+
+    public function supplier(){
+        return $this->belongsTo('App\Models\Supplier', 'supplier_id', 'id')->withTrashed();
     }
 
     public function bomCalculator(){
@@ -505,6 +510,27 @@ class Item extends Model
     {
         return $this->hasMany('App\Models\ItemStock','item_id','id');
     }
+
+    public function itemStockNew()
+    {
+        return $this->hasOne('App\Models\ItemStockNew','item_id','id');
+    }
+
+    public function storeItemStock()
+    {
+        return $this->hasOne('App\Models\StoreItemStock','item_id','id');
+    }
+
+    public function childrenConversion()
+    {
+        return $this->hasMany(ItemConversion::class, 'item_id');
+    }
+
+    public function parentConversion()
+    {
+        return $this->hasOne(ItemConversion::class, 'item_child_id');
+    }
+
 
     public function itemCogs()
     {

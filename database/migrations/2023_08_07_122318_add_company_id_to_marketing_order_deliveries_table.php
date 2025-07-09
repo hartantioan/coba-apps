@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('post_date')->nullable()->after('marketing_order_id');
             $table->bigInteger('void_id')->nullable()->after('status');
             $table->string('void_note')->nullable()->after('void_id');
-            $table->timestamp('void_date')->nullable()->after('void_date');
+            $table->timestamp('void_date')->nullable();
             $table->index(['user_id','company_id','account_id','marketing_order_id'],'mod_index');
         });
     }

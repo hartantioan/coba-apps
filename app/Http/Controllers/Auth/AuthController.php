@@ -70,14 +70,14 @@ class AuthController extends Controller
                 $isMobile = $detect->isMobile();
                 $isTablet = $detect->isTablet();
                 $isComputer = !$isMobile && !$isTablet;
-                AccessDevice::create([
-                    'user_agent'	=> $detect->getUserAgent(),
-                    'user_id'		=> session('bo_id'),
-                    'is_mobile'     => $isMobile,
-                    'is_computer'   => $isComputer,
-                    'ip'            => $request->ip(),
-                
-                ]);
+                // AccessDevice::create([
+                //     'user_agent'	=> $detect->getUserAgent(),
+                //     'user_id'		=> session('bo_id'),
+                //     'is_mobile'     => $isMobile,
+                //     'is_computer'   => $isComputer,
+                //     'ip'            => $request->ip(),
+
+                // ]);
                 UsedData::where('user_id', $user->id)->delete();
 
                 Auth::login($user);
@@ -85,7 +85,7 @@ class AuthController extends Controller
                 activity()
                     ->performedOn(new User())
                     ->causedBy($user->id)
-                    ->withProperties($user) 
+                    ->withProperties($user)
                     ->log('Login ke dalam aplikasi.');
 
                 $response = [
@@ -105,7 +105,7 @@ class AuthController extends Controller
 				'message'	=> 'Account not found'
 			];
 		}
-        
+
         // session([
         //     'bo_id'             => '1',
         // ]);
@@ -119,7 +119,7 @@ class AuthController extends Controller
     public function reminder(Request $request){
         $data = Task::where(function($query) {
                 $query->where(function($query)  {
-                    
+
                 $query->whereIn('id',session('bo_reminder'))
                     ->orWhereHas('user',function($query) {
                         $query->where('id','like',session('bo_id'));
@@ -128,7 +128,7 @@ class AuthController extends Controller
         })-> get();
 
         $arr = [];
-      
+
         foreach($data as $row){
                 $start_date = Carbon::parse($row->start_date);
                 $end_date = Carbon::parse($row->end_date);
@@ -152,7 +152,7 @@ class AuthController extends Controller
                     'end_date'              => $row->end_date,
                     'age'             => '<div class="progress pink lighten-5 mt-0" style="margin-bottom:unset">
                                             <div class="determinate" style="width: '.$progressPercentage.'%; background-color: #f2d60e">
-                                                
+
                                             </div>
                                         </div>
                                         <div style="position: relative;">
@@ -168,17 +168,17 @@ class AuthController extends Controller
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy_one_time(`' . CustomHelper::encrypt($row->id) . '`)"><i class="material-icons dp48">delete</i></button>
                 ',
                 ];
-            
+
         }
 
         session([
             'bo_reminder' => null,
         ]);
         return response()->json($arr);
-        
+
     }
 
-    
+
 
     public function logout(){
         if(session('bo_id')){
@@ -186,7 +186,7 @@ class AuthController extends Controller
             activity()
                 ->performedOn(new User())
                 ->causedBy($user->id)
-                ->withProperties($user) 
+                ->withProperties($user)
                 ->log('Logout dari aplikasi.');
         }
         session()->flush();
@@ -199,7 +199,7 @@ class AuthController extends Controller
             'bo_is_lock' => 1,
             'bo_last_url' => url()->previous(),
         ]);
-        
+
         return redirect('admin/lock');
     }
 
@@ -234,17 +234,17 @@ class AuthController extends Controller
                 'message'	=> 'Apa yang sedang anda lakukan? Hayo jawab.'
             ];
         }
-        
+
         return response()->json($response);
     }
-    
+
     public function lock(){
         if(session('bo_is_lock') == 1){
             $data = [
                 'title'     => 'Profil Pengguna',
                 'content'   => 'admin.personal.profile',
                 'data'      => User::find(session('bo_id')),
-                
+
             ];
             return view('admin.personal.lock', ['data' => $data]);
         }else{
@@ -264,7 +264,7 @@ class AuthController extends Controller
     }
 
     public function update(Request $request){
-        
+
         if($request->hasFile('file')){
             $validation = Validator::make($request->all(), [
                 'file'              => 'image|max:100|mimes:jpg,jpeg,png',
@@ -304,7 +304,7 @@ class AuthController extends Controller
                 'city_id.required'      => 'Kota tidak boleh kosong.',
             ]);
         }
-        
+
 
         if($validation->fails()) {
             $response = [
@@ -367,7 +367,7 @@ class AuthController extends Controller
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
                         ->log('Update user information.');
-    
+
                     $response = [
                         'status'    => 200,
                         'message'   => 'Data successfully saved.',
@@ -385,7 +385,7 @@ class AuthController extends Controller
                 DB::rollback();
             }
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -403,7 +403,7 @@ class AuthController extends Controller
 				'file.required' => 'Tanda tangan tidak boleh kosong.'
 			]);
 		}
-		
+
 		if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -411,27 +411,27 @@ class AuthController extends Controller
             ];
         } else {
             $query = User::find(session('bo_id'));
-            
+
             if($request->signdata) {
                 if($query->signature){
                     if(Storage::exists($query->signature)) {
                         Storage::delete($query->signature);
                     }
                 }
-				
+
 				$folderPath = Storage::path('public/user_signs/');
-				
+
 				$image_parts = explode(";base64,", $request->signdata);
 				$image_type_aux = explode("image/", $image_parts[0]);
 				$image_type = $image_type_aux[1];
 				$image_base64 = base64_decode($image_parts[1]);
-				
+
 				$newname = Str::random(40).'.'.$image_type;
-				
+
 				$file = $folderPath.$newname;
-				
+
 				file_put_contents($file, $image_base64);
-				
+
 				$image = 'public/user_signs/'.$newname;
             }elseif($request->hasFile('file')) {
                 if($query->signature){
@@ -475,9 +475,9 @@ class AuthController extends Controller
     }
 
     public function createReset(Request $request){
-        
+
         $query = User::where('email',$request->email)->where('status','1')->where('type','1')->first();
-        
+
         if($query) {
             $code = Str::random(50);
             $encryptCode = CustomHelper::encrypt($code);
@@ -513,7 +513,7 @@ class AuthController extends Controller
                     'message' => 'Link reset berhasil dikirimkan ke email anda.'
                 ];
             }
-            
+
         } else {
             $response = [
                 'status'  => 500,
@@ -547,9 +547,9 @@ class AuthController extends Controller
     }
 
     public function changePassword(Request $request){
-        
+
         $query = User::where('status','1')->where('reset_code',CustomHelper::decrypt($request->code))->first();
-        
+
         if($query) {
 
             $query->update([
@@ -584,7 +584,7 @@ class AuthController extends Controller
                     'message' => 'Berhasil reset password. Halaman akan dialihkan.'
                 ];
             }
-            
+
         } else {
             $response = [
                 'status'  => 500,

@@ -110,7 +110,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -195,13 +195,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -217,14 +217,14 @@
     $(function() {
         loadDataTable();
         $('#datatable_serverside').on('click', 'button', function(event) {
-            event.stopPropagation();     
+            event.stopPropagation();
         });
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -292,7 +292,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -325,9 +325,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -354,7 +354,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -415,7 +415,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#name').val(response.name);
                 $("#address").val(response.address);
@@ -495,7 +495,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -503,7 +503,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -513,10 +513,10 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-           
-           
+
+
         });
-        
+
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -535,8 +535,8 @@
                     'type': 'INVOICE',
                     'url': response.message
                 })
-                
-               
+
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -553,7 +553,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        
+
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

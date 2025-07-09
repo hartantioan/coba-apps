@@ -53,7 +53,7 @@ class ItemGroupController extends Controller
         $search = $request->input('search.value');
 
         $total_data = ItemGroup::count();
-        
+
         $query_data = ItemGroup::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -89,16 +89,11 @@ class ItemGroupController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $val->id,
                     $val->code,
                     $val->name,
-                    $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
-                    $val->coa()->exists() ? $val->coa->name : '',
-                    $val->listWarehouse(),
-                    $val->productionType(),
-                    $val->isActiva(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -124,7 +119,7 @@ class ItemGroupController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'			=> $request->temp ? ['required', Rule::unique('item_groups', 'code')->ignore($request->temp)] : 'required|unique:item_groups,code',
             'name'          => 'required',
@@ -180,7 +175,7 @@ class ItemGroupController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 $newdata = [];
@@ -227,7 +222,7 @@ class ItemGroupController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -240,13 +235,13 @@ class ItemGroupController extends Controller
         }
 
         $itemgroup['warehouses'] = $arrWarehouse;
-        				
+
 		return response()->json($itemgroup);
     }
 
     public function destroy(Request $request){
         $query = ItemGroup::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new ItemGroup())
@@ -275,7 +270,7 @@ class ItemGroupController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -292,7 +287,7 @@ class ItemGroupController extends Controller
             $data = [
                 'title'     => 'Master Item Group',
                 'data'      => $pr
-            ];  
+            ];
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
@@ -314,8 +309,8 @@ class ItemGroupController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -323,7 +318,7 @@ class ItemGroupController extends Controller
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
-		
+
 		return Excel::download(new ExportItemGroup($search,$status), 'item_group_'.uniqid().'.xlsx');
     }
 }

@@ -27,7 +27,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['parent_id', 'coa_id', 'depreciation_coa_id', 'cost_coa_id']);
         });
     }
 

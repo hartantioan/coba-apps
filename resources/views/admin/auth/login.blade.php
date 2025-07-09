@@ -14,8 +14,8 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
     <title>Login | Superior Porcelain Sukses</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- BEGIN: VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/vendors.min.css') }}">
@@ -40,50 +40,68 @@
                 <div id="login-page" class="row">
                     <div class="col s12 m6 l4 z-depth-4 card-panel border-radius-6 login-card bg-opacity-8">
                         <form class="login-form" id="login_form">
+                            <!-- Logo -->
+                            <div class="row center-align">
+                                {{-- <div class="col s12">
+                                    <img src="{{ url('website/logo_web_fix.png') }}" width="70%" class="responsive-img">
+                                </div> --}}
+                            </div>
+
+                            <!-- Title -->
                             <div class="row">
-                                <div class="input-field col s12 center-align">
-                                    <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
-                                </div>
-                                <div class="input-field col s12">
-                                    <h5 class="ml-4">Silahkan Masuk</h5>
+                                <div class="col s12 center-align">
+                                    <h5 class="grey-text text-darken-3">Silahkan Masuk</h5>
+                                    <p class="grey-text">Gunakan akun Anda untuk login</p>
                                 </div>
                             </div>
+
+                            <!-- NIK Input -->
                             <div class="row margin">
                                 <div class="input-field col s12">
-                                    <i class="material-icons prefix pt-2">person_pin</i>
-                                    <input id="id_card" type="text" name="id_card">
-                                    <label for="id_card" class="center-align">NIK</label>
+                                    <input id="id_card" type="text" name="id_card" class="validate" required>
+                                    <label for="id_card">NIK</label>
                                 </div>
                             </div>
+
+                            <!-- Password Input -->
                             <div class="row margin">
                                 <div class="input-field col s12">
-                                    <i class="material-icons prefix pt-2">lock_outline</i>
-                                    <input id="password" type="password" name="password">
+                                    <input id="password" type="password" name="password" class="validate" required>
                                     <label for="password">Password</label>
                                 </div>
                             </div>
+
+                            <!-- Show Password Checkbox -->
                             <div class="row">
-                                <div class="col s12 m12 l12 ml-2 mt-1">
-                                    <p>
-                                        <label>
-                                            <input type="checkbox" id="showPassword"/>
-                                            <span>Lihat Password</span>
-                                        </label>
-                                    </p>
+                                <div class="col s12">
+                                    <label>
+                                        <input type="checkbox" id="showPassword">
+                                        <span class="grey-text">Lihat Password</span>
+                                    </label>
                                 </div>
                             </div>
+
+                            <!-- Login Button -->
                             <div class="row">
                                 <div class="input-field col s12">
-                                    <button class="btn waves-effect waves-light border-round gradient-45deg-purple-deep-orange col s12" type="submit" onclick="">Login</button>
+                                    <button class="btn waves-effect waves-light teal darken-1 col s12 border-round" type="submit">
+                                        Masuk
+                                    </button>
                                 </div>
                             </div>
+
+                            <!-- Links -->
                             <div class="row">
-                                <div class="input-field col s6 m6 l6">
-                                    <p class="margin medium-small"><a href="{{ url('admin/register') }}">Register Karyawan Non-Staff</a></p>
+                                {{-- <div class="col s6">
+                                    <p class="margin medium-small">
+                                        <a href="{{ url('admin/register') }}" class="blue-text text-darken-2">Register Karyawan Non-Staff</a>
+                                    </p>
                                 </div>
-                                <div class="input-field col s6 m6 l6">
-                                    <p class="margin right-align medium-small"><a href="{{ url('admin/forget') }}">Lupa Password ?</a></p>
-                                </div>
+                                <div class="col s6 right-align">
+                                    <p class="margin medium-small">
+                                        <a href="{{ url('admin/forget') }}" class="red-text text-darken-2">Lupa Password?</a>
+                                    </p>
+                                </div> --}}
                             </div>
                         </form>
                     </div>
@@ -92,6 +110,7 @@
             <div class="content-overlay"></div>
         </div>
     </div>
+
 
     <!-- END: Footer-->
     <!-- BEGIN VENDOR JS-->
@@ -117,7 +136,7 @@
 					$('#password').attr('type', 'password');
 				}
 			});
-			
+
 			$("#login_form").submit(function(event) {
 				event.preventDefault();
 				if($('#id_card').val() !== '' && $('#password').val() !== ''){
@@ -133,10 +152,10 @@
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					 },
 					 beforeSend: function() {
-						
+
 					 },
 					 success: function(response) {
-						
+
 						if(response.status == 200) {
 							setTimeout(function() {
                                 @if(Request::get('url'))
@@ -144,7 +163,7 @@
                                 @else
                                     location.reload();
                                 @endif
-							}, 1500);							
+							}, 1500);
 							swal({
 								title: 'Success',
 								text: response.message,
@@ -157,11 +176,11 @@
 								icon: 'warning'
 							});
 						} else {
-						   
+
 						}
 					 },
 					 error: function() {
-						
+
 						swal({
 							title: 'Ups!',
 							text: 'Check your internet connection.',
@@ -182,7 +201,7 @@
                 window.location.reload();
             }
 
-            
+
             setInterval(reloadPage, 3600000);
 		});
 	</script>

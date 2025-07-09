@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
+use App\Models\Supplier;
+use App\Models\StoreCustomer;
 use App\Models\VarietyCategory;
 use App\Models\SampleType;
 use App\Models\SampleTestInput;
@@ -650,6 +652,7 @@ class Select2Controller extends Controller {
                 'code'                      => $d->code,
                 'name'                      => $d->name,
                 'uom'                       => $d->uomUnit->code,
+                'stock'                     => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
                 'stock_list'                => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'            => $d->warehouseList(),
                 'outstanding_issue_request' => CustomHelper::formatConditionalQty($d->getOutstandingIssueRequest()).' '.$d->uomUnit->code,
@@ -1162,6 +1165,7 @@ class Select2Controller extends Controller {
                 })
                 ->where('status','1')
                 ->whereNotNull('is_sales_item')
+                ->whereDoesntHave('parentConversion')
                 ->whereDoesntHave('fgGroup')->get();
         foreach($data as $d) {
             $response[] = [
@@ -1170,6 +1174,29 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+                'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function supplierStore(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = Supplier::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
             ];
         }
 
@@ -6506,5 +6533,56 @@ class Select2Controller extends Controller {
         }
 
         return response()->json(['items' => $response]);
+    }
+
+    public function storeCustomer(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = StoreCustomer::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('no_telp', 'like', "%$search%");
+                })->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			        => $d->id,
+                'text' 			        => $d->no_telp.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function childItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+
+        $data = Item::where(function($query) use($search,$request){
+                    $query->whereHas('parentConversion',function($query) use($search,$request){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%");
+                        if($request->item_id){
+                            $query->where('item_id',$request->item_id);
+                        }
+                    });
+                })
+                ->where('status','1')->paginate(10);
+        info($data);
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
+            ];
+        }
+
+        return response()->json(['items' => $response,'pagination' => [
+                'more' => $data->hasMorePages()
+            ]]);
     }
 }

@@ -136,6 +136,10 @@ class AppServiceProvider extends ServiceProvider
             'complaint_sales'                       => 'App\Models\ComplaintSales',
             'personal_visits'                       => 'App\Models\PersonalVisit',
             'merge_stocks'                          => 'App\Models\MergeStock',
+            'delivery_receives'                     => 'App\Models\DeliveryReceive',
+            'sales_orders'                          => 'App\Models\SalesOrder',
+            'daily_collection_reports'              => 'App\Models\SalesOrder',
+            'inventory_issues'                      => 'App\Models\InventoryIssue',
         ]);
     }
 }

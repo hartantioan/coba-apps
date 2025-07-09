@@ -4336,7 +4336,7 @@ li.home:before
 }
 
 /*----------------------------------------
-  Grid 
+  Grid
 ------------------------------------------*/
 .section
 {
@@ -8560,8 +8560,8 @@ span.badge.pill
 
     color: #fff;
     border-radius: 50%;
-    background-color: #ff4081;
-    box-shadow: 0 0 10px 0 #ff4081;
+    background-color: #4c5fdd;
+    box-shadow: 0 0 10px 0 #fff5f9;
 }
 
 .navbar #notifications-dropdown

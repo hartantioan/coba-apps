@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('approval_templates', function (Blueprint $table) {
-            $table->char('is_check_benchmark',1)->nullable()->after('is_check_nominal');
+            $table->char('is_check_benchmark',1)->nullable();
             $table->char('nominal_type',1)->nullable()->after('is_check_benchmark');
-            $table->double('nominal_final')->nullable()->after('nominal');
+            $table->double('nominal_final')->nullable();
         });
     }
 

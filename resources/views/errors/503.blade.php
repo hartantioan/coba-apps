@@ -10,8 +10,8 @@
     <meta name="keywords" content="materialize, admin template, dashboard template, flat admin template, responsive admin template, eCommerce dashboard, analytic dashboard">
     <meta name="author" content="ThemeSelect">
     <title>{{ env('APP_NAME') }} | 503 Page</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- BEGIN: VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/vendors.min.css') }}">

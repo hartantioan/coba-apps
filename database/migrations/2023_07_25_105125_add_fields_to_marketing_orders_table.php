@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('marketing_orders', function (Blueprint $table) {
-            $table->bigInteger('account_id')->after('place_id')->nullable();
+            $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->after('account_id')->nullable();
             $table->date('post_date')->after('type_sales')->nullable();
             $table->date('valid_date')->after('post_date')->nullable();
@@ -31,8 +31,7 @@ return new class extends Migration
             $table->string('document_no',155)->after('document')->nullable();
             $table->bigInteger('subdistrict_id')->after('city_id')->nullable();
 
-            $table->index(['user_id','place_id','account_id','company_id','sender_id','province_id','city_id','subdistrict_id','sales_id','currency_id'],'marketing_order_index');
-        });
+             });
     }
 
     /**

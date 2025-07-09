@@ -14,8 +14,8 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
     <title>Lupa Password | Superior Porcelain Sukses</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- BEGIN: VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/vendors.min.css') }}">
@@ -105,7 +105,7 @@
 					$('#password').attr('type', 'password');
 				}
 			});
-			
+
 			$("#reset_form").submit(function(event) {
 				event.preventDefault();
                 $.ajax({

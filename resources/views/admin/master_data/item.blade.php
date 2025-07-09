@@ -131,42 +131,9 @@
                                                 <div class="input-field col s12">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
                                                         @foreach($group->whereNull('parent_id') as $c)
-                                                            @if(!$c->childSub()->exists())
-                                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                                            @else
-                                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                                                @foreach($c->childSub as $bc)
-                                                                    @if(!$bc->childSub()->exists())
-                                                                        <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                                    @else
-                                                                        <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                                            @foreach($bc->childSub as $bcc)
-                                                                                @if(!$bcc->childSub()->exists())
-                                                                                    <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                                                @else
-                                                                                    <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                                        @foreach($bcc->childSub as $bccc)
-                                                                                            @if(!$bccc->childSub()->exists())
-                                                                                                <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                                            @else
-                                                                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                                    @foreach($bccc->childSub as $bcccc)
-                                                                                                        @if(!$bcccc->childSub()->exists())
-                                                                                                            <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                                        @endif
-                                                                                                    @endforeach
-                                                                                                </optgroup>
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </optgroup>
-                                                                                @endif
-                                                                            @endforeach
-                                                                        </optgroup>
-                                                                    @endif
-                                                                @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                    @endforeach
+                                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
@@ -234,8 +201,6 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
-                                                        <th>Nama Asing</th>
-                                                        <th>Nama Print</th>
                                                         <th>Grup</th>
                                                         <th>UOM</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -339,43 +304,6 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12 row">
-                        <div class="input-field col s12 m12" id="item-sale-show" style="display:none;border:solid red 3px;border-radius:30px;">
-                            <div class="card-alert card green">
-                                <div class="card-content white-text">
-                                    <p>Info : Kode & nama item akan otomatis terbuat dari gabungan komposisi kode & nama master data dibawah ini.</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="type_id" name="type_id" onchange="generateCode();"></select>
-                                    <label class="active" for="type_id">Group</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="size_id" name="size_id" onchange="generateCode();"></select>
-                                    <label class="active" for="size_id">Ukuran</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="variety_id" name="variety_id" onchange="generateCode();"></select>
-                                    <label class="active" for="variety_id">Jenis</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
-                                    <label class="active" for="brand_id">{{ __('translations.brand') }}</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
-                                    <label class="active" for="pattern_id">Motif & Warna</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="pallet_id" name="pallet_id" onchange="generateCode();"></select>
-                                    <label class="active" for="pallet_id">Palet</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="grade_id" name="grade_id" onchange="generateCode();"></select>
-                                    <label class="active" for="grade_id">Grade</label>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col s12 m8 row">
                             <div class="input-field col s12 m4">
                                 <input type="hidden" id="temp" name="temp">
@@ -386,12 +314,9 @@
                                 <input id="name" name="name" type="text" placeholder="Nama Item">
                                 <label class="active" for="name">{{ __('translations.name') }}</label>
                             </div>
-                            <div class="input-field col s12 m4">
-                                <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
-                                <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
-                            </div><div class="input-field col s12 m4">
-                                <input id="print_name" name="print_name" type="text" placeholder="Nama Item saat Print">
-                                <label class="active" for="print_name">Printing {{ __('translations.name') }}</label>
+                            <div class="input-field col m4 s12">
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="generateCode();"></select>
+                                <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col s12 m4">
                                 <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
@@ -399,64 +324,11 @@
                             </div>
                             <div class="input-field col s12 m4 unit-inputs">
                                 <select class="select2 browser-default" id="item_group_id" name="item_group_id">
-                                    @foreach($group->whereNull('parent_id') as $c)
-                                            @if(!$c->childSub()->exists())
-                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                            @else
-                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                                @foreach($c->childSub as $bc)
-                                                    @if(!$bc->childSub()->exists())
-                                                        <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                    @else
-                                                        <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                            @foreach($bc->childSub as $bcc)
-                                                                @if(!$bcc->childSub()->exists())
-                                                                    <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                                @else
-                                                                    <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                        @foreach($bcc->childSub as $bccc)
-                                                                            @if(!$bccc->childSub()->exists())
-                                                                                <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                            @else
-                                                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                    @foreach($bccc->childSub as $bcccc)
-                                                                                        @if(!$bcccc->childSub()->exists())
-                                                                                            <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </optgroup>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </optgroup>
-                                                                @endif
-                                                            @endforeach
-                                                        </optgroup>
-                                                    @endif
-                                                @endforeach
-                                                </optgroup>
-                                            @endif
+                                    @foreach($group as $c)
+                                        <option value="{{ $c->id }}"> - {{ $c->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="active" for="item_group_id">Grup Item</label>
-                            </div>
-                            <div class="input-field col s12 m4">
-                                <select class="browser-default" id="bom_calculator_id" name="bom_calculator_id"></select>
-                                <label class="active" for="bom_calculator_id">Link Bom Calculator (Jika ada untuk FG)</label>
-                            </div>
-                            <div class="input-field col s12 m4">
-                                <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
-                                <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
-                            </div>
-                            <div class="input-field col s12 m4">
-                                <div class="switch mb-1">
-                                    <label for="is_hide_supplier">Item Top Secret</label>
-                                    <label class="right">
-                                        {{ __('translations.no') }}
-                                        <input type="checkbox" id="is_hide_supplier" name="is_hide_supplier" value="1">
-                                        <span class="lever"></span>
-                                        {{ __('translations.yes') }}
-                                    </label>
-                                </div>
                             </div>
                             <div class="input-field col s12 m4">
                                 <div class="switch mb-1">
@@ -504,28 +376,6 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
-                                <div class="switch">
-                                    <label for="is_service">Item untuk Service</label>
-                                    <label class="right">
-                                        {{ __('translations.no') }}
-                                        <input type="checkbox" id="is_service" name="is_service" value="1">
-                                        <span class="lever"></span>
-                                        {{ __('translations.yes') }}
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
-                                <div class="switch">
-                                    <label for="is_production">Item untuk Produksi</label>
-                                    <label class="right">
-                                        {{ __('translations.no') }}
-                                        <input type="checkbox" id="is_production" name="is_production" value="1">
-                                        <span class="lever"></span>
-                                        {{ __('translations.yes') }}
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                         <div class="col s12 m7 row">
                             <div class="col s12">
@@ -541,27 +391,23 @@
                             </div>
                             <div class="col s12">
                                 <div class="center">
-                                    <h6>Satuan Konversi</h6>
+                                    <h6>Item Jual</h6>
                                 </div>
                                 <table class="bordered">
                                     <thead>
                                         <tr>
-                                            <th class="center" width="10%">{{ __('translations.unit') }}</th>
-                                            <th class="center">{{ __('translations.conversion') }}</th>
-                                            <th class="center">{{ __('translations.sell') }}</th>
-                                            <th class="center">{{ __('translations.buy') }}</th>
-                                            <th class="center">{{ __('translations.default') }}</th>
-                                            <th class="center">{{ __('translations.delete') }}</th>
+                                            <th class="center" width="50%">Item Jual</th>
+                                            <th class="center">Hapus</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-unit">
                                         <tr id="empty-unit">
-                                            <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
+                                            <td colspan="2" class="center">Silahkan tambahkan item Jual</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="6" class="center">
+                                            <th colspan="2" class="center">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addUnit();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah
                                                 </a>
@@ -569,63 +415,6 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-                            </div>
-                        </div>
-                        <div class="col s12 m5">
-                            <div class="center">
-                                <h6>Stok Buffer (Satuan Stok/terkecil)</h6>
-                            </div>
-                            <table class="bordered">
-                                <thead>
-                                    <tr>
-                                        <th class="center">{{ __('translations.plant') }}</th>
-                                        <th class="center">{{ __('translations.minimum_stock') }}</th>
-                                        <th class="center">{{ __('translations.maximum_stock') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-buffer">
-                                    @foreach($place as $row)
-                                        <input name="arr_place_buffer[]" type="hidden" value="{{ $row->id }}">
-                                        <td>
-                                            {{ $row->code }}
-                                        </td>
-                                        <td>
-                                            <input name="arr_min_buffer[]" id="arr_min_buffer{{ $row->id }}" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this)">
-                                        </td>
-                                        <td>
-                                            <input name="arr_max_buffer[]" id="arr_max_buffer{{ $row->id }}" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this)">
-                                        </td>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                            <br>
-                            <hr>
-                            <div class="center mt-3">
-                                <h6>Isi jika ada pengecekan QC & Link Timbangan</h6>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s12 m12">
-                                    <div class="switch">
-                                        <label for="is_quality_check">{{ __('translations.quality_check') }}</label>
-                                        <label class="right">
-                                            {{ __('translations.no') }}
-                                            <input type="checkbox" id="is_quality_check" name="is_quality_check" value="1" onclick="showQcParameter();">
-                                            <span class="lever"></span>
-                                            {{ __('translations.yes') }}
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="input-field col s12 m12">
-                                    <div class="switch mb-1">
-                                        <label for="qty_good_scale">Qty GRPO dari Timbangan?</label>
-                                        <label class="right">
-                                            {{ __('translations.no') }}
-                                            <input type="checkbox" id="qty_good_scale" name="qty_good_scale" value="1">
-                                            <span class="lever"></span>
-                                            {{ __('translations.yes') }}
-                                        </label>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -894,7 +683,7 @@
                 $('.unit-inputs').css('pointer-events','auto');
                 $("#item_group_id").val($("#item_group_id option:first").val()).trigger('change');
                 $('#temp').val('');
-                $('#code,#name,#other_name').prop('readonly',false);
+                $('#code,#name').prop('readonly',false);
                 $('#body-parameter').empty().append(`
                     <tr id="empty-parameter">
                         <td colspan="4" class="center">Silahkan tambahkan parameter</td>
@@ -945,6 +734,7 @@
         });
 
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
+        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier_store") }}');
         select2ServerSide('#size_id', '{{ url("admin/select2/size") }}');
         select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
         select2ServerSide('#bom_calculator_id', '{{ url("admin/select2/bom_calculator") }}');
@@ -995,7 +785,7 @@
             if($('.row_unit').length == 0){
                 $('#body-unit').append(`
                     <tr id="empty-unit">
-                        <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
+                        <td colspan="2" class="center">Silahkan tambahkan item Jual</td>
                     </tr>
                 `);
             }
@@ -1053,40 +843,11 @@
         if($('#empty-unit').length > 0){
             $('#empty-unit').remove();
         }
-        let unit = $("#uom_unit").select2().find(":selected").data("code") ? $("#uom_unit").select2().find(":selected").data("code") : '-';
         let count = makeid(10);
         $('#body-unit').append(`
             <tr class="row_unit">
                 <td class="unit-inputs">
-                    <select class="select2 browser-default" id="arr_unit` + count + `" name="arr_unit[]">
-                        @foreach ($unit as $row)
-                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="unit-inputs">
-                    <div class="input-field">
-                        <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
-                        <div class="form-control-feedback stock-unit">` + unit + `</div>
-                    </div>
-                </td>
-                <td class="center-align unit-inputs">
-                    <label>
-                        <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1">
-                        <span>&nbsp;</span>
-                    </label>
-                </td>
-                <td class="center-align unit-inputs">
-                    <label>
-                        <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1">
-                        <span>&nbsp;</span>
-                    </label>
-                </td>
-                <td class="center-align unit-inputs">
-                    <label>
-                        <input type="radio" id="arr_default` + count + `" name="arr_default" value="1">
-                        <span>&nbsp;</span>
-                    </label>
+                    <select class="browser-default item-array" id="arr_item_conversion` + count + `" name="arr_item_conversion[]" data-id="` + count + `"></select>
                 </td>
                 <td class="center-align unit-inputs">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
@@ -1095,10 +856,12 @@
                 </td>
             </tr>
         `);
-        $('select[name="arr_unit[]"]').select2({
+
+        $('select[name="arr_item_conversion[]"]').select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
+        select2ServerSideLonger('#arr_item_conversion' + count, '{{ url("admin/select2/sales_item") }}');
     }
 
     function getUnitStock(){
@@ -1188,35 +951,10 @@
     function generateCode(){
         arrCode = [];
         arrName = [];
-        if($('#type_id').val() || $('#size_id').val() || $('#variety_id').val() || $('#pattern_id').val() || $('#pallet_id').val() || $('#grade_id').val() || $('#brand_id').val()){
-            if($('#type_id').val()){
-                arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code"));
-                arrName.push($('#type_id').select2('data')[0].name ? $('#type_id').select2('data')[0].name : $('#type_id').find(":selected").data("name"));
-            }
-            if($('#size_id').val()){
-                arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));
-                arrName.push($('#size_id').select2('data')[0].name ? $('#size_id').select2('data')[0].name : $('#size_id').find(":selected").data("name"));
-            }
-            if($('#variety_id').val()){
-                arrCode.push($('#variety_id').select2('data')[0].code ? $('#variety_id').select2('data')[0].code : $('#variety_id').find(":selected").data("code"));
-                arrName.push($('#variety_id').select2('data')[0].name ? $('#variety_id').select2('data')[0].name : $('#variety_id').find(":selected").data("name"));
-            }
-            if($('#pattern_id').val()){
-                let pattern_code = $('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code.split('.') : $('#pattern_id').find(":selected").data("code").split('.');
-                arrCode.push(pattern_code[1]);
-                arrName.push($('#pattern_id').select2('data')[0].name ? $('#pattern_id').select2('data')[0].name : $('#pattern_id').find(":selected").data("name"));
-            }
-            if($('#pallet_id').val()){
-                arrCode.push($('#pallet_id').select2('data')[0].code ? $('#pallet_id').select2('data')[0].code : $('#pallet_id').find(":selected").data("code"));
-                arrName.push($('#pallet_id').select2('data')[0].name ? $('#pallet_id').select2('data')[0].name : $('#pallet_id').find(":selected").data("name"));
-            }
-            if($('#grade_id').val()){
-                arrCode.push($('#grade_id').select2('data')[0].code ? $('#grade_id').select2('data')[0].code : $('#grade_id').find(":selected").data("code"));
-                arrName.push($('#grade_id').select2('data')[0].name ? $('#grade_id').select2('data')[0].name : $('#grade_id').find(":selected").data("name"));
-            }
-            if($('#brand_id').val()){
-                arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
-                arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
+        if($('#supplier_id').val() ){
+            if($('#supplier_id').val()){
+                arrCode.push($('#supplier_id').select2('data')[0].code ? $('#supplier_id').select2('data')[0].code : $('#supplier_id').find(":selected").data("code"));
+                arrName.push($('#supplier_id').select2('data')[0].name ? $('#supplier_id').select2('data')[0].name : $('#supplier_id').find(":selected").data("name"));
             }
             let newCode = arrCode.join('.');
             let newName = arrName.join(' ');
@@ -1336,8 +1074,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
-                { name: 'other_name', className: '' },
-                { name: 'other_name', className: '' },
                 { name: 'group', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1646,8 +1382,6 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#other_name').val(response.other_name);
-                $('#print_name').val(response.print_name);
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit_id).trigger('change');
@@ -1666,24 +1400,12 @@
                 }else{
                     $('#is_quality_check').prop( "checked", false);
                 }
-
-                if(response.qty_good_scale == '1'){
-                    $('#qty_good_scale').prop( "checked", true);
-                }else{
-                    $('#qty_good_scale').prop( "checked", false);
-                }
-
-                if(response.is_hide_supplier == '1'){
-                    $('#is_hide_supplier').prop( "checked", true);
-                }else{
-                    $('#is_hide_supplier').prop( "checked", false);
-                }
-
-                if(response.bom_calculator_data){
-                    $('#bom_calculator_id').empty().append(`
-                        <option value="` + response.bom_calculator_id + `">` + response.bom_calculator_data + `</option>
+                if(response.supplier_name){
+                    $('#supplier_id').empty().append(`
+                        <option value="` + response.supplier_id + `" data-code="` + response.supplier_code + `" data-name="` + response.supplier_name + `">`+ response.supplier_code +`-`+ response.supplier_name + `</option>
                     `);
                 }
+
 
                 if(response.is_sales_item == '1'){
                     $('#is_sales_item').trigger('click');
@@ -1732,17 +1454,6 @@
                     $('#is_purchase_item').prop( "checked", false);
                 }
 
-                if(response.is_service == '1'){
-                    $('#is_service').prop( "checked", true);
-                }else{
-                    $('#is_service').prop( "checked", false);
-                }
-
-                if(response.is_production == '1'){
-                    $('#is_production').prop( "checked", true);
-                }else{
-                    $('#is_production').prop( "checked", false);
-                }
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
@@ -1750,51 +1461,18 @@
                     $('#status').prop( "checked", false);
                 }
 
-                if(response.buffers.length > 0){
-                    $.each(response.buffers, function(i, val) {
-                        $('#arr_min_buffer' + val.place_id).val(val.min_stock);
-                        $('#arr_max_buffer' + val.place_id).val(val.max_stock);
-                    });
-                }
 
                 if(response.units.length > 0){
                     $('#body-unit').empty();
 
                     $.each(response.units, function(i, val) {
-                        let unit = response.uom_code;
                         let count = makeid(10);
                         $('#body-unit').append(`
                             <tr class="row_unit">
                                 <td class="unit-inputs">
-                                    <select class="select2 browser-default" id="arr_unit` + count + `" name="arr_unit[]">
-                                        @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
+                                    <select class="select2 browser-default" id="arr_item_conversion` + count + `" name="arr_item_conversion[]">
+
                                     </select>
-                                </td>
-                                <td class="unit-inputs">
-                                    <div class="input-field">
-                                        <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="` + val.conversion + `" onkeyup="formatRupiahNoMinus(this)">
-                                        <div class="form-control-feedback stock-unit">` + unit + `</div>
-                                    </div>
-                                </td>
-                                <td class="center-align unit-inputs">
-                                    <label>
-                                        <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1" ` + (val.is_sell_unit ? 'checked' : '' ) + `>
-                                        <span>&nbsp;</span>
-                                    </label>
-                                </td>
-                                <td class="center-align unit-inputs">
-                                    <label>
-                                        <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1" ` + (val.is_buy_unit ? 'checked' : '' ) + `>
-                                        <span>&nbsp;</span>
-                                    </label>
-                                </td>
-                                <td class="center-align unit-inputs">
-                                    <label>
-                                        <input type="radio" id="arr_default` + count + `" name="arr_default" value="1" ` + (val.is_default ? 'checked' : '' ) + `>
-                                        <span>&nbsp;</span>
-                                    </label>
                                 </td>
                                 <td class="center-align unit-inputs">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
@@ -1807,12 +1485,14 @@
                             dropdownAutoWidth: true,
                             width: '100%',
                         });
-                        $('#arr_unit' + count).val(val.unit_id).trigger('change');
+                        $('#arr_item_conversion' + count).empty().val(val.unit_id).append(`
+                            <option value="` + val.item_child_id + `" >` + response.item_child_name + `</option>
+                        `);
                     });
                 }
 
                 if(response.used){
-                    $('#code,#name,#other_name').prop('readonly',true);
+                    $('#code,#name').prop('readonly',true);
                     $('.unit-inputs').css('pointer-events','none');
                 }
 

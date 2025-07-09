@@ -81,11 +81,6 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
-                                                        <th>{{ __('translations.parent') }}</th>
-                                                        <th>Coa</th>
-                                                        <th>{{ __('translations.warehouse') }}</th>
-                                                        <th>Item Hasil Produksi</th>
-                                                        <th>Item Aktiva</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -122,64 +117,6 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama Group">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <select class="select2 browser-default" id="parent_id" name="parent_id" onchange="getCoaParent();">
-                                <option value="">Parent (Utama)</option>
-                                @foreach($parent as $m)
-                                    <option value="{{ $m->id }}" data-coa="{{ $m->coa_id }}">{{ $m->name }}</option>
-                                    @foreach($m->childSub as $m2)
-                                        <option value="{{ $m2->id }}" data-coa="{{ $m2->coa_id }}"> - {{ $m2->name }}</option>
-                                        @foreach($m2->childSub as $m3)
-                                            <option value="{{ $m3->id }}" data-coa="{{ $m3->coa_id }}"> - - {{ $m3->name }}</option>
-                                            @foreach($m3->childSub as $m4)
-                                                <option value="{{ $m4->id }}" data-coa="{{ $m4->coa_id }}"> - - - {{ $m4->name }}</option>
-                                            @endforeach
-                                        @endforeach
-                                    @endforeach
-                                @endforeach
-                            </select>
-                            <label class="active" for="parent_id">Parent Menu</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <select class="select2 browser-default" id="coa_id" name="coa_id">
-                                <option value="">-- Kosong --</option>
-                                @foreach($coa as $c)
-                                    <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="active" for="coa_id">Coa</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <select class="select2 browser-default" multiple="multiple" id="warehouse_id" name="warehouse_id[]">
-                                @foreach ($warehouse as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="active" for="warehouse_id">{{ __('translations.warehouse') }}</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <select class="browser-default" id="production_type" name="production_type">
-                                <option value="">Bukan Hasil Produksi</option>
-                                <option value="1">SFG-1</option>
-                                <option value="2">SFG-2</option>
-                                <option value="3">SFG-3</option>
-                                <option value="4">SFG-4</option>
-                                <option value="5">SFG-5</option>
-                                <option value="6">FG</option>
-                            </select>
-                            <label class="active" for="production_type">Item Hasil Produksi</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <div class="switch mb-1">
-                                <label for="is_activa">Item Aktiva</label>
-                                <label>
-                                    Tidak
-                                    <input type="checkbox" id="is_activa" name="is_activa" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -219,13 +156,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -240,17 +177,17 @@
     });
     $(function() {
         loadDataTable();
-        
+
         $('#datatable_serverside').on('click', 'button', function(event) {
-            event.stopPropagation();     
+            event.stopPropagation();
         });
 
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -316,11 +253,6 @@
                 { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: '' },
-                { name: 'parent', className: '' },
-                { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'production_type', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'is_activa', orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -360,9 +292,9 @@
 	}
 
     function save(){
-			
+
         var formData = new FormData($('#form_data')[0]);
-        
+
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -395,7 +327,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -456,7 +388,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
@@ -538,7 +470,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -546,7 +478,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -556,9 +488,9 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-           
+
         });
-        
+
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -577,8 +509,8 @@
                     'type': 'INVOICE',
                     'url': response.message
                 })
-                
-               
+
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -595,7 +527,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        
+
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

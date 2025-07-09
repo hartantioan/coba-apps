@@ -1,7 +1,7 @@
     <!-- BEGIN: Header-->
     <header class="page-topbar" id="header">
         <div class="navbar navbar-fixed" style="z-index:9999;">
-            <nav class="navbar-main navbar-color nav-collapsible sideNav-lock navbar-dark gradient-45deg-indigo-purple no-shadow" style="background: linear-gradient(45deg, #e19e4b, #6d2b17d8) !important;">
+            <nav class="navbar-main navbar-color nav-collapsible sideNav-lock navbar-dark gradient-45deg-indigo-purple no-shadow" style="background: #0c0052 !important;">
                 <div class="nav-wrapper">
                     <div class="header-search-wrapper hide-on-med-and-down">
                         <i class="material-icons">search</i>

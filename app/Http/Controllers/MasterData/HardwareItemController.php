@@ -617,7 +617,7 @@ class HardwareItemController extends Controller
             $data = [
                 'data' => $RH,
             ];
-            $img_path = 'website/logo_web_small.png';
+            $img_path = 'website/logo_web_small1.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
             $img_base_64 = base64_encode($image_temp);
@@ -665,7 +665,7 @@ class HardwareItemController extends Controller
                     "verify_peer_name"=>false,
                     ),
                 );
-                $img_path = 'website/logo_web_small.png';
+                $img_path = 'website/logo_web_small1.png';
                 $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                 $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
                 $img_base_64 = base64_encode($image_temp);
@@ -738,7 +738,7 @@ class HardwareItemController extends Controller
                         'title'     => 'Inventaris',
                         'data'      => $pr
                     ];
-                    $img_path = 'website/logo_web_small.png';
+                    $img_path = 'website/logo_web_small1.png';
                     $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                     $image_temp = file_get_contents($img_path);
                     $img_base_64 = base64_encode($image_temp);

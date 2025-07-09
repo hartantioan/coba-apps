@@ -3,7 +3,7 @@
 <!-- BEGIN: Head-->
 
 <head>
-    
+
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -15,8 +15,8 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
     <title>{{ env('APP_NAME') }} | {{ $title }}</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <!-- BEGIN: VENDOR CSS-->
@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=20') }}" type="text/css">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=8') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=9') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=9') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=8') }}">

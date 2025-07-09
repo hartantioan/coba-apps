@@ -20,8 +20,7 @@ return new class extends Migration
             $table->decimal('percent_discount_2', 20, 5)->change();
             $table->decimal('discount_3', 20, 5)->change();
             $table->decimal('subtotal', 20, 5)->change();
-            $table->decimal('percent_wtax', 20, 5)->change();
-          
+
             $table->decimal('tax', 20, 5)->change();
             $table->decimal('wtax', 20, 5)->change();
             $table->decimal('grandtotal', 20, 5)->change();

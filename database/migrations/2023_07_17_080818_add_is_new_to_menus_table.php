@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('menus', function (Blueprint $table) {
-            $table->char('is_new',1)->after('is_maintenance')->nullable();
+            $table->char('is_new',1)->nullable();
         });
     }
 

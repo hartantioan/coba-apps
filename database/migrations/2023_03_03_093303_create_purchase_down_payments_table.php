@@ -43,8 +43,10 @@ return new class extends Migration
             $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
-
-            $table->index(['user_id', 'account_id', 'company_id', 'tax_id', 'currency_id']);
+            $table->index(
+                ['user_id', 'account_id', 'company_id', 'tax_id', 'currency_id'],
+                'idx_user_acc_comp_tax_curr'
+            );
         });
     }
 

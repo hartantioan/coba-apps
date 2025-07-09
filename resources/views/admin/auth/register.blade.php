@@ -14,8 +14,8 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
     <title>Register | Superior Porcelain Sukses</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- BEGIN: VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/vendors.min.css') }}">
@@ -191,7 +191,7 @@
 					$('#password, #password_confirm').attr('type', 'password');
 				}
 			});
-			
+
 			$("#register_form").submit(function(event) {
 				event.preventDefault();
                 let formData = new FormData($('#register_form')[0]);
@@ -213,7 +213,7 @@
                             $('#validation_alert_form').html('');
                         },
                         success: function(response) {
-                            if(response.status == 200) {				
+                            if(response.status == 200) {
                                 swal({
                                     title: 'Success',
                                     text: response.message,
@@ -223,7 +223,7 @@
                                 });
                             } else if(response.status == 422) {
                                 $('#validation_alert_form').show();
-                                
+
                                 swal({
                                     title: 'Ups! Validation',
                                     text: 'Check your form.',
@@ -245,11 +245,11 @@
                                     });
                                 });
                             } else {
-                            
+
                             }
                         },
                         error: function() {
-                            
+
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',
@@ -288,7 +288,7 @@
                     },
                     success: function(response) {
                         loadingClose('body');
-                        if(response.status == 200) {				
+                        if(response.status == 200) {
                             swal({
                                 title: 'Success',
                                 text: response.message,
@@ -298,7 +298,7 @@
                             });
                         } else if(response.status == 422) {
                             $('#validation_alert_upload').show();
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -320,7 +320,7 @@
                                 });
                             });
                         } else {
-                        
+
                         }
                     },
                     error: function() {

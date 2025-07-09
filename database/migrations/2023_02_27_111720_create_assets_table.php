@@ -33,7 +33,11 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'branch_id', 'plant_id', 'department_id', 'item_id', 'cost_coa_id']);
+            $table->index(
+                ['user_id', 'branch_id', 'plant_id', 'department_id', 'item_id', 'cost_coa_id'],
+                'idx_user_branch_plant_dept_item_costcoa'
+            );
+
         });
     }
 

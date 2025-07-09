@@ -49,7 +49,11 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'supplier_id', 'place_id', 'department_id','currency_id']);
+            $table->index(
+                ['user_id', 'supplier_id', 'place_id', 'department_id', 'currency_id'],
+                'po_user_supplier_place_dept_curr_idx'
+            );
+
         });
     }
 

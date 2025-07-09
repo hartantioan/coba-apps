@@ -16,7 +16,7 @@
                 <table id="table_reminder" >
                     <thead>
                         <tr>
-                            
+
                             <th>{{ __('translations.name') }}</th>
                             <th>{{ __('translations.note') }}</th>
                             <th>Tanggal Mulai</th>
@@ -29,8 +29,8 @@
                     </thead>
                     <tbody id="body-reminder"></tbody>
                 </table>
-               
-            
+
+
         </div>
     </div>
     <div class="modal-footer" style="background: #fee13e">
@@ -42,27 +42,27 @@
     $('#modal_reminder').modal({
         dismissible: false,
         onOpenStart: function(modal,trigger) {
-            
+
         },
-        onOpenEnd: function(modal, trigger) { 
+        onOpenEnd: function(modal, trigger) {
             $('#name').focus();
             $('#validation_alert').hide();
             $('#validation_alert').html('');
             M.updateTextFields();
         },
         onCloseEnd: function(modal, trigger){
-           
-       
+
+
             M.updateTextFields();
         }
     });
     let reminder = {!! json_encode(session('bo_reminder')) !!};
     if (reminder!=null && Array.isArray(reminder) && reminder.length > 0) {
-        
+
         loadDataTableReminder();
         $('#modal_reminder').modal('open');
     }
-   
+
  });
 
  function loadDataTableReminder(){
@@ -83,7 +83,7 @@
             if(response.length > 0){
                 console.log(response);
                 $.each(response, function(i, val) {
-                    
+
                     $('#body-reminder').append(`
                         <tr>
                             <td>` + val.name + `</td>
@@ -105,7 +105,7 @@
                 scrollCollapse: true,
                 "iDisplayInLength": 10,
                 dom: 'Blfrtip',
-              
+
                 "language": {
                     "lengthMenu": "Menampilkan _MENU_ data per halaman",
                     "zeroRecords": "Data tidak ditemukan / kosong",
@@ -119,11 +119,11 @@
                         next:       ">",
                         last:       ">>"
                     },
-                    
-                    
+
+
                 },
-                
-              
+
+
             });
             $('#table_reminder_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
             $('select[name="table_reminder_length"]').addClass('browser-default');
@@ -138,13 +138,13 @@
             });
         }
     });
-    
+
  }
 
 function show_one_time(id){
     var baseUrl = window.location.origin;
     var redirectUrl = baseUrl + "/admin/personal/task?code=" + id;
-    window.location.href = redirectUrl;    
+    window.location.href = redirectUrl;
 }
 function destroy_one_time(id){
     swal({
@@ -197,10 +197,10 @@ document.addEventListener('DOMContentLoaded', function() {
         fixedActionBtn.style.left = `calc(${sidenavWidth}px + 19px)`;
     }
 
-    
+
     adjustButtonPosition();
 
-   
+
     window.addEventListener('resize', adjustButtonPosition);
 
 

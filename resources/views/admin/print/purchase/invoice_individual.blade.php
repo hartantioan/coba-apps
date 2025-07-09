@@ -42,15 +42,10 @@
 
 
 
-            @media only screen and (max-width : 768px) {
-                .invoice-print-area {
-                    zoom:0.4;
-                }
-            }
 
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
-                    zoom:0.6;
+
                     font-size:9px !important;
                 }
 
@@ -102,7 +97,6 @@
 
                 body {
                     background-color:white !important;
-                    zoom:0.8;
                 }
 
                 .modal {
@@ -157,7 +151,10 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
+            @page {
+                margin: 10px;
+            }
+
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
 
 

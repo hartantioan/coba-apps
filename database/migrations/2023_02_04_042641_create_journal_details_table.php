@@ -32,7 +32,11 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['journal_id', 'coa_id', 'place_id', 'line_id', 'account_id', 'item_id', 'department_id', 'warehouse_id', 'type']);
+            $table->index(
+                ['journal_id', 'coa_id', 'place_id', 'line_id', 'account_id', 'item_id', 'department_id', 'warehouse_id', 'type'],
+                'journal_coa_place_line_idx'
+            );
+
         });
     }
 

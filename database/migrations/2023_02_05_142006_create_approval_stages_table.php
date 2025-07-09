@@ -24,8 +24,11 @@ return new class extends Migration
             $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+            $table->index(
+                ['approval_id', 'user_id'],
+                'approval_id_user_id'
+            );
 
-            $table->index(['approval_id', 'user_id']);
         });
     }
 

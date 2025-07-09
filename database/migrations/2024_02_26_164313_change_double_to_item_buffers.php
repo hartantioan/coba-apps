@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('item_buffers', function (Blueprint $table) {
-            $table->decimal('min_stock', 20, 5)->change();
-            $table->decimal('max_stock', 20, 5)->change();
-        });
+
     }
 
     /**

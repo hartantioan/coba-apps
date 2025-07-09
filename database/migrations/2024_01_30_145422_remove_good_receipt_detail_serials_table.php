@@ -11,7 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::drop('good_receipt_detail_serials');
     }
 
     /**

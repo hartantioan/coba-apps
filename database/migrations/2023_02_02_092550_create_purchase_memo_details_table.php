@@ -24,7 +24,6 @@ return new class extends Migration
             $table->bigInteger('tax_id')->nullable();
             $table->bigInteger('wtax_id')->nullable();
             $table->double('percent_tax')->nullable();
-            $table->double('percent_wtax')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('wtax')->nullable();
@@ -32,7 +31,10 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_memo_id', 'lookable_id', 'coa_debit_id']);
+            $table->index(
+                ['user_id', 'company_id', 'lookable_type', 'lookable_id', 'currency_id'],
+                'journal_user_company_look_curr_idx'
+            );
         });
     }
 

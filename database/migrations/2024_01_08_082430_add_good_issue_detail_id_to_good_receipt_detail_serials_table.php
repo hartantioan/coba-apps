@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('good_receipt_detail_serials', function (Blueprint $table) {
-            $table->bigInteger('good_issue_detail_id')->nullable()->after('serial_number')->index();
-        });
+
     }
 
     /**

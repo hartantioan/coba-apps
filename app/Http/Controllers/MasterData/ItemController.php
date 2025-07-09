@@ -41,8 +41,11 @@ use App\Exports\ExportItem;
 use App\Imports\ImportItemMaster;
 use App\Models\BomCalculator;
 use App\Models\ItemBuffer;
+use App\Models\ItemConversion;
 use App\Models\ItemQcParameter;
+use App\Models\ItemStockNew;
 use App\Models\ItemUnit;
+use App\Models\StoreItemStock;
 use App\Models\User;
 
 class ItemController extends Controller
@@ -105,7 +108,6 @@ class ItemController extends Controller
             'id',
             'code',
             'name',
-            'other_name',
             'item_group_id',
             'uom_unit',
         ];
@@ -122,8 +124,7 @@ class ItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('other_name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%");
                     });
                 }
 
@@ -174,8 +175,7 @@ class ItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('other_name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%");
                     });
                 }
 
@@ -224,15 +224,12 @@ class ItemController extends Controller
             foreach($query_data as $val) {
 				$btnShading = $val->is_sales_item ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light '.($val->itemShading()->exists() ? 'green' : 'amber darken-3').' accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item : '.count($val->itemShading).'" onclick="shading(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">devices_other</i></button>' : '';
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
+                    $nomor,
                     $val->code,
                     $val->name??'',
-                    $val->other_name??'',
-                    $val->print_name??'',
                     $val->itemGroup->name??'',
                     $val->uomUnit->code??'',
                     $val->status(),
-                    $btnShading.
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-text btn-small" data-popup="tooltip" title="Document Relasi" onclick="documentRelation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">device_hub</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -260,33 +257,16 @@ class ItemController extends Controller
     public function create(Request $request){
 
         $validation = Validator::make($request->all(), [
-            'code'			    => $request->temp ? ['required', Rule::unique('items', 'code')->ignore($request->temp), 'uppercase'] : 'required|unique:items,code|uppercase',
+            'code'			    => $request->temp ? ['required', Rule::unique('items', 'code')->ignore($request->temp)] : 'required|unique:items,code|uppercase',
             'name'              => 'required|uppercase',
-            'item_group_id'     => 'required',
             'uom_unit'          => 'required',
-            'arr_unit'          => 'required',
-            'arr_conversion'    => 'required',
-            'tolerance_gr'      => 'required',
-            'arr_place_buffer'  => 'required',
-            'arr_min_buffer'    => 'required|array',
-            'arr_max_buffer'    => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
             'code.uppercase'            => 'Kode harus huruf capital',
             'name.required'             => 'Nama tidak boleh kosong',
             'name.uppercase'            => 'Nama harus huruf capital',
-            'item_group_id.required'    => 'Grup item tidak boleh kosong.',
             'uom_unit.required'         => 'Satuan stok & produksi tidak boleh kosong.',
-            'arr_unit.required'         => 'Satuan konversi tidak boleh kosong.',
-            'arr_conversion.required'   => 'Nilai konversi tidak boleh kosong.',
-            'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
-            'arr_place_buffer.required' => 'Buffer stock tidak boleh kosong.',
-            'arr_place_buffer.array'    => 'Buffer stock harus array.',
-            'arr_min_buffer.required'   => 'Buffer min stock tidak boleh kosong.',
-            'arr_min_buffer.array'      => 'Buffer min stock harus array.',
-            'arr_max_buffer.required'   => 'Buffer max stock tidak boleh kosong.',
-            'arr_max_buffer.array'      => 'Buffer max stock harus array.',
         ]);
 
         if($validation->fails()) {
@@ -295,39 +275,6 @@ class ItemController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-            $passedDefaultUnit = false;
-            $passedBufferStock = true;
-
-            foreach($request->arr_place_buffer as $key => $row){
-                if(!$request->arr_min_buffer[$key]){
-                    $passedBufferStock = false;
-                }
-
-                if(!$request->arr_max_buffer[$key]){
-                    $passedBufferStock = false;
-                }
-            }
-
-            foreach($request->arr_default as $key => $row){
-                if($row){
-                    $passedDefaultUnit = true;
-                }
-            }
-
-            if(!$passedDefaultUnit){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf default satuan konversi harus ditentukan.'
-                ]);
-            }
-
-            if(!$passedBufferStock){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf buffer stock harus diisi.'
-                ]);
-            }
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -341,67 +288,26 @@ class ItemController extends Controller
                     } */
                     $query->code                = $request->code;
                     $query->name                = $request->name;
-                    $query->other_name          = $request->other_name;
                     $query->item_group_id       = $request->item_group_id;
                     $query->uom_unit            = $request->uom_unit;
-                    $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
-                    $query->is_production       = $request->is_production ? $request->is_production : NULL;
                     $query->note                = $request->note;
+                    $query->supplier_id                = $request->supplier_id ?? null;
                     $query->status              = $request->status ? $request->status : '2';
-                    $query->is_quality_check    = $request->is_quality_check ?? NULL;
-                    $query->is_hide_supplier    = $request->is_hide_supplier ?? NULL;
-                    $query->is_reject           = $request->is_reject ?? NULL;
-                    $query->type_id             = $request->type_id ? $request->type_id : NULL;
-                    $query->size_id             = $request->size_id ? $request->size_id : NULL;
-                    $query->variety_id          = $request->variety_id ? $request->variety_id : NULL;
-                    $query->pattern_id          = $request->pattern_id ? $request->pattern_id : NULL;
-                    $query->pallet_id           = $request->pallet_id ?? NULL;
-                    $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
-                    $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
-                    $query->bom_calculator_id   = $request->bom_calculator_id ?? NULL;
-                    $query->print_name          = $request->print_name ?? NULL;
-                    $query->qty_good_scale      = $request->qty_good_scale ?? NULL;
                     $query->save();
 
                     if($request->arr_unit){
-                        $query->itemUnit()->whereNotIn('unit_id',$request->arr_unit)->delete();
+                        $query->childConversion()->delete();
                     }
 
                     if(!$query->itemCogs()->exists()){
                         $query->itemStock()->delete();
+                        $query->itemStockNew()->delete();
                     }
-                    
-                    //FOR TKTW API Update
-                    if ($request->brand_id == 15){
-                        $payload=[
-                            "code"           => $query->code,
-                            "name"           => $query->code,
-                            "uom"            => $query->uomUnit->code,
-                            "desc"           => $query->note,
-                            "type"           => $query->type->name,
-                            "size"           => $query->size->name,
-                            "variety"        => $query->variety->name,
-                            "pattern"        => $query->pattern->name,
-                            "grade"          => $query->grade->name,
-                            "merk"           => $query->brand->name,
-                            "package"        => $query->pallet->prefix_code,
-                            "uomConvertions" => [],
-                        ];
 
-                        $query_syncdata = $query->mitraApiSyncDatas()->create([
-                            'mitra_id'  => 1411,
-                            'operation' => 'update',
-                            'payload'   => json_encode($payload),
-                            'status'    => '0',
-                            'attempts'  => 0,
-                        ]);
-
-                        // MitraApiSyncData
-                    }
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -410,83 +316,21 @@ class ItemController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                try {   
-                    $passedBomCalculator = true;
-
-                    if($request->bom_calculator_id){
-                        $bomCalculator = BomCalculator::find($request->bom_calculator_id);
-                        if($bomCalculator){
-                            if($bomCalculator->item()->exists()){
-                                $passedBomCalculator = false;
-                            }
-                            if(!$passedBomCalculator){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Bom Calculator telah selesai dan dipakai pada produk lain '.$bomCalculator->item->code.' - '.$bomCalculator->item->name,
-                                ]);
-                            }
-                        }
-                    }
-
+                try {
                     $query = Item::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,
-                        'other_name'        => $request->other_name,
                         'item_group_id'     => $request->item_group_id,
                         'uom_unit'          => $request->uom_unit,
-                        'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
-                        'is_production'     => $request->is_production ? $request->is_production : NULL,
                         'note'              => $request->note,
                         'status'            => $request->status ? $request->status : '2',
-                        'is_quality_check'  => $request->is_quality_check ?? NULL,
-                        'is_hide_supplier'  => $request->is_hide_supplier ?? NULL,
-                        'is_reject'         => $request->is_reject ?? NULL,
-                        'type_id'           => $request->type_id ?? NULL,
-                        'size_id'           => $request->size_id ?? NULL,
-                        'variety_id'        => $request->variety_id ?? NULL,
-                        'pattern_id'        => $request->pattern_id ?? NULL,
-                        'pallet_id'         => $request->pallet_id ?? NULL,
-                        'grade_id'          => $request->grade_id ?? NULL,
-                        'brand_id'          => $request->brand_id ?? NULL,
-                        'bom_calculator_id' => $request->bom_calculator_id ?? NULL,
-                        'print_name'        => $request->print_name ?? NULL,
-                        'qty_good_scale'    => $request->qty_good_scale ?? NULL,
+
                     ]);
 
-                    //FOR TKTW API Insert
-                    if ($request->brand_id == 15){
-                        // konversi default dengan dirinya sendiri
-                        // $konversi=[
-                        //     ['uomCode' => optional(Unit::where('id',$query->uom_unit)->first())->code, 'qty' => 1 ],
-                        // ];
-                        $konversi = [];
-                        $payload=[
-                            "code"           => $request->code,
-                            "name"           => $request->name,
-                            "uom"            => optional(Unit::where('id',$query->uom_unit)->first())->code,
-                            "desc"           => $request?->note ?? "-",
-                            "type"           => optional(Type::where('id',$query->type_id)->first())->name,
-                            "size"           => optional(Size::where('id',$query->size_id)->first())->name,
-                            "variety"        => optional(Variety::where('id',$query->variety_id)->first())->name,
-                            "pattern"        => optional(Pattern::where('id',$query->pattern_id)->first())->name,
-                            "grade"          => optional(Grade::where('id',$query->grade_id)->first())->name,
-                            "merk"           => optional(Brand::where('id',$query->brand_id)->first())->name,
-                            "package"        => optional(Pallet::where('id',$query->pallet_id)->first())->prefix_code,
-                            "uomConvertions" => $konversi,
-                        ];
-                        $query_syncdata = $query->mitraApiSyncDatas()->create([
-                            'mitra_id'  => 1411,
-                            'operation' => 'store',
-                            'payload'   => json_encode($payload),
-                            'status'    => '0',
-                            'attempts'  => 0,
-                        ]);
-                        Log::info($payload);
-                    }
                     DB::commit();
                 }catch(\Exception $e){
                     Log::error($e);
@@ -499,111 +343,34 @@ class ItemController extends Controller
                 $place = Place::where('status','1')->get();
 
                 if(!$request->temp){
-                    foreach($place as $row_place){
-                        foreach($query->itemGroup->itemGroupWarehouse as $rowwarehouse){
-                            ItemStock::create([
-                                'place_id'      => $row_place->id,
-                                'warehouse_id'  => $rowwarehouse->warehouse_id,
-                                'item_id'       => $query->id,
-                                'qty'           => 0
-                            ]);
-                        }
-                    }
+                    ItemStock::create([
+                        'item_id'       => $query->id,
+                        'qty'           => 0
+                    ]);
+                    $itemstocknew=ItemStockNew::create([
+                        'item_id'       => $query->id,
+                        'qty'           => 0
+                    ]);
                 }
 
-                if($request->arr_place_buffer){
-                    foreach($request->arr_place_buffer as $key => $row){
-                        $cek = ItemBuffer::where('place_id',$row)->where('item_id',$query->id)->get();
-                        if($cek->count() > 0){
-                            foreach($cek as $rowupdate){
-                                $rowupdate->update([
-                                    'min_stock' => str_replace(',','.',str_replace('.','',$request->arr_min_buffer[$key])),
-                                    'max_stock' => str_replace(',','.',str_replace('.','',$request->arr_max_buffer[$key])),
-                                ]);
-                            }
-                        }else{
-                            ItemBuffer::create([
-                                'item_id'   => $query->id,
-                                'place_id'  => $row,
-                                'min_stock' => str_replace(',','.',str_replace('.','',$request->arr_min_buffer[$key])),
-                                'max_stock' => str_replace(',','.',str_replace('.','',$request->arr_max_buffer[$key])),
-                            ]);
-                        }
-                    }
-                }
 
-                if($request->arr_unit){
-                    foreach($request->arr_unit as $key => $row){
-                        $cek2 = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->count();
-                        if($cek2 > 1){
-                            ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->delete();
-                        }
-                        $cek = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->count();
-                        if($cek == 0){
-                            ItemUnit::create([
-                                'item_id'       => $query->id,
-                                'unit_id'       => $row,
-                                'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
-                                'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
-                                'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
-                                'is_default'    => $request->arr_default[$key] ? $request->arr_default[$key] : NULL,
-                            ]);
-                            
-                            
-
-                        }else{
-                            $itemUnit = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->first();
-                            if($itemUnit){
-                                $itemUnit->update([
-                                    'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
-                                    'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
-                                    'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
-                                    'is_default'    => $request->arr_default[$key] ? $request->arr_default[$key] : NULL,
-                                ]);
-                            }
-                        }
-                    }
-
-                    if($query->brand_id == "15"){
-                        $arrItemUnit = ItemUnit::where('item_id', $query->id)->get();
-                        $itemUnit=[];
-                        foreach($arrItemUnit as $row){
-                            $itemUnit[] = [
-                                'uomCode' => $row->unit->code,
-                                'qty'     => $row->conversion,
-                            ];
-                        }
-                        
-                        //get object sync data yang baru diinput
-                        $sync_data = MitraApiSyncData::find($query_syncdata->id);
-                        $temp_payload                 = json_decode($sync_data->payload);
-                        $temp_payload->uomConvertions = $itemUnit;
-                        //save kembali konversi ke payload
-                        $sync_data->payload           = json_encode($temp_payload);
-                        $sync_data->save();
-                    }
-                }
-
-                if($request->bom_calculator_id){
-                    $bomcalc = BomCalculator::find($request->bom_calculator_id);
-                    if($request->status){
-                        $note = 'DISELESAIKAN OTOMATIS OLEH SISTEM DARI MASTER ITEM.';
-                        $bomcalc->update([
-                            'status'        => '3',
-                            'done_date'     => now(),
-                            'done_note'     => $note,
+                if($request->arr_item_conversion){
+                    foreach($request->arr_item_conversion as $key => $row){
+                        ItemConversion::create([
+                            'item_id'       => $query->id,
+                            'item_child_id' => $row,
                         ]);
-                        CustomHelper::sendNotification($bomcalc->getTable(),$bomcalc->id,'Pengajuan bom calculator Nama. '.$bomcalc->name.' telah diupdate',$note,$bomcalc->user_id);
-                    }else{
-                        $note = 'DIBUKA KEMBALI OTOMATIS OLEH SISTEM DARI MASTER ITEM.';
-                        $bomcalc->update([
-                            'status'        => '2',
-                            'done_date'     => NULL,
-                            'done_note'     => NULL,
-                        ]);
-                        CustomHelper::sendNotification($bomcalc->getTable(),$bomcalc->id,'Pengajuan bom calculator Nama. '.$bomcalc->name.' telah diupdate',$note,$bomcalc->user_id);
+                        if(!$request->temp){
+                            StoreItemStock::create([
+                                'item_id'       => $row,
+                                'qty'           => 0,
+                                'item_stock_new_id' => $itemstocknew->id ?? null,
+                            ]);
+                        }
                     }
+
                 }
+
 
                 activity()
                     ->performedOn(new Item())
@@ -846,54 +613,22 @@ class ItemController extends Controller
         $item = Item::find($request->id);
         $item['uom_unit_id'] = $item->uomUnit->id;
         $item['uom_code'] = $item->uomUnit->code;
-        $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
-        $item['type_name'] = $item->type()->exists() ? $item->type->code.' - '.$item->type->name : '';
-        $item['type_code'] = $item->type()->exists() ? $item->type->code : '';
-        $item['type_name_real'] = $item->type()->exists() ? $item->type->name : '';
-        $item['size_name'] = $item->size()->exists() ? $item->size->code.' - '.$item->size->name : '';
-        $item['size_code'] = $item->size()->exists() ? $item->size->code : '';
-        $item['size_name_real'] = $item->size()->exists() ? $item->size->name : '';
-        $item['variety_name'] = $item->variety()->exists() ? $item->variety->code.' - '.$item->variety->name : '';
-        $item['variety_code'] = $item->variety()->exists() ? $item->variety->code : '';
-        $item['variety_name_real'] = $item->variety()->exists() ? $item->variety->name : '';
-        $item['pattern_name'] = $item->pattern()->exists() ? $item->pattern->code.' - '.$item->pattern->name : '';
-        $item['pattern_code'] = $item->pattern()->exists() ? $item->pattern->code : '';
-        $item['pattern_name_real'] = $item->pattern()->exists() ? $item->pattern->name : '';
-        $item['pallet_name'] = $item->pallet()->exists() ? $item->pallet->code.' - '.$item->pallet->name : '';
-        $item['pallet_code'] = $item->pallet()->exists() ? $item->pallet->code : '';
-        $item['pallet_name_real'] = $item->pallet()->exists() ? $item->pallet->name : '';
-        $item['grade_name'] = $item->grade()->exists() ? $item->grade->code.' - '.$item->grade->name : '';
-        $item['grade_code'] = $item->grade()->exists() ? $item->grade->code : '';
-        $item['grade_name_real'] = $item->grade()->exists() ? $item->grade->name : '';
-        $item['brand_name'] = $item->brand()->exists() ? $item->brand->code.' - '.$item->brand->name : '';
-        $item['brand_code'] = $item->brand()->exists() ? $item->brand->code : '';
-        $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
-        $item['used'] = $item->hasChildDocument() ? '1' : '';
-        $item['bom_calculator_data'] = $item->bomCalculator()->exists() ? $item->bomCalculator->name.' | '.$item->bomCalculator->note : '';
+        $item['supplier_name'] = $item->supplier?->name ?? null;
+        $item['supplier_code'] = $item->supplier?->code ?? null;
 
         $units = [];
-        $buffer = [];
-        $parameter = [];
-        foreach($item->itemUnit as $row){
-            $units[] = [
-                'unit_id'       => $row->unit_id,
-                'conversion'    => number_format($row->conversion,2,',','.'),
-                'is_sell_unit'  => $row->is_sell_unit ? $row->is_sell_unit : '',
-                'is_buy_unit'   => $row->is_buy_unit ? $row->is_buy_unit : '',
-                'is_default'    => $row->is_default ? $row->is_default : '',
-            ];
+        if($item->childrenConversion()->exists()){
+            foreach($item->childrenConversion as $row){
+                $units[] = [
+                    'item_id'             => $row->item_id,
+                    'item_child_id'       => $row->item_child_id,
+                    'item_child_name'       => $row->child->name,
+                ];
+            }
         }
 
-        foreach($item->itemBuffer as $row){
-            $buffer[] = [
-                'place_id'      => $row->place_id,
-                'min_stock'     => number_format($row->min_stock,2,',','.'),
-                'max_stock'     => number_format($row->max_stock,2,',','.'),
-            ];
-        }
 
         $item['units'] = $units;
-        $item['buffers'] = $buffer;
 
 		return response()->json($item);
     }

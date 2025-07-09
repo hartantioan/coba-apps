@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('marketing_order_delivery_processes', function (Blueprint $table) {
             $table->double('rounding')->after('tax')->nullable();
-            $table->string('document')->nullable()->after('status_tracking');
+            $table->string('document')->nullable();
             $table->date('return_date')->nullable()->after('post_date');
         });
     }

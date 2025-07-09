@@ -35,8 +35,11 @@ return new class extends Migration
             $table->char('type', 3)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+$table->index(
+    ['lookable_id', 'company_id', 'place_id', 'warehouse_id', 'item_id'],
+    'idx_lookable_company_place_wh_item'
+);
 
-            $table->index(['lookable_id', 'company_id', 'place_id', 'warehouse_id', 'item_id']);
         });
     }
 

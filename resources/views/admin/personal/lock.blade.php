@@ -11,8 +11,8 @@
     <meta name="author" content="ThemeSelect">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login | Superior Porcelain Sukses</title>
-    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- BEGIN: VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/vendors.min.css') }}">
@@ -69,7 +69,7 @@
                             </div>
                             <div class="row">
                                 <div class="input-field col s6 m6 l6">
-                                    
+
                                 </div>
                                 <div class="input-field col s6 m6 l6">
                                     {{-- <p class="margin right-align medium-small"><a href="{{ url('admin/forget') }}">Forgot password ?</a></p> --}}
@@ -99,7 +99,7 @@
     <!-- BEGIN PAGE LEVEL JS-->
 	<script>
 		$(function() {
-            
+
 			$('#showPassword').click(function(){
 				if($(this).is(':checked')){
 					$('#password').attr('type', 'text');
@@ -107,7 +107,7 @@
 					$('#password').attr('type', 'password');
 				}
 			});
-			
+
 			$("#login_form").submit(function(event) {
 				event.preventDefault();
 				if($('#id_card').val() !== '' && $('#password').val() !== ''){
@@ -123,7 +123,7 @@
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					 },
 					 beforeSend: function() {
-						
+
 					 },
 					 success: function(response) {
                         if(response.status == 200){
@@ -137,7 +137,7 @@
                         }
 					 },
 					 error: function() {
-						
+
 						swal({
 							title: 'Ups!',
 							text: 'Check your internet connection.',
@@ -154,7 +154,7 @@
 				}
 			});
 		});
-        
+
 	</script>
     @if(session('bo_id'))
      <script>

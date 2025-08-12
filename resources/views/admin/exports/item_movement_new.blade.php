@@ -1,0 +1,86 @@
+@if($perlu == 1)
+    <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+        <thead>
+            <tr align="center">
+                <th class="center-align">{{ __('translations.no') }}.</th>
+                <th class="center-align">Tanggal.</th>
+                <th class="center-align">Kode Item</th>
+                <th class="center-align">Nama Item</th>
+                <th class="center-align">{{ __('translations.unit') }}</th>
+                <th class="center-align">No Dokumen</th>
+                <th class="center-align">Mutasi</th>
+                <th class="center-align">Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+               $x = 0;
+               $tempNo = '';
+            @endphp
+            @foreach($data as $i => $row)
+                @php
+                    if($tempNo != $row['kode']){
+                        $no = 1;
+                    }else{
+                        $no++;
+                    }
+                @endphp
+                <tr>
+                    <td align="center">{{ $no }}</td>
+                    <td align="center">{{ $tempNo != $row['kode'] ? '' : $row['date'] }}</td>
+                    <td align="center">{{$row['kode']}}</td>
+                    <td align="center">{{$row['item']}}</td>
+                    <td align="center">{{$row['satuan']}}</td>
+                    <td align="center">{{$row['document']}}</td>
+                    <td align="right">{{$row['qty']}}</td>
+                    <td align="right">{{$row['cum_qty']}}</td>
+                </tr>
+                @php
+                    $tempNo = $row['kode'];
+                @endphp
+            @endforeach
+
+            @if(count($data) == 0)
+                <tr>
+                    <td colspan="7" align="center">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+            @endif
+
+        </tbody>
+
+    </table>
+@else
+    <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+        <thead>
+            <tr align="center">
+                <th align="center">{{ __('translations.no') }}.</th>
+                <th align="center">{{ __('translations.code') }}</th>
+                <th align="center">Nama Item</th>
+                <th align="center">{{ __('translations.unit') }}</th>
+                <th align="center">Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($data as $key => $row)
+            <tr>
+                <td align="center">{{$key+1}}</td>
+                <td align="center">{{$row['kode']}}</td>
+                <td align="center">{{$row['item']}}</td>
+                <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{$row['cum_qty']}}</td>
+            </tr>
+            @endforeach
+            @if(count($data) == 0)
+                <tr>
+                    <td colspan="4" align="center">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+            @endif
+
+        </tbody>
+
+    </table>
+@endif

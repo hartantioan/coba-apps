@@ -322,6 +322,7 @@
                                                 </td>
                                             </tr>
                                         `);
+                                        countRow(count);
                                         arrCode.push(val.code);
                                     }
                                 });
@@ -908,8 +909,8 @@
             var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",","."));
             var price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",","."));
             var discount = parseFloat($('#rowDiscount' + id).val().replaceAll(".", "").replaceAll(",","."));
-
             var total = (qty * price )- discount;
+            console.log(total);
 
             $('#arr_total' + id).val(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
             $('#total' + id).text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));

@@ -1485,8 +1485,8 @@
                             dropdownAutoWidth: true,
                             width: '100%',
                         });
-                        $('#arr_item_conversion' + count).empty().val(val.unit_id).append(`
-                            <option value="` + val.item_child_id + `" >` + response.item_child_name + `</option>
+                        $('#arr_item_conversion' + count).empty().append(`
+                            <option value="` + val.item_child_id + `" >` + val.item_child_name + `</option>
                         `);
                     });
                 }
@@ -1685,10 +1685,7 @@
                 },
                 success: function(response) {
                     loadingClose('#main');
-                    printService.submit({
-                        'type': 'INVOICE',
-                        'url': response.message
-                    })
+                    window.open(response.message, '_blank');
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);

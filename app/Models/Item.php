@@ -605,7 +605,7 @@ class Item extends Model
     }
 
     public function getStockAll(){
-        $total = $this->itemStock()->sum('qty');
+        $total = $this->itemStockNew()->sum('qty');
 
         return $total;
     }

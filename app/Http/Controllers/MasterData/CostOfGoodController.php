@@ -23,13 +23,10 @@ class CostOfGoodController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'code',
-            'name',
-            'user_id',
-            'no_telp',
-            'address',
-            'group_id',
-            'total',
+            'item_id',
+            'price',
+            'discount',
+            'date',
             'status',
         ];
 
@@ -110,10 +107,10 @@ class CostOfGoodController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'name' 				=> 'required',
-            'address'           => 'required',
+            'item_id'           => 'required',
         ], [
             'name.required' 	    => 'Nama tidak boleh kosong.',
-            'address.required'      => 'Alamat tidak boleh kosong.',
+            'item_id.required'      => 'Item tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -128,12 +125,9 @@ class CostOfGoodController extends Controller
                     $query               = CostOfGood::find($request->temp);
                     $query->user_id      = session('bo_id');
                     $query->item_id      = $request->item_id;
-                    $query->start_date   = $request->start_date;
-                    $query->end_date     = $request->end_date;
+                    $query->date         = $request->date;
                     $query->price        = $request->price;
                     $query->discount     = $request->discount;
-                    $query->sell_price   = $request->sell_price;
-                    $query->qty_discount = $request->qty_discount;
                     $query->status       = $request->status ?? '2';
 
                     $query->save();
@@ -149,12 +143,9 @@ class CostOfGoodController extends Controller
                         'code'         => $request->code,
                         'user_id'      => session('bo_id'),
                         'item_id'      => $request->item_id,
-                        'start_date'   => $request->start_date,
-                        'end_date'     => $request->end_date,
+                        'date'         => $request->date,
                         'price'        => $request->price,
                         'discount'     => $request->discount,
-                        'qty_discount' => $request->qty_discount,
-                        'sell_price'   => $request->sell_price,
                         'status'       => $request->status ?? '2',
                     ]);
 
@@ -189,6 +180,7 @@ class CostOfGoodController extends Controller
 
     public function show(Request $request){
         $CostOfGood = CostOfGood::find($request->id);
+        $CostOfGood['item_name'] = $CostOfGood->item->name;
 
 		return response()->json($CostOfGood);
     }

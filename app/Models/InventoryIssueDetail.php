@@ -38,6 +38,6 @@ class InventoryIssueDetail extends Model
 
     public function inventoryIssue()
     {
-        return $this->belongsTo('App\Models\InventoryIssue', 'inventory_issue_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\InventoryIssue', 'inventory_issue_id', 'id');
     }
 }

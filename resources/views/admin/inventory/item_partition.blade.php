@@ -864,7 +864,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/inventory_item_to_store") }}',
+                url: '{{ url("admin/select2/inventory_item") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 delay: 250,
@@ -1240,6 +1240,163 @@
                 });
             },
             error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+     function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                $('#temp').val(id);
+                $('#code').text(response.code);
+                $('#post_date').text(response.post_date);
+
+                if(response.details.length > 0){
+                    $('#last-row-item').remove();
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        console.log(val);
+                        let no = i + 1;
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="">
+                                <input type="hidden" name="arr_id[]" value="0">
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
+                                </td>
+                                <td class="center" >
+                                    <input onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.stock + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="stock` + count + `" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                </td>
+                                <td class="center" id="unit` + count + `">
+                                    ` + val.unit + `
+                                </td>
+                                <td>
+                                    <select class="browser-default item-array" id="arr_item_stock_store` + count + `" name="arr_item_stock_store[]" onchange="getRowUnitStore('` + count + `')" data-id="` + count + `"></select>
+                                </td>
+                                <td class="center" >
+                                    <input onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.stock_partition + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="stock_store` + count + `" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_store[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_partition + `" onkeyup="formatRupiah(this);setStockStore('` + count + `')" style="text-align:right;width:100%;" id="rowQtyStore`+ count +`">
+                                </td>
+                                <td class="center" id="unitStock` + count + `">
+                                    ` + val.unit_partition + `
+                                </td>
+                                <td>
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                </td>
+                            </tr>
+                        `);
+                        if(val.item_stock_new_id){
+                            $('#arr_item_stock' + count).append(`
+                                <option value="` + val.item_stock_new_id +`">` + val.item_stock_new_name + `</option>
+                            `);
+                        }
+                        if(val.to_item_stock_new_id){
+                            $('#arr_item_stock_store' + count).append(`
+                                <option value="` + val.to_item_stock_new_id +`">` + val.to_item_stock_new_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_item_stock_store' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 4,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/child_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                delay: 250,
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: $("#arr_item_stock" + count).select2('data')[0].id,
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
+                        $('#arr_item_stock' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 4,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/inventory_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                delay: 250,
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        page: params.page || 1
+                                    };
+                                },
+                                processResults: function(data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: data.pagination.more
+                                        }
+                                    };
+                                },
+                                cache: true,
+                            }
+                        });
+                    });
+
+
+                }
+
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

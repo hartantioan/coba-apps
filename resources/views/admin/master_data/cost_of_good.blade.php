@@ -82,9 +82,7 @@
                                                         <th>Item</th>
                                                         <th>Harga</th>
                                                         <th>Discount</th>
-                                                        <th>Qty Discount</th>
-                                                        <th>Tanggal Mulai</th>
-                                                        <th>Tanggal Akhir</th>
+                                                        <th>Tanggal</th>
                                                         <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -123,13 +121,8 @@
                     </div>
 
                     <div class="input-field col s12 m3">
-                        <input type="date" id="start_date" name="start_date">
-                        <label class="active" for="start_date">Tanggal Mulai</label>
-                    </div>
-
-                    <div class="input-field col s12 m3">
-                        <input type="date" id="end_date" name="end_date">
-                        <label class="active" for="end_date">Tanggal Akhir</label>
+                        <input type="date" id="date" name="date">
+                        <label class="active" for="date">Tanggal</label>
                     </div>
 
                     <div class="input-field col s12 m3">
@@ -142,15 +135,6 @@
                         <label class="active" for="discount">Diskon</label>
                     </div>
 
-                    <div class="input-field col s12 m3">
-                        <input type="number" id="qty_discount" name="qty_discount" value="0" min="0">
-                        <label class="active" for="qty_discount">Qty Diskon</label>
-                    </div>
-
-                    <div class="input-field col s12 m3">
-                        <input type="text" id="sell_price" name="sell_price" onkeyup="formatRupiah(this)" value="0">
-                        <label class="active" for="sell_price">Harga Jual</label>
-                    </div>
 
                     <div class="input-field col s12 m3">
                         <div class="switch mb-1">
@@ -427,10 +411,8 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'item_id', className: '' },
-                { name: 'group_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'start_date', className: 'center-align' },
-                { name: 'end_date', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
+                { name: 'discount', className: 'center-align' },
                 { name: 'price', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -536,25 +518,14 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#type_id').empty().append(`
-                    <option value="` + response.type_id + `">` + response.type['name'] + `</option>
-                `);
-                $('#grade_id').empty().append(`
-                    <option value="` + response.grade_id + `">` + response.grade['name'] + `</option>
-                `);
-
-                $('#province_id').empty().append(`
-                    <option value="` + response.province_id + `">` + response.province['name'] + `</option>
-                `);
-                $('#city_id').empty().append(`
-                    <option value="` + response.city_id + `">` + response.city['name'] + `</option>
-                `);
-                $('#type_delivery').val(response.type_delivery).formSelect();
-                $('#sell_price').val(response.sell_price);
-                $('#discount').val(response.discount);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#group_id').val(response.group_id).formSelect();
                 $('#price').val(response.price);
+                $('#date').val(response.date);
+                $('#discount').val(response.discount);
+                if(response.item_id){
+                    $('#item_id').empty().append(`
+                        <option value="` + response.item_id + `">` + response.item_name + `</option>
+                    `);
+                }
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

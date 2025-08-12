@@ -74,6 +74,21 @@ class DeliveryReceive extends Model
         return $status;
     }
 
+    public function statusRaw(){
+        $status = match ($this->status) {
+            '1' => 'Menunggu',
+            '2' => 'Proses',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Direvisi',
+            '7' => 'Schedule',
+            '8' => 'Ditutup Balik',
+            default => 'Invalid',
+        };
+        return $status;
+    }
+
 
     public function account(){
         return $this->belongsTo('App\Models\Supplier','account_id','id')->withTrashed();

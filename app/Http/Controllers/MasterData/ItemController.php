@@ -82,11 +82,7 @@ class ItemController extends Controller
             $result1 = 0;
         }
 
-        $itemGroup = ItemGroup::whereHas('childSub',function($query){
-            $query->whereHas('itemGroupWarehouse',function($query){
-                $query->whereIn('warehouse_id',$this->datawarehouses);
-            });
-        })->get();
+        $itemGroup = ItemGroup::where('status',1)->get();
 
         $data = [
             'title'     => 'Item',
@@ -231,6 +227,7 @@ class ItemController extends Controller
                     $val->uomUnit->code??'',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Barcode" onclick="barcode(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">style</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-text btn-small" data-popup="tooltip" title="Document Relasi" onclick="documentRelation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">device_hub</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -299,8 +296,8 @@ class ItemController extends Controller
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
-                    if($request->arr_unit){
-                        $query->childConversion()->delete();
+                    if($request->arr_item_conversion){
+                        $query->childrenConversion()->delete();
                     }
 
                     if(!$query->itemCogs()->exists()){
@@ -622,7 +619,7 @@ class ItemController extends Controller
                 $units[] = [
                     'item_id'             => $row->item_id,
                     'item_child_id'       => $row->item_child_id,
-                    'item_child_name'       => $row->child->name,
+                    'item_child_name'     => $row->child->name,
                 ];
             }
         }
@@ -832,7 +829,7 @@ class ItemController extends Controller
 
     public function import(Request $request)
     {
-        Excel::import(new ImportItem, $request->file('file'));
+        Excel::import(new ImportItemMaster, $request->file('file'));
 
         return response()->json([
             'status'    => 200,

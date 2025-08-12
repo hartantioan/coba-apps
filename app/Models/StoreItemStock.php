@@ -13,10 +13,11 @@ class StoreItemStock extends Model
     protected $fillable = ['item_id', 'qty','item_stock_new_id'];
 
     public function item(){
-        return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\Item','item_id','id');
     }
 
     public function itemStockNew(){
-        return $this->belongsTo('App\Models\ItemStockNew','item_stock_new_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemStockNew','item_stock_new_id','id');
     }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 
+use App\Exports\ExportDeliveryReceive;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryReceive;
@@ -191,14 +192,8 @@ class DeliveryReceiveController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        '.$btn_cancel.'
-
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown white-tex btn-small" data-popup="tooltip" title="Lihat Relasi Simple" onclick="simpleStructrueTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gesture</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Multiple LC" onclick="multiple(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">share</i></button>
                         <!-- <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> -->
 					'
                 ];
@@ -324,7 +319,7 @@ class DeliveryReceiveController extends Controller
                         } else {
                             $document = $query->document;
                         }
-                        $query->account_id = $account_id;
+                        $query->account_id = $request->account_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
                         $query->document_date = $request->document_date;
@@ -335,19 +330,39 @@ class DeliveryReceiveController extends Controller
                         $query->tax = $taxall;
                         $query->wtax = $wtaxall;
                         $query->grandtotal = $grandtotalall;
-                        $query->status = '1';
+                        $query->status = '2';
 
                         $query->save();
                         ItemMove::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->delete();
 
-                        foreach($query->deliveryReceiveDetail as $row){
-                            $items = ItemStockNew::where('item_id',$row->item_id)->first();
-                            if ($items) {
-                                $items->qty -= $row->qty;
+                        $previousDetails = DeliveryReceiveDetail::onlyTrashed()
+                            ->where('delivery_receive_id', $query->id)
+                            ->get();
 
-                                $items->save();
+                        foreach ($previousDetails as $old) {
+                            $qty = (float) $old->qty;
+                            $total = (float) $old->total;
+
+                            ItemMove::where('lookable_type', $query->getTable())
+                                ->where('lookable_id', $query->id)
+                                ->where('item_id', $old->item_id)
+                                ->where('type', 1)
+                                ->delete(); // or ->forceDelete() if needed
+
+                            $itemStock = ItemStockNew::where('item_id', $old->item_id)->first();
+                            if ($itemStock) {
+                                $itemStock->qty -= $qty;
+                                if($itemStock->qty >= 0){
+
+                                    $itemStock->save();
+                                }else{
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'Stock Item sebelumnya ada yang minus saat melakukan edit hubungi IT'
+                                    ]);
+                                }
                             }
-                            $row->delete();
+
                         }
 
                     }else{
@@ -364,14 +379,14 @@ class DeliveryReceiveController extends Controller
                     $query = DeliveryReceive::create([
                         'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
-                        'account_id'            => $account_id,
+                        'account_id'            => $request->account_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,
                         'document_date'         => $request->document_date,
                         'delivery_no'           => $request->delivery_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/delivery_receives') : NULL,
                         'note'                  => $request->note,
-                        'status'                => '1',
+                        'status'                => '2',
                         'total'                 => $totalall,
                         'tax'                   => $taxall,
                         'wtax'                  => $wtaxall,
@@ -494,7 +509,6 @@ class DeliveryReceiveController extends Controller
                                         <th class="center-align">Qty</th>
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan </th>
-                                        <th class="center-align">Remark</th>
                                     </tr>
                                 </thead>
                                 <tbody>';
@@ -505,17 +519,14 @@ class DeliveryReceiveController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
-                <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
+                <td class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
-                <td class="center-align">'.$rowdetail->remark.'</td>
-            </tr>
-            <tr>
-                <td colspan="13">Serial No : '.$rowdetail->listSerial().'</td>
             </tr>';
         }
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
                 </tr>
         ';
 
@@ -535,6 +546,7 @@ class DeliveryReceiveController extends Controller
         foreach($grm->deliveryReceiveDetail()->orderBy('id')->get() as $key => $row){
             $item_stocknew = ItemStockNew::where('item_id',$row->item_id)->first();
 
+                info($row->item->unit);
             $arr[] = [
                 'id'                        => $row->id,
                 'item_id'                   => $row->item_id,
@@ -542,7 +554,7 @@ class DeliveryReceiveController extends Controller
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                 'total'                       => CustomHelper::formatConditionalQty($row->total),
                 'price'                       => CustomHelper::formatConditionalQty($row->price),
-                'unit_stock'                => $row->item->unit?->code ?? null,
+                'unit_stock'                => $row->item->uomUnit?->code ?? null,
                 'qty_stock'                 => CustomHelper::formatConditionalQty($item_stocknew->qty),
                 'note'                      => $row->note ? $row->note : '',
                 'remark'                    => $row->remark ?? null,
@@ -719,7 +731,7 @@ class DeliveryReceiveController extends Controller
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
-            $pdf = PrintHelper::print($pr,'delivery receive','a5','landscape','admin.print.inventory.good_receipt_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'delivery receive','a5','landscape','admin.print.inventory.delivery_receive_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
@@ -746,17 +758,13 @@ class DeliveryReceiveController extends Controller
 	// 	return Excel::download(new ExportGoodReceipt($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     // }
 
-    // public function exportFromTransactionPage(Request $request){
-    //     $menu = Menu::where('url','good_receipt_po')->first();
-    //     $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
-    //     $search = $request->search? $request->search : '';
-    //     $post_date = $request->start_date? $request->start_date : '';
-    //     $end_date = $request->end_date ? $request->end_date : '';
-    //     $status = $request->status ? $request->status : '';
-	// 	$modedata = $request->modedata ? $request->modedata : '';
-    //     $nominal = $menuUser->show_nominal ?? '';
-	// 	return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
-    // }
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		return Excel::download(new ExportDeliveryReceive($search,$status,$end_date,$post_date), 'penerimaan_barang'.uniqid().'.xlsx');
+    }
 
 
 

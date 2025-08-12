@@ -184,6 +184,15 @@
                                 </select>
                                 <label class="" for="payment_type">Tipe Pembayaran</label>
                             </div>
+                            <div class="input-field col m3 s12 step9">
+                                <select class="form-control" id="type_sales" name="type_sales">
+                                    <option value="1">Toko Offline</option>
+                                    <option value="2">Tokopedia</option>
+                                    <option value="3">Shopee</option>
+                                    <option value="4">Tiktok</option>
+                                </select>
+                                <label class="" for="type_sales">Tipe Penjualan</label>
+                            </div>
                             <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Post</label>
@@ -215,6 +224,7 @@
                                                 <tr>
                                                     <th class="center">{{ __('translations.delete') }}</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
+                                                    <th class="center">Stock Gudang</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Harga</th>
                                                     <th class="center">Total</th>
@@ -1213,6 +1223,9 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
+                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                </td>
+                <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                 </td>
                 <td>
@@ -1264,16 +1277,11 @@
     }
 
     function getRowUnit(val){
-        $("#arr_warehouse" + val).empty();
-        $("#unit_stock" + val).empty();
         $("#qty_stock" + val).empty().text('-');
         if($("#arr_item" + val).val()){
-            $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
+            $("#qty_stock" + val).val($("#arr_item" + val).select2('data')[0].stock);
         }else{
             $("#arr_item" + val).empty();
-            $("#arr_warehouse" + val).append(`
-                <option value="">--Silahkan pilih item--</option>
-            `);
             $("#unit_stock" + val).text('-');
         }
         countRow(val);
@@ -1315,10 +1323,11 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
 
-            console.log($('#temp').val());
+                console.log($('#temp').val());
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#type').val(response.type).formSelect();
+                console.log(response);
                 if(response.customer_id){
                     $('#customer_id').empty().append(`
                         <option value="` + response.customer_id + `">` + response.customer_name + `</option>
@@ -1346,6 +1355,9 @@
                                 </td>
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                </td>
+                                <td>
+                                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="` + val.qty_stock + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">

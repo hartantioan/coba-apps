@@ -39,6 +39,7 @@ use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\Inventory\MinimumStockController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
+use App\Http\Controllers\MasterData\StoreCustomerController;
 use App\Http\Controllers\MasterData\RuleBpScaleController;
 use App\Http\Controllers\MasterData\RuleProcurementController;
 use App\Http\Controllers\MasterData\StockItemController;
@@ -408,6 +409,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
                 Route::get('purchase_item_scale', [Select2Controller::class, 'purchaseItemScale']);
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
+                Route::get('inventory_item_to_store', [Select2Controller::class, 'inventoryItemToStore']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('sales_item_parent', [Select2Controller::class, 'salesItemParent']);
                 Route::get('sales_item_child', [Select2Controller::class, 'salesItemChild']);
@@ -982,15 +984,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [SupplierController::class, 'destroy'])->middleware('operation.access:supplier,delete');
                     });
 
-                    Route::prefix('store_item_pricelist')->middleware('operation.access:store_item_pricelist,view')->group(function () {
-                        Route::get('/', [StoreItemPriceListController::class, 'index']);
-                        Route::get('datatable', [StoreItemPriceListController::class, 'datatable']);
-                        Route::post('show', [StoreItemPriceListController::class, 'show']);
-                        Route::post('print', [StoreItemPriceListController::class, 'print']);
-                        Route::get('export', [StoreItemPriceListController::class, 'export']);
-                        Route::post('create', [StoreItemPriceListController::class, 'create'])->middleware('operation.access:store_item_pricelist,update');
-                        Route::post('destroy', [StoreItemPriceListController::class, 'destroy'])->middleware('operation.access:store_item_pricelist,delete');
-                    });
+
 
                     Route::prefix('warehouse')->middleware('operation.access:warehouse,view')->group(function () {
                         Route::get('/', [WarehouseController::class, 'index']);
@@ -1027,6 +1021,28 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [InventoryCoaController::class, 'show']);
                         Route::post('create', [InventoryCoaController::class, 'create'])->middleware('operation.access:inventory_coa,update');
                         Route::post('destroy', [InventoryCoaController::class, 'destroy'])->middleware('operation.access:inventory_coa,delete');
+                    });
+                });
+
+                Route::prefix('store')->group(function () {
+                    Route::prefix('store_customer')->middleware('operation.access:store_customer,view')->group(function () {
+                        Route::get('/', [StoreCustomerController::class, 'index']);
+                        Route::get('datatable', [StoreCustomerController::class, 'datatable']);
+                        Route::post('show', [StoreCustomerController::class, 'show']);
+                        Route::post('print', [StoreCustomerController::class, 'print']);
+                        Route::get('export', [StoreCustomerController::class, 'export']);
+                        Route::post('create', [StoreCustomerController::class, 'create'])->middleware('operation.access:store_customer,update');
+                        Route::post('destroy', [StoreCustomerController::class, 'destroy'])->middleware('operation.access:store_customer,delete');
+                    });
+
+                    Route::prefix('store_item_pricelist')->middleware('operation.access:store_item_pricelist,view')->group(function () {
+                        Route::get('/', [StoreItemPriceListController::class, 'index']);
+                        Route::get('datatable', [StoreItemPriceListController::class, 'datatable']);
+                        Route::post('show', [StoreItemPriceListController::class, 'show']);
+                        Route::post('print', [StoreItemPriceListController::class, 'print']);
+                        Route::get('export', [StoreItemPriceListController::class, 'export']);
+                        Route::post('create', [StoreItemPriceListController::class, 'create'])->middleware('operation.access:store_item_pricelist,update');
+                        Route::post('destroy', [StoreItemPriceListController::class, 'destroy'])->middleware('operation.access:store_item_pricelist,delete');
                     });
                 });
 

@@ -635,27 +635,62 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Item::where(function($query) use($search){
+        $data = Item::where(function ($query) use ($search) {
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
-                })->whereHas('itemGroup',function($query) {
-                    $query->whereHas('itemGroupWarehouse',function($query){
-                        $query->whereIn('warehouse_id', $this->datawarehouses);
-                    });
-                })->where('status','1')
+                })
+                ->where('status', '1')
+                ->where(function ($query) {
+                    $query->whereHas('childrenConversion')
+                        ->orWhereDoesntHave('parentConversion');
+                })
                 ->paginate(10);
+
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			            => $d->id,
+                'id'   			            => $d->itemStockNew->id,
                 'text' 			            => $d->code.' - '.$d->name,
                 'code'                      => $d->code,
                 'name'                      => $d->name,
                 'uom'                       => $d->uomUnit->code,
                 'stock'                     => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
-                'stock_list'                => $d->currentStock($this->dataplaces,$this->datawarehouses),
-                'list_warehouse'            => $d->warehouseList(),
-                'outstanding_issue_request' => CustomHelper::formatConditionalQty($d->getOutstandingIssueRequest()).' '.$d->uomUnit->code,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
+    public function inventoryItemToStore(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function ($query) use ($search) {
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status', '1')
+                ->where(function ($query) {
+                    $query->whereHas('itemStockNew',function($query){
+                        $query->where('qty','>',0);
+                    });
+                })
+                ->paginate(10);
+
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			            => $d->itemStockNew->id,
+                'text' 			            => $d->code.' - '.$d->name,
+                'code'                      => $d->code,
+                'name'                      => $d->name,
+                'uom'                       => $d->uomUnit->code,
+                'stock'                     => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
             ];
         }
 
@@ -1082,37 +1117,27 @@ class Select2Controller extends Controller {
 
     public function purchaseItem(Request $request)
     {
-        $response = [];
-        $search   = $request->search;
-        $data = Item::where(function($query) use($search){
-            $query->where('code', 'like', "%$search%")
-                ->orWhere('name', 'like', "%$search%")
-                ->orWhere('other_name', 'like', "%$search%");
-        })
-        ->whereHas('itemGroup',function($query) {
-            $query->whereHas('itemGroupWarehouse',function($query){
-                $query->whereIn('warehouse_id', $this->datawarehouses);
-            });
-        })
-        ->where('status', '1')
-        ->where(function($query) use($search){
-            $query->whereNotNull('is_purchase_item');
-        })
-        ->paginate(10);
 
-        foreach($data as $d) {
+        $response = [];
+        $search = $request->search;
+
+        $data = Item::where(function ($query) use ($search) {
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+            })
+            ->where('status', '1')
+            ->whereNotNull('is_purchase_item')
+            ->paginate(10);
+
+        foreach ($data as $d) {
             $response[] = [
-                'id'   			    => $d->id,
-                'text' 			    => $d->code.' - '.$d->name,
-                'code'              => $d->code,
-                'name'              => $d->name,
-                'uom'               => $d->uomUnit->code,
-                'old_prices'        => $d->oldPrices($this->dataplaces),
-                'list_warehouse'    => $d->warehouseList(),
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
-                'buy_units'         => $d->arrBuyUnits(),
-                'buy_price_now'     => $d->buyPriceNow(),
-                'stock'             => CustomHelper::formatConditionalQty($d->getStockAll()),
+                'id'             => $d->id,
+                'text'           => $d->code . ' - ' . $d->name,
+                'code'           => $d->code,
+                'name'           => $d->name,
+                'uom'            => $d->uomUnit->code,
+                // 'buy_price_now'  => $d->buyPriceNow(),
+                'stock'                     => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
             ];
         }
 
@@ -1123,6 +1148,7 @@ class Select2Controller extends Controller {
             ]
         ]);
     }
+
 
     public function purchaseItemScale(Request $request)
     {
@@ -1164,9 +1190,7 @@ class Select2Controller extends Controller {
                         ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')
-                ->whereNotNull('is_sales_item')
-                ->whereDoesntHave('parentConversion')
-                ->whereDoesntHave('fgGroup')->get();
+                ->whereNotNull('is_sales_item')->get();
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -6559,20 +6583,29 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
 
-        $data = Item::where(function($query) use($search,$request){
-                    $query->whereHas('parentConversion',function($query) use($search,$request){
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
-                        if($request->item_id){
-                            $query->where('item_id',$request->item_id);
-                        }
-                    });
-                })
-                ->where('status','1')->paginate(10);
+        $data = Item::where(function($query) use($search, $request) {
+            $query->whereHas('parentConversion', function($q) use($search, $request) {
+                $q->where(function($q2) use($search) {
+                    $q2->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                });
+
+                if ($request->item_id) {
+                    $q->where('item_id', $request->item_id); // Now correctly filters on parentConversion
+                }
+            });
+        })
+        ->where('status', '1')
+        ->paginate(10);
+
+        if(!$data){
+            $data = Item::where('id',$request->item_id)->paginate(10);
+        }
+
         info($data);
         foreach($data as $d) {
             $response[] = [
-                'id'   			    => $d->id,
+                'id'   			    => $d->itemStockNew->id,
                 'text' 			    => $d->code.' - '.$d->name,
                 'code'              => $d->code,
                 'name'              => $d->name,

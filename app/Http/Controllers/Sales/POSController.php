@@ -15,6 +15,7 @@ use App\Models\Line;
 use App\Models\Menu;
 use App\Models\Place;
 use App\Models\StoreCustomer;
+use App\Models\StoreItemPriceList;
 use App\Models\StoreItemStock;
 use App\Models\UsedData;
 use App\Models\User;
@@ -69,15 +70,16 @@ class POSController extends Controller
         $barcode = StoreItemStock::whereHas('item',function($query)use($request){
             $query->where('code',$request->code);
         })->first();
-        $itempricelist = $barcode->item?->storeItemPriceList ?? null;
+        $itempricelist = StoreItemPriceList::where('item_id',$barcode->item_id)->first();
+        // $itempricelist = $barcode->item?->storeItemPriceList ?? null;
         if($barcode){
 
             $result[] = [
                 'item_id'       => $barcode->item->id,
                 'item_code'     => $barcode->item->code,
                 'item_name'     => $barcode->item->name,
-                'discount'      => $itempricelist->discount ?? 0,
-                'price'         => $itempricelist->price ?? 0,
+                'discount'      => number_format($itempricelist->discount ?? 0,2,',','.'),
+                'price'         => number_format($itempricelist->sell_price ?? 0,2,',','.'),
             ];
             return response()->json($result);
         }else{
@@ -218,7 +220,21 @@ class POSController extends Controller
         $pr = Invoice::where('code',$id)->first();
 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Invoice',[0, 0, 3.15, 3.15],'portrait','admin.print.sales.invoice_store_individual','all');
+            $itemCount = $pr->invoiceDetail->count();
+            $baseHeight = 100; // points for header/footer
+            $itemHeight = 3 * 28.3465;  // 3 cm per item → ~85.04 points
+
+            $totalHeight = $baseHeight + ($itemCount * $itemHeight);
+
+            $widthPoints = 8 * 28.3465;
+            $pdf = PrintHelper::print(
+                $pr,
+                'Invoice',
+                [0, 0,$widthPoints, $totalHeight ], // width stays fixed, height changes
+                'portrait',
+                'admin.print.sales.invoice_store_individual',
+                'all'
+            );
 
             $content = $pdf->download()->getOriginalContent();
 

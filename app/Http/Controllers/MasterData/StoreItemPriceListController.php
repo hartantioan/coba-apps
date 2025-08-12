@@ -7,6 +7,7 @@ use App\Models\StoreItemPriceList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class StoreItemPriceListController extends Controller
 {
@@ -79,7 +80,7 @@ class StoreItemPriceListController extends Controller
 
                 $response['data'][] = [
                     $nomor,
-                    $val->item->name,
+                    $val->item->code.' '.$val->item->name,
                     $val->price,
                     $val->discount,
                     $val->qty_discount,
@@ -111,11 +112,13 @@ class StoreItemPriceListController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'name' 				=> 'required',
-            'address'           => 'required',
+            'item_id' 				=> 'required',
+            'price'                 => 'required',
+            'sell_price'            => 'required',
         ], [
-            'name.required' 	    => 'Nama tidak boleh kosong.',
-            'address.required'      => 'Alamat tidak boleh kosong.',
+            'item_id.required' 	    => 'Item tidak boleh kosong.',
+            'sell_price.required'   => 'Harga Jual tidak boleh kosong.',
+            'price.required'        => 'Harga tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -132,11 +135,11 @@ class StoreItemPriceListController extends Controller
                     $query->item_id      = $request->item_id;
                     $query->start_date   = $request->start_date;
                     $query->end_date     = $request->end_date;
-                    $query->price        = $request->price;
-                    $query->discount     = $request->discount;
-                    $query->sell_price   = $request->sell_price;
-                    $query->qty_discount = $request->qty_discount;
-                    $query->status       = $request->status ?? '2';
+                    $query->price        = str_replace(',', '.', str_replace('.', '', $request->price));
+                    $query->discount     = str_replace(',', '.', str_replace('.', '', $request->discount));
+                    $query->sell_price   = str_replace(',', '.', str_replace('.', '', $request->sell_price));
+                    $query->qty_discount = str_replace(',', '.', str_replace('.', '', $request->qty_discount));
+                    $query->status       = $request->status ?? '1';
 
                     $query->save();
 
@@ -148,16 +151,16 @@ class StoreItemPriceListController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = StoreItemPriceList::create([
-                        'code'         => $request->code,
+                        'code'         => Str::random(8),
                         'user_id'      => session('bo_id'),
                         'item_id'      => $request->item_id,
                         'start_date'   => $request->start_date,
                         'end_date'     => $request->end_date,
-                        'price'        => $request->price,
-                        'discount'     => $request->discount,
-                        'qty_discount' => $request->qty_discount,
-                        'sell_price'   => $request->sell_price,
-                        'status'       => $request->status ?? '2',
+                        'price'        => str_replace(',', '.', str_replace('.', '', $request->price)),
+                        'discount'     => str_replace(',', '.', str_replace('.', '', $request->discount)),
+                        'qty_discount' => str_replace(',', '.', str_replace('.', '', $request->qty_discount)),
+                        'sell_price'   => str_replace(',', '.', str_replace('.', '', $request->sell_price)),
+                        'status'       => $request->status ?? '1',
                     ]);
 
                     DB::commit();
@@ -191,7 +194,7 @@ class StoreItemPriceListController extends Controller
 
     public function show(Request $request){
         $StoreItemPriceList = StoreItemPriceList::find($request->id);
-
+        $StoreItemPriceList['item_name'] = $StoreItemPriceList->item->code.'-'.$StoreItemPriceList->item->name;
 		return response()->json($StoreItemPriceList);
     }
 

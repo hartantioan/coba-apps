@@ -5,7 +5,7 @@
     <title>Receipt</title>
     <style>
         @page {
-            size: 20cm 8cm portrait;
+            /* size: 20cm 8cm portrait; */
             margin: 0.7cm 1.7cm 0.7cm 0.7cm !important;
         }
         body {

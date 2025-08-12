@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Exports\ExportInventoryIssueDetail;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
@@ -21,6 +22,7 @@ use App\Models\User;
 use iio\libmergepdf\Merger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventoryIssueController extends Controller
 {
@@ -440,7 +442,8 @@ class InventoryIssueController extends Controller
 
                             $itemId = $request->arr_item_stock_store[$key];
                             $qty_in = (float) str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));
-                            $total_store = $rowprice * $qty_in;
+                            $total_store = $total;
+                            $price_in = round($total/$qty_in,2);
 
                             // get previous totals across all types
                             $total_qty_in = ItemMove::where('item_id', $itemId)->where('type', 1)->sum('qty_in');
@@ -458,7 +461,7 @@ class InventoryIssueController extends Controller
                                 'lookable_id' => $query->id,
                                 'item_id' => $request->arr_item_stock_store[$key],
                                 'qty_in' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
-                                'price_in' => $rowprice,
+                                'price_in' => $price_in,
                                 'total_in' => $total_store,
                                 'qty_out' => 0,
                                 'price_out' => 0,
@@ -1007,17 +1010,14 @@ class InventoryIssueController extends Controller
     //     $nominal = $menuUser->show_nominal ?? '';
 	// 	return Excel::download(new ExportInventoryIssue($post_date,$end_date,$mode,$nominal), 'good_issue_'.uniqid().'.xlsx');
     // }
-    // public function exportFromTransactionPage(Request $request){
-    //     $menu = Menu::where('url','good_issue')->first();
-    //     $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
-    //     $search = $request->search? $request->search : '';
-    //     $post_date = $request->start_date? $request->start_date : '';
-    //     $end_date = $request->end_date ? $request->end_date : '';
-    //     $status = $request->status ? $request->status : '';
-	// 	$modedata = $request->modedata ? $request->modedata : '';
-    //     $nominal = $menuUser->show_nominal ?? '';
-	// 	return Excel::download(new ExportInventoryIssueTransactionPage($search,$post_date,$end_date,$status,$modedata,$nominal), 'good_issue'.uniqid().'.xlsx');
-    // }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		return Excel::download(new ExportInventoryIssueDetail($search,$status,$end_date,$post_date), 'barang_ke_toko'.uniqid().'.xlsx');
+    }
 
 
     public function removeUsedData(Request $request){

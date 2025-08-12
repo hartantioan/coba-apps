@@ -32,9 +32,12 @@ class ItemPartition extends Model
         'post_date',
         'void_date',
         'done_date',
-        'grandtotal',
     ];
 
+    public function itemPartitionDetail()
+    {
+        return $this->hasMany('App\Models\ItemPartitionDetail','item_partition_id','id');
+    }
     public static function generateCode($prefix)
     {
         $query = ItemPartition::selectRaw('RIGHT(code, 8) as code')
@@ -62,6 +65,31 @@ class ItemPartition extends Model
         return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
+    public function status(){
+        $status = match ($this->status) {
+          1 => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',
+          2 => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>',
+          3 => 'Selesai',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+        info($this->status);
+        return $status;
+    }
+
+    public function statusRaw(){
+        $status = match ($this->status) {
+            '1' => 'Menunggu',
+            '2' => 'Proses',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Direvisi',
+            '7' => 'Schedule',
+            '8' => 'Ditutup Balik',
+            default => 'Invalid',
+        };
+        return $status;
+    }
     public function voidUser()
     {
         return $this->belongsTo(User::class, 'void_id')->withTrashed();

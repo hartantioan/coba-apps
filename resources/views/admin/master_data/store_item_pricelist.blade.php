@@ -109,16 +109,15 @@
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Price List</h4>
-                <form class="row" id="form_price_list" onsubmit="return false;">
+                <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
 
                     <div class="input-field col s12 m3">
                         <input type="hidden" id="temp" name="temp">
-                        <select id="item_id" name="item_id" class="browser-default">
-                            <option value="">Pilih Item</option>
-                        </select>
+
+                        <select class="browser-default" id="item_id" name="item_id"></select>
                         <label class="active" for="item_id">Item</label>
                     </div>
 
@@ -217,7 +216,7 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal_price_list">
         <i class="material-icons">add</i>
     </a>
 </div>
@@ -353,7 +352,7 @@
                 }
             });
         });
-        $('#modal1').modal({
+        $('#modal_price_list').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
 
@@ -376,6 +375,7 @@
                 $('#grade_id').empty();
             }
         });
+        select2ServerSide('#item_id', '{{ url("admin/select2/sales_item") }}');
 
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
         select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
@@ -515,7 +515,7 @@
 
     function success(){
         loadDataTable();
-        $('#modal1').modal('close');
+        $('#modal_price_list').modal('close');
     }
 
     function show(id){
@@ -534,26 +534,22 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
+                $('#modal_price_list').modal('open');
                 $('#temp').val(id);
-                $('#type_id').empty().append(`
-                    <option value="` + response.type_id + `">` + response.type['name'] + `</option>
-                `);
-                $('#grade_id').empty().append(`
-                    <option value="` + response.grade_id + `">` + response.grade['name'] + `</option>
-                `);
+                console.log(response.item_name);
+                if(response.item_id){
+                    $('#item_id').append(`
+                        <option value="` + response.item_id + `">` + response.item_name+`</option>
+                    `);
+                }
 
-                $('#province_id').empty().append(`
-                    <option value="` + response.province_id + `">` + response.province['name'] + `</option>
-                `);
-                $('#city_id').empty().append(`
-                    <option value="` + response.city_id + `">` + response.city['name'] + `</option>
-                `);
-                $('#type_delivery').val(response.type_delivery).formSelect();
+                $('#start_date').val(response.start_date);
+                $('#qty_discount').val(response.qty_discount);
+                $('#discount').val(response.discount);
+                $('#end_date').val(response.end_date);
+                $('#price').val(response.price);
                 $('#sell_price').val(response.sell_price);
                 $('#discount').val(response.discount);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#group_id').val(response.group_id).formSelect();
                 $('#price').val(response.price);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

@@ -10,6 +10,7 @@ use App\Models\ItemGroup;
 use App\Models\ItemStock;
 use App\Models\ItemStockNew;
 use App\Models\ItemUnit;
+use App\Models\Supplier;
 use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
@@ -20,7 +21,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Row;
 
-class ImportItem implements WithMultipleSheets
+class ImportItemMaster implements WithMultipleSheets
 {
     public function sheets(): array
     {
@@ -44,6 +45,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
         try {
             $check = null;
             $row = $row->toArray();
+            info($row['code']);
             if(isset($row['code']) && $row['code']){
                 $check = Item::withTrashed()->where('code',$row['code'])->first();
 
@@ -52,6 +54,8 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 
                 $item_unit_code = explode('#',$row['unit'])[0];
                 $item_unit_id= Unit::where('code',$item_unit_code)->first();
+                $supplier_code = explode('#',$row['supplier'])[0];
+                $supplier_id= Supplier::where('code',$supplier_code)->first();
 
                 if(!$check){
                     $query = Item::create([
@@ -59,13 +63,11 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         'name'              => $row['name'],
                         'item_group_id'     => $item_group_id->id,
                         'uom_unit'          => $item_unit_id->id,
-                        'tolerance_gr'      => $row['toleransi_gr'],
                         'is_inventory_item' => $row['is_invent_item'],
                         'is_sales_item'     => $row['is_sales_item'],
                         'is_purchase_item'  => $row['is_purchase'],
-                        'is_service'        => $row['is_service'],
-                        'is_production'     => $row['is_production'],
                         'note'              => $row['note'],
+                        'supplier_id'       => $supplier_id->id,
                         'status'            => '1',
                     ]);
 
@@ -78,25 +80,16 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 
 
                 }else{
+                    $check->name = $row['name'];
+                    $check->item_group_id=$item_group_id->id;
+                    $check->uom_unit=$item_unit_id->id;
+                    $check->is_inventory_item=$row['is_invent_item'];
+                    $check->is_sales_item=$row['is_sales_item'];
+                    $check->is_purchase_item=$row['is_purchase'];
+                    $check->supplier_id       = $supplier_id->id;
+                    $check->note =  $row['note'];
 
-                    if(!$check->hasChildDocument()){
-                        if ($check->trashed()) {
-                            $check->restore();
-                        }
-                        $check->name = $row['name'];
-                        $check->item_group_id=$item_group_id->id;
-                        $check->uom_unit=$item_unit_id->id;
-                        $check->tolerance_gr=$row['toleransi_gr'];
-                        $check->is_inventory_item=$row['is_invent_item'];
-                        $check->is_sales_item=$row['is_sales_item'];
-                        $check->is_purchase_item=$row['is_purchase'];
-                        $check->is_service=$row['is_service'];
-                        $check->is_production = $row['is_production'];
-                        $check->note =  $row['note'];
-
-                        $check->save();
-
-                    }
+                    $check->save();
                 }
             }
             else{

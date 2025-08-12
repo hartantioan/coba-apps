@@ -20,23 +20,23 @@ class ItemPartitionDetail extends Model
         'qty',
         'price',
         'total',
+        'qty_partition',
         'note',
     ];
 
-    // Relationships (optional but recommended)
-
-    public function partition()
+    public function itemPartition()
     {
-        return $this->belongsTo(ItemPartition::class, 'item_partition_id')->withTrashed();
+        return $this->belongsTo(ItemPartition::class, 'item_partition_id');
     }
 
     public function fromStock()
     {
-        return $this->belongsTo(ItemStockNew::class, 'item_stock_new_id')->withTrashed();
+        return $this->belongsTo(ItemStockNew::class, 'item_stock_new_id');
     }
 
     public function toStock()
     {
-        return $this->belongsTo(ItemStockNew::class, 'to_item_stock_new_id')->withTrashed();
+        return $this->belongsTo(ItemStockNew::class, 'to_item_stock_new_id');
     }
+
 }

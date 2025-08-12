@@ -1258,6 +1258,7 @@
                 data: function(params) {
                     return {
                         search: params.term,
+                        account_id: $('#account_id').val(),
                         page: params.page || 1
                     };
                 },
@@ -1282,6 +1283,7 @@
         $("#qty_stock" + val).empty().text('-');
         if($("#arr_item" + val).val()){
             $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
+            $("#qty_stock" + val).text($("#arr_item" + val).select2('data')[0].stock);
         }else{
             $("#arr_item" + val).empty();
             $("#unit_stock" + val).text('-');

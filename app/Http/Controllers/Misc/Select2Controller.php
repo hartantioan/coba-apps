@@ -6602,7 +6602,6 @@ class Select2Controller extends Controller {
             $data = Item::where('id',$request->item_id)->paginate(10);
         }
 
-        info($data);
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->itemStockNew->id,

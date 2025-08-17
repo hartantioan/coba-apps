@@ -728,7 +728,6 @@ class UserController extends Controller
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
                     $query->place_id	    = $request->type == '1' ? $request->place_id : NULL;
                     $query->province_id     = $request->province_id;
-                    $query->area_province_id= $request->province_area_id;
                     $query->city_id         = $request->city_id;
                     $query->district_id     = $request->district_id;
                     $query->tax_id          = $request->tax_id;
@@ -743,31 +742,7 @@ class UserController extends Controller
                     $query->top_internal    = $request->top_internal;
 
 
-                    $query->brand_id             = $request->brand_id ? $request->brand_id : NULL;
-                    $query->sales_payment_type    = $request->sales_payment_type;
-
-                    $query->pic_finance    = $request->pic_finance;
-                    $query->no_pic_finance    = $request->no_pic_finance;
-
-
-                    $query->status          = $request->status ? $request->status : '2';
-                    $query->gender          = $request->gender;
-
-                    $query->sale_area_id    = $request->sale_area_id;
-
-                    $query->type_body       = $request->type_body;
-                    $query->nib             = $request->nib;
-                    $query->sppkp            = $request->sppkp;
-
-
-                    $query->married_status  = $request->type == '1' ? $request->married_status : NULL;
-                    $query->married_date    = $request->type == '1' ? $request->married_date : NULL;
-                    $query->children        = $request->type == '1' ? $request->children : NULL;
-                    $query->country_id      = $request->country_id;
-                    $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
-                    $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
                     $query->last_change_password =  $request->password ? date('Y-m-d H:i:s') : $query->last_change_password;
-                    $query->is_special_lock_user = $request->is_special_lock_user && $request->type == '1' ? $request->is_special_lock_user : NULL;
                     $query->save();
 
                     //update tabel mitra customer saat update data user/customer
@@ -804,7 +779,7 @@ class UserController extends Controller
                         'place_id'	            => $request->type == '1' ? $request->place_id : NULL,
                         'province_id'	        => $request->province_id ? $request->province_id : NULL,
 
-                        'area_province_id'	    => $request->province_area_id ? $request->province_area_id : NULL,
+
                         'city_id'               => $request->city_id ? $request->city_id : NULL,
                         'district_id'           => $request->district_id ? $request->district_id : NULL,
                         'tax_id'                => $request->tax_id ? $request->tax_id : NULL,
@@ -825,25 +800,6 @@ class UserController extends Controller
 
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,
-
-                        'brand_id'              => $request->brand_id ? $request->brand_id : NULL,
-                        'sales_payment_type'    => $request->sales_payment_type,
-
-                        'pic_finance'    => $request->pic_finance,
-                        'no_pic_finance'    => $request->no_pic_finance,
-
-                        'status'                => $request->status ? $request->status : '2',
-                        'gender'                => $request->gender ? $request->gender : NULL,
-                        'married_status'        => $request->type == '1' ? ($request->married_status ? $request->married_status : NULL) :NULL,
-                        'married_date'          => $request->type == '1' ? ($request->married_date ? $request->married_date : NULL) : NULL,
-                        'children'              => $request->type == '1' ? ($request->children ? $request->children : NULL) : NULL,
-                        'country_id'            => $request->country_id ? $request->country_id : NULL,
-                        'connection_id'         => 0,
-                        'user_status'           => 'Offline',
-                        'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
-                        'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
-                        // 'last_change_password'  => date('Y-m-d H:i:s'),
-                        'is_special_lock_user'  => $request->is_special_lock_user && $request->type == '1' ? $request->is_special_lock_user : NULL,
                     ]);
                     if($request->type == 1){
                         $query_salary_component = SalaryComponent::where('status',1)->get();
@@ -1505,135 +1461,6 @@ class UserController extends Controller
         $user['limit_credit']      = number_format($user->limit_credit, 0, ',', '.');
         $user['cities']            = $user->province()->exists() ? $user->province->getCity() : '';
         $user['has_document']      = $user->hasDocument() ? '1' : '';
-        $user['brand_name']        = $user->brand()->exists() ? $user->brand->code.' - '.$user->brand->name : '';
-
-        $banks = [];
-		foreach($user->userBank as $row){
-			$banks[] = [
-                'id'            => $row->id,
-                'bank'          => $row->bank,
-                'name'          => $row->name,
-                'no'            => $row->no,
-                'branch'        => $row->branch,
-                'is_default'    => $row->is_default
-            ];
-		}
-		$user['banks'] = $banks;
-
-        $datas        = [];
-        $destinations = [];
-        $documents    = [];
-        foreach($user->userData as $row){
-            $code_provinsi = $row->province->code ?? null;
-
-            $code_city = $row->city->code ?? null;
-            $cities = DB::select("
-                SELECT id, code, name
-                FROM regions
-                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
-            ", ["$code_provinsi%"]);
-            $districts = DB::select("
-                    SELECT id, code, name
-                    FROM regions
-                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
-                ", ["$code_city%"]);
-			$datas[] = [
-                'id'                => $row->id,
-                'title'             => $row->title,
-                'tax_type'          => $row->tax_type,
-                'content'           => $row->content,
-                'npwp'              => $row->npwp,
-                'nitku'             => $row->nitku,
-                'address'           => $row->address,
-                'country_id'        => $row->country_id ? $row->country_id : '',
-                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
-                'province_id'       => $row->province_id ? $row->province_id : '',
-                'province_code'     => $row->province_id ? $row->province->code : '',
-                'city_code'         => $row->city_id ? $row->city->code : '',
-                'cities'            => $cities,
-                'districts'         => $districts,
-                'city_id'           => $row->city_id ? $row->city_id : '',
-                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
-                'district_id'       => $row->district_id ? $row->district_id : '',
-                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
-                'is_default'        => $row->is_default
-            ];
-		}
-        foreach($user->userDestination as $row){
-            $code_provinsi = $row->province->code ?? null;
-
-            $code_city = $row->city->code ?? null;
-            $cities = DB::select("
-                SELECT id, code, name
-                FROM regions
-                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
-            ", ["$code_provinsi%"]);
-            $districts = DB::select("
-                    SELECT id, code, name
-                    FROM regions
-                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
-                ", ["$code_city%"]);
-			$destinations[] = [
-                'id'                => $row->id,
-                'address'           => $row->address,
-                'country_id'        => $row->country_id ? $row->country_id : '',
-                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
-                'province_id'       => $row->province_id ? $row->province_id : '',
-                'province_code'     => $row->province_id ? $row->province->code : '',
-                'city_code'         => $row->city_id ? $row->city->code : '',
-                'cities'            => $cities,
-                'districts'         => $districts,
-                'city_id'           => $row->city_id ? $row->city_id : '',
-                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
-                'district_id'       => $row->district_id ? $row->district_id : '',
-                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
-                'is_default'        => $row->is_default
-            ];
-		}
-        foreach($user->userDestinationDocument as $row){
-            $code_provinsi = $row->province->code ?? null;
-
-            $code_city = $row->city->code ?? null;
-            $cities = DB::select("
-                SELECT id, code, name
-                FROM regions
-                WHERE code LIKE ? AND CHAR_LENGTH(code) = 5
-            ", ["$code_provinsi%"]);
-            $districts = DB::select("
-                    SELECT id, code, name
-                    FROM regions
-                    WHERE code LIKE ? AND CHAR_LENGTH(code) = 8
-                ", ["$code_city%"]);
-			$documents[] = [
-                'id'                => $row->id,
-                'address'           => $row->address,
-                'country_id'        => $row->country_id ? $row->country_id : '',
-                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
-                'province_id'       => $row->province_id ? $row->province_id : '',
-                'province_code'     => $row->province_id ? $row->province->code : '',
-                'city_code'         => $row->city_id ? $row->city->code : '',
-                'cities'            => $cities,
-                'districts'         => $districts,
-                'city_id'           => $row->city_id ? $row->city_id : '',
-                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
-                'district_id'       => $row->district_id ? $row->district_id : '',
-                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
-                'is_default'        => $row->is_default
-            ];
-		}
-        $user['datas']        = $datas;
-        $user['destinations'] = $destinations;
-        $user['documents']    = $documents;
-
-        $drivers = [];
-        foreach($user->userDriver as $row){
-            $drivers[] = [
-                'id'    => $row->id,
-                'name'  => $row->name,
-                'hp'    => $row->hp,
-            ];
-        }
-        $user['drivers'] = $drivers;
 
 		return response()->json($user);
     }

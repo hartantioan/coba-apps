@@ -106,13 +106,13 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 $start_pengurangan_penjualan->sum('grandtotal')+
                 $start_pengurangan_store->sum('total')
             );
-            if($row_stock->id == 2){
-                info($row_stock->item->name);
-                info($start_penambahan_partisi);
-                info($start_pengurangan_partisi);
-                info($start_pengurangan_penjualan);
-                info($start_pengurangan_store);
-            }
+            // if($row_stock->id == 2){
+            //     info($row_stock->item->name);
+            //     info($start_penambahan_partisi);
+            //     info($start_pengurangan_partisi);
+            //     info($start_pengurangan_penjualan);
+            //     info($start_pengurangan_store);
+            // }
 
             $penambahan_item_partisi = ItemPartitionDetail::where('to_item_stock_new_id',$row_stock->id)
             ->whereHas('itemPartition', function ($query) {

@@ -240,7 +240,7 @@ use App\Http\Controllers\Inventory\InventoryTransferOutController;
 use App\Http\Controllers\Inventory\InventoryTransferInController;
 use App\Http\Controllers\Inventory\TruckQueueController;
 use App\Http\Controllers\Inventory\TruckQueueUpdaterController;
-use App\Http\Controllers\Inventory\GoodReceiveController;
+use App\Http\Controllers\Inventory\ReportStockValueController;
 use App\Http\Controllers\Inventory\InventoryIssueController;
 use App\Http\Controllers\Inventory\ItemPartitionController;
 use App\Http\Controllers\Inventory\GoodIssueRequestController;
@@ -1440,7 +1440,13 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [ItemPartitionController::class, 'destroy'])->middleware('operation.access:item_partition,delete');
                     Route::get('export_from_page', [ItemPartitionController::class, 'exportFromTransactionPage']);
                 });
-
+                Route::prefix('inventory_report')->group(function () {
+                    Route::prefix('report_stock_value')->middleware('operation.access:report_stock_value,view')->group(function () {
+                        Route::get('/', [ReportStockValueController::class, 'index']);
+                        Route::post('refresh', [ReportStockValueController::class, 'refresh']);
+                        Route::get('export', [ReportStockValueController::class, 'export'])->middleware('operation.access:report_stock_value,update');
+                    });
+                });
             });
 
             Route::prefix('sales')->middleware('direct.access')->group(function () {

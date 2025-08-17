@@ -13,8 +13,8 @@ class ReportStockValueController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Laporan Antrian Truk',
-            'content'   => 'admin.inventory.report_truck_queue',
+            'title'     => 'Laporan Persediaan Barang',
+            'content'   => 'admin.inventory.report_stock_value',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

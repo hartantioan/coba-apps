@@ -1131,16 +1131,60 @@ class Item extends Model
         return implode(', ',$arr);
     }
 
-    public function materialRequestDetail(){
-        return $this->hasMany('App\Models\MaterialRequestDetail','item_id','id')->withTrashed();
+    public function deliveryReceiveDetail(){
+        return $this->hasMany('App\Models\DeliveryReceiveDetail','item_id','id')->withTrashed();
     }
 
-    public function purchaseRequestDetail(){
-        return $this->hasMany('App\Models\PurchaseRequestDetail','item_id','id')->withTrashed();
+    public function invoiceDetail(){
+        return $this->hasMany('App\Models\InvoiceDetail','store_item_stock_id','id')->withTrashed();
     }
 
-    public function purchaseOrderDetail(){
-        return $this->hasMany('App\Models\PurchaseOrderDetail','item_id','id')->withTrashed();
+    public function itemPartitionDetails()
+    {
+        return $this->hasManyThrough(
+            \App\Models\ItemPartitionDetail::class,
+            \App\Models\ItemStockNew::class,
+            'item_id', // Foreign key on ItemStock table...
+            'item_stock_new_id', // Foreign key on ItemPartitionDetail table...
+            'id', // Local key on Item table...
+            'id' // Local key on ItemStock table...
+        )->withTrashed();
+    }
+
+    public function itemPartitionDetailscome()
+    {
+        return $this->hasManyThrough(
+            \App\Models\ItemPartitionDetail::class,
+            \App\Models\ItemStockNew::class,
+            'item_id', // Foreign key on ItemStock table...
+            'to_item_stock_new_id', // Foreign key on ItemPartitionDetail table...
+            'id', // Local key on Item table...
+            'id' // Local key on ItemStock table...
+        )->withTrashed();
+    }
+
+    public function inventoryIssueDetail()
+    {
+        return $this->hasManyThrough(
+            \App\Models\InventoryIssueDetail::class,
+            \App\Models\ItemStockNew::class,
+            'item_id', // Foreign key on ItemStock table...
+            'item_stock_new_id', // Foreign key on ItemPartitionDetail table...
+            'id', // Local key on Item table...
+            'id' // Local key on ItemStock table...
+        )->withTrashed();
+    }
+
+    public function inventoryIssueDetailcome()
+    {
+        return $this->hasManyThrough(
+            \App\Models\InventoryIssueDetail::class,
+            \App\Models\StoreItemStock::class,
+            'item_id', // Foreign key on ItemStock table...
+            'store_item_stock_id', // Foreign key on ItemPartitionDetail table...
+            'id',
+            'id' // Local key on ItemStock table...
+        )->withTrashed();
     }
 
     public function goodReceiptDetail(){

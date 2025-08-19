@@ -37,6 +37,7 @@ class ExportItemPartitionDetail implements FromCollection, WithTitle, WithHeadin
         'Harga',
         'Total',
         'Item Tujuan',
+        'Qty Partisi',
         'Keterangan',
     ];
 
@@ -76,15 +77,16 @@ class ExportItemPartitionDetail implements FromCollection, WithTitle, WithHeadin
 
             $arr[] = [
                 'no'           => $key + 1,
+                'kode'         => $row->itemPartition->code ?? '',
                 'status'       => $row->itemPartition->statusRaw() ?? '',
                 'grandtotal'   => number_format($row->itemPartition->grandtotal, 2, ',', '.'),
-                'kode'         => $row->itemPartition->code ?? '',
                 'tgl_posting'  => $row->itemPartition->post_date ? date('d/m/Y', strtotime($row->itemPartition->post_date)) : '',
                 'item_asal'    => $row->fromStock->item->name ?? '',
                 'qty'          => number_format($row->qty, 2, ',', '.'),
                 'harga'        => number_format($row->price, 2, ',', '.'),
                 'total'        => number_format($row->total, 2, ',', '.'),
                 'item_tujuan'  => $row->toStock->item->name ?? '',
+                'qty_part'     => number_format($row->qty_partition, 2, ',', '.'),
                 'keterangan'   => $row->note ?? '',
             ];
 

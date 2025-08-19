@@ -865,113 +865,106 @@ class ItemController extends Controller
                                 <th class="center-align">Dokumen</th>
                                 <th class="center-align">User</th>
                                 <th class="center-align">Qty Dokumen</th>
-                                <th class="center-align">Qty Outstanding</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Status Dokumen</th>
                             </tr>
                         </thead><tbody>';
         $no = 1;
-        if($data->materialRequestDetail()->exists()){
+        if($data->deliveryReceiveDetail()->exists()){
 
-            foreach($data->materialRequestDetail as $row_mr_d){
-                if($row_mr_d->deleted_at == null){
+            foreach($data->deliveryReceiveDetail as $row_dr_d){
+                if($row_dr_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_mr_d->materialRequest->code.'</td>
-                        <td >'.$row_mr_d->materialRequest->user->name.'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_mr_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_mr_d->balancePr()).'</td>
+                        <td class="center-align">'.$row_dr_d->deliveryReceive->code.'</td>
+                        <td class="center-align">'.$row_dr_d->deliveryReceive->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_dr_d->qty).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_mr_d->materialRequest->status().'</td>
-                    </tr>';
-                    $no++;
-                }
-
-
-            }
-        }
-        if($data->purchaseRequestDetail()->exists()){
-            foreach($data->purchaseRequestDetail as $row_pr_d){
-                if($row_pr_d->deleted_at == null){
-                    $string .= '<tr>
-                        <td class="center-align">'.$no.'</td>
-                        <td>'.$row_pr_d->purchaseRequest->code.'</td>
-                        <td >'.$row_pr_d->purchaseRequest->user->name.'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_pr_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_pr_d->qtyBalance()).'</td>
-                        <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_pr_d->purchaseRequest->status().'</td>
+                        <td class="center-align">'.$row_dr_d->deliveryReceive->status().'</td>
                     </tr>';
                     $no++;
                 }
             }
         }
-        if($data->purchaseOrderDetail()->exists()){
-            foreach($data->purchaseOrderDetail as $row_po_d){
-                if($row_po_d->deleted_at == null){
+        if($data->itemPartitionDetails()->exists()){
+            foreach($data->itemPartitionDetails as $row_ipar_d){
+                if($row_ipar_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_po_d->purchaseOrder->code.'</td>
-                        <td >'.$row_po_d->purchaseOrder->user->name.'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_po_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_po_d->getBalanceReceipt()).'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->code.'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_ipar_d->qty).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_po_d->purchaseOrder->status().'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->status().'</td>
                     </tr>';
                     $no++;
                 }
             }
         }
-        if($data->goodReceiptDetail()->exists()){
-            foreach($data->goodReceiptDetail as $row_gr_d){
-                if($row_gr_d->deleted_at == null){
+        if($data->itemPartitionDetailscome()->exists()){
+            foreach($data->itemPartitionDetailscome as $row_ipar_d){
+                if($row_ipar_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_gr_d->goodReceipt->code.'</td>
-                        <td >'.$row_gr_d->goodReceipt->user->name.'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_gr_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_gr_d->balanceQtyInvoice()).'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->code.'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_ipar_d->qty_partition).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_gr_d->goodReceipt->status().'</td>
+                        <td class="center-align">'.$row_ipar_d->itemPartition->status().'</td>
                     </tr>';
                     $no++;
                 }
             }
         }
 
-        if($data->goodIssueRequestDetail()->exists()){
-            foreach($data->goodIssueRequestDetail as $row_gir_d){
-                if($row_gir_d->deleted_at == null){
+        if($data->inventoryIssueDetail()->exists()){
+            foreach($data->inventoryIssueDetail as $row_ii_d){
+                if($row_ii_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_gir_d->goodIssueRequest->code.'</td>
-                        <td >'.$row_gir_d->goodIssueRequest->user->name.'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->balanceGi()).'</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->code.'</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_ii_d->qty).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_gir_d->goodIssueRequest->status().'</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->status().'</td>
                     </tr>';
                     $no++;
                 }
             }
         }
 
-        if($data->landedCostDetail()->exists()){
-            foreach($data->landedCostDetail as $row_lc_d){
-                if($row_lc_d->deleted_at == null){
+        if($data->inventoryIssueDetailcome()->exists()){
+            foreach($data->inventoryIssueDetailcome as $row_iv_d){
+                if($row_ii_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_lc_d->landedCost->code.'</td>
-                        <td >'.$row_lc_d->landedCost->user->name.'</td>
-                        <td>'.$row_lc_d->qty.'</td>
-                        <td>-</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->code.'</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_ii_d->qty_store_item).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_lc_d->landedCost->status().'</td>
+                        <td class="center-align">'.$row_ii_d->inventoryIssue->status().'</td>
                     </tr>';
                     $no++;
                 }
             }
         }
+
+        if($data->invoiceDetail()->exists()){
+            foreach($data->invoiceDetail as $row_iv_d){
+                if($row_iv_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td class="center-align">'.$row_iv_d->invoice->code.'</td>
+                        <td class="center-align">'.$row_iv_d->invoice->user->name.'</td>
+                        <td class="center-align">'.CustomHelper::formatConditionalQty($row_iv_d->qty).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_iv_d->invoice->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+
 
         $string .= '</tbody></table></div>';
 

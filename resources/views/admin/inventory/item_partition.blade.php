@@ -1249,7 +1249,7 @@
         });
     }
 
-     function show(id){
+    function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
             type: 'POST',

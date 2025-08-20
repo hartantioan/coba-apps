@@ -33,7 +33,7 @@ class InventoryIssueDetail extends Model
 
     public function storeItemStock()
     {
-        return $this->belongsTo('App\Models\ItemStockNew', 'store_item_stock_id', 'id');
+        return $this->belongsTo('App\Models\StoreItemStock', 'store_item_stock_id', 'item_id');
     }
 
     public function inventoryIssue()

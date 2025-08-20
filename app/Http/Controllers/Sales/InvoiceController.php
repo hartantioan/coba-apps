@@ -162,12 +162,24 @@ class InvoiceController extends Controller
         $pr = Invoice::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Invoice',[0, 0, 80, 200] ,'portrait','admin.print.sales.invoice_store_individual','all');
+            $itemCount = $pr->invoiceDetail->count();
+            $baseHeight = 100; // points for header/footer
+            $itemHeight = 3 * 28.3465;  // 3 cm per item → ~85.04 points
 
+            $totalHeight = $baseHeight + ($itemCount * $itemHeight);
+
+            $widthPoints = 8 * 28.3465;
+            $pdf = PrintHelper::print(
+                $pr,
+                'Invoice',
+                [0, 0,$widthPoints, $totalHeight ], // width stays fixed, height changes
+                'portrait',
+                'admin.print.sales.invoice_store_individual',
+                'all'
+            );
             $content = $pdf->download()->getOriginalContent();
 
             $document_po = PrintHelper::savePrint($content);
-
             return $document_po;
         }else{
             abort(404);

@@ -193,7 +193,6 @@ class InventoryIssueController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
 
-                        <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
 
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -532,7 +531,7 @@ class InventoryIssueController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Item Toko</th>
-                                <th class="center-align">Stock di Toko</th>
+                                <th class="center-align">Stock di Toko Saat Ini</th>
                                 <th class="center-align">Qty Konversi</th>
                                 <th class="center-align">Satuan Item Konversi</th>
                                 <th class="center-align">Ket</th>
@@ -543,13 +542,14 @@ class InventoryIssueController extends Controller
         foreach($data->InventoryIssueDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="">'.$row->itemStock->item->code.' - '.$row->itemStock->item->name.'</td>
+                <td class="center-align">'.$row->itemStockNew->item->code.' - '.$row->itemStockNew->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
-                <td class="">'.$row->storeItemStock->item->code.' - '.$row->storeItemStock->item->name.'</td>
+                <td class="center-align">'.$row->itemStockNew->item->uomUnit->code.'</td>
+                <td class="center-align">'.$row->storeItemStock->item->code.' - '.$row->storeItemStock->item->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->storeItemStock->qty).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_store_item).'</td>
                 <td class="center-align">'.$row->storeItemStock->item->uomUnit->code.'</td>
-                <td class="">'.$row->note.'</td>
+                <td class="center-align">'.$row->note.'</td>
             </tr>';
         }
 
@@ -564,17 +564,19 @@ class InventoryIssueController extends Controller
         $arr = [];
         foreach($gr->InventoryIssueDetail as $row){
             $arr[] = [
-                'id'                        => $row->id,
-                'item_id'                   => $row->itemStock->item_id,
-                'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
-                'uom'                       => $row->itemStock->item->uomUnit->code,
-                'item_stock_id'             => $row->item_stock_id,
-                'qty'                       => CustomHelper::formatConditionalQty($row->qty),
-                'store_item_id'                   => $row->storeItemStock->item_id,
-                'store_item_name'                 => $row->storeItemStock->item->code.' - '.$row->storeItemStock->item->name,
-                'store_uom'                       => $row->storeItemStock->item->uomUnit->code,
-                'store_item_stock_id'             => $row->store_item_stock_id,
-                'store_qty'                       => CustomHelper::formatConditionalQty($row->qty_store_item),
+                'id'                  => $row->id,
+                'item_id'             => $row->itemStockNew->item_id,
+                'item_name'           => $row->itemStockNew->item->code.' - '.$row->itemStockNew->item->name,
+                'uom'                 => $row->itemStockNew->item->uomUnit->code,
+                'stock'               => CustomHelper::formatConditionalQty($row->itemStockNew->qty),
+                'qty'                 => CustomHelper::formatConditionalQty($row->qty),
+                'store_item_id'       => $row->storeItemStock->item_id,
+                'store_item_name'     => $row->storeItemStock->item->code.' - '.$row->storeItemStock->item->name,
+                'store_uom'           => $row->storeItemStock->item->uomUnit->code,
+                'store_item_stock_id' => $row->store_item_stock_id,
+                'store_qty'           => CustomHelper::formatConditionalQty($row->qty_store_item),
+                'store_stock'         => CustomHelper::formatConditionalQty($row->storeItemStock->qty),
+                'note'                => $row->note,
             ];
         }
 
@@ -984,7 +986,7 @@ class InventoryIssueController extends Controller
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
-            $pdf = PrintHelper::print($pr,'inventory issue','a5','landscape','admin.print.inventory.good_issue_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'inventory issue','a5','landscape','admin.print.inventory.inventory_issue_individual',$menuUser->mode);
 
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

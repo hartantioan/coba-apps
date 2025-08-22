@@ -73,19 +73,20 @@ class InventoryIssue extends Model
         return $this->hasMany('App\Models\InventoryIssueDetail');
     }
 
-    public function status(){
-        $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
-          '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
-          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+    public function status() {
+        $status = match ((string)$this->status) {
+            '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+            '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+            '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+            '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+            '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
+            '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+            default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
         return $status;
     }
+
 
     public function statusRaw(){
         $status = match ($this->status) {

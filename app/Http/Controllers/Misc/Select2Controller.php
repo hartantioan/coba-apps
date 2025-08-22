@@ -6598,7 +6598,7 @@ class Select2Controller extends Controller {
         ->where('status', '1')
         ->paginate(10);
 
-        if(!$data){
+        if(!$data['data']){
             $data = Item::where('id',$request->item_id)->paginate(10);
         }
 

@@ -571,35 +571,10 @@ class DeliveryReceiveController extends Controller
 
         if($query) {
 
-            $array_minus_stock=[];
-
-            foreach($query->DeliveryReceiveDetail as $row_good_receipt_detail){
-                $item_real_stock = $row_good_receipt_detail->item->getStockPlaceWarehouse($row_good_receipt_detail->place_id,$row_good_receipt_detail->warehouse_id);
-                $item_stock_detail = $row_good_receipt_detail->qtyConvert();
-                if($item_real_stock-$item_stock_detail < -1){
-                    $array_minus_stock[]=$row_good_receipt_detail->item->name;
-                }
-            }
-            if(count($array_minus_stock) > 0){
-                $arrError = [];
-                foreach($array_minus_stock as $row){
-                    $arrError[] = $row;
-                }
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf GRPO tidak dapat di void karena item stock saat ini kurang dari 0. Daftar Item : '.implode(', ',$arrError),
-                ]);
-            }
-
             if(in_array($query->status,['4','5','8'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->hasChildDocument()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
                 ];
             }else{
                 $query->update([
@@ -609,20 +584,57 @@ class DeliveryReceiveController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                $query->updateRootDocumentStatusProcess();
+                foreach($query->deliveryReceiveDetail as $row){
 
-                foreach($query->DeliveryReceiveDetail as $row){
-                    $row->itemSerial()->delete();
+                    $item_out = ItemStockNew::where('item_id', $row->item_id)->first();
+                    if ($item_out) {
+                        $item_out->qty -= $row->qty; // minus the qty that was reduced
+                        $item_out->save();
+                    }
+
+
+                    $item_stock = ItemStockNew::where('item_id',$row->item_id)->first();
+                    $rowprice = $item_stock->priceDate($query->post_date);
+                    $qty_in_stock = $row->qty;
+
+                    $qty_in_total_stock = ItemMove::where('item_id', $row->item_id)->where('type', 1)->sum('qty_in');
+                    $qty_out_total_stock = ItemMove::where('item_id', $row->item_id)->where('type', 2)->sum('qty_out');
+                    $new_qty_final_stock = $qty_in_total_stock - $qty_out_total_stock - $qty_in_stock;
+
+                    $total_in_stock = ItemMove::where('item_id', $row->item_id)->where('type', 1)->sum('total_in');
+                    $total_out_stock = ItemMove::where('item_id', $row->item_id)->where('type', 2)->sum('total_out');
+                    $new_total_final = $total_in_stock - $total_out_stock - $row->total;
+
+                    $new_price_final = $new_qty_final_stock > 0 ? $new_total_final / $new_qty_final_stock : 0;
+                    ItemMove::where('lookable_type', $query->getTable())
+                        ->where('lookable_id', $query->id)
+                        ->where(function ($q) use ($row) {
+                            $q->where('item_id', $row->item_id);
+                    })->delete();
+                    ItemMove::create([
+                        'lookable_type' => $query->getTable(),
+                        'lookable_id' => $query->id,
+                        'item_id' => $row->item_id,
+                        'qty_in' => 0,
+                        'price_in' => 0,
+                        'total_in' => 0,
+                        'qty_out' => $qty_in_stock,
+                        'price_out' => $rowprice,
+                        'total_out' => $row->total,
+                        'qty_final' => $new_qty_final_stock,
+                        'price_final' => $new_price_final,
+                        'total_final' => $new_total_final,
+                        'date' => now(),
+                        'type' => 2,
+                    ]);
+
+
+
+
+
                 }
 
-                if($query->cancelDocument()->exists()){
-                    $query->cancelDocument->journal->journalDetail()->delete();
-                    $query->cancelDocument->journal->delete();
-                    $query->cancelDocument->delete();
-                }
 
-                CustomHelper::removeJournal('delivery_receives',$query->id);
-                CustomHelper::removeCogs('delivery_receives',$query->id);
                 CustomHelper::sendNotification('delivery_receives',$query->id,'Delivery Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
 
 

@@ -387,7 +387,7 @@ class ItemPartitionController extends Controller
                             // IN movement reversal
                             $item_in = ItemStockNew::where('item_id', $detail->item_stock_new_id)->first(); // assuming you store the 'item_id' for store
                             if ($item_in) {
-                                $item_in->qty -= $detail->qty_store_item; // remove the qty that was added
+                                $item_in->qty -= $detail->qty_partition; // remove the qty that was added
                                 $item_in->save();
                             }
 
@@ -680,7 +680,7 @@ class ItemPartitionController extends Controller
                 'to_item_stock_new_name' => $row->toStock->item->code.' - '.$row->toStock->item->name,
                 'unit_partition'         => $row->toStock->item->uomUnit->code,
                 'to_item_stock_new_id'   => $row->to_item_stock_new_id,
-                'stock_partition'        => CustomHelper::formatConditionalQty($row->qty_store_item),
+                'stock_partition'        => CustomHelper::formatConditionalQty($row->qty_partition),
                 'note'                   => $row->note,
             ];
         }
@@ -708,75 +708,103 @@ class ItemPartitionController extends Controller
                 ]);
 
                 foreach($query->ItemPartitionDetail as $row){
-                    $rowprice = NULL;
-                    $item_stock = ItemStockNew::find(intval($row->item_stock_id));
+                    $item_out = ItemStockNew::where('id', $row->item_stock_new_id)->first();
+                    if ($item_out) {
+                        $item_out->qty += $row->qty; // restore the qty that was reduced
+                        $item_out->save();
+                    }
+
+                    // IN movement reversal
+                    $item_in = ItemStockNew::where('item_id', $row->to_item_stock_new_id)->first(); // assuming you store the 'item_id' for store
+                    if ($item_in) {
+                        $item_in->qty -= $row->qty_partition; // remove the qty that was added
+                        $item_in->save();
+                    }
+                    // Remove both move logs (in and out)
+
+
+                    $item_stock = ItemStockNew::where('item_id',$row->item_stock_new_id)->first();
                     $rowprice = $item_stock->priceDate($query->post_date);
-                    $total = $row->total;
+                    $qty_in_stock = $row->qty;
 
-                    $item_stock->qty += $row->qty;
-                    $item_stock->save();
-                    $prev_qty_final = ItemMove::where('item_id', $row)
-                                    ->where('type', 2)
-                                    ->sum('qty_final');
+                    $qty_in_total_stock = ItemMove::where('item_id', $row->item_stock_new_id)->where('type', 1)->sum('qty_in');
+                    $qty_out_total_stock = ItemMove::where('item_id', $row->item_stock_new_id)->where('type', 2)->sum('qty_out');
+                    $new_qty_final_stock = $qty_in_total_stock - $qty_out_total_stock + $qty_in_stock;
 
-                    $prev_total_final = ItemMove::where('item_id', $row)
-                        ->where('type', 2)
-                        ->sum('total_final');
+                    $total_in_stock = ItemMove::where('item_id', $row->item_stock_new_id)->where('type', 1)->sum('total_in');
+                    $total_out_stock = ItemMove::where('item_id', $row->item_stock_new_id)->where('type', 2)->sum('total_out');
+                    $new_total_final = $total_in_stock - $total_out_stock + $row->total;
 
-                    $new_qty_final = $prev_qty_final - $row->qty;
-                    $new_total_final = $prev_total_final - $total;
-                    $new_price_final = $new_qty_final > 0 ? $new_total_final / $new_qty_final : 0;
-
+                    $new_price_final = $new_qty_final_stock > 0 ? $new_total_final / $new_qty_final_stock : 0;
+                    ItemMove::where('lookable_type', $query->getTable())
+                        ->where('lookable_id', $query->id)
+                        ->where(function ($q) use ($row) {
+                            $q->where('item_id', $row->item_stock_new_id)
+                            ->orWhere('item_id', optional($row->itemStockNew)->item_id);
+                        })->delete(); // or forceDelete()
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
-                        'item_id' => $row->item_stock_id,
-                        'qty_in' => $row->qty,
-                        'price_in' => $row->price,
-                        'total_in' => $total,
+                        'item_id' => $row->item_stock_new_id,
+                        'qty_in' => $qty_in_stock,
+                        'price_in' => $rowprice,
+                        'total_in' => $row->total,
                         'qty_out' => 0,
                         'price_out' => 0,
                         'total_out' => 0,
-                        'qty_final' => $new_qty_final,
+                        'qty_final' => $new_qty_final_stock,
                         'price_final' => $new_price_final,
                         'total_final' => $new_total_final,
                         'date' => now(),
                         'type' => 1,
                     ]);
 
-                    //item stock keluar
 
-                    //itemstock masuk store
+                    $itemId = $row->to_item_stock_new_id;
+                    $qty_out_store = $row->qty_partition;
+                    $total_store = $row->total;
+                    $price_in = round($total_store/$qty_out_store,2);
 
+                    // get previous totals across all types
+                    $total_qty_in_store = ItemMove::where('item_id', $itemId)->where('type', 1)->sum('qty_in');
+                    $total_qty_out_store = ItemMove::where('item_id', $itemId)->where('type', 2)->sum('qty_out');
+                    $total_in_value_store = ItemMove::where('item_id', $itemId)->where('type', 1)->sum('total_in');
+                    $total_out_value_store = ItemMove::where('item_id', $itemId)->where('type', 2)->sum('total_out');
+
+                    // apply the new "in" movement
+                    $new_qty_final_store = ($total_qty_in_store - $qty_out_store) - $total_qty_out_store;
+                    $new_total_final_store = ($total_in_value_store - $total_store) - $total_out_value_store;
+                    $new_price_final_store = $new_qty_final_store > 0 ? $new_total_final_store / $new_qty_final_store : 0;
+                    ItemMove::where('lookable_type', $query->getTable())
+                        ->where('lookable_id', $query->id)
+                        ->where(function ($q) use ($row) {
+                            $q->where('item_id', $row->to_item_stock_new_id);
+                        })->delete();
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
-                        'item_id' => $row->store_item_stock_id,
+                        'item_id' => $itemId,
                         'qty_in' => 0,
                         'price_in' => 0,
                         'total_in' => 0,
-                        'qty_out' => $row->qty,
-                        'price_out' => $row->price,
-                        'total_out' => $total,
-                        'qty_final' => $new_qty_final,
-                        'price_final' => $new_price_final,
-                        'total_final' => $new_total_final,
+                        'qty_out' => $qty_out_store,
+                        'price_out' => $price_in,
+                        'total_out' => $total_store,
+                        'qty_final' => $new_qty_final_store,
+                        'price_final' => $new_price_final_store,
+                        'total_final' => $new_total_final_store,
                         'date' => now(),
                         'type' => 2,
                     ]);
-
-                    $item_stock_store = ItemStockNew::find(intval($row->store_item_stock_id));
-                    $item_stock_store->qty -= $row->qty;
-                    $item_stock_store->save();
                 }
 
                 activity()
                     ->performedOn(new ItemPartition())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the inventory issue data');
+                    ->log('Void the Item Partisi data');
 
-                CustomHelper::sendNotification('inventory_issues',$query->id,'Barang Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('item_partitions',$query->id,'Item Partisi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
 
                 $response = [
                     'status'  => 200,

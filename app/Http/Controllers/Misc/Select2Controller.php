@@ -40,6 +40,7 @@ use App\Models\MarketingOrderPlan;
 use App\Models\ItemShading;
 use App\Models\MaterialRequest;
 use App\Models\Menu;
+use App\Models\ItemStockNew;
 use App\Models\MenuUser;
 use App\Models\Outlet;
 use App\Models\PaymentRequest;
@@ -6582,24 +6583,19 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-
-        $data = Item::where(function($query) use($search, $request) {
-            $query->whereHas('parentConversion', function($q) use($search, $request) {
-                $q->where(function($q2) use($search) {
-                    $q2->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
-                });
-
-                if ($request->item_id) {
-                    $q->where('item_id', $request->item_id); // Now correctly filters on parentConversion
-                }
-            });
+        $itemStockNew = ItemStockNew::find($request->item_id);
+        $data = Item::whereHas('parentConversion', function($q) use ($itemStockNew) {
+            $q->where('item_id', $itemStockNew->item_id);
+        })
+        ->where(function ($query) use ($search) {
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name', 'like', "%$search%");
         })
         ->where('status', '1')
         ->paginate(10);
 
-        if(!$data['data']){
-            $data = Item::where('id',$request->item_id)->paginate(10);
+        if ($data->isEmpty()) {
+            $data = Item::where('id', $request->item_id)->paginate(10);
         }
 
         foreach($data as $d) {

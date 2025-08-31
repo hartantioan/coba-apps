@@ -27,6 +27,8 @@ class ItemMove extends Model
         'total_final',
         'date',
         'type',
+        'lookable_detail_type',
+        'lookable_detail_id'
     ];
 
     protected $dates = ['deleted_at', 'date'];

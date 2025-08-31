@@ -11,6 +11,7 @@ use App\Models\ItemPartitionDetail;
 use App\Models\ItemStockNew;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderDetail;
+use App\Models\StoreItemMove;
 use App\Models\StoreItemStock;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -246,9 +247,11 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                         $query->where('post_date', '>=', $this->start_date)
                             ->where('post_date', '<=', $this->finish_date);
                     })->get();
+                $total_invoice = StoreItemMove::where('lookable_type','invoice_details')
+                ->whereIn('lookable_id',$pengurangan_item_store_invoice->pluck('id'))->get();
 
                 $pengurangan_item_store_invoice_qty = $pengurangan_item_store_invoice->sum('qty');
-                $pengurangan_item_store_invoice_total = $pengurangan_item_store_invoice->sum('total');
+                $pengurangan_item_store_invoice_total = $total_invoice->sum('total_out');
             } else {
                 // Default values if no store_item_stock found
                 $penambahan_item_store_inventory_issue_qty = 0;

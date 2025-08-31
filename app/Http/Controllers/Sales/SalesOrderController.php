@@ -451,6 +451,8 @@ class SalesOrderController extends Controller
                         ItemMove::create([
                             'lookable_type' => $query->getTable(),
                             'lookable_id' => $query->id,
+                            'lookable_detail_type' => $grd->getTable(),
+                            'lookable_detail_id' => $grd->id,
                             'item_id' => $itemId,
                             'qty_in' => 0,
                             'price_in' => 0,

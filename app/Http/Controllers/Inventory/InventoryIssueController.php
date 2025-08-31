@@ -423,6 +423,8 @@ class InventoryIssueController extends Controller
                             ItemMove::create([
                                 'lookable_type' => $query->getTable(),
                                 'lookable_id' => $query->id,
+                                'lookable_detail_type' => $gid->getTable(),
+                                'lookable_detail_id' => $gid->id,
                                 'item_id' => $row,
                                 'qty_in' => 0,
                                 'price_in' => 0,
@@ -493,6 +495,8 @@ class InventoryIssueController extends Controller
                             StoreItemMove::create([
                                 'lookable_type' => $query->getTable(),
                                 'lookable_id' => $query->id,
+                                'lookable_detail_type' => $gid->getTable(),
+                                'lookable_detail_id' => $gid->id,
                                 'item_id' => $request->arr_item_stock_store[$key],
                                 'qty_in' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
                                 'price_in' => $price_in,
@@ -675,6 +679,8 @@ class InventoryIssueController extends Controller
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
+                        'lookable_detail_type' => $row->getTable(),
+                        'lookable_detail_id' => $row->id,
                         'item_id' => $row->item_stock_new_id,
                         'qty_in' => $qty_in_stock,
                         'price_in' => $rowprice,
@@ -713,6 +719,8 @@ class InventoryIssueController extends Controller
                     StoreItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
+                        'lookable_detail_type' => $row->getTable(),
+                        'lookable_detail_id' => $row->id,
                         'item_id' => $itemId,
                         'qty_in' => 0,
                         'price_in' => 0,

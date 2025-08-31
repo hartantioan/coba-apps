@@ -433,6 +433,8 @@ class DeliveryReceiveController extends Controller
                         ItemMove::create([
                             'lookable_type' => $query->getTable(),
                             'lookable_id' => $query->id,
+                            'lookable_detail_type' => $grd->getTable(),
+                            'lookable_detail_id' => $grd->id,
                             'item_id' => $row,
                             'qty_in' => str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key])),
                             'price_in' => str_replace(',', '.', str_replace('.', '', $request->arr_price[$key])),
@@ -614,6 +616,8 @@ class DeliveryReceiveController extends Controller
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
+                        'lookable_detail_type' => $row->getTable(),
+                        'lookable_detail_id' => $row->id,
                         'item_id' => $row->item_id,
                         'qty_in' => 0,
                         'price_in' => 0,

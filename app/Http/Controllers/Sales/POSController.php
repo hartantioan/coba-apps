@@ -168,6 +168,8 @@ class POSController extends Controller
                         ItemMove::create([
                             'lookable_type' => $query->getTable(),
                             'lookable_id' => $query->id,
+                            'lookable_detail_type' => $ivd->getTable(),
+                            'lookable_detail_id' => $ivd->id,
                             'item_id' => $itemId,
                             'qty_in' => 0,
                             'price_in' => 0,

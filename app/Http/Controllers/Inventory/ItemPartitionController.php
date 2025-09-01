@@ -523,12 +523,12 @@ class ItemPartitionController extends Controller
                         $item_stock->save();
                         $qty_out = (float) str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
 
-                        $qty_in_total = ItemMove::where('item_id', $row)->where('type', 1)->sum('qty_in');
-                        $qty_out_total = ItemMove::where('item_id', $row)->where('type', 2)->sum('qty_out');
+                        $qty_in_total = ItemMove::where('item_id', $item_stock->item_id)->where('type', 1)->sum('qty_in');
+                        $qty_out_total = ItemMove::where('item_id', $item_stock->item_id)->where('type', 2)->sum('qty_out');
                         $new_qty_final = $qty_in_total - $qty_out_total - $qty_out; // subtract new out
 
-                        $total_in = ItemMove::where('item_id', $row)->where('type', 1)->sum('total_in');
-                        $total_out = ItemMove::where('item_id', $row)->where('type', 2)->sum('total_out');
+                        $total_in = ItemMove::where('item_id', $item_stock->item_id)->where('type', 1)->sum('total_in');
+                        $total_out = ItemMove::where('item_id', $item_stock->item_id)->where('type', 2)->sum('total_out');
                         $new_total_final = $total_in - $total_out - $total; // subtract new out
 
                         $new_price_final = $new_qty_final > 0 ? $new_total_final / $new_qty_final : 0;
@@ -538,7 +538,7 @@ class ItemPartitionController extends Controller
                             'lookable_id' => $query->id,
                             'lookable_detail_type' => $gid->getTable(),
                             'lookable_detail_id' => $gid->id,
-                            'item_id' => $row,
+                            'item_id' => $item_stock->item_id,
                             'qty_in' => 0,
                             'price_in' => 0,
                             'total_in' => 0,

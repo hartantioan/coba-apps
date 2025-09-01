@@ -300,12 +300,6 @@ class ItemController extends Controller
                         $query->childrenConversion()->delete();
                     }
 
-                    if(!$query->itemCogs()->exists()){
-                        $query->itemStock()->delete();
-                        $query->itemStockNew()->delete();
-                    }
-
-
                     DB::commit();
                 }catch(\Exception $e){
                     Log::error($e);

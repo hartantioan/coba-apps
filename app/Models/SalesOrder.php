@@ -107,8 +107,8 @@ class SalesOrder extends Model
 
     public function status(){
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+          '1' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+          '2' => '<span class="green medium-small white-text padding-3">Selesai</span>',
           '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
           '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',

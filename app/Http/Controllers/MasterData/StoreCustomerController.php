@@ -8,6 +8,7 @@ use App\Models\StoreCustomer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StoreCustomerController extends Controller
@@ -71,6 +72,9 @@ class StoreCustomerController extends Controller
                     $val->code,
                     $val->name ?? '-',
                     $val->no_telp,
+                    '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>',
                 ];
 
                 $nomor++;
@@ -121,6 +125,7 @@ class StoreCustomerController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = StoreCustomer::create([
+                        'code' => strtoupper(Str::random(8)),
                         'name'	=> $request->name,
                         'no_telp'	=> $request->no_telp,
                     ]);

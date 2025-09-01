@@ -82,6 +82,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>No Telp</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -116,7 +117,6 @@
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <input type="hidden" id="temp" name="temp">
                             <input id="no_telp" name="no_telp" type="text" placeholder="No. Telp">
                             <label class="active" for="no_telp">Telepon</label>
                         </div>
@@ -232,6 +232,7 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'name', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

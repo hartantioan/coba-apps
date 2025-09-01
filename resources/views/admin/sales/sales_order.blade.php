@@ -507,7 +507,7 @@
             }
         });
 
-        select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
+        select2ServerSide('#customer_id', '{{ url("admin/select2/store_customer") }}');
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {

@@ -505,7 +505,7 @@ class ItemPartitionController extends Controller
                     }
                     foreach($request->arr_item_stock as $key => $row){
                         $rowprice = NULL;
-                        $item_stock = ItemStockNew::where('item_id',$row)->first();
+                        $item_stock = ItemStockNew::where('id',$row)->first();
                         $rowprice = $item_stock->priceDate($query->post_date);
                         $total = $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                         $gid = ItemPartitionDetail::create([

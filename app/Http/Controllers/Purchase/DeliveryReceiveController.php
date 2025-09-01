@@ -412,6 +412,7 @@ class DeliveryReceiveController extends Controller
                             'remark'                    => $remark,
 
                         ]);
+                        info($row);
 
                         $itemId = $row;
                         $qty_in = (float) str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
@@ -547,8 +548,6 @@ class DeliveryReceiveController extends Controller
 
         foreach($grm->deliveryReceiveDetail()->orderBy('id')->get() as $key => $row){
             $item_stocknew = ItemStockNew::where('item_id',$row->item_id)->first();
-
-                info($row->item->unit);
             $arr[] = [
                 'id'                        => $row->id,
                 'item_id'                   => $row->item_id,

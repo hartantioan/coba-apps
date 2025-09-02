@@ -15,6 +15,7 @@ use App\Models\Line;
 use App\Models\Menu;
 use App\Models\Place;
 use App\Models\StoreCustomer;
+use App\Models\StoreItemMove;
 use App\Models\StoreItemPriceList;
 use App\Models\StoreItemStock;
 use App\Models\UsedData;
@@ -144,7 +145,7 @@ class POSController extends Controller
                         $qtyOut = (float) str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
 
                         // Get the latest price_final (from any previous movement)
-                        $lastMove = ItemMove::where('item_id', $itemId)
+                        $lastMove = StoreItemMove::where('item_id', $itemId)
                             ->latest('id') // or latest('date') if you prefer
                             ->first();
 
@@ -154,18 +155,18 @@ class POSController extends Controller
                         $totalOut = $qtyOut * $priceFinal;
 
                         // Get all previous in/out sums
-                        $totalQtyIn = ItemMove::where('item_id', $itemId)->where('type', 1)->sum('qty_in');
-                        $totalQtyOut = ItemMove::where('item_id', $itemId)->where('type', 2)->sum('qty_out');
+                        $totalQtyIn = StoreItemMove::where('item_id', $itemId)->where('type', 1)->sum('qty_in');
+                        $totalQtyOut = StoreItemMove::where('item_id', $itemId)->where('type', 2)->sum('qty_out');
 
-                        $totalInValue = ItemMove::where('item_id', $itemId)->where('type', 1)->sum('total_in');
-                        $totalOutValue = ItemMove::where('item_id', $itemId)->where('type', 2)->sum('total_out');
+                        $totalInValue = StoreItemMove::where('item_id', $itemId)->where('type', 1)->sum('total_in');
+                        $totalOutValue = StoreItemMove::where('item_id', $itemId)->where('type', 2)->sum('total_out');
 
                         // Calculate new stock values
                         $newQtyFinal = ($totalQtyIn - $totalQtyOut) - $qtyOut;
                         $newTotalFinal = ($totalInValue - $totalOutValue) - $totalOut;
                         $newPriceFinal = $newQtyFinal > 0 ? $newTotalFinal / $newQtyFinal : 0;
 
-                        ItemMove::create([
+                        StoreItemMove::create([
                             'lookable_type' => $query->getTable(),
                             'lookable_id' => $query->id,
                             'lookable_detail_type' => $ivd->getTable(),

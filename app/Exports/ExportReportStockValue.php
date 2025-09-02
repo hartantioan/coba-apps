@@ -6,6 +6,7 @@ use App\Models\DeliveryReceiveDetail;
 use App\Models\InventoryIssue;
 use App\Models\InventoryIssueDetail;
 use App\Models\InvoiceDetail;
+use App\Models\ItemMove;
 use App\Models\ItemPartition;
 use App\Models\ItemPartitionDetail;
 use App\Models\ItemStockNew;
@@ -82,6 +83,9 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 ->whereHas('salesOrder', function ($query) {
                     $query->where('post_date', '<', $this->start_date);
                 })->get();
+            $total_penjualan = ItemMove::where('lookable_type','sales_orders')
+            ->whereIn('lookable_id',$start_pengurangan_penjualan->pluck('sales_order_id'))->get();
+            $pengurangan_item_penjualan_total = $total_penjualan->sum('total_out');
 
             $start_pengurangan_store = InventoryIssueDetail::where('item_stock_new_id', $row_stock->item_id)
                 ->whereHas('inventoryIssue', function ($query) {
@@ -104,7 +108,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 $start_penambahan_supplier->sum('grandtotal')
             ) - (
                 $start_pengurangan_partisi->sum('total') +
-                $start_pengurangan_penjualan->sum('grandtotal')+
+                $pengurangan_item_penjualan_total+
                 $start_pengurangan_store->sum('total')
             );
             if($row_stock->item_id == 1){
@@ -155,8 +159,11 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                         ->where('post_date', '<=', $this->finish_date);
             })->get();
 
+            $total_penjualan = ItemMove::where('lookable_type','sales_orders')
+            ->whereIn('lookable_id',$pengurangan_item_penjualan->pluck('sales_order_id'))->get();
+
             $pengurangan_item_penjualan_qty = $pengurangan_item_penjualan->sum('qty');
-            $pengurangan_item_penjualan_total = $pengurangan_item_penjualan->sum('grandtotal');
+            $pengurangan_item_penjualan_total = $total_penjualan->sum('total_out');
 
             $pengurangan_item_ke_store = InventoryIssueDetail::where('item_stock_new_id',$row_stock->item_id)
             ->whereHas('inventoryIssue', function ($query) {
@@ -228,7 +235,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
             $store_item_stock = StoreItemStock::where('item_stock_new_id', $row_stock->id)
                 ->where('item_id', $row_stock->item_id)
                 ->first();
-
+            $start_pengurangan_item_store_invoice_total=0;
             if ($store_item_stock) {
                 $start_store_penambahan = InventoryIssueDetail::where('store_item_stock_id', $store_item_stock->item_id)
                     ->whereHas('inventoryIssue', function ($query) {
@@ -239,6 +246,10 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                     ->whereHas('invoice', function ($query) {
                         $query->where('post_date', '<', $this->start_date);
                     })->get();
+
+                $start_total_invoice = StoreItemMove::where('lookable_type','invoices')
+                ->whereIn('lookable_id',$start_store_pengurangan->pluck('invoice_id'))->get();
+                $start_pengurangan_item_store_invoice_total = $start_total_invoice->sum('total_out');
             } else {
                 $start_store_penambahan = collect();
                 $start_store_pengurangan = collect();
@@ -266,7 +277,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                             ->where('post_date', '<=', $this->finish_date);
                     })->get();
                 $total_invoice = StoreItemMove::where('lookable_type','invoices')
-                ->whereIn('lookable_id',$pengurangan_item_store_invoice->pluck('id'))->get();
+                ->whereIn('lookable_id',$pengurangan_item_store_invoice->pluck('invoice_id'))->get();
 
                 $pengurangan_item_store_invoice_qty = $pengurangan_item_store_invoice->sum('qty');
                 $pengurangan_item_store_invoice_total = $total_invoice->sum('total_out');
@@ -282,7 +293,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
 
             $start_qty_store =$start_store_penambahan->sum('qty')- $start_store_pengurangan->sum('qty');
 
-            $start_value_store = $start_store_penambahan->sum('total') - $start_store_pengurangan->sum('total');
+            $start_value_store = $start_store_penambahan->sum('total') - $start_pengurangan_item_store_invoice_total;
 
             $arr[] = [
                 $keys, // Serial number

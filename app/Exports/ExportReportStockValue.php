@@ -156,7 +156,15 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
             $pengurangan_item_ke_store_qty = $pengurangan_item_ke_store->sum('qty');
             $pengurangan_item_ke_store_total = $pengurangan_item_ke_store->sum('total');
 
-
+            if($row_stock->item_id == 1){
+                info('sehabis start');
+                info($row_stock->item->name);
+                info($penambahan_item_supplier);
+                info($penambahan_item_partisi);
+                info($pengurangan_item_partisi);
+                info($pengurangan_item_penjualan);
+                info($pengurangan_item_ke_store);
+            }
             //item Store
             // Ambil data StoreItemStock
 

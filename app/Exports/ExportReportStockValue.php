@@ -247,7 +247,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                         $query->where('post_date', '>=', $this->start_date)
                             ->where('post_date', '<=', $this->finish_date);
                     })->get();
-                $total_invoice = StoreItemMove::where('lookable_type','invoice_details')
+                $total_invoice = StoreItemMove::where('lookable_type','invoices')
                 ->whereIn('lookable_id',$pengurangan_item_store_invoice->pluck('id'))->get();
 
                 $pengurangan_item_store_invoice_qty = $pengurangan_item_store_invoice->sum('qty');

@@ -108,11 +108,21 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 $start_pengurangan_store->sum('total')
             );
             if($row_stock->item_id == 1){
-                info($row_stock->item->name);
-                info($start_penambahan_partisi);
-                info($start_pengurangan_partisi);
-                info($start_pengurangan_penjualan);
-                info($start_pengurangan_store);
+                info('Start Penambahan Partisi - Qty: ' . $start_penambahan_partisi->sum('qty_partition'));
+                info('Start Penambahan Supplier - Qty: ' . $start_penambahan_supplier->sum('qty'));
+                info('Start Pengurangan Partisi - Qty: ' . $start_pengurangan_partisi->sum('qty'));
+                info('Start Pengurangan Penjualan - Qty: ' . $start_pengurangan_penjualan->sum('qty'));
+                info('Start Pengurangan Store - Qty: ' . $start_pengurangan_store->sum('qty'));
+
+                info('Start Penambahan Partisi - Value: ' . $start_penambahan_partisi->sum('total'));
+                info('Start Penambahan Supplier - Value: ' . $start_penambahan_supplier->sum('grandtotal'));
+                info('Start Pengurangan Partisi - Value: ' . $start_pengurangan_partisi->sum('total'));
+                info('Start Pengurangan Penjualan - Value: ' . $start_pengurangan_penjualan->sum('grandtotal'));
+                info('Start Pengurangan Store - Value: ' . $start_pengurangan_store->sum('total'));
+
+                info('Calculated Start Qty: ' . $start_qty);
+                info('Calculated Start Value: ' . $start_value);
+
             }
 
             $penambahan_item_partisi = ItemPartitionDetail::where('to_item_stock_new_id',$row_stock->id)

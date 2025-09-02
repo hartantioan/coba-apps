@@ -83,7 +83,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                     $query->where('post_date', '<', $this->start_date);
                 })->get();
 
-            $start_pengurangan_store = InventoryIssueDetail::where('item_stock_new_id', $row_stock->item_id)
+            $start_pengurangan_store = InventoryIssueDetail::where('item_stock_new_id', $row_stock->id)
                 ->whereHas('inventoryIssue', function ($query) {
                     $query->where('post_date', '<', $this->start_date);
                 })->get();

@@ -107,7 +107,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 $start_pengurangan_penjualan->sum('grandtotal')+
                 $start_pengurangan_store->sum('total')
             );
-            if($row_stock->id == 69){
+            if($row_stock->item_id == 1){
                 info($row_stock->item->name);
                 info($start_penambahan_partisi);
                 info($start_pengurangan_partisi);

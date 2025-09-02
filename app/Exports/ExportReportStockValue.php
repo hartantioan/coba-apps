@@ -148,7 +148,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
             $pengurangan_item_penjualan_qty = $pengurangan_item_penjualan->sum('qty');
             $pengurangan_item_penjualan_total = $pengurangan_item_penjualan->sum('grandtotal');
 
-            $pengurangan_item_ke_store = InventoryIssueDetail::where('item_stock_new_id',$row_stock->item_id)
+            $pengurangan_item_ke_store = InventoryIssueDetail::where('item_stock_new_id',$row_stock->id)
             ->whereHas('inventoryIssue', function ($query) {
                 $query->where('post_date', '>=', $this->start_date)
                         ->where('post_date', '<=', $this->finish_date);
@@ -212,12 +212,12 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 ->first();
 
             if ($store_item_stock) {
-                $start_store_penambahan = InventoryIssueDetail::where('store_item_stock_id', $store_item_stock->item_id)
+                $start_store_penambahan = InventoryIssueDetail::where('store_item_stock_id', $store_item_stock->id)
                     ->whereHas('inventoryIssue', function ($query) {
                         $query->where('post_date', '<', $this->start_date);
                     })->get();
 
-                $start_store_pengurangan = InvoiceDetail::where('store_item_stock_id', $store_item_stock->item_id)
+                $start_store_pengurangan = InvoiceDetail::where('store_item_stock_id', $store_item_stock->id)
                     ->whereHas('invoice', function ($query) {
                         $query->where('post_date', '<', $this->start_date);
                     })->get();
@@ -232,7 +232,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
 
             if ($store_item_stock) {
                 // Penambahan item ke store dari Inventory Issue
-                $penambahan_item_store_inventory_issue = InventoryIssueDetail::where('store_item_stock_id', $store_item_stock->item_id)
+                $penambahan_item_store_inventory_issue = InventoryIssueDetail::where('store_item_stock_id', $store_item_stock->id)
                     ->whereHas('inventoryIssue', function ($query) {
                         $query->where('post_date', '>=', $this->start_date)
                             ->where('post_date', '<=', $this->finish_date);
@@ -242,7 +242,7 @@ class ExportReportStockValue implements FromArray, WithTitle, ShouldAutoSize
                 $penambahan_item_store_inventory_issue_total = $penambahan_item_store_inventory_issue->sum('total');
 
                 // Pengurangan item dari store karena invoice
-                $pengurangan_item_store_invoice = InvoiceDetail::where('store_item_stock_id', $store_item_stock->item_id)
+                $pengurangan_item_store_invoice = InvoiceDetail::where('store_item_stock_id', $store_item_stock->id)
                     ->whereHas('invoice', function ($query) {
                         $query->where('post_date', '>=', $this->start_date)
                             ->where('post_date', '<=', $this->finish_date);

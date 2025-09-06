@@ -333,8 +333,6 @@ class DeliveryReceiveController extends Controller
                         $query->status = '2';
 
                         $query->save();
-                        ItemMove::where('lookable_type',$query->getTable())->where('lookable_id',$query->id)->delete();
-
                         $previousDetails = DeliveryReceiveDetail::onlyTrashed()
                             ->where('delivery_receive_id', $query->id)
                             ->get();
@@ -343,11 +341,11 @@ class DeliveryReceiveController extends Controller
                             $qty = (float) $old->qty;
                             $total = (float) $old->total;
 
-                            ItemMove::where('lookable_type', $query->getTable())
-                                ->where('lookable_id', $query->id)
-                                ->where('item_id', $old->item_id)
-                                ->where('type', 1)
-                                ->delete(); // or ->forceDelete() if needed
+                            // ItemMove::where('lookable_type', $query->getTable())
+                            //     ->where('lookable_id', $query->id)
+                            //     ->where('item_id', $old->item_id)
+                            //     ->where('type', 1)
+                            //     ->delete(); // or ->forceDelete() if needed
 
                             $itemStock = ItemStockNew::where('item_id', $old->item_id)->first();
                             if ($itemStock) {

@@ -149,7 +149,7 @@ class POSController extends Controller
                             ->latest('id') // or latest('date') if you prefer
                             ->first();
 
-                        $priceFinal = $lastMove?->price_final ?? 0;
+                        $priceFinal = $lastMove?->price_final ?? str_replace(',', '.', str_replace('.', '', $request->arr_price[$key]));
 
                         // Calculate out value
                         $totalOut = $qtyOut * $priceFinal;

@@ -1226,7 +1226,7 @@
                     <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');setStock('` + count + `')">
                 </td>
                 <td>
                     <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
@@ -1357,10 +1357,10 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="` + val.qty_stock + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="` + val.qty_stock + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" readonly>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');setStock('` + count + `')">
                                 </td>
                                 <td>
                                     <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="` + val.price + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
@@ -1439,6 +1439,19 @@
                 });
             }
         });
+    }
+
+    function setStock(val){
+        if($("#arr_item_stock" + val).val()){
+            let qtyMax = parseFloat($('#qty_stock' + val).val().replaceAll(".", "").replaceAll(",","."));
+            let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+            if(qtyInput > qtyMax){
+                $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+            }
+
+        }else{
+            $('#rowQty' + val).val('0,000');
+        }
     }
 
     function voidStatus(id){

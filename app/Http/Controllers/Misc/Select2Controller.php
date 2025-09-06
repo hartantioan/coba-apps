@@ -6613,4 +6613,37 @@ class Select2Controller extends Controller {
                 'more' => $data->hasMorePages()
             ]]);
     }
+
+    public function salesItemInventory(Request $request)
+    {
+
+        $response = [];
+        $search = $request->search;
+
+        $data = Item::where(function ($query) use ($search) {
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+            })
+            ->where('status', '1')
+            ->whereNotNull('is_sales_item')
+            ->paginate(10);
+
+        foreach ($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->code . ' - ' . $d->name,
+                'code'  => $d->code,
+                'name'  => $d->name,
+                'uom'   => $d->uomUnit->code,
+                'stock' => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
 }

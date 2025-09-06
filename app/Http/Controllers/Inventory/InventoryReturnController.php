@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Sales;
+namespace App\Http\Controllers\Inventory;
 
-use App\Exports\ExportSalesOrderDetail;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
+use App\Models\InventoryReturn;
+use App\Models\InventoryReturnDetail;
 use App\Models\ItemMove;
 use App\Models\ItemStockNew;
 use App\Models\Menu;
 use App\Models\MenuUser;
-use App\Models\SalesOrder;
-use App\Models\SalesOrderDetail;
 use App\Models\UsedData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -19,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
-class SalesOrderController extends Controller
+class InventoryReturnController extends Controller
 {
     protected $document_code;
     public function index(Request $request)
@@ -31,8 +30,8 @@ class SalesOrderController extends Controller
         session(['document_code' => $document_code]);
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'     => 'Penjualan Barang',
-            'content'   => 'admin.sales.sales_order',
+            'title'     => 'Pengembalian Barang',
+            'content'   => 'admin.inventory.inventory_return',
             'newcode'   => $document_code,
             'menucode'  => $menu->document_code,
             'modedata'  => $menuUser->mode ? $menuUser->mode : '',
@@ -50,7 +49,7 @@ class SalesOrderController extends Controller
             return response()->json(['error' => 'Document code not found'], 400);
         }
 
-        $code = SalesOrder::generateCode($document_code);
+        $code = InventoryReturn::generateCode($document_code);
 
         return response()->json($code);
     }
@@ -60,13 +59,7 @@ class SalesOrderController extends Controller
             'code',
             'user_id',
             'note',
-            'type_sales',
-            'customer_id',
-            'document',
             'post_date',
-            'payment_type',
-            'subtotal',
-            'tax',
             'grandtotal',
             'status',
             'void_id',
@@ -80,14 +73,12 @@ class SalesOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = SalesOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
-            if(!$request->modedata){
-                $query->where('user_id',session('bo_id'));
-            }
+        $total_data = InventoryReturn::where(function($query)use($request){
+
         })
         ->count();
 
-        $query_data = SalesOrder::where(function($query) use ($search, $request) {
+        $query_data = InventoryReturn::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -122,7 +113,7 @@ class SalesOrderController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = SalesOrder::where(function($query) use ($search, $request) {
+        $total_filtered = InventoryReturn::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -164,14 +155,9 @@ class SalesOrderController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">info_outline</i></button>',
                     $val->code,
                     $val->user->name ?? '',
-                    $val->paymentType() ?? '',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    number_format($val->subtotal,2,',','.'),
-                    number_format($val->grandtotal,2,',','.'),
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
-
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -208,7 +194,6 @@ class SalesOrderController extends Controller
             'arr_qty'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'customer_id.required'               => 'Supplier/vendor tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
@@ -222,15 +207,7 @@ class SalesOrderController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-            $totalall = 0;
-            $taxall = 0;
-            $wtaxall = 0;
             $grandtotalall = 0;
-            $arrDetail = [];
-
-            $account_id = NULL;
-
             foreach($request->arr_item as $key => $row){
                 if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0 ||str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) < 1){
                     $kambing["kambing"][]="Qty KURANG DARI 1";
@@ -240,107 +217,26 @@ class SalesOrderController extends Controller
                     ];
                     return response()->json($response);
                 }
-                $wtax = 0;
-                $total = 0;
+
+                $itemStock = ItemStockNew::where('item_id', $row)->first();
+                $price = $itemStock->priceDate($request->post_date);
                 $grandtotal = 0;
-                $tax = 0;
-                $total = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                $tax = data_get($request, "arr_tax.$key");
-                $wtax = data_get($request, "wtax.$key");
-                $raw_discount = trim(data_get($request->arr_discount, $key, '0'));
-                $discount = str_replace(',', '.', str_replace('.', '', $raw_discount ?: '0'));
+                $total = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $price;
 
 
-                $grandtotal = $total + $tax - $wtax - $discount;
+                $grandtotal = $total;
 
                 $arrDetail[] = [
                     'total'         => $total,
-                    'tax'           => $tax,
-                    'wtax'          => $wtax,
                     'grandtotal'    => $grandtotal,
                 ];
 
-                $totalall += $total;
-                $taxall += $tax;
-                $wtaxall += $wtax;
                 $grandtotalall += $grandtotal;
-
-
-
-
-                    // $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
-
-                    // $balanceqtygr = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR() - $pod->qtyRetur();
-
-                    // $balance = round($balanceqtygr - $pod->qty,2);
-                    // $percent_balance = round(($balance / $pod->qty) * 100,2);
-                    // if($percent_balance > $tolerance_gr){
-                    //     $overtolerance = true;
-                    //     $arrToleranceMessage[] = 'Item '.$pod->item->name.' toleransi terima '.$tolerance_gr.'% sedangkan kelebihan qty '.$percent_balance.'% dari '.CustomHelper::formatConditionalQty($balance).'/'.CustomHelper::formatConditionalQty($pod->qty).'. Qty sudah diterima dan akan diterima sebesar '.CustomHelper::formatConditionalQty($balanceqtygr).', Qty PO sebesar '.CustomHelper::formatConditionalQty($pod->qty);
-                    // }
-
-                    // $discount = $pod->purchaseOrder->discount;
-                    // $subtotal = $pod->purchaseOrder->subtotal;
-
-                    // $rowprice = 0;
-
-                    // $bobot = $subtotal > 0 ? $pod->subtotal / $subtotal : 0;
-                    // $rowprice = $pod->price;
-
-                    // if($pod->total){
-                    //     $rowprice = $pod->total / $pod->qty;
-                    //     $total = round($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))),2);
-                    // }else{
-                    //     $total = round(($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount),2);
-                    // }
-
-                    // if($pod->is_tax == '1' && $pod->is_include_tax == '1'){
-                    //     $total = round($total / (1 + ($pod->percent_tax / 100)),2);
-                    // }
-
-                    // if($pod->is_tax == '1'){
-                    //     $tax = round($total * ($pod->percent_tax / 100),2);
-                    // }
-
-                    // if($pod->is_wtax == '1'){
-                    //     $wtax = round($total * ($pod->percent_wtax / 100),2);
-                    // }
-
-
 
             }
 			if($request->temp){
-                    $query = SalesOrder::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = InventoryReturn::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Delivery Receive PO telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
                     if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if($query->document){
@@ -348,25 +244,20 @@ class SalesOrderController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/sales_orders');
+                            $document = $request->file('file')->store('public/inventory_returns');
                         } else {
                             $document = $query->document;
                         }
                         $query->user_id = session('bo_id');
-                        $query->type_sales = '1';
-                        $query->payment_type = $request->payment_type;
                         $query->post_date = $request->post_date;
-                        $query->customer_id = $request->customer_id ?? null;
                         $query->document = $document;
                         $query->note = $request->note;
-                        $query->subtotal = $totalall;
-                        $query->tax = $taxall;
                         $query->grandtotal = $grandtotalall;
-                        $query->status = '1';
+                        $query->status = '3';
 
                         $query->save();
 
-                        foreach($query->SalesOrderDetail as $row){
+                        foreach($query->InventoryReturnDetail as $row){
 
                             $items = ItemStockNew::where('item_id',$row->item_id)->first();
                             if ($items) {
@@ -387,47 +278,36 @@ class SalesOrderController extends Controller
 			}else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=SalesOrder::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode=InventoryReturn::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    $query = SalesOrder::create([
-                        'code'			        => $newCode,
-                        'user_id'		        => session('bo_id'),
-                        'customer_id'           =>  $request->customer_id ?? null,
-                        'type_sales'            => '1',
-                        'post_date'             => $request->post_date,
-                        'payment_type'          => $request->payment_type,
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/sales_orders') : NULL,
-                        'note'                  => $request->note,
-                        'status'                => '1',
-                        'subtotal'                 => $totalall,
-                        'tax'                   => $taxall,
-                        'grandtotal'            => $grandtotalall,
+                    $query = InventoryReturn::create([
+                        'code'         => $newCode,
+                        'user_id'      => session('bo_id'),
+                        'post_date'    => $request->post_date,
+                        'document'     => $request->file('document') ? $request->file('document')->store('public/inventory_returns') : NULL,
+                        'note'         => $request->note,
+                        'status'       => '1',
+                        'grandtotal'   => $grandtotalall,
                     ]);
 
 			}
 
 			if($query) {
                     foreach($request->arr_item as $key => $row){
-                        $raw_discount = trim(data_get($request->arr_discount, $key, '0'));
-                        $discount = str_replace(',', '.', str_replace('.', '', $raw_discount ?: '0'));
-                        $total = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                        $remark = data_get($request, "arr_remark.$key");
-                        $grd = SalesOrderDetail::create([
-                            'sales_order_id'           => $query->id,
-                            'item_id'                   => $row,
-                            'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                     => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'total'                     => $total,
-                            'tax'                       => $arrDetail[$key]['tax'],
-                            'wtax'                      => $arrDetail[$key]['wtax'],
-                            'grandtotal'                => $arrDetail[$key]['grandtotal'],
-                            'note'                      => $request->arr_note[$key],
-                            'discount_3'                => $discount,
-
+                        $itemStock = ItemStockNew::where('item_id', $row)->first();
+                        $price = $itemStock->priceDate($request->post_date);
+                        $total = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $price;
+                        $grd = InventoryReturnDetail::create([
+                            'inventory_return_id' => $query->id,
+                            'item_id'             => $row,
+                            'qty'                 => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'price'               => $price,
+                            'total'               => $total,
+                            'grandtotal'          => $arrDetail[$key]['grandtotal'],
+                            'note'                => $request->arr_note[$key],
                         ]);
 
 
-                        $itemStock = ItemStockNew::where('item_id', $row)->first();
                         $itemId = $itemStock->item_id;
 
                         // Get and format the outgoing quantity
@@ -480,14 +360,14 @@ class SalesOrderController extends Controller
 
                     }
 
-                    CustomHelper::sendNotification('sales_orders',$query->id,' Penjualan kode. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendNotification('inventory_returns',$query->id,' Pengembalian Barang kode. '.$query->code,$query->note,session('bo_id'));
 
 
                 activity()
-                    ->performedOn(new SalesOrder())
+                    ->performedOn(new InventoryReturn())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit penjualan barang.');
+                    ->log('Add / edit pengembalian barang.');
 
 				$response = [
 					'status'    => 200,
@@ -506,7 +386,7 @@ class SalesOrderController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = SalesOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = InventoryReturn::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
         if (isset($data->void_date)) {
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
@@ -533,7 +413,7 @@ class SalesOrderController extends Controller
                                 </thead>
                                 <tbody>';
         $totalqty=0;
-        foreach($data->SalesOrderDetail as $key => $rowdetail){
+        foreach($data->InventoryReturnDetail as $key => $rowdetail){
             $totalqty+=$rowdetail->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
@@ -557,11 +437,11 @@ class SalesOrderController extends Controller
 
 
     public function show(Request $request){
-        $grm = SalesOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $grm = InventoryReturn::where('code',CustomHelper::decrypt($request->id))->first();
         $grm['customer_name'] = $grm->customer?->name ?? '';
         $arr = [];
 
-        foreach($grm->SalesOrderDetail()->orderBy('id')->get() as $key => $row){
+        foreach($grm->InventoryReturnDetail()->orderBy('id')->get() as $key => $row){
             $stock = ItemStockNew::where('item_id',$row->item_id)->first();
             $arr[] = [
                 'id'                        => $row->id,
@@ -581,13 +461,13 @@ class SalesOrderController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = SalesOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = InventoryReturn::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query) {
 
             $array_minus_stock=[];
 
-            foreach($query->SalesOrderDetail as $row_good_receipt_detail){
+            foreach($query->InventoryReturnDetail as $row_good_receipt_detail){
                 $item_real_stock = $row_good_receipt_detail->item->getStockPlaceWarehouse($row_good_receipt_detail->place_id,$row_good_receipt_detail->warehouse_id);
                 $item_stock_detail = $row_good_receipt_detail->qtyConvert();
                 if($item_real_stock-$item_stock_detail < -1){
@@ -625,7 +505,7 @@ class SalesOrderController extends Controller
 
                 $query->updateRootDocumentStatusProcess();
 
-                foreach($query->SalesOrderDetail as $row){
+                foreach($query->InventoryReturnDetail as $row){
                     $row->itemSerial()->delete();
                 }
 
@@ -635,13 +515,13 @@ class SalesOrderController extends Controller
                     $query->cancelDocument->delete();
                 }
 
-                CustomHelper::removeJournal('sales_orders',$query->id);
-                CustomHelper::removeCogs('sales_orders',$query->id);
-                CustomHelper::sendNotification('sales_orders',$query->id,'Delivery Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeJournal('inventory_returns',$query->id);
+                CustomHelper::removeCogs('inventory_returns',$query->id);
+                CustomHelper::sendNotification('inventory_returns',$query->id,'Delivery Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
 
 
                 activity()
-                    ->performedOn(new SalesOrder())
+                    ->performedOn(new InventoryReturn())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the delivery receive data');
@@ -663,7 +543,7 @@ class SalesOrderController extends Controller
 
 
     public function destroy(Request $request){
-        $query = SalesOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = InventoryReturn::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -703,18 +583,18 @@ class SalesOrderController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->SalesOrderDetail as $row){
+            foreach($query->InventoryReturnDetail as $row){
                 $row->itemSerial()->delete();
             }
 
-            CustomHelper::removeJournal('sales_orders',$query->id);
-            CustomHelper::removeCogs('sales_orders',$query->id);
-            CustomHelper::removeApproval('sales_orders',$query->id);
+            CustomHelper::removeJournal('inventory_returns',$query->id);
+            CustomHelper::removeCogs('inventory_returns',$query->id);
+            CustomHelper::removeApproval('inventory_returns',$query->id);
 
-            $query->SalesOrderDetail()->delete();
+            $query->InventoryReturnDetail()->delete();
 
             activity()
-                ->performedOn(new SalesOrder())
+                ->performedOn(new InventoryReturn())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the delivery receive data');
@@ -741,7 +621,7 @@ class SalesOrderController extends Controller
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
 
-        $pr = SalesOrder::where('code',CustomHelper::decrypt($id))->first();
+        $pr = InventoryReturn::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
@@ -761,23 +641,12 @@ class SalesOrderController extends Controller
         }
     }
 
-    // public function export(Request $request){
-    //     $menu = Menu::where('url','good_receipt_po')->first();
-    //     $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
-    //     $post_date = $request->start_date? $request->start_date : '';
-    //     $end_date = $request->end_date ? $request->end_date : '';
-    //     $mode = $request->mode ? $request->mode : '';
-    //     $modedata = $menuUser->mode ?? '';
-    //     $nominal = $menuUser->show_nominal ?? '';
-	// 	return Excel::download(new ExportGoodReceipt($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
-    // }
-
     public function exportFromTransactionPage(Request $request){
         $search = $request->search? $request->search : '';
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
-		return Excel::download(new ExportSalesOrderDetail($search,$status,$end_date,$post_date), 'penjualan_'.uniqid().'.xlsx');
+		return Excel::download(new ExportInventoryReturnDetail($search,$status,$end_date,$post_date), 'penjualan_'.uniqid().'.xlsx');
     }
 
 
@@ -792,7 +661,7 @@ class SalesOrderController extends Controller
 
 
     public function done(Request $request){
-        $query_done = SalesOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $query_done = InventoryReturn::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query_done){
 
@@ -804,7 +673,7 @@ class SalesOrderController extends Controller
                 ]);
 
                 activity()
-                        ->performedOn(new SalesOrder())
+                        ->performedOn(new InventoryReturn())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the delivery receive data');

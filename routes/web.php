@@ -234,7 +234,7 @@ use App\Http\Controllers\Sales\InvoiceController;
 
 use App\Http\Controllers\Mitra\MitraMarketingOrderController;
 
-use App\Http\Controllers\Inventory\GoodReceiptPOController;
+use App\Http\Controllers\Inventory\InventoryReturnController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
 use App\Http\Controllers\Inventory\InventoryTransferOutController;
 use App\Http\Controllers\Inventory\InventoryTransferInController;
@@ -413,6 +413,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('sales_item_parent', [Select2Controller::class, 'salesItemParent']);
                 Route::get('sales_item_child', [Select2Controller::class, 'salesItemChild']);
+                Route::get('sales_item_inventory', [Select2Controller::class, 'salesItemInventory']);
                 Route::get('sales_item_shading_box', [Select2Controller::class, 'salesItemShadingBox']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
@@ -1440,6 +1441,28 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [ItemPartitionController::class, 'destroy'])->middleware('operation.access:item_partition,delete');
                     Route::get('export_from_page', [ItemPartitionController::class, 'exportFromTransactionPage']);
                 });
+
+                Route::prefix('inventory_return')->middleware(['operation.access:inventory_return,view'])->group(function () {
+                    Route::get('/', [InventoryReturnController::class, 'index']);
+                    Route::get('datatable', [InventoryReturnController::class, 'datatable']);
+                    Route::get('row_detail', [InventoryReturnController::class, 'rowDetail']);
+                    Route::post('show', [InventoryReturnController::class, 'show']);
+                    Route::post('done', [InventoryReturnController::class, 'done'])->middleware('operation.access:inventory_return,update');
+                    Route::post('get_code', [InventoryReturnController::class, 'getCode']);
+                    Route::get('print_individual/{id}', [InventoryReturnController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('get_purchase_order', [InventoryReturnController::class, 'getPurchaseOrder']);
+                    Route::post('get_purchase_order_all', [InventoryReturnController::class, 'getPurchaseOrderAll']);
+                    Route::post('remove_used_data', [InventoryReturnController::class, 'removeUsedData']);
+                    Route::post('create', [InventoryReturnController::class, 'create'])->middleware('operation.access:inventory_return,update');
+                    Route::get('approval/{id}', [InventoryReturnController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [InventoryReturnController::class, 'voidStatus'])->middleware('operation.access:inventory_return,void');
+                    Route::post('unlock_procurement', [InventoryReturnController::class, 'unlockProcurement'])->middleware('operation.access:inventory_return,update');
+                    Route::post('edit_selected', [InventoryReturnController::class, 'editSelected'])->middleware('operation.access:inventory_return,update');
+                    Route::post('destroy', [InventoryReturnController::class, 'destroy'])->middleware('operation.access:inventory_return,delete');
+                    Route::get('export_from_page', [InventoryReturnController::class, 'exportFromTransactionPage']);
+                    Route::post('cancel_status', [InventoryReturnController::class, 'cancelStatus'])->middleware('operation.access:inventory_return,void');
+                });
+
                 Route::prefix('inventory_report')->group(function () {
                     Route::prefix('report_stock_value')->middleware('operation.access:report_stock_value,view')->group(function () {
                         Route::get('/', [ReportStockValueController::class, 'index']);

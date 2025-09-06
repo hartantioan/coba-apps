@@ -392,14 +392,14 @@ class ItemPartitionController extends Controller
                             }
 
                             // Remove both move logs (in and out)
-                            ItemMove::where('lookable_type', $query->getTable())
-                                ->where('lookable_id', $query->id)
-                                ->where(function ($q) use ($detail) {
-                                    $q->where('item_id', $detail->item_id)
-                                    ->orWhere('item_id', optional($detail->itemStockNew)->item_id);
-                                })->delete(); // or forceDelete()
+                            // ItemMove::where('lookable_type', $query->getTable())
+                            //     ->where('lookable_id', $query->id)
+                            //     ->where(function ($q) use ($detail) {
+                            //         $q->where('item_id', $detail->item_id)
+                            //         ->orWhere('item_id', optional($detail->itemStockNew)->item_id);
+                            //     })->delete(); // or forceDelete()
 
-                            // Optional: soft delete the detail if not already
+                            // // Optional: soft delete the detail if not already
                             $detail->delete();
                         }
 
@@ -744,12 +744,12 @@ class ItemPartitionController extends Controller
                     $new_total_final = $total_in_stock - $total_out_stock + $row->total;
 
                     $new_price_final = $new_qty_final_stock > 0 ? $new_total_final / $new_qty_final_stock : 0;
-                    ItemMove::where('lookable_type', $query->getTable())
-                        ->where('lookable_id', $query->id)
-                        ->where(function ($q) use ($row) {
-                            $q->where('item_id', $row->item_stock_new_id)
-                            ->orWhere('item_id', optional($row->itemStockNew)->item_id);
-                        })->delete(); // or forceDelete()
+                    // ItemMove::where('lookable_type', $query->getTable())
+                    //     ->where('lookable_id', $query->id)
+                    //     ->where(function ($q) use ($row) {
+                    //         $q->where('item_id', $row->item_stock_new_id)
+                    //         ->orWhere('item_id', optional($row->itemStockNew)->item_id);
+                    //     })->delete(); // or forceDelete()
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,
@@ -785,11 +785,11 @@ class ItemPartitionController extends Controller
                     $new_qty_final_store = ($total_qty_in_store - $qty_out_store) - $total_qty_out_store;
                     $new_total_final_store = ($total_in_value_store - $total_store) - $total_out_value_store;
                     $new_price_final_store = $new_qty_final_store > 0 ? $new_total_final_store / $new_qty_final_store : 0;
-                    ItemMove::where('lookable_type', $query->getTable())
-                        ->where('lookable_id', $query->id)
-                        ->where(function ($q) use ($row) {
-                            $q->where('item_id', $row->to_item_stock_new_id);
-                        })->delete();
+                    // ItemMove::where('lookable_type', $query->getTable())
+                    //     ->where('lookable_id', $query->id)
+                    //     ->where(function ($q) use ($row) {
+                    //         $q->where('item_id', $row->to_item_stock_new_id);
+                    //     })->delete();
                     ItemMove::create([
                         'lookable_type' => $query->getTable(),
                         'lookable_id' => $query->id,

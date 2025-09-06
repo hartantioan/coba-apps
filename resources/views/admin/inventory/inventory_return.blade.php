@@ -79,9 +79,6 @@
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
-                                                        <option value="6">Direvisi</option>
-                                                        <option value="8">Ditutup Balik</option>
-                                                        <option value="9">Dilock Procurement</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -131,12 +128,8 @@
                                                         <th >#</th>
                                                         <th >{{ __('translations.code') }}</th>
                                                         <th >{{ __('translations.user') }}</th>
-                                                        <th >Penerima</th>
                                                         <th  class="center-align">{{ __('translations.date') }}</th>
-                                                        <th  class="center-align">Tanggal Dokumen</th>
-                                                        <th >{{ __('translations.note') }}</th>
-                                                        <th >No.Surat Jalan</th>
-                                                        <th >Lampiran</th>
+                                                        <th  class="center-align">Keterangan</th>
                                                         <th >{{ __('translations.status') }}</th>
                                                         <th >Operasi</th>
                                                     </tr>
@@ -172,27 +165,11 @@
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
                             <div class="col m12 s12"></div>
-                            <div class="input-field col m3 s12 div-account">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
-                                <label class="active" for="account_id">Supplier</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
-                                <label class="active" for="receiver_name">Nama Penerima</label>
-                            </div>
                             <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Diterima</label>
+                                <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="input-field col m3 s12 step8">
-                                <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
-                                <label class="active" for="document_date">Tgl. Dokumen</label>
-                            </div>
-                            <div class="input-field col m3 s12 step9">
-                                <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Surat Jalan">
-                                <label class="active" for="delivery_no">No. Surat Jalan</label>
-                            </div>
+                            <div class="col s12"></div>
                             <div class="col m4 s12 step10">
                                 <label class="">Bukti Upload</label>
                                 <br>
@@ -219,23 +196,20 @@
                                                 <tr>
                                                     <th class="center">{{ __('translations.delete') }}</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
+                                                    <th class="center">Stock Gudang</th>
                                                     <th class="center">Qty</th>
-                                                    <th class="center">Harga</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Qty Stok</th>
-                                                    <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="8" class="center">
-                                                        Pilih purchase order untuk memulai...
+                                                    <td colspan="5" class="center">
+                                                        Tambah Item Untuk Memulai
                                                     </td>
                                                 </tr>
                                             </tbody>
                                             <thead>
-                                                <th colspan="6">TOTAL</th>
+                                                <th colspan="3">TOTAL</th>
                                                 <th class="right-align" id="total-received">0,000</th>
                                                 <th colspan="1"></th>
                                             </thead>
@@ -271,19 +245,6 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12" id="show_print">
-
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
-    </div>
-</div>
-
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -296,22 +257,6 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
-
-
-<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content row">
-        <div class="col s12" id="show_structure">
-            <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
-
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
-    </div>
-</div>
-
-
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -501,23 +446,16 @@
                 $('#show_detail').empty();
             }
         });
-
-        select2ServerSide('#account_id', '{{ url("admin/select2/supplier_store") }}');
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
+
+                getCode();
             },
             onOpenEnd: function(modal, trigger) {
-                getCode();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-                window.onbeforeunload = function() {
-                    if($('.data-used').length > 0){
-                        $('.data-used').trigger('click');
-                    }
-                    return 'You will lose all changes made since your last save';
-                };
             },
             onCloseEnd: function(modal, trigger){
                 clearButton.click();
@@ -526,20 +464,15 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
-                $('.row_item_serial').each(function(){
-                    $(this).remove();
-                });
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="23" class="center">
-                                Pilih purchase order untuk memulai...
+                            <td colspan="5" class="center">
+                                Tambah Item Untuk Memulai
                             </td>
                         </tr>
                     `);
                 }
-                $('#purchase_order_id,#good_scale_id,#purchase_order_detail_id').empty();
-                $('#account_id').empty();
                 M.updateTextFields();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -585,7 +518,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="8" class="center">
+                        <td colspan="5" class="center">
                             Harap Tambah Item Detail terlebih dahulu
                         </td>
                     </tr>
@@ -597,19 +530,11 @@
     });
 
     function countAll(){
-        let total = 0;
         let qty_total = 0;
         $('input[name^="arr_qty[]"]').each(function(){
             qty_total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
-        $('.total-column').each(function () {
-            let value = $(this).text().replaceAll(".", "").replaceAll(",", "."); // Convert to a valid number format
-            let numericValue = parseFloat(value);
-            if (!isNaN(numericValue)) {
-                total += numericValue;
-            }
-        });
-        $('#total-received').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
+        $('#total-received').text(formatRupiahIni(qty_total.toFixed(3).toString().replace('.',',')));
 
     }
 
@@ -623,8 +548,8 @@
             if($('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="8" class="center">
-                            Pilih purchase order untuk memulai...
+                        <td colspan="5" class="center">
+                            Tambah Item untuk memulai
                         </td>
                     </tr>
                 `);
@@ -638,8 +563,8 @@
 
     function getCode(){
         if($('#temp').val()){
-
-            }else{
+            console.log('ddd');
+        }else{
             if($('#code').val().length > 7){
                 $('#code').val($('#code').val().slice(0, 7));
             }
@@ -692,190 +617,6 @@
         `;
     };
 
-    function makeTreeOrg(data,link){
-        var $ = go.GraphObject.make;
-
-        myDiagram =
-        $(go.Diagram, "myDiagramDiv",
-        {
-            initialContentAlignment: go.Spot.Center,
-            "undoManager.isEnabled": true,
-            layout: $(go.TreeLayout,
-            {
-                angle: 180,
-                path: go.TreeLayout.PathSource,
-                setsPortSpot: false,
-                setsChildPortSpot: false,
-                arrangement: go.TreeLayout.ArrangementHorizontal
-            })
-        });
-        $("PanelExpanderButton", "METHODS",
-            { row: 2, column: 1, alignment: go.Spot.TopRight },
-            {
-                visible: true,
-                click: function(e, obj) {
-                    var node = obj.part.parent;
-                    var diagram = node.diagram;
-                    var data = node.data;
-                    diagram.startTransaction("Collapse/Expand Methods");
-                    diagram.model.setDataProperty(data, "isTreeExpanded", !data.isTreeExpanded);
-                    diagram.commitTransaction("Collapse/Expand Methods");
-                }
-            },
-            new go.Binding("visible", "methods", function(arr) { return arr.length > 0; })
-        );
-        myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
-            var part = e.subject.part;
-            if (part instanceof go.Link) {
-
-            } else if (part instanceof go.Node) {
-                window.open(part.data.url);
-                if (part.isTreeExpanded) {
-                    part.collapseTree();
-                } else {
-                    part.expandTree();
-                }
-
-            }
-        });
-        myDiagram.nodeTemplate =
-        $(go.Node, "Auto",
-            {
-            locationSpot: go.Spot.Center,
-            fromSpot: go.Spot.AllSides,
-            toSpot: go.Spot.AllSides,
-            portId: "",
-
-            },
-            { isTreeExpanded: false },
-            $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
-            new go.Binding("fill", "color")),
-            $(go.Panel, "Table",
-            { defaultRowSeparatorStroke: "black" },
-            $(go.TextBlock,
-                {
-                row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
-                font: "bold 12pt sans-serif",
-                isMultiline: false, editable: true
-                },
-                new go.Binding("text", "name").makeTwoWay()
-            ),
-            $(go.TextBlock, "Properties",
-                { row: 1, font: "italic 10pt sans-serif" },
-                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")
-            ),
-            $(go.Panel, "Vertical", { name: "PROPERTIES" },
-                new go.Binding("itemArray", "properties"),
-                {
-                row: 1, margin: 3, stretch: go.GraphObject.Fill,
-                defaultAlignment: go.Spot.Left,
-                }
-            ),
-
-            $(go.Panel, "Auto",
-                { portId: "r" },
-                { margin: 6 },
-                $(go.Shape, "Circle", { fill: "transparent", stroke: null, desiredSize: new go.Size(8, 8) })
-            ),
-            ),
-
-            $("TreeExpanderButton",
-            { alignment: go.Spot.Right, alignmentFocus: go.Spot.Right, width: 14, height: 14 }
-            )
-        );
-        myDiagram.model.root = data[0].key;
-
-
-        myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
-        setTimeout(function() {
-
-            var rootKey = data[0].key;
-            var rootNode = myDiagram.findNodeForKey(rootKey);
-            if (rootNode !== null) {
-                rootNode.collapseTree();
-            }
-        }, 100);
-        });
-
-        myDiagram.layout = $(go.TreeLayout);
-
-        myDiagram.addDiagramListener("InitialLayoutCompleted", e => {
-           e.diagram.findTreeRoots().each(r => r.expandTree(3));
-            e.diagram.nodes.each(node => {
-                node.findTreeChildrenNodes().each(child => child.expandTree(10));
-            });
-        });
-
-        myDiagram.model = $(go.GraphLinksModel,
-        {
-            copiesArrays: true,
-            copiesArrayObjects: true,
-            nodeDataArray: data,
-            linkDataArray: link
-        });
-
-    }
-
-    function viewStructureTree(id){
-        $.ajax({
-            url: '{{ Request::url() }}/viewstructuretree',
-            type: 'GET',
-            dataType: 'JSON',
-            data: {
-                id : id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }, beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                makeTreeOrg(response.message,response.link);
-                $('#modal3').modal('open');
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function simpleStructrueTree(id){
-        $.ajax({
-            url: '{{ Request::url() }}/simplestructuretree',
-            type: 'GET',
-            dataType: 'JSON',
-            data: {
-                id : id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-
-                makeTreeOrg(response.message,response.link);
-
-                $('#modal3').modal('open');
-            },
-            error: function() {
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -921,12 +662,8 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'company_id', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1002,143 +739,81 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
+                var formData = new FormData($('#form_data')[0]), passed = true, passedSerial = true;
 
-                if($('#type').val() == '2'){
-                    let totalScale = parseFloat($('#goodScaleQtyMax').text().replaceAll(".", "").replaceAll(",","."));
-                    let totalReceived = 0;
-
-                    $('.arr_qty_gs').each(function(index){
-                        if($(this).text() == 'YA'){
-                            totalReceived += parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-                        }else{
-                            totalReceived += (totalScale - totalReceived);
-                        }
-                    });
-
-                    if(totalScale != totalReceived){
-                        M.toast({
-                            html: 'Mohon maaf untuk tipe Timbangan, nominal BERAT TIMBANG harus sama dengan total Qty Diterima. Qty Timbang : ' + totalScale + ', sedangkan Qty PO Diterima (item Timbang) : ' + totalReceived.toFixed(3)
-                        });
-                        return false;
-                    }
-                }
-
-                var formData = new FormData($('#form_data')[0]), passedSerial = true;
-
-                formData.delete("arr_department[]");
-                formData.delete("arr_line[]");
-                formData.delete("arr_machine[]");
-                formData.delete("arr_scale[]");
-                formData.delete("arr_serial[]");
-
-                $('input[name^="arr_department"]').each(function(index){
-                    formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
-                });
-
-                $('input[name^="arr_line"]').each(function(index){
-                    formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
-                });
-
-                $('input[name^="arr_machine"]').each(function(index){
-                    formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
-                });
-
-                $('input[name^="arr_scale"]').each(function(index){
-                    formData.append('arr_scale[]',($(this).val() ? $(this).val() : ''));
-                });
-
-                if($('input[name^="arr_serial[]"]').length > 0){
-                    $('input[name^="arr_serial[]"]').each(function(index){
-                        if(!$(this).val()){
-                            passedSerial = false;
-                        }else{
-                            formData.append('arr_serial[]',$(this).val());
-                            formData.append('arr_serial_item[]',$(this).data('item'));
-                            formData.append('arr_serial_po[]',$(this).data('po'));
-                        }
-                    });
-                }
-
-                if(passedSerial){
-                    var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
+                var path = window.location.pathname;
+                path = path.replace(/^\/|\/$/g, '');
 
 
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
+                var segments = path.split('/');
+                var lastSegment = segments[segments.length - 1];
 
-                    formData.append('lastsegment',lastSegment);
+                formData.append('lastsegment',lastSegment);
 
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('#modal1');
-                        },
-                        success: function(response) {
-                            loadingClose('#modal1');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('#modal1');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal1');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
 
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
-                                    });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
-                                });
-                            }
-                        },
-                        error: function() {
-                            $('#modal1').scrollTop(0);
-                            loadingClose('.modal-content');
                             swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
                             });
                         }
-                    });
-                }else{
-                    swal({
-                        title: 'Ups!',
-                        text: 'Nomor serial item tidak boleh kosong.',
-                        icon: 'error'
-                    });
-                }
+                    },
+                    error: function() {
+                        $('#modal1').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+
             }
         });
     }
@@ -1148,12 +823,6 @@
         $('#modal1').modal('close');
     }
 
-    function fillInArray(){
-        arrpod = [];
-        $('input[name^="arr_purchase[]"]').each(function(){
-            arrpod.push($(this).val());
-        });
-    }
 
     function removeUsedData(id){
         $.ajax({
@@ -1223,20 +892,10 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" readonly>
                 </td>
                 <td>
-                    <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
-                </td>
-                <td class="center" id="unit_stock` + count + `">
-                    -
-                </td>
-                <td class="center" id="qty_stock` + count + `">
-                    -
-                </td>
-                <td class="center total-column" id="total` + count + `">
-                    <input name="arr_total[]" onfocus="emptyThis(this);" id="arr_total` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" hidden>
-
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');setStock('` + count + `')">
                 </td>
                 <td>
                     <input name="arr_note[]" type="text" placeholder="Keterangan...">
@@ -1251,14 +910,13 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/purchase_item") }}',
+                url: '{{ url("admin/select2/sales_item_inventory") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 delay: 250,
                 data: function(params) {
                     return {
                         search: params.term,
-                        account_id: $('#account_id').val(),
                         page: params.page || 1
                     };
                 },
@@ -1278,12 +936,9 @@
     }
 
     function getRowUnit(val){
-        $("#arr_warehouse" + val).empty();
-        $("#unit_stock" + val).empty();
         $("#qty_stock" + val).empty().text('-');
         if($("#arr_item" + val).val()){
-            $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
-            $("#qty_stock" + val).text($("#arr_item" + val).select2('data')[0].stock);
+            $("#qty_stock" + val).val($("#arr_item" + val).select2('data')[0].stock);
         }else{
             $("#arr_item" + val).empty();
             $("#unit_stock" + val).text('-');
@@ -1294,12 +949,6 @@
     function countRow(id){
         if($('#arr_item' + id).val()){
             var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",","."));
-            var price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",","."));
-
-            var total = qty * price;
-
-            $('#arr_total' + id).val(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
-            $('#total' + id).text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
             countAll()
         }
     }
@@ -1325,13 +974,17 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+
+                console.log($('#temp').val());
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                if(response.account_id){
-                    $('#account_id').empty().append(`
-                        <option value="` + response.account_id + `">` + response.account_name + `</option>
+                $('#type').val(response.type).formSelect();
+                console.log(response);
+                if(response.customer_id){
+                    $('#customer_id').empty().append(`
+                        <option value="` + response.customer_id + `">` + response.customer_name + `</option>
                     `);
                 }
-
                 $('#note').val(response.note);
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
@@ -1341,6 +994,7 @@
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        arrpod.push(val.purchase_order_detail_id);
                         $('#body-item').append(`
                             <tr class="row_item" data-id="">
                                 <input type="hidden" name="arr_lookable_type[]" value="">
@@ -1355,29 +1009,31 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                    <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="` + val.qty_stock + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');setStock('` + count + `')">
                                 </td>
                                 <td>
                                     <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="` + val.price + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                 </td>
-                                <td class="center" id="unit_stock` + count + `">
-                                    ` + val.unit_stock + `
-                                </td>
-                                <td class="center" id="qty_stock` + count + `">
-                                    -
-                                </td>
                                 <td class="center total-column" id="total` + count + `">
-                                    <input name="arr_total[]" onfocus="emptyThis(this);" id="arr_total` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" hidden>
+                                    <input name="arr_total[]" onfocus="emptyThis(this);" id="arr_total` + count + `" type="text" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" hidden>
 
+                                </td>
+                                <td>
+                                    <input name="arr_discount[]" onfocus="emptyThis(this);" id="rowDiscount` + count + `" type="text" value="` + val.discount3 + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                 </td>
                                 <td>
                                     <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `">
                                 </td>
                             </tr>
+
                         `);
 
-                        $("#qty_stock" + count).empty().text(val.qty_stock);
-                        $("#total" + count).empty().text(val.total);
+                        $('#arr_item' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        `);
                         $('#arr_item'+ count).select2({
                             placeholder: '-- Pilih ya --',
                             minimumInputLength: 4,
@@ -1408,14 +1064,10 @@
                                 cache: true,
                             }
                         });
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-
                     });
-                    countAll();
                 }
 
+                countAll();
                 if(response.document){
                     const baseUrl = '{{ URL::to("/") }}/storage/';
                     const filePath = response.document.replace('public/', '');
@@ -1439,6 +1091,19 @@
                 });
             }
         });
+    }
+
+    function setStock(val){
+        if($("#arr_item_stock" + val).val()){
+            let qtyMax = parseFloat($('#qty_stock' + val).val().replaceAll(".", "").replaceAll(",","."));
+            let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+            if(qtyInput > qtyMax){
+                $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+            }
+
+        }else{
+            $('#rowQty' + val).val('0,000');
+        }
     }
 
     function voidStatus(id){

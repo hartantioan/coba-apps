@@ -591,7 +591,7 @@ class ItemPartitionController extends Controller
                             'type' => 1,
                         ]);
 
-                        $item_stock_store = ItemStockNew::where('item_id',$request->arr_item_stock_store[$key])->first();
+                        $item_stock_store = ItemStockNew::where('id',$request->arr_item_stock_store[$key])->first();
                         if($item_stock_store){
 
                             $item_stock_store->qty += str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));

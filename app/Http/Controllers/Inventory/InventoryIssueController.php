@@ -395,18 +395,18 @@ class InventoryIssueController extends Controller
                     if(!$request->temp){
                         foreach($request->arr_item_stock as $key => $row){
                             $rowprice = NULL;
-                            info($row);
                             $item_stock = ItemStockNew::where('id',$row)->first();
+                            $item_stock_tujuan = ItemStockNew::where('id',$request->arr_item_stock_store)->first();
                             $rowprice = $item_stock->priceDate($query->post_date);
                             $total = $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                             $gid = InventoryIssueDetail::create([
                                 'inventory_issue_id'    => $query->id,
-                                'item_stock_new_id'         => $row,
+                                'item_stock_new_id'     => $row,
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                 'price'                 => $rowprice,
                                 'total'                 => $total,
                                 'note'                  => $request->arr_note[$key],
-                                'store_item_stock_id'   => $request->arr_item_stock_store[$key],
+                                'store_item_stock_id'   => $item_stock_tujuan->item_id,
                                 'qty_store_item'        => str_replace(',','.',str_replace('.','',$request->arr_qty_store[$key])),
                             ]);
 
@@ -480,7 +480,7 @@ class InventoryIssueController extends Controller
                             //     'type' => 1,
                             // ]);
 
-                            $itemId = $request->arr_item_stock_store[$key];
+                            $itemId = $item_stock_tujuan->item_id;
                             $qty_in = (float) str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));
                             $total_store = $total;
                             $price_in = round($total/$qty_in,2);
@@ -522,7 +522,7 @@ class InventoryIssueController extends Controller
                                 $item_stock_store->save();
                             }else{
                                 StoreItemStock::create([
-                                    'item_id' => $request->arr_item_stock_store[$key],
+                                    'item_id' => $itemId,
                                     'qty' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
                                     'item_stock_new_id' => $row,
                                 ]);

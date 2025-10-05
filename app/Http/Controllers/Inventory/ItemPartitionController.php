@@ -572,12 +572,23 @@ class ItemPartitionController extends Controller
                         $new_total_final_store = ($total_in_value + $total_store) - $total_out_value;
                         $new_price_final_store = $new_qty_final_store > 0 ? $new_total_final_store / $new_qty_final_store : 0;
 
+                        $item_stock_store = ItemStockNew::where('id',$request->arr_item_stock_store[$key])->first();
+                        if($item_stock_store){
+                            $item_stock_store->qty += str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));
+                            $item_stock_store->save();
+                        }else{
+                            ItemStockNew::create([
+                                'item_id' => $request->arr_item_stock_store[$key],
+                                'qty' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
+                                'item_stock_new_id' => $row,
+                            ]);
+                        }
                         ItemMove::create([
                             'lookable_type' => $query->getTable(),
                             'lookable_id' => $query->id,
                             'lookable_detail_type' => $gid->getTable(),
                             'lookable_detail_id' => $gid->id,
-                            'item_id' => $request->arr_item_stock_store[$key],
+                            'item_id' => $item_stock_store->item_id,
                             'qty_in' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
                             'price_in' => $price_in,
                             'total_in' => $total_store,
@@ -591,18 +602,7 @@ class ItemPartitionController extends Controller
                             'type' => 1,
                         ]);
 
-                        $item_stock_store = ItemStockNew::where('id',$request->arr_item_stock_store[$key])->first();
-                        if($item_stock_store){
 
-                            $item_stock_store->qty += str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));
-                            $item_stock_store->save();
-                        }else{
-                            ItemStockNew::create([
-                                'item_id' => $request->arr_item_stock_store[$key],
-                                'qty' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
-                                'item_stock_new_id' => $row,
-                            ]);
-                        }
 
 
                     }

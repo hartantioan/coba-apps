@@ -570,6 +570,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('supplier_store', [Select2Controller::class, 'supplierStore']);
                 Route::get('store_customer', [Select2Controller::class, 'storeCustomer']);
                 Route::get('child_item', [Select2Controller::class, 'childItem']);
+                Route::get('child_item_inventory_issue', [Select2Controller::class, 'childItemInventoryIssue']);
             });
 
             Route::prefix('dashboard')->group(function () {

@@ -278,7 +278,9 @@ class InventoryIssueController extends Controller
                         $passedZeroQty = false;
                     }
                     $rowprice = NULL;
-                    $item_stock = ItemStockNew::where('item_id',$row)->first();
+                    $item_stock = ItemStockNew::where('id',$row)->first();
+
+                    info($item_stock);
                     $rowprice = $item_stock->priceDate($request->post_date);
                     $grandtotal += round($rowprice * $cumulative_qty[$key],2);
                     if($item_stock){
@@ -290,6 +292,7 @@ class InventoryIssueController extends Controller
 
                         if($itemCogsBefore){
                             $cogs = $itemCogsBefore->infoFg();
+                            info($cogs);
                             if(!$request->temp){
                                 info($item_stock->item->name);
                                 if(round(($cogs['qty'] - $qtyout),3) < 0){
@@ -392,6 +395,7 @@ class InventoryIssueController extends Controller
                     if(!$request->temp){
                         foreach($request->arr_item_stock as $key => $row){
                             $rowprice = NULL;
+                            info($row);
                             $item_stock = ItemStockNew::where('id',$row)->first();
                             $rowprice = $item_stock->priceDate($query->post_date);
                             $total = $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
@@ -656,7 +660,7 @@ class InventoryIssueController extends Controller
                     }
                     // Remove both move logs (in and out)
 
-
+                    info($row->item_stock_new_id);
                     $item_stock = ItemStockNew::where('item_id',$row->item_stock_new_id)->first();
                     $rowprice = $item_stock->priceDate($query->post_date);
                     $qty_in_stock = $row->qty;

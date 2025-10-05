@@ -834,7 +834,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/child_item") }}',
+                url: '{{ url("admin/select2/child_item_inventory_issue") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 delay: 250,

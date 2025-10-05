@@ -6614,6 +6614,40 @@ class Select2Controller extends Controller {
             ]]);
     }
 
+    public function childItemInventoryIssue(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $itemStockNew = ItemStockNew::find($request->item_id);
+        $data = Item::whereHas('parentConversion', function($q) use ($itemStockNew) {
+            $q->where('item_id', $itemStockNew->item_id);
+        })
+        ->where(function ($query) use ($search) {
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name', 'like', "%$search%");
+        })
+        ->where('status', '1')
+        ->paginate(10);
+        if ($data->isEmpty()) {
+            $data = Item::where('id', $itemStockNew->item_id)->paginate(10);
+        }
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->itemStockNew->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
+            ];
+        }
+
+        return response()->json(['items' => $response,'pagination' => [
+                'more' => $data->hasMorePages()
+            ]]);
+    }
+
     public function salesItemInventory(Request $request)
     {
 

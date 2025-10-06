@@ -268,7 +268,7 @@
                                 <span>{{ $item->name }}</span>
                                 <div class="price">
                                     @if($priceList)
-                                        {{ number_format($priceList->price, 2) }}
+                                        {{ number_format($priceList->sell_price, 2) }}
                                     @else
                                         <span class="red-text">Belum dibuat harga di master</span>
                                     @endif

@@ -1,5 +1,62 @@
 <script src="{{ url('app-assets/js/sweetalert2.js') }}"></script>
 <style>
+    .group-filter.active {
+        background-color: #4a148c !important; /* dark purple */
+    }
+
+    .hidden {
+        display: none !important;
+    }
+    .search-bar {
+        margin-bottom: 20px;
+    }
+
+    .group-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .group-buttons .btn {
+        background-color: #1a075f;
+        text-transform: none;
+    }
+
+    .item-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .item-card {
+        height: 100px;
+        border-radius: 8px;
+        transition: box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .item-card:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+    }
+
+    .item-card span {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+
+    .item-card .price {
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
     .modal {
         top: 50% !important;
         transform: translateY(-50%) !important;
@@ -181,6 +238,49 @@
             </div>
             <div class="content-overlay"></div>
         </div>
+        <div class="col s12">
+            <div class="container">
+            <div class="card">
+                <div class="card-content">
+
+                    <!-- Search Bar -->
+                    <div class="input-field search-bar">
+                        <input type="text" id="search_bar" class="validate" placeholder="Search items...">
+                    </div>
+
+                    <!-- Group Filter Buttons -->
+                    <div class="group-buttons">
+                        <button class="btn group-filter" data-group="all">All</button>
+                        @foreach($groups as $group)
+                            <button class="btn small group-filter" data-group="{{ $group->id }}">{{ $group->name }}</button>
+                        @endforeach
+
+                    </div>
+
+                    <!-- Items Grid -->
+                    <div class="item-grid" id="items-container">
+                        @foreach($items as $item)
+                            @php
+                                $priceList = $item->storeItemPriceList->first();
+                            @endphp
+
+                            <div class="card item-card" data-group="{{ $item->itemGroup->id }}" data-name="{{ $item->name }}" onclick="getDataItem('{{ $item->code }}')">
+                                <span>{{ $item->name }}</span>
+                                <div class="price">
+                                    @if($priceList)
+                                        {{ number_format($priceList->price, 2) }}
+                                    @else
+                                        <span class="red-text">Belum dibuat harga di master</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        </div>
     </div>
 </div>
 
@@ -212,6 +312,50 @@
     </form>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search_bar');
+        const groupButtons = document.querySelectorAll('.group-filter');
+        const items = document.querySelectorAll('.item-card');
+
+        // Filter by group
+        groupButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const group = button.getAttribute('data-group');
+
+                // Remove 'active' class from all buttons
+                groupButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Add 'active' to clicked one
+                button.classList.add('active');
+
+                // Filter items
+                items.forEach(item => {
+                    const itemGroup = item.getAttribute('data-group');
+                    if (group === 'all' || itemGroup === group) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+
+        // Filter by search
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            items.forEach(item => {
+                const name = item.getAttribute('data-name').toLowerCase();
+                if (name.includes(query)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script>
 
 
 
@@ -281,7 +425,6 @@
                                 }
                                 $.each(response, function(i, val) {
                                     let existingRow = $(`.row_item[data-code="${val.code}"]`);
-
                                     if (existingRow.length) {
                                         // If row already exists, increment the quantity
                                         let qtyInput = existingRow.find('input[name="arr_qty[]"]');
@@ -331,7 +474,7 @@
                                 countAll();
                             }
 
-                            $('#production_barcode_detail_id').empty();
+
                         }
                     },
                     error: function() {
@@ -916,6 +1059,110 @@
             $('#total' + id).text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
             countAll()
         }
+    }
+
+    function getDataItem(code){
+        $.ajax({
+            url: '{{ Request::url() }}/get_pallet_barcode_by_scan',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                code: code,
+                batch_used: arrCode,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+
+                if(response.status == 500){
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
+                    });
+                    if(response.errors){
+                        $.each(response.errors, function(i, val) {
+                            M.toast({
+                                html: val
+                            });
+                        });
+                    }
+                }else{
+                    if(response.length > 0){
+                        if($('.row_item').length == 0){
+                            $('#body-item').empty();
+                        }
+                        $.each(response, function(i, val) {
+                            let existingRow = $(`.row_item[data-code="${val.code}"]`);
+                            console.log(val.code);
+                            console.log(existingRow);
+                            if (existingRow.length) {
+                                // If row already exists, increment the quantity
+                                let qtyInput = existingRow.find('input[name="arr_qty[]"]');
+                                let currentQty = parseFloat(qtyInput.val().replaceAll(".", "").replaceAll(",", ".")) || 0;
+                                let dicountInput = existingRow.find('input[name="arr_discount_item[]"]');
+                                let currentDiscount = parseFloat(dicountInput.val().replaceAll(".", "").replaceAll(",", ".")) || 0;
+                                qtyInput.val(currentQty + 1).trigger('keyup');
+                                dicountInput.val(currentDiscount * (currentQty+1)).trigger('keyup');
+                            } else {
+                                // If not exists, create a new row
+                                let count = makeid(10);
+                                let no = $('.row_item').length + 1;
+
+                                $('#body-item').append(`
+                                    <tr class="row_item" data-code="` + val.code + `">
+                                        <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `" id="arr_item` + count + `">
+                                        <td>
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="1" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                        </td>
+                                        <td>
+                                            <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="` + val.price + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                        </td>
+                                        <td>
+                                            <input name="arr_total[]" onfocus="emptyThis(this);" id="arr_total` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" hidden>
+                                            <input name="arr_discount_item[]" onfocus="emptyThis(this);" id="rowDiscountItem` + count + `" type="text" value="` + val.discount + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" hidden>
+                                            <input name="arr_discount[]" onfocus="emptyThis(this);" id="rowDiscount` + count + `" type="text" value="` + val.discount + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
+                                        </td>
+                                        <td class="center total-column" id="total` + count + `">
+
+                                        </td>
+                                        <td class="center-align">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                                countRow(count);
+                                arrCode.push(val.code);
+                            }
+                        });
+
+                        $('.modal-content').scrollTop($("#body-item").offset().top);
+                        countAll();
+                    }
+
+
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function countAll(){

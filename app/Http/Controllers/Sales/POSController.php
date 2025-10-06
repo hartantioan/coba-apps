@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\Item;
+use App\Models\ItemGroup;
 use App\Models\ItemMove;
 use App\Models\ItemStockNew;
 use App\Models\Line;
@@ -42,16 +43,18 @@ class POSController extends Controller
 
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Invoice',
-            'content'       => 'admin.sales.pos',
-            'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'minDate'       => $request->get('minDate'),
-            'maxDate'       => $request->get('maxDate'),
-            'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'title'    => 'Invoice',
+            'content'  => 'admin.sales.pos',
+            'company'  => Company::where('status','1')->get(),
+            'place'    => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'items'     => Item::where('status','1')->get(),
+            'groups'   => ItemGroup::where('status','1')->get(),
+            'line'     => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
+            'code'     => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'minDate'  => $request->get('minDate'),
+            'maxDate'  => $request->get('maxDate'),
+            'newcode'  => $menu->document_code.date('y'),
+            'menucode' => $menu->document_code
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -71,13 +74,33 @@ class POSController extends Controller
         $barcode = StoreItemStock::whereHas('item',function($query)use($request){
             $query->where('code',$request->code);
         })->first();
-        $itempricelist = StoreItemPriceList::where('item_id',$barcode->item_id)->first();
-        // $itempricelist = $barcode->item?->storeItemPriceList ?? null;
+        if(!$barcode){
+            $itemgudang = ItemStockNew::whereHas('item',function($query)use($request){
+                $query->where('code',$request->code);
+            })->first();
+            if($itemgudang){
+                $item=Item::where('code',$request->code)->first();
+                StoreItemStock::create([
+                    'item_id'=>$item->id,
+                    'qty'=>0,
+                    'item_stock_new_id'=>$itemgudang->id
+                ]);
+                $barcode =$barcode = StoreItemStock::whereHas('item',function($query)use($request){
+                    $query->where('code',$request->code);
+                })->first();
+            }else{
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.'
+                ]);
+            }
+        }
         if($barcode){
+            $itempricelist = StoreItemPriceList::where('item_id',$barcode->item_id)->first();
 
             $result[] = [
                 'item_id'       => $barcode->item->id,
-                'item_code'     => $barcode->item->code,
+                'code'     => $barcode->item->code,
                 'item_name'     => $barcode->item->name,
                 'discount'      => number_format($itempricelist->discount ?? 0,2,',','.'),
                 'price'         => number_format($itempricelist->sell_price ?? 0,2,',','.'),

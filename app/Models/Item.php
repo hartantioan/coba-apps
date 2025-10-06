@@ -521,6 +521,11 @@ class Item extends Model
         return $this->hasOne('App\Models\StoreItemStock','item_id','id');
     }
 
+    public function storeItemPriceList()
+    {
+        return $this->hasMany('App\Models\StoreItemPriceList','item_id','id');
+    }
+
     public function childrenConversion()
     {
         return $this->hasMany(ItemConversion::class, 'item_id');

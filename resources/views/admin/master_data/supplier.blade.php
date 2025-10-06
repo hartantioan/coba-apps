@@ -394,6 +394,7 @@
                 $('#modal1').modal('open');
 
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#name').val(response.name);
                 $("#address").val(response.address);
                 $("#npwp_no").val(response.npwp_no);

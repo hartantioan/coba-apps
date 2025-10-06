@@ -124,9 +124,11 @@ class SupplierController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code' 				=> 'required',
             'name' 				=> 'required',
             'address'           => 'required',
         ], [
+            'code.required' 	    => 'Kode tidak boleh kosong.',
             'name.required' 	    => 'Nama tidak boleh kosong.',
             'address.required'      => 'Alamat tidak boleh kosong.',
         ]);
@@ -140,11 +142,12 @@ class SupplierController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Supplier::find($request->temp);
-                    $query->name            = $request->name;
-                    $query->address	        = $request->address;
-                    $query->no_telp     = $request->no_telp;
-                    $query->status          = $request->status ? $request->status : '2';
+                    $query          = Supplier::find($request->temp);
+                    $query->code    = $request->code;
+                    $query->name    = $request->name;
+                    $query->address = $request->address;
+                    $query->no_telp = $request->no_telp;
+                    $query->status  = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){

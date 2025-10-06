@@ -897,6 +897,7 @@
         if($("#arr_item_stock" + val).val()){
             $('#unit' + val).text($("#arr_item_stock" + val).select2('data')[0].uom);
             $('#stock' + val).val($("#arr_item_stock" + val).select2('data')[0].stock);
+            $('#rowQty' + val).val($("#arr_item_stock" + val).select2('data')[0].stock);
 
 
         }else{
@@ -908,12 +909,20 @@
 
     function getRowUnitStore(val){
         $('#stock' + val).empty();
+        let conversion=$("#arr_item_stock_store" + val).select2('data')[0].conversion;
+        let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
         if($("#arr_item_stock_store" + val).val()){
             $('#stock_store' + val).text($("#arr_item_stock_store" + val).select2('data')[0].stock);
             $('#unitStock' + val).text($("#arr_item_stock_store" + val).select2('data')[0].uom);
         }else{
             $("#arr_item_stock_store" + val).empty();
             $('#stock_store' + val).val('0');
+        }
+        if(qtyInput > 0){
+
+            let new_conversion = conversion*qtyInput;
+            $('#rowQtyStore' + val).val(formatRupiahIni(new_conversion.toFixed(3).toString().replace('.',',')));
+
         }
     }
 
@@ -930,7 +939,13 @@
             }
 
         }else{
+            $("#arr_item_stock_store" + val).empty();
             $('#rowQty' + val).val('0,000');
+        }
+        if($("#arr_item_stock_store" + val).val()){
+            let conversion=$("#arr_item_stock_store" + val).select2('data')[0].conversion;
+            let new_conversion = conversion*parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+            $('#rowQtyStore' + val).val(formatRupiahIni(new_conversion.toFixed(3).toString().replace('.',',')));
         }
     }
 

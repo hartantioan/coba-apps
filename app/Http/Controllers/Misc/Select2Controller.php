@@ -647,8 +647,13 @@ class Select2Controller extends Controller {
                 })
                 ->paginate(10);
 
-
         foreach($data as $d) {
+            if(!$d->itemStockNew()->exists()){
+                ItemStockNew::create([
+                    'item_id'=>$d->id,
+                    'qty'=>0,
+                ]);
+            }
             $response[] = [
                 'id'   			            => $d->itemStockNew->id,
                 'text' 			            => $d->code.' - '.$d->name,
@@ -6603,6 +6608,7 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->itemStockNew->id,
                 'text' 			    => $d->code.' - '.$d->name,
                 'code'              => $d->code,
+                'conversion'        => $d->parentConversion?->qty_conversion ?? 1,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
@@ -6637,6 +6643,7 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->itemStockNew->id,
                 'text' 			    => $d->code.' - '.$d->name,
                 'code'              => $d->code,
+                'conversion'        => $d->parentConversion?->qty_conversion ?? 1,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),

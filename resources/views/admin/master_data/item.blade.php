@@ -378,6 +378,7 @@
                                     <thead>
                                         <tr>
                                             <th class="center" width="50%">Item Jual</th>
+                                            <th class="center" width="30%">Qty Konversi</th>
                                             <th class="center">Hapus</th>
                                         </tr>
                                     </thead>
@@ -829,6 +830,9 @@
             <tr class="row_unit">
                 <td class="unit-inputs">
                     <select class="browser-default item-array" id="arr_item_conversion` + count + `" name="arr_item_conversion[]" data-id="` + count + `"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td class="center-align unit-inputs">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
@@ -1454,6 +1458,9 @@
                                     <select class="select2 browser-default" id="arr_item_conversion` + count + `" name="arr_item_conversion[]">
 
                                     </select>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="`+val.qty_conversion+`" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center-align unit-inputs">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ItemConversion extends Model
 {
-    protected $fillable = ['item_id', 'item_child_id'];
+    protected $fillable = ['item_id', 'item_child_id','qty_conversion'];
 
     // Parent item
     public function parent(): BelongsTo

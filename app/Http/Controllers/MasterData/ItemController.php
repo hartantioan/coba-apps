@@ -349,6 +349,7 @@ class ItemController extends Controller
                     foreach($request->arr_item_conversion as $key => $row){
                         ItemConversion::create([
                             'item_id'       => $query->id,
+                            'qty_conversion'=> str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key])),
                             'item_child_id' => $row,
                         ]);
                         if(!$request->temp){
@@ -612,6 +613,7 @@ class ItemController extends Controller
             foreach($item->childrenConversion as $row){
                 $units[] = [
                     'item_id'             => $row->item_id,
+                    'qty_conversion'      => $row->qty_conversion ?? 0,
                     'item_child_id'       => $row->item_child_id,
                     'item_child_name'     => $row->child->name,
                 ];

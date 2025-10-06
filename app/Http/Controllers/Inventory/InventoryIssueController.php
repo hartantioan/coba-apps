@@ -501,7 +501,7 @@ class InventoryIssueController extends Controller
                                 'lookable_id' => $query->id,
                                 'lookable_detail_type' => $gid->getTable(),
                                 'lookable_detail_id' => $gid->id,
-                                'item_id' => $request->arr_item_stock_store[$key],
+                                'item_id' => $itemId,
                                 'qty_in' => str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key])),
                                 'price_in' => $price_in,
                                 'total_in' => $total_store,
@@ -515,7 +515,7 @@ class InventoryIssueController extends Controller
                                 'type' => 1,
                             ]);
 
-                            $item_stock_store = StoreItemStock::where('item_id',$request->arr_item_stock_store[$key])->first();
+                            $item_stock_store = StoreItemStock::where('item_id',$itemId)->first();
                             if($item_stock_store){
 
                                 $item_stock_store->qty += str_replace(',', '.', str_replace('.', '', $request->arr_qty_store[$key]));

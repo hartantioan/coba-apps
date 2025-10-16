@@ -109,7 +109,18 @@ class Item extends Model
             ? asset(Storage::url($this->document))
             : asset('website/empty.jpg');
 
-        return '<img src="' . $url . '" alt="Attachment Preview" style="width: 150px; height: 150px; object-fit: cover; border: 1px solid #ccc;">';
+        return '<img src="' . $url . '" alt="Attachment Preview" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ccc;">';
+    }
+
+    public function getPriceLatest()
+    {
+        $storeItemPriceList = $this->storeItemPriceList()->first();
+        if($storeItemPriceList){
+            $price = number_format($storeItemPriceList->sell_price,2,',','.');
+        }else{
+            $price = 'tidak ada master harga pada item ini';
+        }
+        return $price;
     }
 
     public function getURLDocument(){

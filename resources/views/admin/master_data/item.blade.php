@@ -183,6 +183,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>Image</th>
+                                                        <th>Harga Jual</th>
                                                         <th>Grup</th>
                                                         <th>UOM</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -1113,6 +1114,7 @@
                 { name: 'name', className: '' },
                 { name: 'group', className: '' },
                 { name: 'image', className: '' },
+                { name: 'sell_price', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

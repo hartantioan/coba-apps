@@ -224,6 +224,7 @@ class ItemController extends Controller
                     $val->code,
                     $val->name??'',
                     $val->getAttachmentHtmlAttribute(),
+                    $val->getPriceLatest(),
                     $val->itemGroup->name??'',
                     $val->uomUnit->code??'',
                     $val->status(),

@@ -80,6 +80,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Item</th>
+                                                        <th>Gambar</th>
                                                         <th>Harga</th>
                                                         <th>Discount</th>
                                                         <th>Qty Discount</th>
@@ -113,11 +114,13 @@
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
-
+                    <div class="input-field col s12 m3">
+                        <div id="document-preview" style="margin-top: 20px;"></div>
+                    </div>
                     <div class="input-field col s12 m3">
                         <input type="hidden" id="temp" name="temp">
 
-                        <select class="browser-default" id="item_id" name="item_id"></select>
+                        <select class="browser-default" id="item_id" name="item_id" onchange="getItem()"></select>
                         <label class="active" for="item_id">Item</label>
                     </div>
 
@@ -142,7 +145,7 @@
                     </div>
 
                     <div class="input-field col s12 m3">
-                        <input type="number" id="qty_discount" name="qty_discount" value="0" min="0">
+                        <input onkeyup="formatRupiah(this)" type="text" id="qty_discount" name="qty_discount" value="0" min="0">
                         <label class="active" for="qty_discount">Qty Diskon</label>
                     </div>
 
@@ -162,6 +165,34 @@
                             </label>
                         </div>
                     </div>
+                    <div class="col s12">
+                        <div class="center">
+                            <h6>Item Jual</h6>
+                        </div>
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th class="center" width="50%">Tipe Penjualan</th>
+                                    <th class="center" width="30%">Harga</th>
+                                    <th class="center">Hapus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-unit">
+                                <tr id="empty-unit">
+                                    <td colspan="3" class="center">Silahkan tambahkan Harga Jual</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="center">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem();" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah
+                                        </a>
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                </div>
 
                     <div class="col s12 mt-3">
                         <button class="btn waves-effect waves-light right submit" onclick="save();">
@@ -250,6 +281,16 @@
     });
     $(function() {
         loadDataTable();
+        $('#body-unit').on('click', '.delete-data-unit', function() {
+            $(this).closest('tr').remove();
+            if($('.row_unit').length == 0){
+                $('#body-unit').append(`
+                    <tr id="empty-unit">
+                        <td colspan="2" class="center">Silahkan tambahkan item Jual</td>
+                    </tr>
+                `);
+            }
+        });
         $('#modal_import').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -366,6 +407,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#document-preview').html('');
                 $('#temp').val('');
                 $('#start_date').val('');
                 $('#end_date').val('');
@@ -387,6 +429,16 @@
     function successImport(){
         loadDataTable();
         $('#modal_import').modal('close');
+    }
+
+    function getItem(){
+        if($("#item_id").val()){
+            $('#document-preview').html('');
+            $('#document-preview').append(`<img src="${$("#item_id").select2('data')[0].document_url}" alt="Preview Gambar" style="width:300px !important; max-height:300px !important;">`);
+        }else{
+
+            $('#document-preview').html('');
+        }
     }
 
 
@@ -427,6 +479,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'item_id', className: '' },
+                { name: 'image', className: '' },
                 { name: 'group_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
@@ -443,6 +496,35 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function addItem(){
+        if($('#empty-unit').length > 0){
+            $('#empty-unit').remove();
+        }
+        let count = makeid(10);
+        $('#body-unit').append(`
+            <tr class="row_unit">
+                <td class="unit-inputs">
+                    <select class="browser-default item-array" id="arr_selling_category` + count + `" name="arr_selling_category[]" data-id="` + count + `"></select>
+                </td>
+                <td>
+                    <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                </td>
+                <td class="center-align unit-inputs">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+
+        $('select[name="arr_selling_category[]"]').select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+        select2ServerSideLonger('#arr_selling_category' + count, '{{ url("admin/select2/selling_category") }}');
+    }
+
 
     function save(){
 
@@ -536,11 +618,42 @@
                 loadingClose('#main');
                 $('#modal_price_list').modal('open');
                 $('#temp').val(id);
-                console.log(response.item_name);
                 if(response.item_id){
                     $('#item_id').append(`
                         <option value="` + response.item_id + `">` + response.item_name+`</option>
                     `);
+                }
+                if(response.detail.length > 0){
+                    $('#body-unit').empty();
+
+                    $.each(response.detail, function(i, val) {
+                        let count = makeid(10);
+                        $('#body-unit').append(`
+                            <tr class="row_unit">
+                                <td class="unit-inputs">
+                                    <select class="select2 browser-default" id="arr_selling_category` + count + `" name="arr_selling_category[]">
+
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="`+val.price+`" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                                </td>
+                                <td class="center-align unit-inputs">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        $('select[name="arr_selling_category[]"]').select2({
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+                        $('#arr_selling_category' + count).empty().append(`
+                            <option value="` + val.category + `" >` + val.category_name + `</option>
+                        `);
+                        select2ServerSideLonger('#arr_selling_category' + count, '{{ url("admin/select2/selling_category") }}');
+                    });
                 }
 
                 $('#start_date').val(response.start_date);
@@ -555,6 +668,21 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+                $('#document-preview').html(''); // clear previous
+
+                if (response.document_url) {
+                    const fileURL = response.document_url;
+                    const fileName = fileURL.split('/').pop();
+                    const fileExt = fileName.split('.').pop().toLowerCase();
+
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+                        $('#document-preview').append(`<img src="${fileURL}" alt="Preview Gambar" style="width:300px !important; max-height:300px !important;">`);
+                    } else if (fileExt === 'pdf') {
+                        $('#document-preview').append(`<iframe src="${fileURL}" width="100%" height="500px" style="border:1px solid #ccc;"></iframe>`);
+                    } else {
+                        $('#document-preview').append(`<p>Preview tidak tersedia untuk file ini. <br><strong><a href="${fileURL}" target="_blank">${fileName}</a></strong></p>`);
+                    }
                 }
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();

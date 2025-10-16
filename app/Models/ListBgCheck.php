@@ -34,12 +34,12 @@ class ListBgCheck extends Model
         'status',
     ];
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -72,7 +72,7 @@ class ListBgCheck extends Model
 
         return substr($prefix,0,9).'-'.$no;
     }
-    
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
@@ -115,7 +115,7 @@ class ListBgCheck extends Model
             '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
             default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
-  
+
         return $status;
     }
 

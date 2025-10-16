@@ -17,7 +17,7 @@ class AttachmentMaintenanceHardwareItemsUsage extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
 
-    protected $fillable = [    
+    protected $fillable = [
         'maintenance_hardware_item_usage_id',
         'file_name',
         'path',
@@ -27,12 +27,12 @@ class AttachmentMaintenanceHardwareItemsUsage extends Model
         return $this->belongsTo('App\Models\MaintenanceHardwareItemsUsage', 'maintenance_hardware_item_usage_id', 'id')->withTrashed();
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->path !== NULL && Storage::exists($this->path)) {
             $document_path = asset(Storage::url($this->path));
         } else {
-            $document_path = asset('website/empty.png');
+            $document_path = asset('website/empty.jpg');
         }
 
         return $document_path;

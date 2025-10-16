@@ -259,7 +259,7 @@ class GoodScale extends Model
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -270,7 +270,7 @@ class GoodScale extends Model
         if($this->image_in !== NULL && Storage::exists($this->image_in)) {
             $image = asset(Storage::url($this->image_in));
         } else {
-            $image = asset('website/empty.png');
+            $image = asset('website/empty.jpg');
         }
 
         return $image;
@@ -281,7 +281,7 @@ class GoodScale extends Model
         if($this->image_out !== NULL && Storage::exists($this->image_out)) {
             $image = asset(Storage::url($this->image_out));
         } else {
-            $image = asset('website/empty.png');
+            $image = asset('website/empty.jpg');
         }
 
         return $image;
@@ -292,7 +292,7 @@ class GoodScale extends Model
         if($this->image_qc !== NULL && Storage::exists($this->image_qc)) {
             $image = asset(Storage::url($this->image_qc));
         } else {
-            $image = asset('website/empty.png');
+            $image = asset('website/empty.jpg');
         }
 
         return $image;

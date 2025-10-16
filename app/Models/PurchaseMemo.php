@@ -78,7 +78,7 @@ class PurchaseMemo extends Model
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
-    
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -107,12 +107,12 @@ class PurchaseMemo extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document_po !== NULL && Storage::exists($this->document_po)) {
             $document_po = asset(Storage::url($this->document_po));
         } else {
-            $document_po = asset('website/empty.png');
+            $document_po = asset('website/empty.jpg');
         }
 
         return $document_po;
@@ -190,7 +190,7 @@ class PurchaseMemo extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

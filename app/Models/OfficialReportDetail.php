@@ -24,12 +24,12 @@ class OfficialReportDetail extends Model
         return $this->belongsTo('App\Models\OfficialReport','official_report_id','id')->withTrashed();
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;

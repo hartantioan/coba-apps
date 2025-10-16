@@ -117,12 +117,12 @@ class MaterialRequest extends Model
         return substr($prefix,0,9).'-'.$no;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -214,7 +214,7 @@ class MaterialRequest extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

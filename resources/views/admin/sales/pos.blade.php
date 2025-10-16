@@ -23,39 +23,56 @@
         text-transform: none;
     }
 
-    .item-grid {
+    #items-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        padding: 20px;
     }
 
     .item-card {
-        height: 100px;
+        background-color: #fff;
+        border: 1px solid #ddd;
         border-radius: 8px;
-        transition: box-shadow 0.2s ease;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
-        padding: 10px;
-        text-align: center;
+        min-height: 180px;
     }
 
     .item-card:hover {
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+
+    .item-card img {
+        width: 60px !important;
+        height: 60px !important;
+        object-fit: contain;
+        margin-bottom: 10px;
     }
 
     .item-card span {
         font-weight: 600;
         font-size: 14px;
-        line-height: 1.2;
+        margin-bottom: 8px;
+        color: #333;
     }
 
     .item-card .price {
-        margin-top: 6px;
-        font-size: 13px;
+        font-size: 14px;
+        color: #007BFF;
     }
+
+    .item-card .price .red-text {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
 
     .modal {
         top: 50% !important;
@@ -265,6 +282,7 @@
                             @endphp
 
                             <div class="card item-card" data-group="{{ $item->itemGroup->id }}" data-name="{{ $item->name }}" onclick="getDataItem('{{ $item->code }}')">
+                                <img src="{{ $item->getURLDocument() }}" alt="Preview Gambar" style="width:150px !important; height:150px !important;">
                                 <span>{{ $item->name }}</span>
                                 <div class="price">
                                     @if($priceList)

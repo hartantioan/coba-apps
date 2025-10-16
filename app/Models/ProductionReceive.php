@@ -77,7 +77,7 @@ class ProductionReceive extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-    
+
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
@@ -137,12 +137,12 @@ class ProductionReceive extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -230,7 +230,7 @@ class ProductionReceive extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -349,7 +349,7 @@ class ProductionReceive extends Model
             $lastSegment = 'production_issue';
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
-            
+
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
                 'user_id'		            => session('bo_id'),
@@ -581,13 +581,13 @@ class ProductionReceive extends Model
                         $rowdetailkuy->delete();
                     }
                 }
-    
+
                 activity()
                     ->performedOn(new ProductionIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($row)
                     ->log('Void the production issue data from production receive');
-    
+
                 CustomHelper::sendNotification($row->getTable(),$row->id,'Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive '.$this->code.'.','Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive '.$this->code.'.',$row->user_id);
                 CustomHelper::removeApproval($row->getTable(),$row->id);
             }

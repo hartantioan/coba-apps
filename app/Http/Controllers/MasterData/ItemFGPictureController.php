@@ -76,7 +76,7 @@ class ItemFGPictureController extends Controller
         ->whereNotNull('is_sales_item')
         ->whereHas('parentFg')
         ->count();
-        
+
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
@@ -84,7 +84,7 @@ class ItemFGPictureController extends Controller
 				if($val->itemFgPicture()->exists()){
                     $src = asset(Storage::url($val->itemFgpicture->image));
                 }else{
-                    $src = asset('website/empty.png');
+                    $src = asset('website/empty.jpg');
                 }
                 $response['data'][] = [
                     $nomor,
@@ -119,10 +119,10 @@ class ItemFGPictureController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'file'                  => 'required',
-           
+
         ], [
             'file.required'         => 'Harap masukkan file jpeg apabila ingin melakukan penyimpanan.',
-            
+
         ]);
 
         if($validation->fails()) {
@@ -134,9 +134,9 @@ class ItemFGPictureController extends Controller
             DB::beginTransaction();
             try {
                 if($request->temp){
-                    
+
                     $query = itemFGPicture::where('item_id',$request->temp)->first();
-                   
+
                     if($request->has('file')) {
                         if($query){
                             if($query->image){
@@ -150,7 +150,7 @@ class ItemFGPictureController extends Controller
                                 $path_document=storage_path('app/public/item_fg_picture/'.$document_name);
                                 $newFile_document = CustomHelper::compress($request->file,$path_document,30);
                                 $basePath = storage_path('app');
-                            
+
                                 $document = explode($basePath.'/', $newFile_document)[1];
                             }else{
                                 $response = [
@@ -173,7 +173,7 @@ class ItemFGPictureController extends Controller
                             $path_document=storage_path('app/public/item_fg_picture/'.$document_name);
                             $newFile_document = CustomHelper::compress($request->file,$path_document,30);
                             $basePath = storage_path('app');
-                        
+
                             $document = explode($basePath.'/', $newFile_document)[1];
                         }else{
                             $response = [
@@ -195,7 +195,7 @@ class ItemFGPictureController extends Controller
             }catch(\Exception $e){
                 DB::rollback();
             }
-			
+
 			if($query) {
 
                 activity()
@@ -215,18 +215,18 @@ class ItemFGPictureController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function saveMulti(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'arr_file'                  => 'required',
-           
+
         ], [
             'arr_file.required'         => 'Harap masukkan file jpeg apabila ingin melakukan penyimpanan.',
-            
+
         ]);
 
         if($validation->fails()) {
@@ -241,14 +241,14 @@ class ItemFGPictureController extends Controller
                     $query = itemFGPicture::whereHas('item', function($query) use ($row_code) {
                         $query->where('code', $row_code);
                     })->first();
-                   
+
                     $extension = $request->arr_file[$index]->getClientOriginalExtension();
                     if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'bmp'])) {
                         $document_name = Str::random(35).'.png';
                         $path_document=storage_path('app/public/item_fg_picture/'.$document_name);
                         $newFile_document = CustomHelper::compress($request->arr_file[$index],$path_document,30);
                         $basePath = storage_path('app');
-                    
+
                         $document = explode($basePath.'/', $newFile_document)[1];
                     }else{
                         $response = [
@@ -269,8 +269,8 @@ class ItemFGPictureController extends Controller
                             $query->image           = $document;
                             $query->save();
                         }
-                        
-                        
+
+
                     }else{
                         $item = Item::where('code',$row_code)->first();
                         $extension = $request->arr_file[$index]->getClientOriginalExtension();
@@ -279,7 +279,7 @@ class ItemFGPictureController extends Controller
                             $path_document=storage_path('app/public/item_fg_picture/'.$document_name);
                             $newFile_document = CustomHelper::compress($request->arr_file[$index],$path_document,30);
                             $basePath = storage_path('app');
-                        
+
                             $document = explode($basePath.'/', $newFile_document)[1];
                         }else{
                             $response = [
@@ -302,17 +302,17 @@ class ItemFGPictureController extends Controller
                             ];
                             return response()->json($response);
                         }
-                        
+
                     }
 
                 }
-                
+
 
                 DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
             }
-			
+
 			if($query) {
 
                 activity()
@@ -332,24 +332,24 @@ class ItemFGPictureController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $bp = itemFGPicture::where('item_id',$request->id)->first();
         if($bp){
-            $bp['images'] = 	asset(Storage::url($bp->image)) ?? asset('website/empty.png');			
+            $bp['images'] = 	asset(Storage::url($bp->image)) ?? asset('website/empty.jpg');
         }else{
-            $bp['images'] = 	asset('website/empty.png');			
+            $bp['images'] = 	asset('website/empty.jpg');
         }
-       
+
 		return response()->json($bp);
     }
 
     public function destroy(Request $request){
         $query = itemFGPicture::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new itemFGPicture())

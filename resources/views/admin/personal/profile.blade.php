@@ -94,8 +94,8 @@
                                         <div class="col m12 s12 center-align">
                                             <canvas id="signature-pad" class="signature-pad" style="border: 3px solid rgb(0, 0, 0);"></canvas>
                                             <center class="mt-3">
-                                                <a href="{{ $data->signature ? asset(Storage::url($data->signature)) : asset("website/empty.png") }}" id="preview_image" data-lightbox="Brand" data-title="Preview Image">
-                                                    <img src="{{ $data->signature ? asset(Storage::url($data->signature)) : asset("website/empty.png") }}" style="max-width:100%;">
+                                                <a href="{{ $data->signature ? asset(Storage::url($data->signature)) : asset("website/empty.jpg") }}" id="preview_image" data-lightbox="Brand" data-title="Preview Image">
+                                                    <img src="{{ $data->signature ? asset(Storage::url($data->signature)) : asset("website/empty.jpg") }}" style="max-width:100%;">
                                                 </a>
                                             </center>
                                         </div>
@@ -123,7 +123,7 @@
                                                         <input id="name" name="name" type="text" placeholder="Nama Alat" value="{{ $data->name }}">
                                                         <label class="active" for="name">{{ __('translations.name') }}</label>
                                                     </div>
-                                                    
+
                                                     <div class="input-field col s12">
                                                         <input id="address" name="address" type="text" placeholder="Alamat" value="{{ $data->address }}">
                                                         <label class="active" for="address">{{ __('translations.address') }}</label>
@@ -172,7 +172,7 @@
                                                     </div>
                                                     <div class="input-field col s12 center-align">
                                                         <div class="input-field" id="previewImg">
-                                                            <img id="previewImage" src="{{ url('website/empty.png') }}" alt="..." width="150px">
+                                                            <img id="previewImage" src="{{ url('website/empty.jpg') }}" alt="..." width="150px">
                                                         </div>
                                                         <label class="active" for="">Preview Foto Profil</label>
                                                     </div>
@@ -267,7 +267,7 @@
                             $.each(response.error, function(field, errorMessage) {
                                 $('#' + field).addClass('error-input');
                                 $('#' + field).css('border', '1px solid red');
-                                
+
                             });
                             swal({
                                 title: 'Ups! Validation',
@@ -310,7 +310,7 @@
     }
 
     var canvas = document.getElementById('signature-pad');
-	   
+
     function resizeCanvas() {
         var parentWidth = $(canvas).parent().outerWidth() - 50;
         canvas.setAttribute("width", parentWidth);
@@ -343,7 +343,7 @@
             var files = $('#sign')[0].files;
             if(files.length > 0 ){
                 fd.append('file',files[0]);
-                
+
                 $.ajax({
                     url: "{{ Request::url() }}/upload_sign",
                     type: 'POST',
@@ -367,7 +367,7 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_sign').show();
                             $('#main').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
@@ -410,7 +410,7 @@
             }
         }else{
             var signdata = signaturePad.toDataURL('image/png');
-            
+
             $.ajax({
                 url: "{{ Request::url() }}/upload_sign",
                 type: 'POST',
@@ -434,7 +434,7 @@
                     } else if(response.status == 422) {
                         $('#validation_alert_sign').show();
                         $('#main').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',

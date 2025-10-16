@@ -221,6 +221,7 @@
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Harga</th>
+                                                    <th class="center">HPP</th>
                                                     <th class="center">Satuan</th>
                                                     <th class="center">Qty Stok</th>
                                                     <th class="center">Total</th>
@@ -229,13 +230,13 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="9" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
                                             </tbody>
                                             <thead>
-                                                <th colspan="6">TOTAL</th>
+                                                <th colspan="7">TOTAL</th>
                                                 <th class="right-align" id="total-received">0,000</th>
                                                 <th colspan="1"></th>
                                             </thead>
@@ -1228,6 +1229,9 @@
                 <td>
                     <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                 </td>
+                <td class="center" id="hpp` + count + `">
+                    -
+                </td>
                 <td class="center" id="unit_stock` + count + `">
                     -
                 </td>
@@ -1281,9 +1285,11 @@
         $("#arr_warehouse" + val).empty();
         $("#unit_stock" + val).empty();
         $("#qty_stock" + val).empty().text('-');
+        $("#hpp" + val).empty().text('-');
         if($("#arr_item" + val).val()){
             $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
             $("#qty_stock" + val).text($("#arr_item" + val).select2('data')[0].stock);
+            $("#hpp" + val).text($("#arr_item" + val).select2('data')[0].hpp);
         }else{
             $("#arr_item" + val).empty();
             $("#unit_stock" + val).text('-');
@@ -1360,6 +1366,9 @@
                                 <td>
                                     <input name="arr_price[]" onfocus="emptyThis(this);" id="rowPrice` + count + `" type="text" value="` + val.price + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                 </td>
+                                <td class="center" id="hpp` + count + `">
+                                    -
+                                </td>
                                 <td class="center" id="unit_stock` + count + `">
                                     ` + val.unit_stock + `
                                 </td>
@@ -1377,6 +1386,7 @@
                         `);
 
                         $("#qty_stock" + count).empty().text(val.qty_stock);
+                        $("#hpp" + count).empty().text(val.hpp);
                         $("#total" + count).empty().text(val.total);
                         $('#arr_item'+ count).select2({
                             placeholder: '-- Pilih ya --',

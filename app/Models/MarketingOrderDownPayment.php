@@ -82,7 +82,7 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getNpwpCoreTax()
-   
+
     {
 
         $npwp = '';
@@ -92,7 +92,7 @@ class MarketingOrderDownPayment extends Model
             //$npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
             //coretax pakai 16 digit
             $npwp = '0000000000000000';
-           
+
         } else {
             $npwp = str_replace('.', '', str_replace('-', '', $this->account->userDataDefault()->npwp));
         }
@@ -101,14 +101,14 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getNitkuCoreTax()
-   
+
     {
 
         $nitku = '';
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $nitku = '000000';
         } else {
@@ -119,14 +119,14 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getBuyerDocCoreTax()
-   
+
     {
 
         $doc = '';
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $doc = 'National ID';
         } else {
@@ -137,14 +137,14 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getBuyerDocNumberCoreTax()
-   
+
     {
 
         $doc = '';
 
         if ($this->account->type_body == 3) {
 
-            
+
             //perorangan gk punya nitku
             $doc = $this->account->id_card;
         } else {
@@ -267,7 +267,7 @@ class MarketingOrderDownPayment extends Model
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;

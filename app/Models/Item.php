@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use Illuminate\Support\Facades\Storage;
 
 class Item extends Model
 {
@@ -37,6 +38,7 @@ class Item extends Model
         'is_service',
         'is_production',
         'note',
+        'document',
         'min_stock',
         'max_stock',
         'status',
@@ -58,6 +60,112 @@ class Item extends Model
 
     public function itemGroup(){
         return $this->belongsTo('App\Models\ItemGroup', 'item_group_id', 'id')->withTrashed();
+    }
+
+    public function attachments()
+    {
+        if ($this->document) {
+            $arr = explode(',', $this->document);
+            $carouselItems = [];
+            $fallback = asset('website/empty.jpg');
+
+            foreach ($arr as $key => $path) {
+                $url = asset(Storage::url($path));
+                $carouselItems[] = '
+                    <a class="carousel-item" href="#item'.($key + 1).'">
+                        <img src="'.$url.'" alt="Lampiran '.($key + 1).'" onerror="this.onerror=null;this.src=\''.$fallback.'\';">
+                    </a>';
+            }
+
+            $carouselHtml = implode("\n", $carouselItems);
+
+            return '
+            <div class="carousel-wrapper" style="position: relative;">
+                <div class="carousel carousel-small">'.$carouselHtml.'</div>
+
+                <button class="btn-floating btn-small red carousel-prev" style="position:absolute;top:45%;left:-10px;z-index:10;">
+                    <i class="material-icons">chevron_left</i>
+                </button>
+                <button class="btn-floating btn-small red carousel-next" style="position:absolute;top:45%;right:-10px;z-index:10;">
+                    <i class="material-icons">chevron_right</i>
+                </button>
+            </div>';
+        }
+
+        // Fallback
+        return '
+            <div class="carousel-wrapper" style="position: relative;">
+                <div class="carousel carousel-small">
+                    <a class="carousel-item" href="#empty">
+                        <img src="'.asset('website/empty.jpg').'" alt="Tidak ada lampiran">
+                    </a>
+                </div>
+            </div>';
+    }
+
+    public function getAttachmentHtmlAttribute(): string
+    {
+        $url = $this->document && Storage::exists($this->document)
+            ? asset(Storage::url($this->document))
+            : asset('website/empty.jpg');
+
+        return '<img src="' . $url . '" alt="Attachment Preview" style="width: 150px; height: 150px; object-fit: cover; border: 1px solid #ccc;">';
+    }
+
+    public function getURLDocument(){
+        $url = $this->document && Storage::exists($this->document)
+            ? asset(Storage::url($this->document))
+            : asset('website/empty.jpg');
+        return $url;
+    }
+
+
+    public function attachmentModal()
+    {
+        if ($this->document) {
+            $arr = explode(',', $this->document);
+            $fallback = asset('website/empty.jpg');
+            $output = '<div class="row" id="attachment_previews">';
+
+            foreach ($arr as $key => $path) {
+                $fileName = basename($path);
+                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']);
+                $fileUrl = asset(Storage::url($path));
+                $output .= '<div class="col s12 m3">';
+                $output .= '<div class="preview-item">';
+                $output .= '<div class="preview-content">';
+
+                if ($isImage && $fileUrl !== $fallback) {
+                    $output .= '<img class="materialboxed" src="'.$fileUrl.'" alt="Lampiran '.($key + 1).'" onerror="this.onerror=null;this.src=\''.$fallback.'\';">';
+                } else {
+                    $output .= '<i class="material-icons file-icon">description</i>';
+                }
+
+                $output .= '</div>'; // .preview-content
+                $output .= '<div class="preview-filename">'.$fileName.'</div>';
+                $output .= '</div>'; // .preview-item
+                $output .= '</div>'; // .col
+            }
+
+            $output .= '</div>'; // .row
+
+            return $output;
+        }
+
+        // No documents at all
+        return '
+            <div class="row" id="attachment_previews">
+                <div class="col s12">
+                    <div class="preview-item">
+                        <div class="preview-content">
+                            <img src="'.asset('website/empty.jpg').'" alt="Tidak ada lampiran">
+                        </div>
+                        <div class="preview-filename">Tidak ada lampiran</div>
+                    </div>
+                </div>
+            </div>';
     }
 
     public function supplier(){
@@ -290,11 +398,13 @@ class Item extends Model
 
     public function buyPriceNow(){
         $pricenow = 0;
-        $price = ItemCogs::where('item_id',$this->id)->orderByDesc('date')->orderByDesc('id')->first();
+        $price = StoreItemPriceList::where('item_id',$this->id)->orderByDesc('start_date')->orderByDesc('id')->first();
         if($price){
-            $pricenow = $price->qty_final > 0 ? $price->total_final / $price->qty_final : 0;
+            $pricenow = CustomHelper::formatConditionalQty(round($price->price));
+        }else{
+            $pricenow = null;
         }
-        return CustomHelper::formatConditionalQty(round($pricenow,2));
+        return $pricenow;
     }
 
     public function priceNow($place_id,$date){

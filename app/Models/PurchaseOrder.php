@@ -241,7 +241,7 @@ class PurchaseOrder extends Model
         if($this->document_po !== NULL && Storage::exists($this->document_po)) {
             $document_po = asset(Storage::url($this->document_po));
         } else {
-            $document_po = asset('website/empty.png');
+            $document_po = asset('website/empty.jpg');
         }
 
         return $document_po;

@@ -14,7 +14,7 @@ class WorkOrderAttachmentDetail extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
 
-    protected $fillable = [    
+    protected $fillable = [
         'work_order_id',
         'file_name',
         'path',
@@ -24,12 +24,12 @@ class WorkOrderAttachmentDetail extends Model
         return $this->belongsTo('App\Models\WorkOrder', 'work_order_id', 'id')->withTrashed();
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->path !== NULL && Storage::exists($this->path)) {
             $document_path = asset(Storage::url($this->path));
         } else {
-            $document_path = asset('website/empty.png');
+            $document_path = asset('website/empty.jpg');
         }
 
         return $document_path;

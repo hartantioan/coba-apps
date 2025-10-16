@@ -91,7 +91,7 @@ class PurchaseDownPayment extends Model
             return implode(', ',$list);
         }else{
             return '-';
-        }   
+        }
     }
 
     public function listPaymentRequest(){
@@ -103,7 +103,7 @@ class PurchaseDownPayment extends Model
             return implode(', ',$list);
         }else{
             return '-';
-        }   
+        }
     }
 
     public function listOutgoingPayment(){
@@ -117,7 +117,7 @@ class PurchaseDownPayment extends Model
             return implode(', ',$list);
         }else{
             return '-';
-        }   
+        }
     }
 
     public function listPayDate(){
@@ -131,7 +131,7 @@ class PurchaseDownPayment extends Model
             return implode(', ',$list);
         }else{
             return '-';
-        }   
+        }
     }
 
     public function used(){
@@ -202,7 +202,7 @@ class PurchaseDownPayment extends Model
             '3'   => 'Cek/BG',
             default => 'Invalid',
         };
-  
+
         return $type;
     }
 
@@ -456,12 +456,12 @@ class PurchaseDownPayment extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -517,7 +517,7 @@ class PurchaseDownPayment extends Model
         return $ada;
     }
 
-    
+
 
     public function hasChildDocument(){
         $hasRelation = false;
@@ -654,7 +654,7 @@ class PurchaseDownPayment extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

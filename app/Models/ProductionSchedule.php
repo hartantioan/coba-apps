@@ -108,12 +108,12 @@ class ProductionSchedule extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -197,7 +197,7 @@ class ProductionSchedule extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -210,7 +210,7 @@ class ProductionSchedule extends Model
         foreach($this->productionScheduleDetail()->where('status','1')->get() as $row){
             $menu = Menu::where('url', $lastSegment)->first();
             $newCode = ProductionOrder::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
-            
+
             $query = ProductionOrder::create([
                 'code'			                => $newCode,
                 'user_id'		                => $this->user_id,

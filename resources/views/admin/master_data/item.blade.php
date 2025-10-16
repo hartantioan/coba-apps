@@ -182,6 +182,7 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>Image</th>
                                                         <th>Grup</th>
                                                         <th>UOM</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -286,6 +287,10 @@
                     </div>
                     <div class="col s12 row">
                         <div class="col s12 m8 row">
+                            <div class="input-field col m4 s12">
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="generateCode();"></select>
+                                <label class="active" for="supplier_id">Supplier</label>
+                            </div>
                             <div class="input-field col s12 m4">
                                 <input type="hidden" id="temp" name="temp">
                                 <input id="code" name="code" type="text" placeholder="Kode Item">
@@ -294,10 +299,6 @@
                             <div class="input-field col s12 m4">
                                 <input id="name" name="name" type="text" placeholder="Nama Item">
                                 <label class="active" for="name">{{ __('translations.name') }}</label>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="generateCode();"></select>
-                                <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col s12 m4">
                                 <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
@@ -399,7 +400,20 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 m3 mt-3">
+                            <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Upload Dokumen</span>
+                                <input type="file" id="document" name="document" accept=".pdf,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Unggah file dokumen">
+                            </div>
+                            </div>
+
+                            <!-- Preview Area -->
+                            <div id="document-preview" style="margin-top: 20px;"></div>
+
 
                         </div>
                     </div>
@@ -445,7 +459,44 @@
     </a>
 </div>
 
-<!-- END: Page Main-->
+<script>
+    document.getElementById('document').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    const previewContainer = document.getElementById('document-preview');
+    previewContainer.innerHTML = ''; // clear previous preview
+
+    if (!file) return;
+
+    const fileType = file.type;
+    const fileURL = URL.createObjectURL(file);
+
+    if (fileType.startsWith('image/')) {
+        // ✅ Preview for images
+        const img = document.createElement('img');
+        img.src = fileURL;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '400px';
+        img.alt = 'Preview Gambar';
+        previewContainer.appendChild(img);
+    } else if (fileType === 'application/pdf') {
+        // ✅ Preview for PDFs
+        const iframe = document.createElement('iframe');
+        iframe.src = fileURL;
+        iframe.width = '100%';
+        iframe.height = '500px';
+        iframe.style.border = '1px solid #ccc';
+        previewContainer.appendChild(iframe);
+    } else {
+        // ❌ Unsupported (Word, Excel, etc.)
+        const msg = document.createElement('p');
+        msg.innerText = 'Preview tidak tersedia untuk file ini. Nama file: ' + file.name;
+        msg.style.color = 'red';
+        previewContainer.appendChild(msg);
+    }
+    });
+</script>
+
+
 <script>
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
@@ -650,6 +701,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#document-preview').html('');
                 $('#uom_unit').val('').trigger('change');
                 M.updateTextFields();
                 $('.stock-unit').text('-');
@@ -1060,6 +1112,7 @@
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
                 { name: 'group', className: '' },
+                { name: 'image', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -1360,7 +1413,6 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-
                 arrCode = [];
                 arrName = [];
 
@@ -1389,6 +1441,22 @@
                     $('#supplier_id').empty().append(`
                         <option value="` + response.supplier_id + `" data-code="` + response.supplier_code + `" data-name="` + response.supplier_name + `">`+ response.supplier_code +`-`+ response.supplier_name + `</option>
                     `);
+                }
+
+                $('#document-preview').html(''); // clear previous
+
+                if (response.document_url) {
+                    const fileURL = response.document_url;
+                    const fileName = fileURL.split('/').pop();
+                    const fileExt = fileName.split('.').pop().toLowerCase();
+
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+                        $('#document-preview').append(`<img src="${fileURL}" alt="Preview Gambar" style="max-width:100%; max-height:400px;">`);
+                    } else if (fileExt === 'pdf') {
+                        $('#document-preview').append(`<iframe src="${fileURL}" width="100%" height="500px" style="border:1px solid #ccc;"></iframe>`);
+                    } else {
+                        $('#document-preview').append(`<p>Preview tidak tersedia untuk file ini. <br><strong><a href="${fileURL}" target="_blank">${fileName}</a></strong></p>`);
+                    }
                 }
 
 

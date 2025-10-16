@@ -6,6 +6,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
 use App\Models\Supplier;
+use App\Models\SellingCategory;
 use App\Models\StoreCustomer;
 use App\Models\VarietyCategory;
 use App\Models\SampleType;
@@ -41,7 +42,7 @@ use App\Models\ItemShading;
 use App\Models\MaterialRequest;
 use App\Models\Menu;
 use App\Models\ItemStockNew;
-use App\Models\MenuUser;
+use App\Models\ExpenseType;
 use App\Models\Outlet;
 use App\Models\PaymentRequest;
 use App\Models\Position;
@@ -419,22 +420,20 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
+                })->where(function($query)use($request){
+                    if($request->arr_item){
+                        $query->whereNotIn('id',$request->arr_item);
+                    }
                 })->where('status','1')->get();
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			    => $d->id,
-                'text' 			    => $d->code.' - '.$d->name,
-                'code'              => $d->code,
-                'name'              => $d->name,
-                'uom'               => $d->uomUnit->code,
-                'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
-                'list_warehouse'    => $d->warehouseList(),
-                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
-                'list_shading'      => $d->arrShading(),
-                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
-                'has_bom'           => $d->bom()->exists() ? '1' : '',
+                'id'    => $d->id,
+                'text'  => $d->code.' - '.$d->name,
+                'code'  => $d->code,
+                'name'  => $d->name,
+                'uom'   => $d->uomUnit->code,
+                'stock' => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
             ];
         }
 
@@ -1137,13 +1136,13 @@ class Select2Controller extends Controller {
 
         foreach ($data as $d) {
             $response[] = [
-                'id'             => $d->id,
-                'text'           => $d->code . ' - ' . $d->name,
-                'code'           => $d->code,
-                'name'           => $d->name,
-                'uom'            => $d->uomUnit->code,
-                // 'buy_price_now'  => $d->buyPriceNow(),
-                'stock'                     => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
+                'id'    => $d->id,
+                'text'  => $d->code . ' - ' . $d->name,
+                'code'  => $d->code,
+                'name'  => $d->name,
+                'uom'   => $d->uomUnit->code,
+                'hpp'   => $d->buyPriceNow() ?? 0,
+                'stock' => CustomHelper::formatConditionalQty($d->itemStockNew?->qty ?? 0),
             ];
         }
 
@@ -1199,12 +1198,13 @@ class Select2Controller extends Controller {
                 ->whereNotNull('is_sales_item')->get();
         foreach($data as $d) {
             $response[] = [
-                'id'   			    => $d->id,
-                'text' 			    => $d->code.' - '.$d->name,
-                'code'              => $d->code,
-                'name'              => $d->name,
-                'uom'               => $d->uomUnit->code,
-                'stock' => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
+                'id'           => $d->id,
+                'text'         => $d->code.' - '.$d->name,
+                'code'         => $d->code,
+                'name'         => $d->name,
+                'uom'          => $d->uomUnit->code,
+                'stock'        => CustomHelper::formatConditionalQty($d->storeItemStock?->qty ?? 0),
+                'document_url' => $d->getURLDocument(),
             ];
         }
 
@@ -6686,5 +6686,49 @@ class Select2Controller extends Controller {
                 'more' => $data->hasMorePages()
             ]
         ]);
+    }
+
+    public function expenseType(Request $request)
+    {
+
+        $response = [];
+        $search = $request->search;
+
+        $data = ExpenseType::where(function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->paginate(10);
+
+        foreach ($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->name,
+            ];
+        }
+
+        return response()->json([
+            'items' => $response,
+            'pagination' => [
+                'more' => $data->hasMorePages()
+            ]
+        ]);
+    }
+
+    public function sellingCategory(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = SellingCategory::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
     }
 }

@@ -547,16 +547,17 @@ class DeliveryReceiveController extends Controller
         foreach($grm->deliveryReceiveDetail()->orderBy('id')->get() as $key => $row){
             $item_stocknew = ItemStockNew::where('item_id',$row->item_id)->first();
             $arr[] = [
-                'id'                        => $row->id,
-                'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->name,
-                'qty'                       => CustomHelper::formatConditionalQty($row->qty),
-                'total'                       => CustomHelper::formatConditionalQty($row->total),
-                'price'                       => CustomHelper::formatConditionalQty($row->price),
-                'unit_stock'                => $row->item->uomUnit?->code ?? null,
-                'qty_stock'                 => CustomHelper::formatConditionalQty($item_stocknew->qty),
-                'note'                      => $row->note ? $row->note : '',
-                'remark'                    => $row->remark ?? null,
+                'id'         => $row->id,
+                'item_id'    => $row->item_id,
+                'item_name'  => $row->item->name,
+                'qty'        => CustomHelper::formatConditionalQty($row->qty),
+                'total'      => CustomHelper::formatConditionalQty($row->total),
+                'price'      => CustomHelper::formatConditionalQty($row->price),
+                'unit_stock' => $row->item->uomUnit?->code ?? null,
+                'qty_stock'  => CustomHelper::formatConditionalQty($item_stocknew->qty),
+                'note'       => $row->note ? $row->note : '',
+                'remark'     => $row->remark ?? null,
+                'hpp'        => $row->item->buyPriceNow() ?? 0,
 
             ];
         }

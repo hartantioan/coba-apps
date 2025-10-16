@@ -40,6 +40,7 @@ use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\Inventory\MinimumStockController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
 use App\Http\Controllers\MasterData\StoreCustomerController;
+use App\Http\Controllers\MasterData\SellingCategoryController;
 use App\Http\Controllers\MasterData\RuleBpScaleController;
 use App\Http\Controllers\MasterData\RuleProcurementController;
 use App\Http\Controllers\MasterData\StockItemController;
@@ -50,7 +51,7 @@ use App\Http\Controllers\MasterData\EmployeeController;
 use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
-use App\Http\Controllers\MasterData\LeaveTypeController;
+use App\Http\Controllers\MasterData\ExpenseTypeController;
 use App\Http\Controllers\MasterData\LevelController;
 use App\Http\Controllers\MasterData\PunishmentController;
 use App\Http\Controllers\MasterData\UserSpecialController;
@@ -151,8 +152,8 @@ use App\Http\Controllers\MasterData\TirtaKencanaController;
 use App\Http\Controllers\MasterData\ToleranceScaleController;
 
 use App\Http\Controllers\Finance\FundRequestController;
-use App\Http\Controllers\Finance\HandoverPurchaseInvoiceController;
-use App\Http\Controllers\Finance\PaymentRequestController;
+use App\Http\Controllers\Finance\ExpensesController;
+use App\Http\Controllers\Finance\IncomeController;
 use App\Http\Controllers\Finance\OutgoingPaymentController;
 use App\Http\Controllers\Finance\CloseBillController;
 use App\Http\Controllers\Finance\IncomingPaymentController;
@@ -243,7 +244,7 @@ use App\Http\Controllers\Inventory\TruckQueueUpdaterController;
 use App\Http\Controllers\Inventory\ReportStockValueController;
 use App\Http\Controllers\Inventory\InventoryIssueController;
 use App\Http\Controllers\Inventory\ItemPartitionController;
-use App\Http\Controllers\Inventory\GoodIssueRequestController;
+use App\Http\Controllers\Inventory\StockOpnameController;
 use App\Http\Controllers\Inventory\InventoryRevaluationController;
 use App\Http\Controllers\Inventory\StockMovementController;
 use App\Http\Controllers\Inventory\AdjustStockController;
@@ -571,6 +572,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('store_customer', [Select2Controller::class, 'storeCustomer']);
                 Route::get('child_item', [Select2Controller::class, 'childItem']);
                 Route::get('child_item_inventory_issue', [Select2Controller::class, 'childItemInventoryIssue']);
+                Route::get('expense_type', [Select2Controller::class, 'ExpenseType']);
+                Route::get('selling_category', [Select2Controller::class, 'sellingCategory']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -1027,6 +1030,15 @@ Route::prefix('admin')->group(function () {
                 });
 
                 Route::prefix('store')->group(function () {
+                    Route::prefix('selling_category')->middleware('operation.access:selling_category,view')->group(function () {
+                        Route::get('/', [SellingCategoryController::class, 'index']);
+                        Route::get('datatable', [SellingCategoryController::class, 'datatable']);
+                        Route::post('show', [SellingCategoryController::class, 'show']);
+                        Route::post('print', [SellingCategoryController::class, 'print']);
+                        Route::get('export', [SellingCategoryController::class, 'export']);
+                        Route::post('create', [SellingCategoryController::class, 'create'])->middleware('operation.access:selling_category,update');
+                        Route::post('destroy', [SellingCategoryController::class, 'destroy'])->middleware('operation.access:selling_category,delete');
+                    });
                     Route::prefix('store_customer')->middleware('operation.access:store_customer,view')->group(function () {
                         Route::get('/', [StoreCustomerController::class, 'index']);
                         Route::get('datatable', [StoreCustomerController::class, 'datatable']);
@@ -1048,6 +1060,17 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
+                Route::prefix('master_finance')->group(function () {
+                    Route::prefix('expense_type')->middleware('operation.access:expense_type,view')->group(function () {
+                        Route::get('/', [ExpenseTypeController::class, 'index']);
+                        Route::get('datatable', [ExpenseTypeController::class, 'datatable']);
+                        Route::post('show', [ExpenseTypeController::class, 'show']);
+                        Route::post('print', [ExpenseTypeController::class, 'print']);
+                        Route::get('export', [ExpenseTypeController::class, 'export']);
+                        Route::post('create', [ExpenseTypeController::class, 'create'])->middleware('operation.access:expense_type,update');
+                        Route::post('destroy', [ExpenseTypeController::class, 'destroy'])->middleware('operation.access:expense_type,delete');
+                    });
+                });
 
 
                 Route::prefix('master_administration')->group(function () {
@@ -1374,6 +1397,44 @@ Route::prefix('admin')->group(function () {
                 });
             });
 
+            Route::prefix('finance')->middleware('direct.access')->group(function () {
+
+                Route::prefix('expenses')->middleware(['operation.access:expenses,view'])->group(function () {
+                    Route::get('/', [ExpensesController::class, 'index']);
+                    Route::get('datatable', [ExpensesController::class, 'datatable']);
+                    Route::get('row_detail', [ExpensesController::class, 'rowDetail']);
+                    Route::post('show', [ExpensesController::class, 'show']);
+                    Route::post('done', [ExpensesController::class, 'done'])->middleware('operation.access:expenses,update');
+                    Route::post('get_code', [ExpensesController::class, 'getCode']);
+                    Route::post('print', [ExpensesController::class, 'print']);
+                    Route::post('print_by_range', [ExpensesController::class, 'printByRange']);
+                    Route::get('print_individual/{id}', [ExpensesController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('create', [ExpensesController::class, 'create'])->middleware('operation.access:expenses,update');
+                    Route::post('unlock_procurement', [ExpensesController::class, 'unlockProcurement'])->middleware('operation.access:expenses,update');
+                    Route::post('edit_selected', [ExpensesController::class, 'editSelected'])->middleware('operation.access:expenses,update');
+                    Route::post('destroy', [ExpensesController::class, 'destroy'])->middleware('operation.access:expenses,delete');
+                    Route::get('export_from_page', [ExpensesController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('incomes')->middleware(['operation.access:incomes,view'])->group(function () {
+                    Route::get('/', [IncomeController::class, 'index']);
+                    Route::get('datatable', [IncomeController::class, 'datatable']);
+                    Route::get('row_detail', [IncomeController::class, 'rowDetail']);
+                    Route::post('show', [IncomeController::class, 'show']);
+                    Route::post('done', [IncomeController::class, 'done'])->middleware('operation.access:incomes,update');
+                    Route::post('get_code', [IncomeController::class, 'getCode']);
+                    Route::post('print', [IncomeController::class, 'print']);
+                    Route::post('print_by_range', [IncomeController::class, 'printByRange']);
+                    Route::get('print_individual/{id}', [IncomeController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('create', [IncomeController::class, 'create'])->middleware('operation.access:incomes,update');
+                    Route::post('unlock_procurement', [IncomeController::class, 'unlockProcurement'])->middleware('operation.access:incomes,update');
+                    Route::post('edit_selected', [IncomeController::class, 'editSelected'])->middleware('operation.access:incomes,update');
+                    Route::post('destroy', [IncomeController::class, 'destroy'])->middleware('operation.access:incomes,delete');
+                    Route::get('export_from_page', [IncomeController::class, 'exportFromTransactionPage']);
+                });
+
+            });
+
             Route::prefix('purchase')->middleware('direct.access')->group(function () {
 
                 Route::prefix('delivery_receive')->middleware(['operation.access:delivery_receive,view'])->group(function () {
@@ -1464,6 +1525,24 @@ Route::prefix('admin')->group(function () {
                     Route::post('cancel_status', [InventoryReturnController::class, 'cancelStatus'])->middleware('operation.access:inventory_return,void');
                 });
 
+                Route::prefix('stock_opname')->middleware(['operation.access:stock_opname,view', 'lockacc'])->group(function () {
+                    Route::get('/', [StockOpnameController::class, 'index']);
+                    Route::get('datatable', [StockOpnameController::class, 'datatable']);
+                    Route::get('row_detail', [StockOpnameController::class, 'rowDetail']);
+                    Route::post('get_code', [StockOpnameController::class, 'getCode']);
+                    Route::post('show', [StockOpnameController::class, 'show']);
+                    Route::post('done', [StockOpnameController::class, 'done'])->middleware('operation.access:stock_opname,update');
+                    Route::post('print', [StockOpnameController::class, 'print']);
+                    Route::post('print_by_range', [StockOpnameController::class, 'printByRange']);
+                    Route::post('remove_used_data', [StockOpnameController::class, 'removeUsedData']);
+                    Route::get('print_individual/{id}', [StockOpnameController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('viewstructuretree', [StockOpnameController::class, 'viewStructureTree']);
+                    Route::post('create', [StockOpnameController::class, 'create'])->middleware('operation.access:stock_opname,update');
+                    Route::post('void_status', [StockOpnameController::class, 'voidStatus'])->middleware('operation.access:stock_opname,void');
+                    Route::post('destroy', [StockOpnameController::class, 'destroy'])->middleware('operation.access:stock_opname,delete');
+                    Route::get('export_from_page', [StockOpnameController::class, 'exportFromTransactionPage']);
+                });
+
                 Route::prefix('inventory_report')->group(function () {
                     Route::prefix('report_stock_value')->middleware('operation.access:report_stock_value,view')->group(function () {
                         Route::get('/', [ReportStockValueController::class, 'index']);
@@ -1534,6 +1613,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable', [SalesOrderController::class, 'datatable']);
                     Route::get('row_detail', [SalesOrderController::class, 'rowDetail']);
                     Route::post('show', [SalesOrderController::class, 'show']);
+                    Route::get('get_item_price', [SalesOrderController::class, 'getItemPrice']);
                     Route::post('update_multiple_lc', [SalesOrderController::class, 'updateMultipleLc'])->middleware('operation.access:sales_order_new,update');
                     Route::post('done', [SalesOrderController::class, 'done'])->middleware('operation.access:sales_order_new,update');
                     Route::post('get_code', [SalesOrderController::class, 'getCode']);

@@ -46,17 +46,17 @@ class Equipment extends Model
     public function equipmentPart(){
         return $this->hasMany('App\Models\EquipmentPart');
     }
-    
+
     public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;

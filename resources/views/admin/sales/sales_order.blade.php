@@ -186,10 +186,10 @@
                             </div>
                             <div class="input-field col m3 s12 step9">
                                 <select class="form-control" id="type_sales" name="type_sales">
-                                    <option value="1">Toko Offline</option>
-                                    <option value="2">Tokopedia</option>
-                                    <option value="3">Shopee</option>
-                                    <option value="4">Tiktok</option>
+                                    <option value="0">Toko Offline</option>
+                                    @foreach ($category as $row_category)
+                                        <option value="{{ $row_category->id }}">{{ $row_category->name }}</option>
+                                    @endforeach
                                 </select>
                                 <label class="" for="type_sales">Tipe Penjualan</label>
                             </div>
@@ -219,7 +219,7 @@
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Produk</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:3100px !important;" id="table-detail">
+                                        <table class="bordered" style="" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">{{ __('translations.delete') }}</th>
@@ -1220,7 +1220,7 @@
                     </a>
                 </td>
                 <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `');getPriceItem('` + count + `')"></select>
                 </td>
                 <td>
                     <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
@@ -1285,6 +1285,34 @@
             $("#unit_stock" + val).text('-');
         }
         countRow(val);
+    }
+
+    function getPriceItem(val){
+        if($("#arr_item" + val).val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_item_price',
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                data: {
+                    id: $("#arr_item" + val).select2('data')[0].id,
+                    type: $("#type_sales").val(),
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $("#rowPrice" + val).val(response.price);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 
     function countRow(id){
@@ -1354,7 +1382,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `');getPriceItem('` + count + `')"></select>
                                 </td>
                                 <td>
                                     <input name="arr_stock[]" onfocus="emptyThis(this);" id="qty_stock` + count + `" type="text" value="` + val.qty_stock + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" readonly>

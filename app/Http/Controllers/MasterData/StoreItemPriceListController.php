@@ -4,8 +4,10 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Models\StoreItemPriceList;
+use App\Models\StoreItemPriceListDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -81,9 +83,10 @@ class StoreItemPriceListController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->item->code.' '.$val->item->name,
-                    $val->price,
-                    $val->discount,
-                    $val->qty_discount,
+                    $val->item->getAttachmentHtmlAttribute(),
+                    number_format($val->price,2,',','.'),
+                    number_format($val->discount,2,',','.'),
+                    number_format($val->qty_discount,2,',','.'),
                     $val->start_date,
                     $val->end_date,
                     $val->status(),
@@ -135,12 +138,14 @@ class StoreItemPriceListController extends Controller
                     $query->item_id      = $request->item_id;
                     $query->start_date   = $request->start_date;
                     $query->end_date     = $request->end_date;
-                    $query->price        = str_replace(',', '.', str_replace('.', '', $request->price));
-                    $query->discount     = str_replace(',', '.', str_replace('.', '', $request->discount));
-                    $query->sell_price   = str_replace(',', '.', str_replace('.', '', $request->sell_price));
-                    $query->qty_discount = str_replace(',', '.', str_replace('.', '', $request->qty_discount));
+                    $query->price        = str_replace(',', '.', str_replace('.', '', $request->price??0));
+                    $query->discount     = str_replace(',', '.', str_replace('.', '', $request->discount??0));
+                    $query->sell_price   = str_replace(',', '.', str_replace('.', '', $request->sell_price??0));
+                    $query->qty_discount = str_replace(',', '.', str_replace('.', '', $request->qty_discount?? 0)) ;
                     $query->status       = $request->status ?? '1';
-
+                    if($query->storeItemPriceListDetail()->exists()){
+                        $query->storeItemPriceListDetail()->delete();
+                    }
                     $query->save();
 
                     DB::commit();
@@ -171,6 +176,18 @@ class StoreItemPriceListController extends Controller
 
 			if($query) {
 
+                if($request->arr_selling_category){
+                    foreach($request->arr_selling_category as $key => $row){
+                        StoreItemPriceListDetail::create([
+                            'store_item_price_list_id' => $query->id,
+                            'selling_category_id'      => $row,
+                            'price'                    => str_replace(',', '.', str_replace('.', '', $request->arr_price[$key])),
+                            'discount'                 => 0,
+                        ]);
+                    }
+
+                }
+
                 activity()
                     ->performedOn(new StoreItemPriceList())
                     ->causedBy(session('bo_id'))
@@ -194,7 +211,27 @@ class StoreItemPriceListController extends Controller
 
     public function show(Request $request){
         $StoreItemPriceList = StoreItemPriceList::find($request->id);
-        $StoreItemPriceList['item_name'] = $StoreItemPriceList->item->code.'-'.$StoreItemPriceList->item->name;
+        $detail = [];
+        $StoreItemPriceList['item_name']    = $StoreItemPriceList->item->code.'-'.$StoreItemPriceList->item->name;
+        $url = $StoreItemPriceList->item->document && Storage::exists($StoreItemPriceList->item->document)
+            ? asset(Storage::url($StoreItemPriceList->item->document))
+            : asset('website/empty.jpg');
+        $StoreItemPriceList['document_url'] = $url;
+        $StoreItemPriceList['price']        = number_format($StoreItemPriceList->price ?? 0,2,',','.');
+        $StoreItemPriceList['discount']     = number_format($StoreItemPriceList->discount ?? 0,2,',','.');
+        $StoreItemPriceList['qty_discount'] = number_format($StoreItemPriceList->qty_discount?? 0,2,',','.') ;
+        $StoreItemPriceList['sell_price']   = number_format($StoreItemPriceList->sell_price?? 0,2,',','.') ;
+        if($StoreItemPriceList->storeItemPriceListDetail()->exists()){
+            foreach($StoreItemPriceList->storeItemPriceListDetail as $row){
+                $detail[] = [
+                    'store_item_price_list_id' => $StoreItemPriceList->id,
+                    'price'                    => number_format($row->price,2,',','.') ?? 0,
+                    'category'                 => $row->selling_category_id,
+                    'category_name'            => $row->sellingCategory->name,
+                ];
+            }
+        }
+        $StoreItemPriceList['detail']=$detail;
 		return response()->json($StoreItemPriceList);
     }
 

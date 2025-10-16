@@ -26,6 +26,9 @@ class StoreItemPriceList extends Model
         'status',
     ];
 
+    public function storeItemPriceListDetail(){
+        return $this->hasMany('App\Models\StoreItemPriceListDetail');
+    }
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }

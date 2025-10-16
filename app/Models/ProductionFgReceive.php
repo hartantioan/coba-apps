@@ -108,7 +108,7 @@ class ProductionFgReceive extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-    
+
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
@@ -194,12 +194,12 @@ class ProductionFgReceive extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -295,7 +295,7 @@ class ProductionFgReceive extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -365,7 +365,7 @@ class ProductionFgReceive extends Model
             if($query){
                 SendApproval::dispatch($query->getTable(),$query->id,'Production Issue No. '.$query->code,$this->user_id);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,$this->user_id);
-    
+
                 activity()
                     ->performedOn(new ProductionIssue())
                     ->causedBy($this->user_id)
@@ -378,7 +378,7 @@ class ProductionFgReceive extends Model
 
         $adaSupporting = false;
         foreach($this->productionFgReceiveDetail as $key => $row){
-            
+
             $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
                 $query->where('item_id',$row->item_id)->orderByDesc('created_at');
             })->whereNotNull('is_default')->first();
@@ -394,10 +394,10 @@ class ProductionFgReceive extends Model
                 }
             }
         }
-        
+
         if($adaSupporting){
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
-        
+
             $query = ProductionIssue::create([
                 'code'			            => $newCode,
                 'user_id'		            => $this->user_id,
@@ -469,7 +469,7 @@ class ProductionFgReceive extends Model
             $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
                 $query->where('item_id',$row)->orderByDesc('created_at');
             })->whereNotNull('is_default')->first();
-    
+
             if($bomAlternative){
                 foreach($bomAlternative->bomDetail as $rowbom){
                     $nominal = 0;
@@ -523,7 +523,7 @@ class ProductionFgReceive extends Model
                         }
                     }
                 }
-    
+
                 if($bomAlternative->bom->bomStandard()->exists()){
                     foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
                         $nominal = 0;
@@ -591,10 +591,10 @@ class ProductionFgReceive extends Model
                     return $index;
                 }
             }
-        }  
+        }
         return -1;
      }
-    
+
     public function recalculate(){
         $totalCost = 0;
         $totalQty = 0;
@@ -608,7 +608,7 @@ class ProductionFgReceive extends Model
                 $totalCost += $rowdetail->total;
             }
         }
-        
+
         $total = $totalCost;
         $price = $totalCost / $totalQty;
         $totalData = count($this->productionFgReceiveDetail);
@@ -656,13 +656,13 @@ class ProductionFgReceive extends Model
                         $rowdetailkuy->delete();
                     }
                 }
-    
+
                 activity()
                     ->performedOn(new ProductionIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($row)
                     ->log('Void the production issue data from production receive');
-    
+
                 CustomHelper::sendNotification($row->getTable(),$row->id,'Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive FG '.$this->code.'.','Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive FG '.$this->code.'.',$row->user_id);
                 CustomHelper::removeApproval($row->getTable(),$row->id);
             }

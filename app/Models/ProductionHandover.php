@@ -101,12 +101,12 @@ class ProductionHandover extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
@@ -202,7 +202,7 @@ class ProductionHandover extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -266,7 +266,7 @@ class ProductionHandover extends Model
                     'total'                             => $rowcost,
                     'item_shading_id'                   => $itemShading->id,
                 ]);
-                
+
                 ProductionBatchUsage::create([
                     'production_batch_id'   => $prfgd->productionBatch->id,
                     'lookable_type'         => $querydetail->getTable(),

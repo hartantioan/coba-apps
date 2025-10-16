@@ -223,6 +223,7 @@ class ItemController extends Controller
                     $nomor,
                     $val->code,
                     $val->name??'',
+                    $val->getAttachmentHtmlAttribute(),
                     $val->itemGroup->name??'',
                     $val->uomUnit->code??'',
                     $val->status(),
@@ -276,6 +277,7 @@ class ItemController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
+
                     $query = Item::find($request->temp);
                     /* if($query->hasChildDocument()){
                         return response()->json([
@@ -283,17 +285,28 @@ class ItemController extends Controller
                             'message' => 'Pengeditan item tidak dapat dilakukan. Masih terdapat dokumen yang terkait dengan item tersebut.'
                         ]);
                     } */
-                    $query->code                = $request->code;
-                    $query->name                = $request->name;
-                    $query->item_group_id       = $request->item_group_id;
-                    $query->uom_unit            = $request->uom_unit;
-                    $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
-                    $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
-                    $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
-                    $query->is_service          = $request->is_service ? $request->is_service : NULL;
-                    $query->note                = $request->note;
-                    $query->supplier_id                = $request->supplier_id ?? null;
-                    $query->status              = $request->status ? $request->status : '2';
+                   if($request->has('document')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('document')->store('public/items');
+                    } else {
+                        $document = $query->document;
+                    }
+                    $query->code              = $request->code;
+                    $query->name              = $request->name;
+                    $query->item_group_id     = $request->item_group_id;
+                    $query->uom_unit          = $request->uom_unit;
+                    $query->is_inventory_item = $request->is_inventory_item ? $request->is_inventory_item : NULL;
+                    $query->is_sales_item     = $request->is_sales_item ? $request->is_sales_item : NULL;
+                    $query->is_purchase_item  = $request->is_purchase_item ? $request->is_purchase_item : NULL;
+                    $query->is_service        = $request->is_service ? $request->is_service : NULL;
+                    $query->note              = $request->note;
+                    $query->supplier_id       = $request->supplier_id ?? null;
+                    $query->status            = $request->status ? $request->status : '2';
+                    $query->document          = $document;
                     $query->save();
 
                     if($request->arr_item_conversion){
@@ -310,7 +323,7 @@ class ItemController extends Controller
                 try {
                     $query = Item::create([
                         'code'              => $request->code,
-                        'name'			    => $request->name,
+                        'name'              => $request->name,
                         'item_group_id'     => $request->item_group_id,
                         'uom_unit'          => $request->uom_unit,
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
@@ -318,7 +331,7 @@ class ItemController extends Controller
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
                         'note'              => $request->note,
-                        'status'            => $request->status ? $request->status : '2',
+                        'document'          => $request->file('document') ? $request->file('document')->store('public/material_requests') : NULL,
 
                     ]);
 
@@ -607,6 +620,7 @@ class ItemController extends Controller
         $item['uom_code'] = $item->uomUnit->code;
         $item['supplier_name'] = $item->supplier?->name ?? null;
         $item['supplier_code'] = $item->supplier?->code ?? null;
+        $item['document_url'] = asset(Storage::url($item->document));
 
         $units = [];
         if($item->childrenConversion()->exists()){
@@ -647,9 +661,8 @@ class ItemController extends Controller
     public function destroy(Request $request){
         $query = Item::find($request->id);
 
-        if(!$query->hasChildDocument()){
+        if(!$query){
             if($query->delete()) {
-                $query->itemStock()->delete();
                 activity()
                     ->performedOn(new Item())
                     ->causedBy(session('bo_id'))

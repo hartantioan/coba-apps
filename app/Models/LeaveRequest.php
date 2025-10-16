@@ -59,17 +59,17 @@ class LeaveRequest extends Model
         return $this->belongsTo('App\Models\LeaveType','leave_type_id','id');
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;
     }
-    
+
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
         if($source){

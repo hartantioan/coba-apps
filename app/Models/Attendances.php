@@ -46,7 +46,7 @@ class Attendances extends Model
         if($this->image !== NULL && Storage::exists($this->image)) {
             $document_po = asset(Storage::url($this->image));
         } else {
-            $document_po = asset('website/empty.png');
+            $document_po = asset('website/empty.jpg');
         }
 
         return $document_po;

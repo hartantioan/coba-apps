@@ -7,11 +7,14 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ItemMove;
+use App\Models\StoreItemPriceList;
 use App\Models\ItemStockNew;
 use App\Models\Menu;
+use App\Models\SellingCategory;
 use App\Models\MenuUser;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderDetail;
+use App\Models\StoreItemPriceListDetail;
 use App\Models\UsedData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -35,6 +38,7 @@ class SalesOrderController extends Controller
             'content'   => 'admin.sales.sales_order',
             'newcode'   => $document_code,
             'menucode'  => $menu->document_code,
+            'category'  => SellingCategory::where('status',1)->get(),
             'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
@@ -771,6 +775,35 @@ class SalesOrderController extends Controller
     //     $nominal = $menuUser->show_nominal ?? '';
 	// 	return Excel::download(new ExportGoodReceipt($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     // }
+
+    public function getItemPrice(Request $request){
+        $price = 0;
+        info($request);
+        if($request->type ==0 ){
+            $pr = StoreItemPriceList::where('item_id',$request->id)->first();
+            $price = number_format($pr->sell_price?? 0,2,',','.');
+        }else{
+            $pr = StoreItemPriceListDetail::where('selling_category_id',$request->type)
+                ->whereHas('StoreItemPriceList',function($query) use($request){
+                    $query->where('item_id',$request->id);
+                })->first();
+            if(!$pr){
+                $second = StoreItemPriceList::where('item_id',$request->id)->first();
+                if($second){
+                    $price = number_format($second->sell_price?? 0,2,',','.');
+                }
+            }else{
+                $price = number_format($pr->price?? 0,2,',','.');
+            }
+        }
+        $response = [
+            'status'  => 200,
+            'price'   => $price,
+            'message' => 'Data updated successfully.'
+        ];
+        info($response);
+        return response()->json($response);
+    }
 
     public function exportFromTransactionPage(Request $request){
         $search = $request->search? $request->search : '';

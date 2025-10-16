@@ -126,7 +126,7 @@ class SampleTestInput extends Model
         if($this->document_test_result !== NULL && Storage::exists($this->document_test_result)) {
             $document = asset(Storage::url($this->document_test_result));
         } else {
-            $document = asset('website/empty.png');
+            $document = asset('website/empty.jpg');
         }
 
         return $document;

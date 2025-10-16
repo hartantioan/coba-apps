@@ -44,7 +44,7 @@ class PersonalVisit extends Model
         if($this->image_in !== NULL && Storage::exists($this->image_in)) {
             $document_po = asset(Storage::url($this->image_in));
         } else {
-            $document_po = asset('website/empty.png');
+            $document_po = asset('website/empty.jpg');
         }
 
         return $document_po;
@@ -55,7 +55,7 @@ class PersonalVisit extends Model
         if($this->image_out !== NULL && Storage::exists($this->image_out)) {
             $document_po = asset(Storage::url($this->image_out));
         } else {
-            $document_po = asset('website/empty.png');
+            $document_po = asset('website/empty.jpg');
         }
 
         return $document_po;

@@ -349,4 +349,13 @@
 
     }
 
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search  + "&end_date=" + end_date + "&start_date=" + start_date + "&store_customer_id=" + null;
+
+    }
 </script>

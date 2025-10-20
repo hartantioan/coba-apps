@@ -4,8 +4,9 @@ namespace App\Exports;
 
 use App\Models\Invoice;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ExportInvoiceStore implements FromCollection
+class ExportInvoiceStore implements FromCollection,WithHeadings
 {
     protected $search,$post_date,$end_date,$store_customer_id;
 

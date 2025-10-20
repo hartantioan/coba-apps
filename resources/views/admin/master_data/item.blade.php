@@ -185,6 +185,7 @@
                                                         <th>Image</th>
                                                         <th>Harga Jual</th>
                                                         <th>Grup</th>
+                                                        <th>Qty</th>
                                                         <th>UOM</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -324,6 +325,14 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="input-field col s12 m8">
+                                <div style="display: flex; gap: 1rem; align-items: center;">
+                                    <p><strong>HPP:</strong> <span id="hpp_item">-</span></p>
+                                    <p><strong>Sell Price:</strong> <span id="sell_price_item">-</span></p>
+                                    <p><strong>Stock:</strong> <span id="stock_item">-</span></p>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="col s12 m4 row">
                             <div class="input-field col s12" style="margin:0 0 0 0 !important;">
@@ -1115,6 +1124,7 @@
                 { name: 'group', className: '' },
                 { name: 'image', className: '' },
                 { name: 'sell_price', className: '' },
+                { name: 'qty', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -1427,6 +1437,9 @@
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
                 $('.stock-unit').text(response.uom_code);
+                $('#sell_price_item').text(response.sell_price_item);
+                $('#hpp_item').text(response.hpp_item);
+                $('#stock_item').text(response.stock_item);
 
                 if(response.is_inventory_item == '1'){
                     $('#is_inventory_item').prop( "checked", true);

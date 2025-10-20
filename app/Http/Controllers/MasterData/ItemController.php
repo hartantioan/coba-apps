@@ -225,7 +225,8 @@ class ItemController extends Controller
                     $val->name??'',
                     $val->getAttachmentHtmlAttribute(),
                     $val->getPriceLatest(),
-                    $val->itemGroup->name??'',
+                    $val->itemGroup->name ?? '',
+                    number_format($val->itemStockNew?->qty ?? 0,0,',','.') ,
                     $val->uomUnit->code??'',
                     $val->status(),
                     '
@@ -622,6 +623,9 @@ class ItemController extends Controller
         $item['supplier_name'] = $item->supplier?->name ?? null;
         $item['supplier_code'] = $item->supplier?->code ?? null;
         $item['document_url'] = asset(Storage::url($item->document));
+        $item['sell_price_item'] = $item->getPriceLatest();
+        $item['hpp_item'] = $item->getPriceHPPLatest();
+        $item['stock_item'] = $item->itemStockNew?->qty ?? 0;
 
         $units = [];
         if($item->childrenConversion()->exists()){

@@ -123,6 +123,17 @@ class Item extends Model
         return $price;
     }
 
+    public function getPriceHPPLatest()
+    {
+        $storeItemPriceList = $this->storeItemPriceList()->first();
+        if($storeItemPriceList){
+            $price = number_format($storeItemPriceList->price,2,',','.');
+        }else{
+            $price = 'tidak ada master harga HPP pada item ini';
+        }
+        return $price;
+    }
+
     public function getURLDocument(){
         $url = $this->document && Storage::exists($this->document)
             ? asset(Storage::url($this->document))

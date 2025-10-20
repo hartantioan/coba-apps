@@ -67,6 +67,7 @@ class StockItemController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->item->name,
+                    $val->item->getPriceLatest(),
                     $val->qty,
                 ];
 

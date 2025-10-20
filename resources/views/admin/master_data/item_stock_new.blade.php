@@ -80,6 +80,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Item</th>
+                                                        <th>Harga Jual</th>
                                                         <th>QTY</th>
                                                     </tr>
                                                 </thead>
@@ -302,6 +303,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
+                { name: 'price', className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

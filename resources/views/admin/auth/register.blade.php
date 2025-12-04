@@ -13,7 +13,7 @@
     {{-- <!-- hilangkan ini bahaya -->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
-    <title>Register | Superior Porcelain Sukses</title>
+    <title>Register </title>
     <link rel="apple-touch-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small1.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
